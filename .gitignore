@@ -7,8 +7,11 @@ data/synthetic_*.json
 data/validation_package/
 *.log
 checkpoints/
+checkpoints_danon/
 diagnostics/
+diagnostics_danon/
 trained_models/
 colab_data.zip
 kaggle_output/
 .kaggle/
+legacy/
