@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+data/_remote_cache/
+data/real_screening_*.json
+data/synthetic_*.json
+data/validation_package/
+*.log
+checkpoints/
+diagnostics/
+trained_models/
+colab_data.zip
+kaggle_output/
+.kaggle/

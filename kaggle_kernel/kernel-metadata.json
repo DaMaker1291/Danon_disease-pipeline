@@ -1,0 +1,14 @@
+{
+  "id": "yjfdityc/longevity-pipeline-full-gpu-training",
+  "title": "Longevity Pipeline - Full GPU Training",
+  "code_file": "kaggle_training.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": false,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "yjfdityc/longevity-real-data"
+  ],
+  "kernelsources": []
+}

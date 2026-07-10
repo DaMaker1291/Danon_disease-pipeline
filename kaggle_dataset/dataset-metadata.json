@@ -1,0 +1,10 @@
+{
+  "title": "Longevity Pipeline - Real Screening Data",
+  "id": "yjfdityc/longevity-real-data",
+  "licenses": [
+    {
+      "name": "CC0-1.0"
+    }
+  ],
+  "description": "Real screening data for longevity drug discovery pipeline. Includes 100K AAV capsid variants (Fit4Function/Harvard Church Lab), 773 LNP formulations (LNPDB), with fitness scores, tissue tropism, immune escape scores, and antibody response data."
+}

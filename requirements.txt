@@ -1,0 +1,45 @@
+# Core ML / Protein Language Models
+torch>=2.1.0
+fair-esm>=2.0.0
+transformers>=4.35.0
+
+# Chemistry / LNP Design
+rdkit>=2023.9.0
+deepchem>=2.8.0
+
+# Bioinformatics
+biopython>=1.81
+numpy>=1.24.0
+scipy>=1.11.0
+pandas>=2.1.0
+scanpy>=1.9.0
+
+# Distributed Computing
+ray[default]>=2.9.0
+mpi4py>=3.1.0
+dask[distributed]>=2023.12.0
+
+# Supercomputer / HPC Integration
+slurm-jobmanager>=0.2.0
+kubernetes>=28.0.0
+
+# Lab Automation
+pyopentrons>=3.0.0
+
+# Sequencing Analysis
+pysam>=0.22.0
+cutadapt>=4.6.0
+
+# Bayesian Optimization for Feedback Loop
+scikit-optimize>=0.10.0
+botorch>=0.10.0
+gpytorch>=1.11.0
+
+# Infrastructure
+pydantic>=2.5.0
+pyyaml>=6.0.0
+aiohttp>=3.9.0
+tqdm>=4.66.0
+h5py>=3.10.0
+lz4>=4.3.0
+msgpack>=1.0.0
