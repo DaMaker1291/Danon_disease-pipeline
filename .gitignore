@@ -16,3 +16,6 @@ kaggle_output/
 kaggle_upload/
 .kaggle/
 legacy/
+
+experimental_history.json
+*.gb
