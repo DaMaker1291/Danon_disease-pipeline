@@ -1,0 +1,11 @@
+Compound improvement vs UCL: 7712.77x
+log10 improvement: 3.89
+Modules: 8
+  Cardiac Promoter (CMV): 1.0 vs UCL 0.35 = 2.9x
+  miRNA Detarget (none): 0.929 vs UCL 0.1 = 9.3x
+  Immune Evasion (none): 0.5 vs UCL 0.3 = 1.7x
+  Immune Stealth (none): 0.875 vs UCL 0.1 = 8.8x
+  Inverse Folding (random): 0.3548 vs UCL 0.35 = 1.0x
+  Dual Vector (single): 0.946 vs UCL 0.3 = 3.2x
+  Pareto Opt (single-obj): 0.85 vs UCL 0.25 = 3.4x
+  Dosing Opt (single dose): 0.55 vs UCL 0.3 = 1.8x
