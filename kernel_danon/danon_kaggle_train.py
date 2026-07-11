@@ -193,7 +193,8 @@ class LNPDanonDataset(Dataset):
 
 class ImmuneDanonDataset(Dataset):
     def __init__(self, data, max_len=50):
-        self.data = data
+        self.data = [d for d in data if isinstance(d.get("total_escape_score", 0.5), (int, float))
+                     and not math.isnan(d.get("total_escape_score", 0.5))]
         self.max_len = max_len
         self.antibodies = ["AAV2_Ab4", "AAV2_Ab58", "AAV8_Ab1", "AAV9_Ab3",
                            "human_IgG_pool", "human_IgM_pool", "anti-AAV9_serum"]
@@ -209,21 +210,26 @@ class ImmuneDanonDataset(Dataset):
             if aa in AA_TO_IDX:
                 encoded[i] = AA_TO_IDX[aa]
 
+        def safe_float(val, default):
+            if isinstance(val, (int, float)) and not math.isnan(val) and not math.isinf(val):
+                return float(val)
+            return default
+
         ab_responses = item.get("antibody_responses", {})
         escape_scores = torch.tensor(
-            [ab_responses.get(ab, {}).get("escape_score", 0.5) for ab in self.antibodies],
+            [safe_float(ab_responses.get(ab, {}).get("escape_score"), 0.5) for ab in self.antibodies],
             dtype=torch.float32
-        )
+        ).clamp(0.001, 0.999)
         binding_energies = torch.tensor(
-            [ab_responses.get(ab, {}).get("binding_energy", -5.0) for ab in self.antibodies],
+            [safe_float(ab_responses.get(ab, {}).get("binding_energy"), -5.0) for ab in self.antibodies],
             dtype=torch.float32
         )
         return {
             "sequence": encoded,
             "escape_scores": escape_scores,
             "binding_energies": binding_energies,
-            "total_escape": torch.tensor(item.get("total_escape_score", 0.5), dtype=torch.float32),
-            "neutralization_resistance": torch.tensor(item.get("neutralization_resistance", 0.5), dtype=torch.float32),
+            "total_escape": torch.tensor(safe_float(item.get("total_escape_score"), 0.5), dtype=torch.float32).clamp(0.001, 0.999),
+            "neutralization_resistance": torch.tensor(safe_float(item.get("neutralization_resistance"), 0.5), dtype=torch.float32).clamp(0.001, 0.999),
         }
 
 # ========================= MODELS (same architecture, Danon heads) =========================
@@ -406,13 +412,29 @@ class ImmuneEscapeLoss(nn.Module):
     def __init__(self):
         super().__init__()
         self.mse = nn.MSELoss()
-        self.bce = nn.BCELoss()
+        self.bce = nn.BCELoss(reduction='none')
 
     def forward(self, pred, target):
-        escape_loss = self.bce(pred["escape_scores"].clamp(0.001, 0.999), target["escape_scores"])
-        binding_loss = self.mse(pred["binding_energies"], target["binding_energies"])
-        total_loss = self.bce(pred["total_escape"].clamp(0.001, 0.999), target["total_escape"])
-        resistance_loss = self.bce(pred["resistance"].clamp(0.001, 0.999), target["neutralization_resistance"])
+        esc_pred = pred["escape_scores"].clamp(0.001, 0.999)
+        esc_target = target["escape_scores"].clamp(0.001, 0.999)
+        escape_mask = torch.isfinite(esc_target)
+        escape_loss = (self.bce(esc_pred, esc_target) * escape_mask.float()).sum() / max(escape_mask.sum(), 1)
+
+        bind_pred = pred["binding_energies"]
+        bind_target = target["binding_energies"]
+        bind_mask = torch.isfinite(bind_target)
+        binding_loss = (self.mse(bind_pred * bind_mask.float(), bind_target * bind_mask.float()) * bind_mask.float()).sum() / max(bind_mask.sum(), 1)
+
+        tot_pred = pred["total_escape"].clamp(0.001, 0.999)
+        tot_target = target["total_escape"].clamp(0.001, 0.999)
+        tot_mask = torch.isfinite(tot_target)
+        total_loss = (self.bce(tot_pred, tot_target) * tot_mask.float()).sum() / max(tot_mask.sum(), 1)
+
+        res_pred = pred["resistance"].clamp(0.001, 0.999)
+        res_target = target["neutralization_resistance"].clamp(0.001, 0.999)
+        res_mask = torch.isfinite(res_target)
+        resistance_loss = (self.bce(res_pred, res_target) * res_mask.float()).sum() / max(res_mask.sum(), 1)
+
         total = escape_loss + 0.5 * binding_loss + total_loss + resistance_loss
         return {"total": total, "escape": escape_loss, "binding": binding_loss,
                 "total_escape": total_loss, "resistance": resistance_loss}

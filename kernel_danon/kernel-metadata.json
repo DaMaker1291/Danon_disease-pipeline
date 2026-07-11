@@ -1,6 +1,6 @@
 {
-  "id": "yjfdityc/danon-finetune-v2",
-  "title": "Danon Disease Fine-Tune v2",
+  "id": "yjfdityc/danon-finetune-fixed",
+  "title": "Danon AAV9 LAMP2B Fixed",
   "code_file": "danon_kaggle_train.py",
   "language": "python",
   "kernel_type": "script",
