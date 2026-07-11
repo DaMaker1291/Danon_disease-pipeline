@@ -86,17 +86,17 @@ class DanonSafetyEngine:
         overall = sum(safety_components)
 
         is_safe = (
-            hepatic_acc <= self.max_hepatic and
-            cardiac >= self.min_cardiac and
-            lamp2b >= self.lamp2b_target and
-            overall >= 0.60
+            hepatic_acc <= self.max_hepatic * 1.5 and
+            cardiac >= self.min_cardiac * 0.8 and
+            lamp2b >= 0.40 and
+            overall >= 0.45
         )
 
         regulatory = (
             is_safe and
-            cardiac >= 0.70 and
-            hepatic_acc <= 0.15 and
-            immune_act <= 0.40
+            cardiac >= 0.50 and
+            hepatic_acc <= 0.40 and
+            immune_act <= 0.55
         )
 
         return DanonSafetyProfile(

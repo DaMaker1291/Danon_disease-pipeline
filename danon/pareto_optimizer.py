@@ -34,8 +34,8 @@ class ParetoOptimizer:
             "hepatic_avoidance",
             "immune_evasion",
             "lamp2b_expression",
-            "promoter_specificity",
-            "mirna_safety",
+            "promoter_score",
+            "mirna_score",
         ]
 
     def pareto_rank(self, points: List[ParetoPoint]) -> List[ParetoPoint]:

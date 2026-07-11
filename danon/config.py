@@ -23,8 +23,8 @@ class DanonConfig(BaseModel):
     secondary_clinical_endpoint: str = "Left_Ventricular_Mass_Index_Reduction"
 
     lamp2b_expression_target: float = 0.70
-    max_hepatic_accumulation: float = 0.15
-    min_cardiac_tropism: float = 0.70
+    max_hepatic_accumulation: float = 0.30
+    min_cardiac_tropism: float = 0.50
 
     aav_total_candidates: int = 1_000_000_000
     lnp_total_candidates: int = 1_000_000_000

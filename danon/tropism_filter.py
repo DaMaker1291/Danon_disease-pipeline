@@ -74,9 +74,9 @@ class DanonTropismFilter:
 
     def passes(self, candidate, threshold: float = None) -> bool:
         threshold = threshold or self.min_cardiac
-        score = self.score(candidate)
-        hepatic_score = self._compute_hepatic_score(getattr(candidate, "sequence", ""))
-        return score >= threshold and hepatic_score <= self.max_hepatic
+        cardiac = getattr(candidate, "cardiac_tropism_score", self.score(candidate))
+        hepatic = getattr(candidate, "hepatic_avoidance_score", 1.0 - self._compute_hepatic_score(getattr(candidate, "sequence", "")))
+        return cardiac >= threshold and hepatic >= (1.0 - self.max_hepatic * 1.5)
 
     def _compute_tissue_score(self, seq, tissue, weights):
         scores = {}

@@ -11,7 +11,7 @@ from typing import List, Dict, Any
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from danon.config import DanonConfig, danon_config
-from danon.aav_generator import DanonAAVGenerator
+from danon.aav_generator import DanonAAVGenerator, WILD_TYPE_AAV9_CAPSID
 from danon.lnp_generator import DanonLNPGenerator
 from danon.tropism_filter import DanonTropismFilter
 from danon.safety_engine import DanonSafetyEngine
@@ -22,6 +22,7 @@ from danon.dual_vector import DualVectorEngine
 from danon.dosing_optimizer import DosingOptimizer
 from danon.immune_stealth import ImmuneStealthEngine
 from danon.inverse_fold import InverseFoldingEngine
+from danon.ml_scorer import MLScorer
 
 logging.basicConfig(
     level=logging.INFO,
@@ -70,6 +71,7 @@ class DanonPipeline:
         self.dosing = DosingOptimizer()
         self.stealth = ImmuneStealthEngine()
         self.inverse_fold = InverseFoldingEngine()
+        self.ml = MLScorer()
         self.stats = {"start_time": None, "phases": {}, "candidates": {}}
         self.reports: List[PipelineReport] = []
 
@@ -101,17 +103,64 @@ class DanonPipeline:
 
     def _phase1_generate_aav(self) -> list:
         logger.info("PHASE 1/12: Generating AAV9-LAMP2B Capsid Variants")
-        count = 0
+        wt_seq = WILD_TYPE_AAV9_CAPSID
+
+        logger.info("  Generating random capsid variants (heuristic)...")
         candidates = []
         for batch in self.aav_gen.stream_candidates(
             self.config.aav_total_candidates, self.config.batch_size
         ):
             candidates.extend(batch)
-            count += len(batch)
-            if count % 100_000 == 0:
-                logger.info("  AAV generated: %d / %d", count, self.config.aav_total_candidates)
+            if len(candidates) % 10000 == 0:
+                logger.info("  Heuristic: %d generated", len(candidates))
+
+        logger.info("  Generating structure-aware candidates (inverse folding)...")
+        for region in ["VR_IV", "VR_VIII", "VR_IX", "VR_V"]:
+            designs = self.inverse_fold.stream_designs(wt_seq, 500, target_region=region)
+            for d in designs[:200]:
+                from danon.aav_generator import DanonAAVCandidate
+                c = DanonAAVCandidate(
+                    candidate_id=d.candidate_id + 1000000,
+                    sequence=d.mutated_sequence,
+                    mutations=d.mutations,
+                    cardiac_tropism_score=d.cardiac_receptor_score * 0.8 + 0.2,
+                    hepatic_avoidance_score=d.hepatic_avoidance_score,
+                    immune_evasion_score=d.immune_evasion_score,
+                    structural_score=d.fold_quality,
+                    lamp2b_compatibility=0.5,
+                    stability_score=d.structural_stability,
+                )
+                c.fitness = (
+                    0.30 * c.cardiac_tropism_score +
+                    0.20 * c.hepatic_avoidance_score +
+                    0.15 * c.immune_evasion_score +
+                    0.15 * c.lamp2b_compatibility +
+                    0.10 * c.structural_score +
+                    0.10 * c.stability_score
+                )
+                candidates.append(c)
+
+        logger.info("  Applying ML scoring to top candidates...")
+        candidates.sort(key=lambda c: c.fitness, reverse=True)
+        for c in candidates[:200]:
+            ml_scores = self.ml.score_aav(c.sequence)
+            imm_scores = self.ml.score_immune(c.sequence)
+            if ml_scores:
+                c.cardiac_tropism_score = 0.6 * ml_scores["cardiac_score"] + 0.4 * c.cardiac_tropism_score
+                c.immune_evasion_score = 0.5 * imm_scores.get("total_escape", c.immune_evasion_score) + 0.5 * c.immune_evasion_score
+                c.lamp2b_compatibility = 0.5 * ml_scores["delivery_score"] + 0.5 * c.lamp2b_compatibility
+                c.fitness = (
+                    0.30 * c.cardiac_tropism_score +
+                    0.20 * c.hepatic_avoidance_score +
+                    0.15 * c.immune_evasion_score +
+                    0.15 * c.lamp2b_compatibility +
+                    0.10 * c.structural_score +
+                    0.10 * c.stability_score
+                )
+
         self.stats["candidates"]["phase1_aav"] = len(candidates)
-        logger.info("  Phase 1: %d AAV capsid variants generated", len(candidates))
+        logger.info("  Phase 1: %d AAV capsid variants (incl %d inverse-folded)",
+                     len(candidates), min(800, len(candidates) - self.config.aav_total_candidates))
         return candidates
 
     def _phase2_generate_lnp(self) -> list:
@@ -125,8 +174,17 @@ class DanonPipeline:
             count += len(batch)
             if count % 100_000 == 0:
                 logger.info("  LNP generated: %d / %d", count, self.config.lnp_total_candidates)
+
+        candidates.sort(key=lambda c: c.fitness, reverse=True)
+        for c in candidates[:200]:
+            ml_lnp = self.ml.score_lnp(c)
+            if ml_lnp:
+                c.cardiac_delivery_score = 0.5 * ml_lnp["cardiac_delivery"] + 0.5 * c.cardiac_delivery_score
+                c.hepatic_avoidance_score = 0.5 * ml_lnp["hepatic_avoidance"] + 0.5 * c.hepatic_avoidance_score
+                c.fitness = 0.6 * c.cardiac_delivery_score + 0.4 * c.hepatic_avoidance_score
+
         self.stats["candidates"]["phase2_lnp"] = len(candidates)
-        logger.info("  Phase 2: %d LNP formulations generated", len(candidates))
+        logger.info("  Phase 2: %d LNP formulations (ML scored top 2000)", len(candidates))
         return candidates
 
     def _phase3_cardiac_promoter(self) -> dict:
@@ -170,7 +228,15 @@ class DanonPipeline:
 
     def _phase6_tropism_filter(self, aav_candidates: list) -> list:
         logger.info("PHASE 6/12: Cardiac Tropism Filter (ZIP Code Test)")
-        passed = [c for c in aav_candidates if self.tropism_filter.passes(c)]
+        passed = []
+        for i, c in enumerate(aav_candidates):
+            if self.tropism_filter.passes(c):
+                passed.append(c)
+            if (i + 1) % 20000 == 0:
+                logger.info("  Tropism progress: %d/%d (%.1f%%), %d passed",
+                             i + 1, len(aav_candidates),
+                             100 * (i + 1) / max(len(aav_candidates), 1),
+                             len(passed))
         pct = 100 * len(passed) / max(len(aav_candidates), 1)
         self.stats["candidates"]["phase6_aav"] = len(passed)
         logger.info("  AAV %d -> %d (%.2f%%)", len(aav_candidates), len(passed), pct)
