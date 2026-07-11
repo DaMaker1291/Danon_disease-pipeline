@@ -1,6 +1,6 @@
 {
-  "id": "yjfdityc/danon-disease-fine-tune",
-  "title": "Danon Disease - Model Fine-Tuning (AAV9-LAMP2B)",
+  "id": "yjfdityc/danon-finetune-v2",
+  "title": "Danon Disease Fine-Tune v2",
   "code_file": "danon_kaggle_train.py",
   "language": "python",
   "kernel_type": "script",
