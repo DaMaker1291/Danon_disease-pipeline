@@ -1,0 +1,14 @@
+[
+  {
+    "candidate_id": 167,
+    "round_number": 0,
+    "predicted_cardiac_tropism": 0.84,
+    "predicted_hepatic_avoidance": 0.5,
+    "predicted_immune_evasion": 0.48,
+    "predicted_lamp2b": 0.5312,
+    "predicted_fitness": 0.7438,
+    "actual": null,
+    "error_cardiac": null,
+    "error_hepatic": null
+  }
+]

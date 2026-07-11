@@ -23,6 +23,9 @@ from danon.dosing_optimizer import DosingOptimizer
 from danon.immune_stealth import ImmuneStealthEngine
 from danon.inverse_fold import InverseFoldingEngine
 from danon.ml_scorer import MLScorer
+from danon.construct_builder import ConstructBuilder
+from danon.clinical_simulator import ClinicalSimulator
+from danon.active_learner import ActiveLearner, ExperimentalResult
 
 logging.basicConfig(
     level=logging.INFO,
@@ -72,6 +75,9 @@ class DanonPipeline:
         self.stealth = ImmuneStealthEngine()
         self.inverse_fold = InverseFoldingEngine()
         self.ml = MLScorer()
+        self.construct_builder = ConstructBuilder()
+        self.clinical = ClinicalSimulator()
+        self.learner = ActiveLearner()
         self.stats = {"start_time": None, "phases": {}, "candidates": {}}
         self.reports: List[PipelineReport] = []
 
@@ -96,10 +102,13 @@ class DanonPipeline:
         phase11 = self._phase11_pareto_optimize(phase10, phase3, phase4)
         winners = self._phase12_dosing_select(phase11, phase3, phase4)
 
+        phase13 = self._phase13_clinical_output(winners, phase3, phase4)
+        phase14 = self._phase14_active_learning(winners)
+
         self.stats["end_time"] = datetime.now().isoformat()
         self._generate_comprehensive_report(winners, phase3, phase4)
         self._print_summary()
-        return winners
+        return {**winners, "clinical": phase13, "active_learning": phase14}
 
     def _phase1_generate_aav(self) -> list:
         logger.info("PHASE 1/12: Generating AAV9-LAMP2B Capsid Variants")
@@ -388,6 +397,113 @@ class DanonPipeline:
             },
         }
         return winners
+
+    def _phase13_clinical_output(self, winners: dict,
+                                  promoter_data: dict,
+                                  mirna_data: dict) -> dict:
+        logger.info("PHASE 13/14: Clinical Output & Construct Synthesis")
+
+        synthetic_candidates = winners["aav"][:5]
+        constructs = []
+        for i, c in enumerate(synthetic_candidates):
+            cb = ConstructBuilder(
+                promoter_name="MHC_promoter_with_cardiac_super_enhancer_MHC_enhancer_1",
+                add_mirna_detarget=True,
+            )
+            construct = cb.build_construct(capsid_id=c["candidate_id"])
+            constructs.append(construct)
+            path = os.path.join(self.config.checkpoint_dir,
+                                 f"construct_capsid_{c['candidate_id']}.gb")
+            cb.export_for_synthesis(construct, path)
+
+        self.construct_builder.print_order_summary(constructs)
+
+        best = winners["aav"][0] if winners["aav"] else None
+        if best:
+            outcomes = self.clinical.stratify_patients(
+                candidate_fitness=best["fitness"],
+                cardiac_tropism=best["cardiac_tropism"],
+                hepatic_avoidance=0.5,
+                immune_evasion=best["immune_evasion"],
+                lamp2b=best["lamp2b_expression"],
+                promoter=promoter_data["best"].optimized_score,
+                mirna=mirna_data["design"].total_optimization_score,
+                dosing=winners["dosing"]["regimen_score"],
+            )
+            self.clinical.print_trial_design(outcomes)
+            worst = outcomes[-1]
+            surv = self.clinical.survival_curve_data(worst)
+            logger.info("  Survival at 5y: untreated=%.1f%% vs treated=%.1f%%",
+                          surv["untreated"][5] * 100, surv["treated"][5] * 100)
+            logger.info("  Survival at 10y: untreated=%.1f%% vs treated=%.1f%%",
+                          surv["untreated"][10] * 100, surv["treated"][10] * 100)
+        else:
+            outcomes = []
+
+        return {
+            "constructs": [
+                {
+                    "name": c.name,
+                    "total_length_bp": c.total_length_bp,
+                    "cargo_length_bp": c.cargo_length_bp,
+                    "cost_usd": c.synthesis_cost_usd,
+                    "vendor": c.synthesis_vendor,
+                }
+                for c in constructs
+            ],
+            "total_synthesis_cost": sum(c.synthesis_cost_usd for c in constructs),
+            "clinical_outcomes": [
+                {
+                    "mutation": o.mutation_type,
+                    "benefit_score": o.clinical_benefit_score,
+                    "expression": o.predicted_lamp2_expression,
+                    "lvmi_reduction_1y": o.predicted_lvmi_reduction_at_1y,
+                    "ef_improvement_1y": o.predicted_ef_improvement_at_1y,
+                    "survival_5y_treated": o.survival_at_5y_treated,
+                    "nnt": o.number_needed_to_treat,
+                    "approved": o.is_approved_for_trial,
+                }
+                for o in outcomes
+            ],
+        }
+
+    def _phase14_active_learning(self, winners: dict) -> dict:
+        logger.info("PHASE 14/14: Active Learning & Experimental Feedback")
+        report = self.learner.round_report()
+        logger.info("  Round: %d, Predictions: %d, Validated: %d, Corr: %.3f",
+                     report["round"], report["total_predictions"],
+                    report["validated"], report.get("mean_cardiac_error", 0))
+
+        if winners["aav"]:
+            best = winners["aav"][0]
+            self.learner.record_prediction(
+                candidate_id=best["candidate_id"],
+                cardiac=best["cardiac_tropism"],
+                hepatic=0.5,
+                immune=best["immune_evasion"],
+                lamp2b=best["lamp2b_expression"],
+                fitness=best["fitness"],
+            )
+
+        experiment_protocols = []
+        for c in winners["aav"][:5]:
+            dummy = type("Dummy", (), {})()
+            for k, v in c.items():
+                setattr(dummy, k, v)
+            protocol = self.learner.experiment_protocol(dummy)
+            experiment_protocols.append(protocol)
+            logger.info("  Protocol for C%d: $%.0f, %d weeks, %s",
+                         c["candidate_id"],
+                         protocol["total_cost_usd"],
+                         protocol["timeline_weeks"],
+                         protocol["go_no_go_criteria"])
+
+        self.learner._save_history()
+        return {
+            "active_learning_report": report,
+            "experiment_protocols": experiment_protocols,
+            "total_experiment_cost": sum(p["total_cost_usd"] for p in experiment_protocols),
+        }
 
     def _generate_comprehensive_report(self, winners: dict,
                                         promoter_data: dict,
