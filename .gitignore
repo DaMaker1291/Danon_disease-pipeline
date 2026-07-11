@@ -13,5 +13,6 @@ diagnostics_danon/
 trained_models/
 colab_data.zip
 kaggle_output/
+kaggle_upload/
 .kaggle/
 legacy/
