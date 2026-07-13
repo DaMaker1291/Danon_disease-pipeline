@@ -1,7 +1,7 @@
 import logging
 import numpy as np
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +92,51 @@ class InverseFoldingEngine:
         self.cardiac_rec = CARDIAC_RECEPTOR_PREFERENCES
         self.hepatic = HEPATIC_AVOIDANCE
 
+    def _proline_guardrail(self, pos: int, original: str, new: str, region: Dict) -> float:
+        penalty = 0.0
+        if new == "P":
+            secondary = self._predict_secondary_structure(pos, region)
+            if secondary == "helix":
+                penalty += 1.0
+            elif secondary == "sheet":
+                penalty += 0.6
+            elif region.get("surface_exposed", 0.5) < 0.5:
+                penalty += 0.4
+        if original == "G" and new != "G":
+            if self._is_tight_turn(pos, region):
+                penalty += 0.8
+        return penalty
+
+    def _predict_secondary_structure(self, pos: int, region: Dict) -> str:
+        start, end = region.get("positions", [0, 0])
+        length = end - start
+        frac = (pos - start) / max(length, 1)
+        if 0.2 < frac < 0.5:
+            return "helix"
+        elif frac < 0.2 or frac > 0.8:
+            return "loop"
+        else:
+            return "sheet"
+
+    def _is_tight_turn(self, pos: int, region: Dict) -> bool:
+        start, end = region.get("positions", [0, 0])
+        length = end - start
+        frac = (pos - start) / max(length, 1)
+        return frac < 0.15 or frac > 0.85
+
+    def _score_aggregation_propensity(self, seq: str, region: Dict) -> float:
+        start, end = region.get("positions", [0, 0])
+        agg_score = 0.0
+        count = 0
+        for pos in range(start, min(end, len(seq))):
+            aa = seq[pos]
+            hydro = self.props[aa]["hydrophobicity"]
+            bulk = self.props[aa]["bulkiness"]
+            if hydro > 1.5 and bulk > 0.6:
+                agg_score += hydro * bulk
+                count += 1
+        return min(agg_score / max(count, 1) / 10.0, 1.0) if count > 0 else 0.0
+
     def design_candidate(self, candidate_id: int, wild_type_seq: str,
                          target_region: str = "VR_IV",
                          target_receptor: str = "integrin_alpha7_beta1",
@@ -134,6 +179,9 @@ class InverseFoldingEngine:
                 size_ratio = self.props[aa]["size"] / self.props[original]["size"]
                 score -= abs(1.0 - size_ratio) * 0.5
 
+                pg_penalty = self._proline_guardrail(pos, original, aa, region)
+                score -= pg_penalty * 2.0
+
                 score *= surface_exposure
 
                 scores.append(score)
@@ -148,16 +196,22 @@ class InverseFoldingEngine:
         cardiac_score = self._score_cardiac_receptor(mutated, [start, end],
                                                       target_receptor)
         hepatic_score = self._score_hepatic_avoidance(mutated, [start, end])
+
+        agg_score = self._score_aggregation_propensity(mutated, region)
+        agg_before = self._score_aggregation_propensity(wild_type_seq, region)
+        agg_penalty = max(0.0, agg_score - agg_before)
+
         stability = self._score_structural_stability(mutated, mutations)
         immune = self._score_immune_evasion(mutated, target_region)
         fold = self._score_fold_quality(mutated, mutations)
 
         total = (
-            0.25 * cardiac_score +
-            0.20 * hepatic_score +
+            0.20 * cardiac_score +
+            0.15 * hepatic_score +
             0.20 * stability +
             0.15 * immune +
-            0.20 * fold
+            0.20 * fold -
+            0.10 * agg_penalty
         )
 
         return InverseFoldedCapsid(

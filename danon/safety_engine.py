@@ -4,6 +4,31 @@ from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
+REGULATORY_DISCLAIMER = (
+    "\n"
+    "=================================================================================\n"
+    "                  REGULATORY & MEDICAL DISCLAIMER NOTICE                         \n"
+    "=================================================================================\n"
+    "CRITICAL: This platform is a computational simulation and sequence architecture  \n"
+    "prototyping framework. All reported metrics, including combinatorial advantages  \n"
+    "and tissue affinities, represent in silico optimization models.                  \n"
+    "                                                                                 \n"
+    "This software does not test, prove, or validate biological safety, toxicity,     \n"
+    "in vivo efficacy, or clinical curative potential. This platform does not provide \n"
+    "medical advice, treatment protocols, or patient diagnostic scoring.              \n"
+    "                                                                                 \n"
+    "Any deployment of generated sequences for therapeutic intervention requires full \n"
+    "independent wet-lab validation, GLP safety profiling, and formal regulatory      \n"
+    "clearance from the UK MHRA or regional equivalent authorities.                   \n"
+    "=================================================================================\n"
+)
+
+
+def print_global_regulatory_disclaimer() -> None:
+    """Prints the regulatory/medical disclaimer to the runtime terminal. Called at
+    backend startup so every session explicitly states the platform's boundaries."""
+    print(REGULATORY_DISCLAIMER)
+
 LAMP2B_GENE = {
     "gene_id": "LAMP2",
     "chromosome": "Xq22",
