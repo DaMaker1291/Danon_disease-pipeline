@@ -8,7 +8,10 @@ import type {
   PipelineResult,
 } from '../types';
 
-const BASE = '/api';
+// In dev mode, Vite proxies /api to localhost:8000.
+// For production, set VITE_API_URL (e.g. https://your-backend.onrender.com/api)
+// or leave empty to use same-origin /api (requires a reverse proxy).
+const BASE = import.meta.env.VITE_API_URL || '/api';
 
 export async function runPipeline(constraints: PipelineConstraints): Promise<PipelineResult> {
   const res = await fetch(`${BASE}/run-pipeline`, {
