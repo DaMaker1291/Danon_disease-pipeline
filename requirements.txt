@@ -3,6 +3,10 @@ torch>=2.1.0
 fair-esm>=2.0.0
 transformers>=4.35.0
 
+# API Server
+fastapi>=0.110.0
+uvicorn>=0.29.0
+
 # Chemistry / LNP Design
 rdkit>=2023.9.0
 deepchem>=2.8.0
