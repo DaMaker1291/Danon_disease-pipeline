@@ -260,6 +260,7 @@ h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.03em;
 .seq-block .res.mut.neg { background: #dc2626; }
 .seq-block .res.mut.neu { background: #64748b; }
 .seq-block .res.mut.viii { outline: 1px solid #f59e0b; }
+.seq-block .res.mut.iv { outline: 1px solid rgba(59,130,246,0.5); }
 .mut-table-wrap { flex: 1; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; }
 .mut-table { width: 100%; border-collapse: collapse; font-size: 11px; }
 .mut-table th { position: sticky; top: 0; background: var(--surface); text-align: left; padding: 7px 10px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text3); border-bottom: 1px solid var(--border); }
@@ -280,6 +281,7 @@ h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.03em;
 .badge { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 700; letter-spacing: 0.03em;
   background: rgba(148,163,184,0.12); color: var(--text2); display: inline-flex; align-items: center; gap: 4px; }
 .badge-mhra { background: rgba(245,158,11,0.15); color: var(--warning); }
+.f-right { margin-left: auto; }
 .badge-warn { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 700;
   background: rgba(245,158,11,0.18); color: var(--warning); letter-spacing: 0.03em; }
 

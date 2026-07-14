@@ -8,7 +8,7 @@ interface Props {
 
 function MutationRow({ m }: { m: Mutation }) {
   return (
-    <tr className={m.region === 'VR_VIII' ? 'row-viii' : 'row-iv'}>
+    <tr>
       <td><span className={`region-chip ${m.region === 'VR_VIII' ? 'viii' : 'iv'}`}>{m.region.replace('_', '-')}</span></td>
       <td className="mono">{m.positionVp1}</td>
       <td className="mono">
@@ -29,12 +29,12 @@ export default function SequenceOutputPanel({ result, selectedSpike }: Props) {
 
   const mutationMap = useMemo(() => {
     const map = new Map<number, Mutation>();
-    if (result) for (const m of result.mutations) map.set(m.position - 1, m);
+    if (result?.mutations) for (const m of result.mutations) map.set(m.position - 1, m);
     return map;
   }, [result]);
 
   const chars = useMemo(() => {
-    if (!result) return [] as React.ReactNode[];
+    if (!result?.sequence) return [] as React.ReactNode[];
     const out: React.ReactNode[] = [];
     for (let i = 0; i < result.sequence.length; i++) {
       const m = mutationMap.get(i);
@@ -87,9 +87,9 @@ export default function SequenceOutputPanel({ result, selectedSpike }: Props) {
       </div>
 
       <div className="seq-meta">
-        <span>VP1 residues {result.vpOffset}–{result.vpOffset + result.sequence.length - 1}</span>
-        <span>{result.mutations.length} substitutions</span>
-        <span>{result.poolEvaluated.toLocaleString()} variants evaluated</span>
+        <span>VP1 residues {result.vpOffset ?? 0}–{(result.vpOffset ?? 0) + (result.sequence?.length ?? 0) - 1}</span>
+        <span>{result.mutations?.length ?? 0} substitutions</span>
+        <span>{(result.poolEvaluated ?? 0).toLocaleString()} variants evaluated</span>
       </div>
 
       <div className="seq-block" ref={seqRef}>{chars}</div>
@@ -98,7 +98,7 @@ export default function SequenceOutputPanel({ result, selectedSpike }: Props) {
         <table className="mut-table">
           <thead><tr><th>Region</th><th>VP1 pos</th><th>Substitution</th><th>Property</th></tr></thead>
           <tbody>
-            {result.mutations.map((m, i) => <MutationRow key={i} m={m} />)}
+            {result.mutations?.map((m, i) => <MutationRow key={i} m={m} />) ?? []}
           </tbody>
         </table>
       </div>

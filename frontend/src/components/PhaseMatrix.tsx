@@ -38,7 +38,7 @@ function StatChip({ label, value, ok }: { label: string; value: string; ok?: boo
 }
 
 export default function PhaseMatrix({ result }: Props) {
-  if (!result?.advancedMetrics) {
+  if (!result?.advancedMetrics || !result?.phases) {
     return (
       <div className="seq-empty">
         {!result
@@ -175,7 +175,7 @@ function PhaseMatrixInner({ result }: { result: PipelineResult }) {
         <div className="h2-card glass">
           <h4>P24 · Synthesis Feasibility Screen</h4>
           <div className="h2-stats">
-            <StatChip label="GC" value={`${am.synthesis.gcContent.toFixed(0)}%`} ok={am.synthesis.gcContent >= am.synthesis.gcBounds[0] && am.synthesis.gcContent <= am.synthesis.gcBounds[1]} />
+            <StatChip label="GC" value={`${am.synthesis.gcContent.toFixed(0)}%`} ok={am.synthesis.gcBounds?.length >= 2 && am.synthesis.gcContent >= am.synthesis.gcBounds[0] && am.synthesis.gcContent <= am.synthesis.gcBounds[1]} />
             <StatChip label="Length" value={`${am.synthesis.lengthBp} bp`} />
             <StatChip label="Synthesizable" value={am.synthesis.synthesizable ? 'yes' : 'no'} ok={am.synthesis.synthesizable} />
           </div>

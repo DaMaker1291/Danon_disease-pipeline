@@ -9,7 +9,6 @@ import {
   buildProtrusionGeometry,
   computeSpikeDescriptors,
   chargeToColor,
-  AA_CHARGE,
   type SpikeDescriptor,
 } from '../utils/capsidGeometry';
 import type { PipelineResult } from '../types';
@@ -34,7 +33,6 @@ const R = 2.0;
 const icosa = new THREE.IcosahedronGeometry(R * 1.005, 1);
 
 function IcosaEdges() {
-  const ref = useRef<THREE.LineSegments>(null!);
   const geo = useMemo(() => {
     const eg = new THREE.EdgesGeometry(icosa, 1);
     return eg;
