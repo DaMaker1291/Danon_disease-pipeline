@@ -1,6 +1,6 @@
-import React, { useRef, useMemo, useState, useCallback } from 'react';
+import React, { useRef, useMemo, useState, useCallback, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, Text, Float } from '@react-three/drei';
+import { OrbitControls, Environment, Float } from '@react-three/drei';
 import { EffectComposer, Bloom, ToneMapping } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import ErrorBoundary from './ErrorBoundary';
@@ -30,7 +30,7 @@ function colorAt(t: number): THREE.Color {
   return new THREE.Color('#334155');
 }
 
-function DoubleHelix({ onHover }: { onHover: (id: string | null) => void }) {
+function DoubleHelix() {
   const groupRef = useRef<THREE.Group>(null!);
   const N = 220;
   const turns = 9;
@@ -77,7 +77,7 @@ function DoubleHelix({ onHover }: { onHover: (id: string | null) => void }) {
     geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
   }, []);
 
-  useMemo(() => { colorizeTube(tubeA, strandA); colorizeTube(tubeB, strandB); }, [tubeA, tubeB, strandA, strandB, colorizeTube]);
+  useEffect(() => { colorizeTube(tubeA, strandA); colorizeTube(tubeB, strandB); }, [tubeA, tubeB, strandA, strandB, colorizeTube]);
 
   useFrame((_, dt) => {
     groupRef.current.rotation.x += dt * 0.15;
@@ -107,7 +107,7 @@ function DoubleHelix({ onHover }: { onHover: (id: string | null) => void }) {
   );
 }
 
-function Scene({ onHover }: { onHover: (id: string | null) => void }) {
+function Scene() {
   return (
     <>
       <color attach="background" args={['#05080f']} />
@@ -118,7 +118,7 @@ function Scene({ onHover }: { onHover: (id: string | null) => void }) {
       <pointLight position={[0, 0, 4]} intensity={0.6} color="#a78bfa" />
       <Environment preset="night" />
       <Float speed={1} rotationIntensity={0.15} floatIntensity={0.3}>
-        <DoubleHelix onHover={onHover} />
+        <DoubleHelix />
       </Float>
       <OrbitControls enablePan={false} minDistance={6} maxDistance={18} enableDamping autoRotate autoRotateSpeed={0.3} />
       <EffectComposer>
@@ -140,7 +140,7 @@ export default function GeneViewer() {
       <div className="canvas-container" style={{ minHeight: 300 }}>
         <ErrorBoundary label="GeneViewer">
           <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 3, 11], fov: 42 }} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}>
-            <Scene onHover={setHovered} />
+            <Scene />
           </Canvas>
         </ErrorBoundary>
       </div>

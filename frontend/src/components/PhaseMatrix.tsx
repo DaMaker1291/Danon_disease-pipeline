@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import type { PipelineResult, Phase } from '../types';
 
 interface Props { result: PipelineResult | null }
@@ -38,24 +38,20 @@ function StatChip({ label, value, ok }: { label: string; value: string; ok?: boo
 }
 
 export default function PhaseMatrix({ result }: Props) {
-  if (!result) {
+  if (!result?.advancedMetrics) {
     return (
       <div className="seq-empty">
-        Run the pipeline (3D Capsid tab) to execute all 24 phases. This matrix renders the live
-        per-phase scores, the six Horizon-2 modules, and the compounded combinatorial design-space advantage.
+        {!result
+          ? 'Run the pipeline (3D Capsid tab) to execute all 24 phases. This matrix renders the live per-phase scores, the six Horizon-2 modules, and the compounded combinatorial design-space advantage.'
+          : 'Pipeline returned without advanced metrics. Re-run to populate Horizon-2 data.'}
       </div>
     );
   }
+  return <PhaseMatrixInner result={result} />;
+}
 
+function PhaseMatrixInner({ result }: { result: PipelineResult }) {
   const am = result.advancedMetrics;
-  if (!am) {
-    return (
-      <div className="seq-empty">
-        Pipeline returned without advanced metrics. Re-run to populate Horizon-2 data.
-      </div>
-    );
-  }
-  const h2 = useMemo(() => result.phases.filter(p => p.horizon === 2), [result.phases]);
 
   return (
     <div className="phase-matrix">

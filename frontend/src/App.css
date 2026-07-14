@@ -277,6 +277,9 @@ h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.03em;
 .flag.reversal { background: rgba(139,92,246,0.15); color: #a78bfa; }
 .flag.epitope { background: rgba(239,68,68,0.15); color: #f87171; }
 .badge-accent.violet { background: rgba(139,92,246,0.15); color: #a78bfa; }
+.badge { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 700; letter-spacing: 0.03em;
+  background: rgba(148,163,184,0.12); color: var(--text2); display: inline-flex; align-items: center; gap: 4px; }
+.badge-mhra { background: rgba(245,158,11,0.15); color: var(--warning); }
 .badge-warn { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 700;
   background: rgba(245,158,11,0.18); color: var(--warning); letter-spacing: 0.03em; }
 

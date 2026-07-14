@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, Text, Line, ContactShadows } from '@react-three/drei';
+import { OrbitControls, Environment, Line, ContactShadows } from '@react-three/drei';
 import { EffectComposer, Bloom, N8AO, ToneMapping, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import ErrorBoundary from './ErrorBoundary';
@@ -35,6 +35,7 @@ function fibonacciSphere(n: number): THREE.Vector3[] {
 function LipidBilayer({ radius, n2p }: { radius: number; n2p: number }) {
   const groupRef = useRef<THREE.Group>(null!);
   const nLipids = 320;
+  const compactness = 0.85 + (n2p / 12) * 0.3;
 
   const lipids: Lipid[] = useMemo(() => {
     const dirs = fibonacciSphere(nLipids);
@@ -46,12 +47,12 @@ function LipidBilayer({ radius, n2p }: { radius: number; n2p: number }) {
       return {
         dir,
         color: new THREE.Color(band.color),
-        headOuter: dir.clone().multiplyScalar(radius + 0.32),
-        tailInner: dir.clone().multiplyScalar(radius - 0.18),
+        headOuter: dir.clone().multiplyScalar((radius + 0.32) * compactness),
+        tailInner: dir.clone().multiplyScalar((radius - 0.18) * compactness),
         phase: Math.random() * Math.PI * 2,
       };
     });
-  }, [radius]);
+  }, [radius, compactness]);
 
   useFrame((_, dt) => {
     groupRef.current.rotation.y += dt * 0.09;

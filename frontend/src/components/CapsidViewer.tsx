@@ -157,8 +157,9 @@ function Assembly({ result, selectedSpike, onSelectSpike }: Props) {
 function OrbitingIons({ netIV, netVIII }: { netIV: number; netVIII: number }) {
   const count = 220;
   const ref = useRef<THREE.Points>(null!);
-  const { positions, colors, speeds } = useMemo(() => {
+  const { positions, initialY, colors, speeds } = useMemo(() => {
     const p = new Float32Array(count * 3);
+    const iy = new Float32Array(count);
     const col = new Float32Array(count * 3);
     const s = new Float32Array(count);
     const bias = (netIV + netVIII) / 2;
@@ -169,12 +170,12 @@ function OrbitingIons({ netIV, netVIII }: { netIV: number; netVIII: number }) {
       p[i * 3] = r * Math.sin(phi) * Math.cos(theta);
       p[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       p[i * 3 + 2] = r * Math.cos(phi);
+      iy[i] = p[i * 3 + 1];
       s[i] = 0.2 + Math.random() * 0.6;
-      // counter-ions: negative surface attracts cations (blue) and vice-versa
       const c = chargeToColor(-bias * (0.5 + Math.random()), 1.4);
       col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
     }
-    return { positions: p, colors: col, speeds: s };
+    return { positions: p, initialY: iy, colors: col, speeds: s };
   }, [netIV, netVIII]);
 
   useFrame(() => {
@@ -182,7 +183,7 @@ function OrbitingIons({ netIV, netVIII }: { netIV: number; netVIII: number }) {
     const arr = ref.current.geometry.attributes.position.array as Float32Array;
     for (let i = 0; i < count; i++) {
       const t = Date.now() * 0.0004 * speeds[i] + i;
-      arr[i * 3 + 1] += Math.sin(t) * 0.0012;
+      arr[i * 3 + 1] = initialY[i] + Math.sin(t) * 0.15;
     }
     ref.current.geometry.attributes.position.needsUpdate = true;
   });

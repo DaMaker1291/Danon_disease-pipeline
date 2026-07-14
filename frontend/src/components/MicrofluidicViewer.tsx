@@ -49,7 +49,8 @@ export default function MicrofluidicViewer() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d')!;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
     let raf = 0;
 
     const draw = () => {

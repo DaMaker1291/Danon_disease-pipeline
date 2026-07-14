@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import CapsidViewer from './components/CapsidViewer';
 import SequenceOutputPanel from './components/SequenceOutputPanel';
 import LNPViewer from './components/LNPViewer';
@@ -58,7 +58,6 @@ export default function App() {
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const setC = useCallback(<K extends keyof PipelineConstraints>(k: K, v: PipelineConstraints[K]) => {
     setConstraints(prev => ({ ...prev, [k]: v }));
@@ -179,7 +178,6 @@ export default function App() {
 
   return (
     <div className="app">
-      <canvas ref={canvasRef} className="bg-canvas" />
       <div className="bg-glow" style={{ left: '15%', top: '10%', width: '40vw', height: '40vw' }} />
       <div className="bg-glow" style={{ right: '10%', bottom: '5%', width: '35vw', height: '35vw', background: 'radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%)' }} />
 
