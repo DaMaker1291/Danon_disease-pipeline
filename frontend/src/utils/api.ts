@@ -14,22 +14,29 @@ const isLocal = window.location.hostname === 'localhost' || window.location.host
 const BASE = import.meta.env.VITE_API_URL || (isLocal ? '/api' : 'http://localhost:8000/api');
 
 export async function runPipeline(constraints: PipelineConstraints): Promise<PipelineResult> {
-  const res = await fetch(`${BASE}/run-pipeline`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      max_hepatic_accumulation: constraints.maxHepaticAccumulation,
-      min_cardiac_tropism: constraints.minCardiacTropism,
-      min_immune_evasion: constraints.minImmuneEvasion,
-      lamp2b_expression_target: constraints.lamp2bExpressionTarget,
-      candidate_pool: constraints.candidatePool,
-      max_mutations_vr_iv: constraints.maxMutationsVrIv,
-      max_mutations_vr_viii: constraints.maxMutationsVrViii,
-      random_seed: constraints.randomSeed,
-    }),
-  });
-  if (!res.ok) throw new Error(`run-pipeline API error: ${res.status}`);
-  return res.json();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 120_000);
+  try {
+    const res = await fetch(`${BASE}/run-pipeline`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        max_hepatic_accumulation: constraints.maxHepaticAccumulation,
+        min_cardiac_tropism: constraints.minCardiacTropism,
+        min_immune_evasion: constraints.minImmuneEvasion,
+        lamp2b_expression_target: constraints.lamp2bExpressionTarget,
+        candidate_pool: constraints.candidatePool,
+        max_mutations_vr_iv: constraints.maxMutationsVrIv,
+        max_mutations_vr_viii: constraints.maxMutationsVrViii,
+        random_seed: constraints.randomSeed,
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`run-pipeline API error: ${res.status}`);
+    return res.json();
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 async function postJson<T>(path: string, body: unknown): Promise<T> {

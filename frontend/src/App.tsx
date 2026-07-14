@@ -10,6 +10,7 @@ import UploadPortal from './components/UploadPortal';
 import TelemetryPanel from './components/TelemetryPanel';
 import PhaseMatrix from './components/PhaseMatrix';
 import TranslationalGateway from './components/TranslationalGateway';
+import ErrorBoundary from './components/ErrorBoundary';
 import { runPipeline } from './utils/api';
 import type { FlowTelemetry, ParetoPoint, UploadResult, PipelineResult, PipelineConstraints } from './types';
 
@@ -69,7 +70,11 @@ export default function App() {
       const r = await runPipeline(constraints);
       setResult(r);
     } catch (e: any) {
-      setError(e?.message || 'pipeline failed');
+      if (e?.name === 'AbortError') {
+        setError('Pipeline timed out (120s). Try reducing the candidate pool size.');
+      } else {
+        setError(e?.message || 'pipeline failed');
+      }
     } finally {
       setRunning(false);
     }
@@ -191,7 +196,7 @@ export default function App() {
               <span className="badge-accent violet">{(result.combinatorialAdvantage / 1e12).toFixed(1)}T× space</span>
             )}
             {result && (
-              result.translationalReadiness.clinicalTrialEligibility
+              result.translationalReadiness?.clinicalTrialEligibility
                 ? <span className="badge-accent">CLINIC ELIGIBLE</span>
                 : <span className="badge-warn">PRECLINICAL STEP 0.5</span>
             )}
@@ -213,7 +218,7 @@ export default function App() {
         ))}
       </nav>
 
-      <main className="app-main">{renderContent()}</main>
+      <main className="app-main"><ErrorBoundary label="TabContent">{renderContent()}</ErrorBoundary></main>
 
       <footer className="app-footer glass">
         <span>Danon Disease Pipeline v2.1 · AAV9-LAMP2B Cardiomyocyte Delivery</span>

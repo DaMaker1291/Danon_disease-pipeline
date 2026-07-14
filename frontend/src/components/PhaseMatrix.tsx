@@ -48,6 +48,13 @@ export default function PhaseMatrix({ result }: Props) {
   }
 
   const am = result.advancedMetrics;
+  if (!am) {
+    return (
+      <div className="seq-empty">
+        Pipeline returned without advanced metrics. Re-run to populate Horizon-2 data.
+      </div>
+    );
+  }
   const h2 = useMemo(() => result.phases.filter(p => p.horizon === 2), [result.phases]);
 
   return (

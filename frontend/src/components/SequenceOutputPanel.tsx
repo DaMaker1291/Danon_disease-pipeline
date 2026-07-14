@@ -78,12 +78,12 @@ export default function SequenceOutputPanel({ result, selectedSpike }: Props) {
       <div className="panel-title">📄 Engineered Capsid #{result.candidateId} <span className="readonly-badge">READ-ONLY OUTPUT</span></div>
 
       <div className="score-grid">
-        <div className="score-cell"><span>Cardiac tropism</span><strong>{(s.cardiacTropism * 100).toFixed(0)}%</strong></div>
-        <div className="score-cell"><span>Hepatic avoidance</span><strong>{(s.hepaticAvoidance * 100).toFixed(0)}%</strong></div>
-        <div className="score-cell"><span>Immune evasion</span><strong>{(s.immuneEvasion * 100).toFixed(0)}%</strong></div>
-        <div className="score-cell"><span>LAMP2B compat.</span><strong>{(s.lamp2bExpression * 100).toFixed(0)}%</strong></div>
-        <div className="score-cell accent"><span>Immune escape vs UCL</span><strong>{s.improvementVsUcl.toFixed(1)}×</strong></div>
-        <div className="score-cell"><span>Docking preserved</span><strong>{s.dockingPreserved ? '✓ yes' : '✗ no'}</strong></div>
+        <div className="score-cell"><span>Cardiac tropism</span><strong>{((s?.cardiacTropism ?? 0) * 100).toFixed(0)}%</strong></div>
+        <div className="score-cell"><span>Hepatic avoidance</span><strong>{((s?.hepaticAvoidance ?? 0) * 100).toFixed(0)}%</strong></div>
+        <div className="score-cell"><span>Immune evasion</span><strong>{((s?.immuneEvasion ?? 0) * 100).toFixed(0)}%</strong></div>
+        <div className="score-cell"><span>LAMP2B compat.</span><strong>{((s?.lamp2bExpression ?? 0) * 100).toFixed(0)}%</strong></div>
+        <div className="score-cell accent"><span>Immune escape vs UCL</span><strong>{(s?.improvementVsUcl ?? 0).toFixed(1)}×</strong></div>
+        <div className="score-cell"><span>Docking preserved</span><strong>{s?.dockingPreserved ? '✓ yes' : '✗ no'}</strong></div>
       </div>
 
       <div className="seq-meta">

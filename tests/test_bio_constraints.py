@@ -357,8 +357,8 @@ class TestHorizon2Phases:
         from api_server import run_full_pipeline, PipelineConstraints
         r = run_full_pipeline(PipelineConstraints(candidate_pool=120, random_seed=7))
         tr = r["translationalReadiness"]
-        assert tr["clinical_trial_eligibility"] is False
-        assert tr["total_gates"] == 9
+        assert tr["clinicalTrialEligibility"] is False
+        assert tr["totalGates"] == 9
 
     # ---- Cross-module integration ----
     def test_lamp2b_uses_single_vector_not_dual(self):

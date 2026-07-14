@@ -1,0 +1,8 @@
+INFO:     Started server process [33360]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:danon.api:Running pipeline with constraints: {'max_hepatic_accumulation': 0.3, 'min_cardiac_tropism': 0.5, 'min_immune_evasion': 0.5, 'lamp2b_expression_target': 0.7, 'candidate_pool': 200, 'max_mutations_vr_iv': 4, 'max_mutations_vr_viii': 6, 'random_seed': 7, 'max_solvation_delta_g': 2.5, 'min_codon_elongation_index': 0.88, 'hla_binding_cutoff_nm': 500.0, 'synthesis_gc_low': 40.0, 'synthesis_gc_high': 65.0}
+INFO:danon.epitope_masker:PDB file not found at None; using embedded coordinate map
+INFO:danon.api:Running pipeline with constraints: {'max_hepatic_accumulation': 0.3, 'min_cardiac_tropism': 0.5, 'min_immune_evasion': 0.5, 'lamp2b_expression_target': 0.7, 'candidate_pool': 400, 'max_mutations_vr_iv': 4, 'max_mutations_vr_viii': 6, 'random_seed': 42, 'max_solvation_delta_g': 2.5, 'min_codon_elongation_index': 0.88, 'hla_binding_cutoff_nm': 500.0, 'synthesis_gc_low': 40.0, 'synthesis_gc_high': 65.0}
+INFO:danon.epitope_masker:PDB file not found at None; using embedded coordinate map

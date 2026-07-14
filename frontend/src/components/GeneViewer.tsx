@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, Text, Float } from '@react-three/drei';
 import { EffectComposer, Bloom, ToneMapping } from '@react-three/postprocessing';
 import * as THREE from 'three';
+import ErrorBoundary from './ErrorBoundary';
 
 interface GeneSegment {
   id: string; label: string; start: number; end: number; color: string; desc: string;
@@ -137,9 +138,11 @@ export default function GeneViewer() {
         🧪 LAMP2B Transgene — 3D DNA Double Helix & Split-Intein Dual-Vector Map
       </div>
       <div className="canvas-container" style={{ minHeight: 300 }}>
-        <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 3, 11], fov: 42 }} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}>
-          <Scene onHover={setHovered} />
-        </Canvas>
+        <ErrorBoundary label="GeneViewer">
+          <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 3, 11], fov: 42 }} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}>
+            <Scene onHover={setHovered} />
+          </Canvas>
+        </ErrorBoundary>
       </div>
 
       <div style={{ marginTop: 10 }}>

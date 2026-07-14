@@ -11,6 +11,7 @@ surface profiles, and the exact amino-acid substitutions per 3-fold protrusion.
 Run:  uvicorn api_server:app --port 8000
 """
 import logging
+import re
 from typing import Dict, List, Optional
 
 import numpy as np
@@ -44,6 +45,15 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("danon.api")
 
 VP1_OFFSET = 263  # stored sequence index 1 == VP1 residue 263
+
+
+def _snake_to_camel(obj):
+    """Recursively convert snake_case dict keys to camelCase for the frontend."""
+    if isinstance(obj, dict):
+        return {re.sub(r'_([a-z])', lambda m: m.group(1).upper(), k): _snake_to_camel(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_snake_to_camel(i) for i in obj]
+    return obj
 
 app = FastAPI(title="Danon AAV9-LAMP2B Pipeline API", version="2.1")
 app.add_middleware(
@@ -311,7 +321,7 @@ def run_full_pipeline(c: PipelineConstraints) -> Dict:
         "combinatorialAdvantage": advantage,
         "phasesPassed": sum(1 for p in phases if p["status"] == "pass"),
         "totalPhases": 24,
-        "translationalReadiness": TranslationalReadinessEngine().evaluate_translational_gate().model_dump(),
+        "translationalReadiness": _snake_to_camel(TranslationalReadinessEngine().evaluate_translational_gate().model_dump()),
     }
 
 

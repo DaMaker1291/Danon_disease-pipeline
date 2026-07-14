@@ -3,6 +3,7 @@ import { Canvas, useFrame, ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, Environment, Sparkles, Html, ContactShadows } from '@react-three/drei';
 import { EffectComposer, Bloom, N8AO, ToneMapping, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
+import ErrorBoundary from './ErrorBoundary';
 import {
   buildCapsidShell,
   buildProtrusionGeometry,
@@ -61,8 +62,8 @@ function Assembly({ result, selectedSpike, onSelectSpike }: Props) {
   const groupRef = useRef<THREE.Group>(null!);
   const [hover, setHover] = useState<number | null>(null);
 
-  const netIV = result?.regions.VR_IV.netCharge ?? 0;
-  const netVIII = result?.regions.VR_VIII.netCharge ?? 0;
+  const netIV = result?.regions?.VR_IV?.netCharge ?? 0;
+  const netVIII = result?.regions?.VR_VIII?.netCharge ?? 0;
 
   const { geometry: shellGeo, radius } = useMemo(
     () => buildCapsidShell(6, netIV, netVIII),
@@ -232,14 +233,16 @@ export default function CapsidViewer(props: Props) {
         🧬 AAV9 Capsid — Icosahedral Assembly · 20 Three-Fold Protrusions · PDB 3J1S Electrostatics
       </div>
       <div className="canvas-container" style={{ position: 'relative' }}>
-        <Canvas
-          shadows
-          dpr={[1, 2]}
-          camera={{ position: [5.5, 3, 5.5], fov: 38 }}
-          gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
-        >
-          <Scene {...props} />
-        </Canvas>
+        <ErrorBoundary label="CapsidViewer">
+          <Canvas
+            shadows
+            dpr={[1, 2]}
+            camera={{ position: [5.5, 3, 5.5], fov: 38 }}
+            gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
+          >
+            <Scene {...props} />
+          </Canvas>
+        </ErrorBoundary>
         {!props.result && (
           <div className="canvas-overlay">
             <div className="overlay-card">

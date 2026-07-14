@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, Text, Line, ContactShadows } from '@react-three/drei';
 import { EffectComposer, Bloom, N8AO, ToneMapping, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
+import ErrorBoundary from './ErrorBoundary';
 
 const LIPID_TYPES = [
   { name: 'Ionizable (DLin-MC3-DMA)', color: '#3b82f6', frac: 0.50 },
@@ -160,9 +161,11 @@ export default function LNPViewer() {
         💊 Lipid Nanoparticle — Bilayer Self-Assembly with Encapsulated mRNA Cargo
       </div>
       <div className="canvas-container" style={{ minHeight: 400 }}>
-        <Canvas shadows dpr={[1, 2]} camera={{ position: [4, 2.5, 4], fov: 40 }} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}>
-          <Scene n2p={n2p} />
-        </Canvas>
+        <ErrorBoundary label="LNPViewer">
+          <Canvas shadows dpr={[1, 2]} camera={{ position: [4, 2.5, 4], fov: 40 }} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}>
+            <Scene n2p={n2p} />
+          </Canvas>
+        </ErrorBoundary>
       </div>
       <div style={{ marginTop: 10, display: 'flex', gap: 20, alignItems: 'flex-end', flexWrap: 'wrap' }}>
         <div className="input-group" style={{ flex: 1, minWidth: 160 }}>
