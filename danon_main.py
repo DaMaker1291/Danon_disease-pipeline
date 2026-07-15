@@ -45,15 +45,15 @@ logger = logging.getLogger(__name__)
 UCL_BASELINE_SCORES = {
     "promoter": 0.35,
     "mirna": 0.10,
-    "immune_evasion": 0.30,
-    "cardiac_tropism": 0.40,
-    "hepatic_avoidance": 0.25,
+    "immune_evasion": 0.25,
+    "cardiac_tropism": 0.65,
+    "hepatic_avoidance": 0.60,
     "stealth": 0.10,
     "inverse_fold": 0.35,
     "dual_vector": 0.30,
     "pareto": 0.25,
     "dosing": 0.30,
-    "safety": 0.50,
+    "safety": 0.85,
     "epitope_mask": 0.15,
     "stoichiometric_decoy": 0.10,
     "promoter_spec": 0.30,
@@ -121,7 +121,7 @@ class DanonPipeline:
         phase15 = self._phase15_epitope_masking(winners, phase3)
         phase16 = self._phase16_stoichiometric_decoy(winners, phase15)
         phase17 = self._phase17_promoter_spec(phase16, phase3)
-        phase18 = self._phase18_mhra_ilap_validation(phase17)
+        phase18 = self._phase18_mhra_ilap_validation(phase17, winners)
 
         self.stats["end_time"] = datetime.now().isoformat()
         self._generate_comprehensive_report(winners, phase3, phase4)
@@ -292,7 +292,7 @@ class DanonPipeline:
     def _phase8_inverse_fold(self, aav_candidates: list,
                               promoter_data: dict) -> list:
         logger.info("PHASE 8/12: Structure-Aware Inverse Folding (ESM-IF)")
-        wt_seq = "A" * 750
+        wt_seq = WILD_TYPE_AAV9_CAPSID
         designs = self.inverse_fold.stream_designs(wt_seq, 1000, target_region="VR_IV")
         self.stats["candidates"]["phase8_inverse_fold"] = len(designs)
         ucl_score = 0.35
@@ -445,7 +445,7 @@ class DanonPipeline:
             outcomes = self.clinical.stratify_patients(
                 candidate_fitness=best["fitness"],
                 cardiac_tropism=best["cardiac_tropism"],
-                hepatic_avoidance=0.5,
+                hepatic_avoidance=best["hepatic_avoidance"],
                 immune_evasion=best["immune_evasion"],
                 lamp2b=best["lamp2b_expression"],
                 promoter=promoter_data["best"].optimized_score,
@@ -501,7 +501,7 @@ class DanonPipeline:
             self.learner.record_prediction(
                 candidate_id=best["candidate_id"],
                 cardiac=best["cardiac_tropism"],
-                hepatic=0.5,
+                hepatic=best["hepatic_avoidance"],
                 immune=best["immune_evasion"],
                 lamp2b=best["lamp2b_expression"],
                 fitness=best["fitness"],
@@ -644,20 +644,23 @@ class DanonPipeline:
             ],
         }
 
-    def _phase18_mhra_ilap_validation(self, phase17: dict) -> dict:
+    def _phase18_mhra_ilap_validation(self, phase17: dict, winners: dict = None) -> dict:
         logger.info("PHASE 18/18: MHRA ILAP FastTrack Regulatory Validation")
 
         best_promoter = phase17.get("best_config", {})
+        best_aav = winners["aav"][0] if winners and winners.get("aav") else {}
+        mirna_scores = winners.get("mirna", {}) if winners else {}
+        dosing_data = winners.get("dosing", {}) if winners else {}
         candidate_metrics = {
-            "cardiac_tropism": 0.68,
+            "cardiac_tropism": best_aav.get("cardiac_tropism", 0.72),
             "hepatic_accumulation": best_promoter.get("hepatic_activity", 0.01),
-            "immune_evasion": 0.55,
-            "lamp2b_expression": 0.72,
+            "immune_evasion": best_aav.get("immune_evasion", 0.25),
+            "lamp2b_expression": best_aav.get("lamp2b_expression", 0.72),
             "promoter_score": best_promoter.get("optimized_score", 0.85),
-            "mirna_score": 0.88,
-            "dosing_score": 0.62,
+            "mirna_score": mirna_scores.get("total_optimization", 0.10),
+            "dosing_score": dosing_data.get("regimen_score", 0.30),
             "complement_activation": 0.20,
-            "liver_toxicity": 0.15,
+            "liver_toxicity": dosing_data.get("toxicity_risk", 0.15),
             "cardiac_inflammation": 0.12,
             "decoy_protection": 0.70,
             "vector_titer": 5e13,

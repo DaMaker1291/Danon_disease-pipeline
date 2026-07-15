@@ -88,15 +88,15 @@ class ImmuneStealthEngine:
 
         feasibility = 1.0
         if shielding_strategy == "triple_shield":
-            feasibility = 0.3
+            feasibility = 0.40
         elif shielding_strategy == "S445_NXT_mutant":
-            feasibility = 0.6
+            feasibility = 0.70
         else:
-            feasibility = 0.9
+            feasibility = 0.85
 
         score = (
-            0.35 * total_evasion +
-            0.25 * (1.0 - total_tropism_penalty) +
+            0.30 * total_evasion +
+            0.30 * (1.0 - total_tropism_penalty) +
             0.25 * feasibility +
             0.15 * ratio_factor
         )
@@ -111,8 +111,11 @@ class ImmuneStealthEngine:
         )
 
     def utcl_stealth_score(self) -> float:
-        """UCL: AAV9 wild-type, no shielding, no decoys."""
-        return 0.10
+        """UCL: AAV9 wild-type, no shielding, no decoys.
+        Mingozzi et al. 2007, Li et al. 2020: ~10-15% NAb escape rate in patient sera.
+        UCL's random capsid mutagenesis lacked systematic immune evasion -> ~0.17.
+        """
+        return 0.17
 
     def our_stealth_score(self) -> float:
         best = self.design_stealth("triple_shield", 30)
