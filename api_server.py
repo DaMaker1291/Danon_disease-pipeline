@@ -582,6 +582,59 @@ async def upload(file: UploadFile = File(...)):
 
 
 # --------------------------------------------------------------------------- #
+# ESM protein language model endpoints
+# --------------------------------------------------------------------------- #
+class EsmFitnessRequest(BaseModel):
+    sequence: str
+    mutations: Optional[List[Dict]] = None
+
+
+@app.post("/api/esm/fitness")
+def esm_fitness(req: EsmFitnessRequest):
+    """ESM-2 per-residue fitness scoring for a protein sequence."""
+    try:
+        from danon.esm_inference import compute_per_residue_fitness, score_mutations_with_esm
+        fitness = compute_per_residue_fitness(req.sequence)
+        result = {
+            "sequenceLength": fitness.sequence_length,
+            "meanFitness": fitness.mean_fitness,
+            "minFitness": fitness.min_fitness,
+            "maxFitness": fitness.max_fitness,
+            "perResidue": [{
+                "position": r.position,
+                "positionVp1": r.position_vp1,
+                "wildTypeAa": r.wild_type_aa,
+                "logLikelihoodRatio": r.log_likelihood_ratio,
+                "predictedClass": r.predicted_class,
+                "confidence": r.confidence,
+            } for r in fitness.per_residue[:200]],
+            "modelVersion": fitness.model_version,
+        }
+        if req.mutations:
+            result["scoredMutations"] = score_mutations_with_esm(req.sequence, req.mutations)
+        return _snake_to_camel(result)
+    except Exception as e:
+        logger.warning("ESM fitness scoring failed: %s", e)
+        return {"error": str(e)}
+
+
+class EsmStructureRequest(BaseModel):
+    sequence: str
+
+
+@app.post("/api/esm/structure")
+def esm_structure(req: EsmStructureRequest):
+    """ESM-2 derived structural features: secondary structure, accessibility, contacts."""
+    try:
+        from danon.esm_inference import compute_structural_features
+        result = compute_structural_features(req.sequence)
+        return _snake_to_camel(result)
+    except Exception as e:
+        logger.warning("ESM structural feature prediction failed: %s", e)
+        return {"error": str(e)}
+
+
+# --------------------------------------------------------------------------- #
 # Horizon-2 individual phase endpoints (phases 19-24)
 # --------------------------------------------------------------------------- #
 class MutationsRequest(BaseModel):

@@ -368,3 +368,7 @@ h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.03em;
 .tg-next-label { font-size: 9px; color: var(--accent); letter-spacing: 0.08em; font-weight: 700; }
 .tg-next-step { font-size: 11px; color: var(--text); font-weight: 600; }
 .tg-disclaimer { font-size: 9px; color: var(--text3); line-height: 1.5; border-top: 1px solid var(--border); padding-top: 10px; }
+
+.esm-stats { padding: 8px 0; }
+.plddt-legend { font-size: 10px; color: var(--text3); margin-top: 8px; }
+.plddt-strip { padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px; overflow-x: auto; white-space: nowrap; }

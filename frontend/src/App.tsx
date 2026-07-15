@@ -121,6 +121,14 @@ export default function App() {
       <div className="tg-col">
         <TranslationalGateway readiness={result?.translationalReadiness ?? null} />
       </div>
+
+      {result?.sequence && (
+        <div className="panel glass" style={{ gridColumn: '1 / -1' }}>
+          <ErrorBoundary label="StructureViewer">
+            <StructureViewer sequence={result.sequence} />
+          </ErrorBoundary>
+        </div>
+      )}
     </div>
   );
 

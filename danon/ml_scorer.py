@@ -327,3 +327,28 @@ class MLScorer:
             "total_escape": float(out["total_escape"][0]),
             "resistance": float(out["resistance"][0]),
         }
+
+    def score_with_esm(self, seq: str, mutations: list = None) -> dict:
+        try:
+            from danon.esm_inference import compute_per_residue_fitness, score_mutations_with_esm
+            fitness = compute_per_residue_fitness(seq)
+            result = {
+                "esm_fitness_mean": fitness.mean_fitness,
+                "esm_fitness_min": fitness.min_fitness,
+                "esm_fitness_max": fitness.max_fitness,
+                "esm_model": fitness.model_version,
+            }
+            if mutations:
+                result["scored_mutations"] = score_mutations_with_esm(seq, mutations)
+            return result
+        except Exception as e:
+            logger.warning("ESM scoring failed: %s", e)
+            return {"esm_fitness_mean": 0.0, "esm_error": str(e)}
+
+    def predict_structure(self, seq: str) -> dict:
+        try:
+            from danon.esm_inference import compute_structural_features
+            return compute_structural_features(seq)
+        except Exception as e:
+            logger.warning("ESM structural prediction failed: %s", e)
+            return {"error": str(e)}
