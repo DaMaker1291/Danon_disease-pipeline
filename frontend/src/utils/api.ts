@@ -8,10 +8,10 @@ import type {
   PipelineResult,
 } from '../types';
 
-// Dev: Vite proxies /api to localhost:8000.
-// Production (GitHub Pages): call local backend directly.
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const BASE = import.meta.env.VITE_API_URL || (isLocal ? '/api' : 'http://localhost:8000/api');
+const BASE = isLocal
+  ? '/api'
+  : (import.meta.env.VITE_API_URL || 'https://danon-disease-pipeline.onrender.com/api');
 
 export async function runPipeline(constraints: PipelineConstraints): Promise<PipelineResult> {
   const controller = new AbortController();
