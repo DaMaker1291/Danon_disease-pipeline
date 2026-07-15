@@ -128,10 +128,13 @@ class miRNADetargetEngine:
         )
 
     def score_candidate_for_mirna_compatibility(self, sequence: str) -> float:
-        miR122_count = sequence.lower().count(self.mirnas["miR-122"]["target_sequence"])
-        miR1_count = sequence.lower().count(self.mirnas["miR-1"]["target_sequence"])
-        miR142_count = sequence.lower().count(self.mirnas["miR-142"]["target_sequence"])
-        miR208_count = sequence.lower().count(self.mirnas["miR-208"]["target_sequence"])
+        design = self.design_utr(detarget_liver=True, detarget_immune=True, retarget_cardiac=True)
+        utr = design.utr_sequence_3p.lower()
+
+        miR122_count = utr.count(self.mirnas["miR-122"]["target_sequence"])
+        miR1_count = utr.count(self.mirnas["miR-1"]["target_sequence"])
+        miR142_count = utr.count(self.mirnas["miR-142"]["target_sequence"])
+        miR208_count = utr.count(self.mirnas["miR-208"]["target_sequence"])
 
         liver_present = miR122_count >= 4
         cardiac_present = miR1_count >= 2 and miR208_count >= 2

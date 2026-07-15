@@ -75,6 +75,7 @@ class StoichiometricProfile:
     empty_full_ratio: float
     free_capsid_fraction: float
     bound_capsid_fraction: float
+    free_nab_fraction: float
     complement_deposition_score: float
     therapeutic_efficacy_score: float
     overall_decoy_efficiency: float
@@ -117,6 +118,7 @@ class StoichiometricCalculator:
                 patient_id=0, nab_titer=nab_titer,
                 empty_full_ratio=empty_full_ratio,
                 free_capsid_fraction=1.0, bound_capsid_fraction=0.0,
+                free_nab_fraction=1.0,
                 complement_deposition_score=0.0,
                 therapeutic_efficacy_score=1.0,
                 overall_decoy_efficiency=1.0,
@@ -162,6 +164,7 @@ class StoichiometricCalculator:
             empty_full_ratio=empty_full_ratio,
             free_capsid_fraction=float(free_full_fraction),
             bound_capsid_fraction=float(bound_fraction),
+            free_nab_fraction=float(np.clip(free_nab_fraction, 0, 1)),
             complement_deposition_score=float(complement_score),
             therapeutic_efficacy_score=float(efficacy),
             overall_decoy_efficiency=float(np.clip(decoy_efficiency, 0, 1)),
@@ -189,7 +192,7 @@ class StoichiometricCalculator:
         hi_ratio = best_ratio * np.sqrt(2)
 
         titer_class = self.classify_titer(nab_titer)
-        free_nab_frac = 1.0 - best_profile.bound_capsid_fraction
+        free_nab_frac = best_profile.free_nab_fraction
         complement_risk = best_profile.complement_deposition_score
 
         titer_reduction = 1.0 - free_nab_frac
@@ -231,7 +234,7 @@ class StoichiometricCalculator:
                                            target_free_nab: float = 0.15) -> float:
         for ratio in np.linspace(1, 200, 200):
             profile = self.simulate_decoy_dose(nab_titer, 5e13, ratio)
-            nab_free = 1.0 - profile.bound_capsid_fraction
+            nab_free = profile.free_nab_fraction
             if nab_free <= target_free_nab:
                 return ratio
         return 200.0
@@ -241,4 +244,7 @@ class StoichiometricCalculator:
 
     def our_best_score(self, nab_titer: float = 200.0) -> float:
         result = self.optimize_ratio(nab_titer)
-        return float(np.clip(result.effective_titer_reduction, 0, 1))
+        nab_neutralized = 1.0 - result.predicted_free_nab_fraction
+        complement_avoidance = 1.0 - result.complement_activation_risk
+        score = 0.60 * nab_neutralized + 0.40 * complement_avoidance
+        return float(np.clip(score, 0, 1))

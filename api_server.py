@@ -44,6 +44,7 @@ from danon.mirna_detarget import miRNADetargetEngine
 from danon.translational_readiness import TranslationalReadinessEngine
 from danon.stoichiometric_calc import StoichiometricCalculator
 from danon.platform_validator import PlatformValidator
+from danon.tropism_filter import DanonTropismFilter, CARDIAC_RECEPTORS, HEPATIC_RECEPTORS, CHARGE_PROFILE
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("danon.api")
@@ -83,8 +84,8 @@ class PipelineConstraints(BaseModel):
     min_immune_evasion: float = Field(default=0.50, ge=0.0, le=1.0)
     lamp2b_expression_target: float = Field(default=0.70, ge=0.0, le=1.0)
     candidate_pool: int = Field(default=400, ge=50, le=4000)
-    max_mutations_vr_iv: int = Field(default=4, ge=0, le=12)
-    max_mutations_vr_viii: int = Field(default=6, ge=0, le=20)
+    max_mutations_vr_iv: int = Field(default=6, ge=0, le=12)
+    max_mutations_vr_viii: int = Field(default=10, ge=0, le=20)
     random_seed: int = Field(default=42, ge=0, le=1_000_000)
     # Horizon-2 (phases 19-24) gates
     max_solvation_delta_g: float = Field(default=2.5, ge=0.5, le=10.0)
@@ -162,6 +163,23 @@ def run_full_pipeline(c: PipelineConstraints) -> Dict:
     total = c.candidate_pool
     for batch in generator.stream_candidates(total, batch_size):
         scored.extend(batch)
+
+    # 1b) Re-score cardiac tropism using receptor-position model
+    tropism_filter = DanonTropismFilter(cfg)
+    for cand in scored:
+        receptor_score = tropism_filter._compute_tissue_score(cand.sequence, "cardiac_myocytes", 1.0)
+        cand.cardiac_tropism_score = float(np.clip(0.5 * cand.cardiac_tropism_score + 0.5 * receptor_score, 0, 1))
+        hepatic_raw = tropism_filter._compute_tissue_score(cand.sequence, "hepatic", 1.0)
+        cand.hepatic_avoidance_score = float(np.clip(0.5 * cand.hepatic_avoidance_score + 0.5 * (1.0 - hepatic_raw), 0, 1))
+        cand.fitness = (
+            0.30 * cand.cardiac_tropism_score +
+            0.15 * cand.skeletal_muscle_score +
+            0.20 * cand.hepatic_avoidance_score +
+            0.15 * cand.immune_evasion_score +
+            0.10 * cand.lamp2b_compatibility +
+            0.10 * cand.structural_score +
+            0.05 * cand.stability_score
+        )
 
     # 2) Constraint filter (soft) then rank by fitness
     def passes(cand):
