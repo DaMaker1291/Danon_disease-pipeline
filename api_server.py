@@ -12,6 +12,7 @@ Run:  uvicorn api_server:app --port 8000
 """
 import logging
 import re
+from contextlib import asynccontextmanager
 from typing import Dict, List, Optional
 
 import numpy as np
@@ -55,7 +56,12 @@ def _snake_to_camel(obj):
         return [_snake_to_camel(i) for i in obj]
     return obj
 
-app = FastAPI(title="Danon AAV9-LAMP2B Pipeline API", version="2.1")
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    print_global_regulatory_disclaimer()
+    yield
+
+app = FastAPI(title="Danon AAV9-LAMP2B Pipeline API", version="2.2", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -485,11 +491,6 @@ def run_horizon2(c: PipelineConstraints, wt_seq: str, masked_seq: str,
 @app.get("/api/health")
 def health():
     return {"status": "ok", "service": "danon-pipeline", "version": "2.2", "phases": 24}
-
-
-@app.on_event("startup")
-def _print_disclaimer():
-    print_global_regulatory_disclaimer()
 
 
 @app.post("/api/run-pipeline")
