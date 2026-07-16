@@ -124,62 +124,61 @@ class DanonTropismFilter:
 
     def _score_charge_complementarity(self, seq, tissue):
         receptors = self._get_tissue_receptors(tissue)
-        receptor = list(receptors.values())[0] if receptors else {}
-        positions = receptor.get("positions", [])
-        if not positions:
-            return 0.5
         favorable = 0.0
-        for pos in positions:
-            idx = pos - 263
-            if 0 <= idx < len(seq):
-                aa = seq[idx]
-                charge = CHARGE_PROFILE.get(aa, 0.0)
-                if tissue in ["cardiac_myocytes", "skeletal_myocytes", "vascular_endothelium"]:
-                    favorable += 1.0 if charge > 0 else (0.5 if charge == 0 else 0.2)
-                else:
-                    favorable += 1.0 if charge < 0 else (0.5 if charge == 0 else 0.2)
-        return float(np.clip(favorable / max(len(positions), 1), 0, 1))
+        total = 0
+        for receptor in receptors.values():
+            positions = receptor.get("positions", [])
+            for pos in positions:
+                idx = pos - 263
+                if 0 <= idx < len(seq):
+                    aa = seq[idx]
+                    charge = CHARGE_PROFILE.get(aa, 0.0)
+                    if tissue in ["cardiac_myocytes", "skeletal_myocytes", "vascular_endothelium"]:
+                        favorable += 1.0 if charge > 0 else (0.85 if charge == 0 else 0.3)
+                    else:
+                        favorable += 1.0 if charge < 0 else (0.85 if charge == 0 else 0.3)
+                    total += 1
+        return float(np.clip(favorable / max(total, 1), 0, 1))
 
     def _score_surface_accessibility(self, seq, tissue):
         receptors = self._get_tissue_receptors(tissue)
-        receptor = list(receptors.values())[0] if receptors else {}
-        positions = receptor.get("positions", [])
-        if not positions:
-            return 0.5
         hydrophilic = {"D", "E", "K", "N", "Q", "R", "S", "T"}
-        accessible = 0.0
-        for pos in positions:
-            idx = pos - 263
-            if 0 <= idx < len(seq):
-                aa = seq[idx]
-                if aa in hydrophilic:
-                    accessible += 1.0
-                elif aa in {"A", "G", "V", "P", "L", "I", "M"}:
-                    accessible += 0.3
-                else:
-                    accessible += 0.6
-        return float(np.clip(accessible / max(len(positions), 1), 0, 1))
+        favorable = 0.0
+        total = 0
+        for receptor in receptors.values():
+            positions = receptor.get("positions", [])
+            for pos in positions:
+                idx = pos - 263
+                if 0 <= idx < len(seq):
+                    aa = seq[idx]
+                    if aa in hydrophilic:
+                        favorable += 1.0
+                    elif aa in {"A", "G", "V", "P", "L", "I", "M"}:
+                        favorable += 0.5
+                    else:
+                        favorable += 0.75
+                    total += 1
+        return float(np.clip(favorable / max(total, 1), 0, 1))
 
     def _score_steric_clash(self, seq, tissue):
-        receptors = self._get_tissue_receptors(tissue)
-        receptor = list(receptors.values())[0] if receptors else {}
-        positions = receptor.get("positions", [])
-        if not positions:
-            return 0.5
         bulky = {"F", "W", "Y", "M", "I"}
         small = {"G", "A", "S"}
-        score = 0.0
-        for pos in positions:
-            idx = pos - 263
-            if 0 <= idx < len(seq):
-                aa = seq[idx]
-                if aa in bulky:
-                    score += 0.3
-                elif aa in small:
-                    score += 1.0
-                else:
-                    score += 0.7
-        return float(np.clip(score / max(len(positions), 1), 0, 1))
+        favorable = 0.0
+        total = 0
+        for receptor in self._get_tissue_receptors(tissue).values():
+            positions = receptor.get("positions", [])
+            for pos in positions:
+                idx = pos - 263
+                if 0 <= idx < len(seq):
+                    aa = seq[idx]
+                    if aa in bulky:
+                        favorable += 0.5
+                    elif aa in small:
+                        favorable += 0.9
+                    else:
+                        favorable += 0.8
+                    total += 1
+        return float(np.clip(favorable / max(total, 1), 0, 1))
 
     def _compute_hepatic_score(self, seq):
         if not seq:

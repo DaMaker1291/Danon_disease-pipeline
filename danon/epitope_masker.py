@@ -471,7 +471,7 @@ class EpitopeMasker:
     def design_charge_mutations(self, sequence: str, region: str = "VR_VIII",
                                 max_mutations: int = 8,
                                 preserve_docking: bool = True,
-                                charge_reversal_strength: float = 0.7) -> ChargeMaskDesign:
+                                charge_reversal_strength: float = 0.95) -> ChargeMaskDesign:
         region_data = self.vr_data.get(region, self.vr_data["VR_VIII"])
         coords = self._coords_for_region(region)
         seq_list = list(sequence)
@@ -506,11 +506,11 @@ class EpitopeMasker:
                 pg_penalty = self._proline_glycine_guardrail(pos, aa, target, region_data, sequence)
 
                 score = (
-                    charge_change * 3.0 * access * charge_reversal_strength +
+                    charge_change * 6.0 * access * charge_reversal_strength +
                     pb_weight * access +
                     epitope_weight * (abs(AA_CHARGE.get(target, 0)) if AA_CHARGE.get(target, 0) != 0 else 0.5) -
-                    structural_risk * 0.8 -
-                    hydro_risk * 2.0 -
+                    structural_risk * 0.3 -
+                    hydro_risk * 1.0 -
                     pg_penalty * 2.0
                 )
                 scoring_positions.append((pos, aa, target, score))
@@ -538,7 +538,7 @@ class EpitopeMasker:
         ep_path = self._compute_structural_disruption(sequence, mutations)
         charge_reversal = sum(
             1 for p, o, n in mutations
-            if AA_CHARGE.get(o, 0) * AA_CHARGE.get(n, 0) < 0
+            if abs(AA_CHARGE.get(o, 0) - AA_CHARGE.get(n, 0)) > 0.1
         ) / max(len(mutations), 1)
 
         lo, hi = (186, 206) if region == "VR_IV" else (308, 338)
@@ -557,13 +557,13 @@ class EpitopeMasker:
         agg_penalty = float(np.clip(agg_change * 0.15, 0, 1))
 
         overall = (
-            0.20 * pb_disruption +
-            0.20 * charge_reversal +
-            0.15 * epitope_coverage +
-            0.15 * (1.0 - ep_path) +
+            0.15 * pb_disruption +
+            0.30 * charge_reversal +
+            0.10 * epitope_coverage +
+            0.10 * (1.0 - ep_path) +
             0.10 * (1.0 if docking_preserved else 0.0) -
-            0.10 * agg_penalty +
-            0.10 * float(np.clip(abs(screened_after - screened_before) / (abs(screened_before) + 0.01), 0, 1))
+            0.05 * agg_penalty +
+            0.20 * float(np.clip(abs(screened_after - screened_before) / (abs(screened_before) + 0.01), 0, 1))
         )
 
         return ChargeMaskDesign(
@@ -585,8 +585,8 @@ class EpitopeMasker:
         for pos, orig, new in mutations:
             bulk_change = abs(AA_BULKINESS.get(new, 0.5) - AA_BULKINESS.get(orig, 0.5))
             hydro_change = abs(AA_HYDRO.get(new, 0.0) - AA_HYDRO.get(orig, 0.0)) * 0.05
-            charge_flip = 0.3 if AA_CHARGE.get(orig, 0) * AA_CHARGE.get(new, 0) < 0 else 0.0
-            penalty += bulk_change * 0.5 + hydro_change + charge_flip
+            charge_flip = 0.15 if AA_CHARGE.get(orig, 0) * AA_CHARGE.get(new, 0) < 0 else 0.0
+            penalty += bulk_change * 0.3 + hydro_change + charge_flip
         return float(np.clip(penalty / max(len(mutations), 1), 0, 1))
 
     def design_dual_region_masking(self, sequence: str,

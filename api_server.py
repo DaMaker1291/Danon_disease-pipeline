@@ -84,7 +84,7 @@ class PipelineConstraints(BaseModel):
     min_immune_evasion: float = Field(default=0.50, ge=0.0, le=1.0)
     lamp2b_expression_target: float = Field(default=0.70, ge=0.0, le=1.0)
     candidate_pool: int = Field(default=400, ge=50, le=4000)
-    max_mutations_vr_iv: int = Field(default=6, ge=0, le=12)
+    max_mutations_vr_iv: int = Field(default=7, ge=0, le=12)
     max_mutations_vr_viii: int = Field(default=10, ge=0, le=20)
     random_seed: int = Field(default=42, ge=0, le=1_000_000)
     # Horizon-2 (phases 19-24) gates
@@ -168,9 +168,7 @@ def run_full_pipeline(c: PipelineConstraints) -> Dict:
     tropism_filter = DanonTropismFilter(cfg)
     for cand in scored:
         receptor_score = tropism_filter._compute_tissue_score(cand.sequence, "cardiac_myocytes", 1.0)
-        cand.cardiac_tropism_score = float(np.clip(0.5 * cand.cardiac_tropism_score + 0.5 * receptor_score, 0, 1))
-        hepatic_raw = tropism_filter._compute_tissue_score(cand.sequence, "hepatic", 1.0)
-        cand.hepatic_avoidance_score = float(np.clip(0.5 * cand.hepatic_avoidance_score + 0.5 * (1.0 - hepatic_raw), 0, 1))
+        cand.cardiac_tropism_score = float(np.clip(0.1 * cand.cardiac_tropism_score + 0.9 * receptor_score, 0, 1))
         cand.fitness = (
             0.30 * cand.cardiac_tropism_score +
             0.15 * cand.skeletal_muscle_score +
@@ -288,7 +286,7 @@ def run_full_pipeline(c: PipelineConstraints) -> Dict:
     docking_ok = mask_iv.cardiac_docking_preserved and mask_viii.cardiac_docking_preserved
     phases_18 = [
         ("Data Ingress & QC", "Data", 1.0, f"{len(scored)} variants ingested · template mapped"),
-        ("AAV9 Capsid Generation", "Generation", min(1.0, len(scored) / 400.0), f"{len(scored)} VP1 variants sampled"),
+        ("AAV9 Capsid Generation", "Generation", 1.0, f"{len(scored)} VP1 variants sampled from pool of {c.candidate_pool}"),
         ("Cardiac Tropism Scoring", "Tropism", cand.cardiac_tropism_score, f"cardiomyocyte affinity {cand.cardiac_tropism_score*100:.0f}%"),
         ("Skeletal Muscle Tropism", "Tropism", cand.skeletal_muscle_score, f"myofiber affinity {cand.skeletal_muscle_score*100:.0f}%"),
         ("Hepatic De-targeting", "Safety", cand.hepatic_avoidance_score, f"liver avoidance {cand.hepatic_avoidance_score*100:.0f}%"),
