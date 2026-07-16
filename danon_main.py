@@ -36,6 +36,7 @@ from danon.mouse_study_simulator import MouseStudySimulator
 from danon.dual_vector_moi_optimizer import DualVectorMOIOptimizer
 from danon.nab_assay_simulator import NAbAssaySimulator
 from danon.immunosuppression_protocol import ImmunosuppressionProtocol
+from danon.cell_simulator import DanonCellSimulator
 
 logging.basicConfig(
     level=logging.INFO,
@@ -68,6 +69,7 @@ UCL_BASELINE_SCORES = {
     "moi_optimization": 0.25,
     "nab_assay": 0.25,
     "immunosuppression": 0.15,
+    "cell_simulator": 0.10,
 }
 
 
@@ -106,6 +108,7 @@ class DanonPipeline:
         self.moi_opt = DualVectorMOIOptimizer()
         self.nab_assay = NAbAssaySimulator()
         self.immunosuppression = ImmunosuppressionProtocol()
+        self.cell_sim = DanonCellSimulator()
         self.stats = {"start_time": None, "phases": {}, "candidates": {}}
         self.reports: List[PipelineReport] = []
 
@@ -143,6 +146,7 @@ class DanonPipeline:
         phase21 = self._phase21_moi_optimization(winners)
         phase22 = self._phase22_nab_assay(winners)
         phase23 = self._phase23_immunosuppression()
+        phase24 = self._phase24_cell_simulation(winners)
 
         self.stats["end_time"] = datetime.now().isoformat()
         self._generate_comprehensive_report(winners, phase3, phase4)
@@ -154,6 +158,7 @@ class DanonPipeline:
             "wetlab_lims": phase19, "mouse_study": phase20,
             "moi_optimization": phase21, "nab_assay": phase22,
             "immunosuppression": phase23,
+            "cell_simulation": phase24,
         }
 
     def _phase1_generate_aav(self) -> list:
@@ -898,6 +903,73 @@ class DanonPipeline:
             "depletion_window_days": assessment.design.window_duration_days,
             "complement_mitigation": assessment.complement_mitigation_vs_none,
             "clinically_feasible": assessment.is_clinically_feasible,
+        }
+
+    def _phase24_cell_simulation(self, winners: dict) -> dict:
+        logger.info("PHASE 24/24: Danon Disease Cardiomyocyte Cell Simulator")
+        cardiac = winners["aav"][0].get("cardiac_tropism", 0.72) if winners["aav"] else 0.72
+        immune = winners["aav"][0].get("immune_evasion", 0.6) if winners["aav"] else 0.6
+        promoter = winners["promoter"]["optimized_score"]
+        mirna = winners["mirna"]["total_optimization"]
+
+        null_result = self.cell_sim.simulate_cell(
+            mutation_type="null", vector_copy_number=10, cardiac_tropism=cardiac,
+            immune_evasion=immune, promoter_score=promoter, mirna_score=mirna,
+        )
+        no_therapy = self.cell_sim.simulate_cell(
+            mutation_type="null", vector_copy_number=0, cardiac_tropism=cardiac,
+        )
+        trial = self.cell_sim.project_trial_outcome(
+            cardiac_tropism=cardiac, n_patients=24,
+        )
+        population = self.cell_sim.simulate_population(
+            cardiac_tropism=cardiac, immune_evasion=immune,
+            promoter_score=promoter, mirna_score=mirna, n_patients=100,
+        )
+        mut_comparison = self.cell_sim.compare_mutation_types(cardiac_tropism=cardiac)
+
+        ucl_score = UCL_BASELINE_SCORES["cell_simulator"]
+        our_score = null_result.functional_cure_score
+        self.reports.append(PipelineReport(
+            module="Cell Simulator (ODE-based Danon cardiomyocyte pathophys + rescue)",
+            our_score=our_score,
+            utcl_baseline=ucl_score,
+            improvement_factor=our_score / max(ucl_score, 0.01),
+        ))
+
+        logger.info("  Null mutation @ VCN=10: cure=%s, score=%.3f", null_result.is_functional_cure, null_result.functional_cure_score)
+        logger.info("    LAMP2=%.1f%%, Glycogen=%.1f%%, Flux=%.1f%%, pH=%.2f, Surv5y=%.3f",
+                     null_result.lamp2_restoration_pct, null_result.glycogen_clearance_pct,
+                     null_result.autophagic_flux_restoration_pct, null_result.lysosomal_ph_normalization,
+                     null_result.cell_survival_at_5y)
+        logger.info("  No therapy: Surv5y=%.1f%%, Surv10y=%.1f%%",
+                     no_therapy.cell_survival_at_5y * 100, no_therapy.cell_survival_at_10y * 100)
+        logger.info("  Population (n=100): cure=%.0f%%, improved=%.0f%%",
+                     population["cure_rate"] * 100, population["improvement_rate"] * 100)
+        logger.info("  Trial (n=24): power=%.2f, feasible=%s",
+                     trial["statistical_power"], trial["trial_feasible"])
+
+        return {
+            "null_mutation_therapy": {
+                "is_functional_cure": null_result.is_functional_cure,
+                "cure_score": null_result.functional_cure_score,
+                "lamp2_restoration_pct": null_result.lamp2_restoration_pct,
+                "glycogen_clearance_pct": null_result.glycogen_clearance_pct,
+                "autophagic_flux_restoration_pct": null_result.autophagic_flux_restoration_pct,
+                "lysosomal_ph_normalization": null_result.lysosomal_ph_normalization,
+                "survival_5y": null_result.cell_survival_at_5y,
+                "survival_10y": null_result.cell_survival_at_10y,
+            },
+            "no_therapy": {
+                "survival_5y": no_therapy.cell_survival_at_5y,
+                "survival_10y": no_therapy.cell_survival_at_10y,
+            },
+            "population_study": {
+                "cure_rate": population["cure_rate"],
+                "improvement_rate": population["improvement_rate"],
+            },
+            "trial_projection": trial,
+            "mutation_comparison": mut_comparison,
         }
 
     def _generate_comprehensive_report(self, winners: dict,

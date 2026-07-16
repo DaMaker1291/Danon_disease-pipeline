@@ -1,0 +1,22 @@
+[
+  {
+    "candidate_id": 1,
+    "vendor": "PackGene",
+    "cost_usd": 1493.0,
+    "estimated_delivery_days": 21,
+    "sequence_hash": 613583905,
+    "ordered_date": "2026-07-16T19:05:48.876661",
+    "status": "ordered",
+    "qc_verified": false,
+    "assays": [
+      "AssayResult(assay_type='cardiac_transduction_flow', candidate_id=1, value=28.5, passed_go=True, passed_target=False, deviation_from_prediction=-0.5928571428571429, timestamp='2026-07-16T19:05:48.877660', operator_notes='')",
+      "AssayResult(assay_type='hepatic_leakage_qpcr', candidate_id=1, value=0.8, passed_go=True, passed_target=False, deviation_from_prediction=3.0000000000000013, timestamp='2026-07-16T19:05:48.877660', operator_notes='')",
+      "AssayResult(assay_type='trans_splicing_western', candidate_id=1, value=0.68, passed_go=True, passed_target=False, deviation_from_prediction=-0.055555555555555455, timestamp='2026-07-16T19:05:48.878661', operator_notes='')"
+    ],
+    "predicted_cardiac": 0.7,
+    "predicted_hepatic": 0.8,
+    "predicted_immune": 0.6,
+    "predicted_lamp2b": 0.75,
+    "predicted_fitness": 0.72
+  }
+]

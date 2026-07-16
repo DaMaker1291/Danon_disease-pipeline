@@ -11,6 +11,7 @@ from danon.mouse_study_simulator import MouseStudySimulator, MouseStudyResult
 from danon.dual_vector_moi_optimizer import DualVectorMOIOptimizer, DualVectorMoiDesign
 from danon.nab_assay_simulator import NAbAssaySimulator, NAbAssayResult
 from danon.immunosuppression_protocol import ImmunosuppressionProtocol, ImmunosuppressionAssessment
+from danon.cell_simulator import DanonCellSimulator, CellSimulationResult
 from danon.epitope_masker import EpitopeMasker, ChargeMaskDesign
 from danon.stoichiometric_calc import StoichiometricCalculator, DecoyOptimizationResult
 from danon.promoter_spec import PromoterSpecEngine, PromoterSpec
@@ -51,4 +52,5 @@ __all__ = [
     "DualVectorMOIOptimizer", "DualVectorMoiDesign",
     "NAbAssaySimulator", "NAbAssayResult",
     "ImmunosuppressionProtocol", "ImmunosuppressionAssessment",
+    "DanonCellSimulator", "CellSimulationResult",
 ]
