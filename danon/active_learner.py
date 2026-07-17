@@ -6,7 +6,21 @@ After each round of wet-lab validation:
   1. Record which predictions were correct/wrong
   2. Update scoring weights via Bayesian updating
   3. Regenerate candidate ranking with refined weights
-  4. Suggest next-round experiments (top candidates not yet tested)
+  4. Suggest next-round experiments using UCB1 exploration to prevent confirmation bias
+
+UPGRADE — UCB1 (Upper Confidence Bound) Exploration:
+  Instead of greedy exploitation (always picking highest predicted fitness),
+  UCB1 balances exploitation (high predicted fitness) with exploration
+  (candidates the model is uncertain about). This prevents confirmation bias
+  where the model keeps selecting similar high-fitness candidates and never
+  explores high-epistemic-uncertainty regions of the sequence space.
+
+  UCB1 score = predicted_fitness + beta * sqrt(2 * ln(N) / n_i)
+
+  where N = total experiments, n_i = times candidate i was tested,
+  beta = exploration coefficient.
+
+Reference: Auer et al. 2002 (UCB1), JMLR 2:235-262.
 """
 import json
 import os
@@ -56,7 +70,7 @@ WEIGHT_DECAY = 0.95
 
 
 class ActiveLearner:
-    def __init__(self, history_path: str = None):
+    def __init__(self, history_path: str = None, exploration_coefficient: float = 1.414):
         self.history_path = history_path or os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             "experimental_history.json"
@@ -73,6 +87,8 @@ class ActiveLearner:
             "mirna": 0.02,
         }
         self.round = 0
+        self.exploration_coefficient = exploration_coefficient
+        self._selection_counts: Dict[int, int] = {}  # candidate_id -> times selected
         self._load_history()
 
     def _load_history(self):
@@ -185,11 +201,62 @@ class ActiveLearner:
             w["mirna"] * 0.5
         )
 
+    def ucb1_score(self, candidate) -> float:
+        """Compute UCB1 score for a candidate.
+
+        UCB1 = mean_reward + beta * sqrt(2 * ln(N) / n_i)
+
+        where:
+            N = total experiments conducted so far
+            n_i = number of times this candidate was selected for testing
+            beta = exploration coefficient (sqrt(2) is the theoretical optimum)
+            mean_reward = predicted fitness from the Bayesian model
+
+        Candidates that have never been tested (n_i = 0) receive +infinity,
+        ensuring they are always explored first. For tested candidates,
+        the exploration bonus decreases as n_i increases, naturally converging
+        to exploitation of the best-known candidates.
+        """
+        cid = getattr(candidate, "candidate_id", -1)
+        n_i = self._selection_counts.get(cid, 0)
+        n_total = sum(self._selection_counts.values())
+        mean_reward = self.get_refined_fitness(candidate)
+
+        if n_i == 0:
+            return float('inf')
+
+        exploration_bonus = self.exploration_coefficient * np.sqrt(
+            2.0 * np.log(max(n_total, 1)) / n_i
+        )
+        return mean_reward + exploration_bonus
+
     def suggest_next_experiments(self, candidates: list, n: int = 10) -> List[tuple]:
+        """Select next experiments using UCB1 exploration-exploitation balance.
+
+        Instead of greedy selection (always highest predicted fitness),
+        UCB1 ensures we explore candidates the model is uncertain about.
+        This prevents confirmation bias where the model keeps selecting
+        similar high-fitness candidates and never explores high-uncertainty
+        regions of the sequence space.
+        """
         tested_ids = {r.candidate_id for r in self.history if r.actual is not None}
         untested = [c for c in candidates if getattr(c, "candidate_id", -1) not in tested_ids]
-        untested.sort(key=lambda c: self.get_refined_fitness(c), reverse=True)
-        return untested[:n]
+
+        if not untested:
+            return []
+
+        # Score all untested candidates using UCB1
+        scored = [(self.ucb1_score(c), c) for c in untested]
+        scored.sort(key=lambda x: x[0], reverse=True)
+
+        # Track selection counts for the chosen candidates
+        selected = []
+        for _, c in scored[:n]:
+            cid = getattr(c, "candidate_id", -1)
+            self._selection_counts[cid] = self._selection_counts.get(cid, 0) + 1
+            selected.append(c)
+
+        return selected
 
     def experiment_protocol(self, candidate) -> Dict:
         return {

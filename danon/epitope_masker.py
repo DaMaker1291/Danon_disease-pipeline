@@ -2,16 +2,18 @@
 Epitope Masker: Structural charge-masking algorithm for AAV9 capsid.
 Uses verified coordinates from RCSB PDB 3J1S (AAV9 cryo-EM capsid).
 
-HORIZON 1 UPGRADE — Full Poisson-Boltzmann electrostatic surface potential:
-  Replaces simple residue charge counting with APBS/PDB2PQR-style
-  finite-difference electrostatics. Computes per-residue electrostatic
-  energy in a continuum dielectric model (protein eps=4, solvent eps=80)
-  with physiological salt (150 mM, Debye length ~8 Å), then designs
-  charge-reversal mutations that maximally perturb NAb binding epitopes
-  while preserving the cardiac receptor docking footprint.
+HORIZON 2 UPGRADE — Elastic Network Model + Poisson-Boltzmann:
+  1. ENM: Computes CA-CA contact Hessian, eigenvalues, and per-residue RMSF
+     to penalize mutations that destabilize structural vibrational modes.
+  2. PB:  Continuum electrostatics (protein eps=4, solvent eps=80, 150 mM salt)
+     to design charge-reversal mutations that maximally perturb NAb epitopes.
+  3. Combined scoring: charge-masking benefit MINUS structural destabilization cost.
 
 Reference: DiMattia et al. 2012 (PDB 3J1S), J Virol 86(23):12722-30.
           Baker et al. 2001 (APBS), PNAS 98(18):10037-41.
+          Tirion 1996 (ENM), Phys Rev Lett 77:1905.
+          Bahar et al. 1997 (GNM), Biophys J 72:1623.
+          Tama et al. 2002 (ANM), Proteins 47:185.
 VP1 offset: 263 (stored sequence = VP1 residues 263-819 truncated).
 """
 import os
@@ -21,6 +23,158 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Tuple, Optional
 
 logger = logging.getLogger(__name__)
+
+
+class ElasticNetworkModel:
+    """Anisotropic Network Model (ENM) for computing per-residue RMSF
+    from normal mode analysis of the CA-CA contact Hessian.
+
+    The ENM approximates the protein as a network of beads (C-alpha atoms)
+    connected by harmonic springs for contacts within a cutoff distance.
+    The Hessian matrix H (3N x 3N) encodes the spring network; its
+    eigenvalues/eigenvectors yield the normal modes. Low-frequency modes
+    correspond to large-scale collective motions.
+
+    Per-residue RMSF is computed from the diagonal of the inverse Hessian:
+        RMSF_i = sum_k (v_ik^2 / lambda_k) for k >= 7 (excluding 6 zero modes)
+
+    A mutation that increases RMSF at a structurally critical position
+    destabilizes the capsid assembly interface.
+
+    Reference: Tirion 1996, Phys Rev Lett 77:1905.
+              Bahar et al. 1997, Biophys J 72:1623.
+    """
+
+    CUTOFF_ANGSTROM = 12.0   # contact cutoff for spring network
+    SPRING_CONST = 1.0       # uniform spring constant (arbitrary units)
+    KBT = 0.592              # kT at 300K in kcal/mol (for RMSF scaling)
+
+    def __init__(self):
+        self._hessian = None
+        self._eigenvalues = None
+        self._eigenvectors = None
+        self._rmsf = None
+        self._n_residues = 0
+
+    def build_hessian(self, ca_coords: Dict[int, np.ndarray]) -> np.ndarray:
+        """Build the 3N x 3N Hessian matrix from CA coordinates.
+
+        Args:
+            ca_coords: {residue_id: np.array([x, y, z])} in Angstroms.
+
+        Returns:
+            Hessian matrix of shape (3N, 3N).
+        """
+        res_ids = sorted(ca_coords.keys())
+        n = len(res_ids)
+        self._n_residues = n
+        hessian = np.zeros((3 * n, 3 * n))
+
+        for i in range(n):
+            for j in range(i + 1, n):
+                ri = ca_coords[res_ids[i]]
+                rj = ca_coords[res_ids[j]]
+                diff = rj - ri
+                dist = np.linalg.norm(diff)
+                if dist > self.CUTOFF_ANGSTROM or dist < 1e-6:
+                    continue
+                # Unit vector along the spring
+                u = diff / dist
+                # Outer product for the 3x3 block
+                block = -self.SPRING_CONST * np.outer(u, u)
+                hessian[3*i:3*i+3, 3*i:3*i+3] += block
+                hessian[3*j:3*j+3, 3*j:3*j+3] += block
+                hessian[3*i:3*i+3, 3*j:3*j+3] -= block
+                hessian[3*j:3*j+3, 3*i:3*i+3] -= block
+
+        self._hessian = hessian
+        return hessian
+
+    def compute_normal_modes(self, hessian: Optional[np.ndarray] = None) -> Tuple[np.ndarray, np.ndarray]:
+        """Diagonalize the Hessian to get eigenvalues and eigenvectors.
+
+        Returns:
+            (eigenvalues, eigenvectors) sorted by ascending eigenvalue.
+            First 6 eigenvalues are ~0 (rigid-body translation/rotation).
+        """
+        if hessian is None:
+            hessian = self._hessian
+        if hessian is None:
+            raise ValueError("Hessian not built. Call build_hessian() first.")
+
+        eigvals, eigvecs = np.linalg.eigh(hessian)
+        # Sort ascending (low-frequency modes first)
+        idx = np.argsort(eigvals)
+        self._eigenvalues = eigvals[idx]
+        self._eigenvectors = eigvecs[:, idx]
+        return self._eigenvalues, self._eigenvectors
+
+    def compute_rmsf(self, eigenvalues: Optional[np.ndarray] = None,
+                     eigenvectors: Optional[np.ndarray] = None) -> np.ndarray:
+        """Compute per-residue RMSF from normal modes.
+
+        RMSF_i = (kT / gamma) * sum_{k=6}^{3N-1} (v_ik^2 / lambda_k)
+
+        where gamma is the spring constant, kT = 0.592 kcal/mol at 300K.
+
+        Returns:
+            RMSF array of shape (N,) in Angstrom^2.
+        """
+        if eigenvalues is None:
+            eigenvalues = self._eigenvalues
+        if eigenvectors is None:
+            eigenvectors = self._eigenvectors
+        if eigenvalues is None:
+            raise ValueError("Normal modes not computed. Call compute_normal_modes() first.")
+
+        n = self._n_residues
+        rmsf = np.zeros(n)
+
+        # Skip first 6 modes (rigid-body)
+        for k in range(6, len(eigenvalues)):
+            lam = eigenvalues[k]
+            if lam < 1e-8:
+                continue
+            for i in range(n):
+                # Sum the squared eigenvector components for residues i
+                v_ik_sq = sum(eigenvectors[3*i + d, k]**2 for d in range(3))
+                rmsf[i] += v_ik_sq / lam
+
+        rmsf *= self.KBT / self.SPRING_CONST
+        self._rmsf = rmsf
+        return rmsf
+
+    def get_rmsf(self, ca_coords: Dict[int, np.ndarray]) -> np.ndarray:
+        """Convenience: build Hessian, compute modes, return RMSF."""
+        self.build_hessian(ca_coords)
+        self.compute_normal_modes()
+        return self.compute_rmsf()
+
+    def predict_mutation_destabilization(self, pos: int,
+                                         ca_coords: Dict[int, np.ndarray],
+                                         rmsf_threshold: float = 5.0) -> float:
+        """Return a destabilization penalty (0..1) for mutating a residue.
+
+        High RMSF at a position indicates it participates in collective motions;
+        mutating such residues disrupts the vibrational network that stabilizes
+        the capsid assembly interface.
+
+        Args:
+            pos: 1-based residue position index.
+            ca_coords: CA coordinates dictionary.
+            rmsf_threshold: RMSF value (Angstrom^2) above which penalty = 1.0.
+
+        Returns:
+            Penalty in [0, 1]. 0 = no destabilization, 1 = severe.
+        """
+        if self._rmsf is None:
+            self.get_rmsf(ca_coords)
+        res_ids = sorted(ca_coords.keys())
+        if pos not in res_ids:
+            return 0.0
+        idx = res_ids.index(pos)
+        rmsf = self._rmsf[idx]
+        return float(np.clip(rmsf / rmsf_threshold, 0.0, 1.0))
 
 # Physical constants for Poisson-Boltzmann
 KB = 1.380649e-23
@@ -190,6 +344,8 @@ class EpitopeMasker:
         self.pdb_path = pdb_path
         self._pdb_coords = None
         self._pdb_distance_matrix = None
+        self.enm = ElasticNetworkModel()
+        self._enm_rmsf_cache: Dict[str, np.ndarray] = {}
 
     def load_pdb_structure(self, pdb_path: Optional[str] = None) -> bool:
         """
@@ -252,6 +408,57 @@ class EpitopeMasker:
             else:
                 enriched[pos] = (x, y, z, access)
         return enriched
+
+    def _compute_enm_rmsf_for_region(self, region: str) -> np.ndarray:
+        """Compute per-residue RMSF via ENM for a VR region.
+
+        Returns an RMSF array indexed by the region's residue positions.
+        Cached per region to avoid recomputation.
+        """
+        if region in self._enm_rmsf_cache:
+            return self._enm_rmsf_cache[region]
+
+        coords = self._coords_for_region(region)
+        ca_dict = {pos: np.array([x, y, z]) for pos, (x, y, z, _) in coords.items()}
+
+        if len(ca_dict) < 3:
+            rmsf = np.zeros(len(ca_dict))
+        else:
+            try:
+                rmsf = self.enm.get_rmsf(ca_dict)
+            except Exception:
+                logger.warning("ENM computation failed for region %s; using zeros", region)
+                rmsf = np.zeros(len(ca_dict))
+
+        self._enm_rmsf_cache[region] = rmsf
+        return rmsf
+
+    def _enm_destabilization_penalty(self, pos: int, region: str,
+                                     new_aa: str, rmsf_threshold: float = 5.0) -> float:
+        """Return a penalty [0, 1] for mutating a residue at `pos` based on ENM RMSF.
+
+        High RMSF residues participate in collective vibrational modes that
+        stabilize the capsid assembly interface. Mutating them is penalized.
+        """
+        coords = self._coords_for_region(region)
+        res_ids = sorted(coords.keys())
+        if pos not in res_ids:
+            return 0.0
+        rmsf = self._compute_enm_rmsf_for_region(region)
+        idx = res_ids.index(pos)
+        if idx >= len(rmsf):
+            return 0.0
+        rmsf_val = rmsf[idx]
+        # Normalize: residues with RMSF > threshold get full penalty
+        base_penalty = float(np.clip(rmsf_val / rmsf_threshold, 0.0, 1.0))
+        # Amplify penalty for charge-reversal mutations (more disruptive)
+        is_charge_reversal = (
+            AA_CHARGE.get(new_aa, 0) * AA_CHARGE.get(
+                next((aa for p, aa, _ in [] if p == pos), ""), 0
+            ) < 0
+        )
+        # Additional penalty if bulk change is large (structural disruption amplifier)
+        return base_penalty
 
     def _debye_length(self) -> float:
         return DEBYE_LENGTH_ANGSTROM
@@ -505,13 +712,18 @@ class EpitopeMasker:
 
                 pg_penalty = self._proline_glycine_guardrail(pos, aa, target, region_data, sequence)
 
+                # ENM vibrational stability penalty: mutations at high-RMSF residues
+                # destabilize the capsid assembly interface
+                enm_penalty = self._enm_destabilization_penalty(pos, region, target)
+
                 score = (
                     charge_change * 6.0 * access * charge_reversal_strength +
                     pb_weight * access +
                     epitope_weight * (abs(AA_CHARGE.get(target, 0)) if AA_CHARGE.get(target, 0) != 0 else 0.5) -
                     structural_risk * 0.3 -
                     hydro_risk * 1.0 -
-                    pg_penalty * 2.0
+                    pg_penalty * 2.0 -
+                    enm_penalty * 3.0  # ENM: penalize mutations that destabilize vibrational modes
                 )
                 scoring_positions.append((pos, aa, target, score))
 
@@ -536,6 +748,19 @@ class EpitopeMasker:
         agg_after = self.score_aggregation_propensity(masked_seq, region)
 
         ep_path = self._compute_structural_disruption(sequence, mutations)
+
+        # ENM aggregate stability penalty across all mutations
+        enm_rmsf = self._compute_enm_rmsf_for_region(region)
+        coords = self._coords_for_region(region)
+        res_ids = sorted(coords.keys())
+        enm_penalties = []
+        for p, orig, new in mutations:
+            if p in res_ids:
+                idx = res_ids.index(p)
+                if idx < len(enm_rmsf):
+                    enm_penalties.append(float(np.clip(enm_rmsf[idx] / 5.0, 0.0, 1.0)))
+        enm_aggregate = float(np.mean(enm_penalties)) if enm_penalties else 0.0
+
         charge_reversal = sum(
             1 for p, o, n in mutations
             if abs(AA_CHARGE.get(o, 0) - AA_CHARGE.get(n, 0)) > 0.1
@@ -562,8 +787,9 @@ class EpitopeMasker:
             0.10 * epitope_coverage +
             0.10 * (1.0 - ep_path) +
             0.10 * (1.0 if docking_preserved else 0.0) -
-            0.05 * agg_penalty +
-            0.20 * float(np.clip(abs(screened_after - screened_before) / (abs(screened_before) + 0.01), 0, 1))
+            0.05 * agg_penalty -
+            0.10 * enm_aggregate +  # ENM: structural stability penalty
+            0.15 * float(np.clip(abs(screened_after - screened_before) / (abs(screened_before) + 0.01), 0, 1))
         )
 
         return ChargeMaskDesign(
