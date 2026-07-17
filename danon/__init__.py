@@ -25,6 +25,7 @@ from danon.smar_insulator import SMARInsulatorEngine, CpGOptimizationEngine, CpG
 from danon.codon_elongation import CodonElongationEngine, CodonElongationResult
 from danon.hla_decoupler import HLADecoupler, HLADecouplerResult
 from danon.synthesis_guard import SynthesisGuard, SynthesisResult
+from danon.plasmid_builder import PlasmidAssembler, PlasmidAssemblyReport, AssembledVector
 
 __all__ = [
     "DanonConfig", "danon_config",
@@ -53,4 +54,5 @@ __all__ = [
     "NAbAssaySimulator", "NAbAssayResult",
     "ImmunosuppressionProtocol", "ImmunosuppressionAssessment",
     "DanonCellSimulator", "CellSimulationResult",
+    "PlasmidAssembler", "PlasmidAssemblyReport", "AssembledVector",
 ]

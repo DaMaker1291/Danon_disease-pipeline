@@ -1,0 +1,123 @@
+{
+  "split_position_aa": 200,
+  "split_position_nt": 600,
+  "harmonization_score": 0.9056,
+  "vector_a": {
+    "vector_id": "Vector_A_5Prime",
+    "total_length_bp": 3783,
+    "cargo_length_bp": 3569,
+    "cargo_within_limit": true,
+    "cost_usd": 1823.05,
+    "vendor": "PackGene",
+    "components": [
+      {
+        "name": "5' ITR (AAV2)",
+        "length_bp": 107,
+        "start_bp": 1,
+        "end_bp": 107
+      },
+      {
+        "name": "S/MAR Insulator",
+        "length_bp": 128,
+        "start_bp": 108,
+        "end_bp": 235
+      },
+      {
+        "name": "Cardiac Promoter (MHC+enhancer)",
+        "length_bp": 2474,
+        "start_bp": 236,
+        "end_bp": 2709
+      },
+      {
+        "name": "LAMP2B 5' (exons 1-6)",
+        "length_bp": 588,
+        "start_bp": 2710,
+        "end_bp": 3297
+      },
+      {
+        "name": "Npu DnaE N-intein (102 aa)",
+        "length_bp": 330,
+        "start_bp": 3298,
+        "end_bp": 3627
+      },
+      {
+        "name": "hGH polyA signal",
+        "length_bp": 49,
+        "start_bp": 3628,
+        "end_bp": 3676
+      },
+      {
+        "name": "3' ITR (AAV2)",
+        "length_bp": 107,
+        "start_bp": 3677,
+        "end_bp": 3783
+      }
+    ]
+  },
+  "vector_b": {
+    "vector_id": "Vector_B_3Prime",
+    "total_length_bp": 3758,
+    "cargo_length_bp": 3544,
+    "cargo_within_limit": true,
+    "cost_usd": 1814.3,
+    "vendor": "PackGene",
+    "components": [
+      {
+        "name": "5' ITR (AAV2)",
+        "length_bp": 107,
+        "start_bp": 1,
+        "end_bp": 107
+      },
+      {
+        "name": "Cardiac Promoter (MHC+enhancer)",
+        "length_bp": 2474,
+        "start_bp": 108,
+        "end_bp": 2581
+      },
+      {
+        "name": "Npu DnaE C-intein (36 aa)",
+        "length_bp": 75,
+        "start_bp": 2582,
+        "end_bp": 2656
+      },
+      {
+        "name": "LAMP2B 3' (exons 7-9)",
+        "length_bp": 0,
+        "start_bp": 2657,
+        "end_bp": 2656
+      },
+      {
+        "name": "miRNA detarget UTR (4xmiR-122/142/1/208)",
+        "length_bp": 360,
+        "start_bp": 2657,
+        "end_bp": 3016
+      },
+      {
+        "name": "WPRE",
+        "length_bp": 586,
+        "start_bp": 3017,
+        "end_bp": 3602
+      },
+      {
+        "name": "hGH polyA signal",
+        "length_bp": 49,
+        "start_bp": 3603,
+        "end_bp": 3651
+      },
+      {
+        "name": "3' ITR (AAV2)",
+        "length_bp": 107,
+        "start_bp": 3652,
+        "end_bp": 3758
+      }
+    ]
+  },
+  "cpg_density": {
+    "vector_a": 0.047632390025217144,
+    "vector_b": 0.0417607223476298
+  },
+  "rna_hairpin_risk": "MEDIUM",
+  "rna_hairpin_count": 20,
+  "total_synthesis_cost_usd": 3637.35,
+  "both_vectors_pass": true
+}

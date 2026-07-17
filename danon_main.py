@@ -37,6 +37,7 @@ from danon.dual_vector_moi_optimizer import DualVectorMOIOptimizer
 from danon.nab_assay_simulator import NAbAssaySimulator
 from danon.immunosuppression_protocol import ImmunosuppressionProtocol
 from danon.cell_simulator import DanonCellSimulator
+from danon.plasmid_builder import PlasmidAssembler, PlasmidAssemblyReport
 
 logging.basicConfig(
     level=logging.INFO,
@@ -70,6 +71,7 @@ UCL_BASELINE_SCORES = {
     "nab_assay": 0.25,
     "immunosuppression": 0.15,
     "cell_simulator": 0.10,
+    "plasmid_assembly": 0.00,
 }
 
 
@@ -109,6 +111,7 @@ class DanonPipeline:
         self.nab_assay = NAbAssaySimulator()
         self.immunosuppression = ImmunosuppressionProtocol()
         self.cell_sim = DanonCellSimulator()
+        self.plasmid_assembler = PlasmidAssembler()
         self.stats = {"start_time": None, "phases": {}, "candidates": {}}
         self.reports: List[PipelineReport] = []
 
@@ -148,6 +151,8 @@ class DanonPipeline:
         phase23 = self._phase23_immunosuppression()
         phase24 = self._phase24_cell_simulation(winners)
 
+        phase25 = self._phase25_plasmid_assembly(winners, phase3)
+
         self.stats["end_time"] = datetime.now().isoformat()
         self._generate_comprehensive_report(winners, phase3, phase4)
         self._print_summary()
@@ -159,6 +164,7 @@ class DanonPipeline:
             "moi_optimization": phase21, "nab_assay": phase22,
             "immunosuppression": phase23,
             "cell_simulation": phase24,
+            "plasmid_assembly": phase25,
         }
 
     def _phase1_generate_aav(self) -> list:
@@ -970,6 +976,75 @@ class DanonPipeline:
             },
             "trial_projection": trial,
             "mutation_comparison": mut_comparison,
+        }
+
+    def _phase25_plasmid_assembly(self, winners: dict,
+                                   promoter_data: dict,
+                                   phase22_data: dict = None) -> dict:
+        logger.info("PHASE 25/25: Synthesis-Ready Plasmid Assembly (Dual-Vector)")
+
+        # Get harmonized CDS from codon harmonization (Phase 22 in codon_elongation.py)
+        from danon.codon_elongation import CodonElongationEngine
+        codon_engine = CodonElongationEngine()
+        harmonized_result = codon_engine.evaluate()
+        harmonized_cds = harmonized_result.harmonized_cds or harmonized_result.optimized_cds
+
+        # Get promoter sequence from Phase 3
+        promoter_seq = promoter_data["best"].sequence
+
+        # Get split position from config
+        split_aa = self.config.lamp2b_split_position
+
+        # Assemble both vectors
+        report = self.plasmid_assembler.assemble(
+            harmonized_cds=harmonized_cds,
+            promoter=promoter_seq,
+            split_position_aa=split_aa,
+            harmonization_score=harmonized_result.harmonization_score_after,
+        )
+
+        # Export to disk
+        fasta_paths = self.plasmid_assembler.export_fasta(report)
+        gb_paths = self.plasmid_assembler.export_genbank(report)
+        report_path = self.plasmid_assembler.export_assembly_report(report)
+        self.plasmid_assembler.print_assembly_summary(report)
+
+        # UCL baseline: 0.00 (they don't generate synthesis-ready output)
+        ucl_score = UCL_BASELINE_SCORES["plasmid_assembly"]
+        our_score = 1.0 if report.both_vectors_pass else 0.5
+        self.reports.append(PipelineReport(
+            module="Plasmid Assembly (dual-vector synthesis-ready FASTA/GenBank)",
+            our_score=our_score,
+            utcl_baseline=ucl_score,
+            improvement_factor=our_score / max(ucl_score + 0.001, 0.001),
+        ))
+
+        return {
+            "vector_a": {
+                "vector_id": report.vector_a.vector_id,
+                "total_length_bp": report.vector_a.total_length_bp,
+                "cargo_length_bp": report.vector_a.cargo_length_bp,
+                "cargo_within_limit": report.vector_a.cargo_within_limit,
+                "cost_usd": report.vector_a.cost_usd,
+                "n_components": len(report.vector_a.components),
+            },
+            "vector_b": {
+                "vector_id": report.vector_b.vector_id,
+                "total_length_bp": report.vector_b.total_length_bp,
+                "cargo_length_bp": report.vector_b.cargo_length_bp,
+                "cargo_within_limit": report.vector_b.cargo_within_limit,
+                "cost_usd": report.vector_b.cost_usd,
+                "n_components": len(report.vector_b.components),
+            },
+            "split_position": {"aa": report.split_position_aa, "nt": report.split_position_nt},
+            "harmonization_score": report.harmonization_score,
+            "rna_hairpin_risk": report.rna_hairpin_risk,
+            "cpg_density": {"a": report.cpg_density_a, "b": report.cpg_density_b},
+            "total_synthesis_cost": report.total_synthesis_cost_usd,
+            "both_vectors_pass": report.both_vectors_pass,
+            "fasta_paths": fasta_paths,
+            "genbank_paths": gb_paths,
+            "assembly_report_path": report_path,
         }
 
     def _generate_comprehensive_report(self, winners: dict,
