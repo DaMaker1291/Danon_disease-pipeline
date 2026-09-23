@@ -7,6 +7,8 @@ observability limits in the report, and well-formed .vti field export.
 
 from __future__ import annotations
 
+import os
+import tempfile
 import xml.etree.ElementTree as ET
 
 import numpy as np
@@ -189,6 +191,108 @@ def test_formatted_report_contains_measured_values(compiled):
 # ---------------------------------------------------------------------------
 
 
+def _probe_geometry(shape):
+    """An asymmetric geometry so any axis-order confusion shows as a transpose."""
+    from danon.evosteer import TumorGeometry
+
+    mask = np.zeros(shape, dtype=bool)
+    mask[1, 2, 3] = True
+    return TumorGeometry(
+        tumor_mask=mask,
+        proliferative=np.where(mask, 0.9, 0.5).astype(float),
+        vessels=np.where(mask, 1.0, 0.1).astype(float),
+        voxel_mm=2.0,
+    )
+
+
+def _probe_trajectory(shape, mask):
+    class _T:
+        pass
+
+    t = _T()
+    t.final_conc_A = np.full(shape, 0.25)
+    t.final_conc_B = np.full(shape, 0.5)
+    t.final_N_S = np.where(mask, 100.0, 0.0)
+    t.final_N_R = np.where(mask, 7.0, 0.0)
+    return t
+
+
+def test_vti_extent_matches_engine_axes_on_non_cubic_grid(tmp_path):
+    """The extent must be (0 sx-1)(0 sy-1)(0 sz-1) for engine shape (sx, sy, sz).
+
+    The previous writer destructured the shape reversed (nz, ny, nx), which
+    silently transposed every non-cubic -- i.e. every real patient -- export
+    while passing every cubic phantom test.
+    """
+    import base64
+
+    shape = (5, 6, 7)
+    geom = _probe_geometry(shape)
+    t = _probe_trajectory(shape, geom.tumor_mask)
+    out = tmp_path / "probe.vti"
+    export_fields_vti(t, geom, str(out))
+    root = ET.parse(str(out)).getroot()
+    img = root.find("ImageData")
+    assert img is not None
+    assert img.attrib["WholeExtent"] == "0 4 0 5 0 6"
+    assert img.attrib["Spacing"] == "2.0 2.0 2.0"
+
+    # Independent F-order reshape recovers the array exactly: the on-disk
+    # layout, not just the metadata, is in the declared axis order.
+    piece = img.find("Piece")
+    arrs = {da.attrib["Name"]: da.text for da in piece.findall("PointData/DataArray")}
+    back = np.frombuffer(base64.b64decode(arrs["resistant"]), dtype="<f4").reshape(
+        shape, order="F"
+    )
+    assert np.array_equal(back, np.where(geom.tumor_mask, 7.0, 0.0).astype("<f4").astype(float))
+
+
+def test_vti_tissue_and_diffusion_maps_are_derived_from_the_geometry(tmp_path):
+    """The derived maps must equal what anisotropy derives from the same geometry."""
+    import base64
+
+    from danon.anisotropy import DiffusionField, tissue_classes_from_geometry
+
+    shape = (5, 6, 7)
+    geom = _probe_geometry(shape)
+    t = _probe_trajectory(shape, geom.tumor_mask)
+    out = tmp_path / "probe.vti"
+    export_fields_vti(t, geom, str(out))
+    piece = ET.parse(str(out)).getroot().find("ImageData/Piece")
+    arrs = {da.attrib["Name"]: da.text for da in piece.findall("PointData/DataArray")}
+
+    def decoded(name):
+        return np.frombuffer(base64.b64decode(arrs[name]), dtype="<f4").reshape(
+            shape, order="F"
+        )
+
+    classes = tissue_classes_from_geometry(geom)
+    assert np.array_equal(decoded("tissue_class"), classes.astype("<f4").astype(float))
+    expected_d = DiffusionField.from_tissue_classes(
+        classes, voxel_mm=float(geom.voxel_mm)
+    ).d_mm2_per_day
+    np.testing.assert_allclose(decoded("diffusion_mm2_per_day"), expected_d, rtol=1e-6)
+    # A heterogeneous probe must actually carry heterogeneous D.
+    assert decoded("diffusion_mm2_per_day").max() > decoded("diffusion_mm2_per_day").min()
+
+
+def test_vti_include_tissue_false_keeps_the_original_four():
+    shape = (5, 6, 7)
+    geom = _probe_geometry(shape)
+    t = _probe_trajectory(shape, geom.tumor_mask)
+    with tempfile.TemporaryDirectory() as td:
+        out = os.path.join(td, "probe.vti")
+        export_fields_vti(t, geom, out, include_tissue=False)
+        piece = ET.parse(out).getroot().find("ImageData/Piece")
+        names = [da.attrib["Name"] for da in piece.findall("PointData/DataArray")]
+        assert names == ["drug_A", "drug_B", "sensitive", "resistant", "tumour_mask"]
+
+
+# ---------------------------------------------------------------------------
+# .vti export (Output A without VR claims)
+# ---------------------------------------------------------------------------
+
+
 def test_vti_export_wellformed(gbm, tmp_path):
     from danon.evosteer import TumorEvolutionSimulator
 
@@ -213,12 +317,21 @@ def test_vti_export_wellformed(gbm, tmp_path):
         da.attrib["Name"]
         for da in piece.findall("PointData/DataArray")
     ]
-    assert names == ["drug_A", "drug_B", "sensitive", "resistant"]
+    assert names[:4] == ["drug_A", "drug_B", "sensitive", "resistant"]
     extent = piece.attrib["Extent"]
     assert extent == "0 15 0 15 0 15"
     # Non-empty base64 payload for the first array.
     first = piece.find("PointData/DataArray")
     assert first is not None and len(first.text or "") > 1000
+    # The derived tissue/diffusion maps ride along by default, and the mask
+    # is point data (one value per point) rather than malformed CellData.
+    point_names = [da.attrib["Name"] for da in piece.findall("PointData/DataArray")]
+    for derived in ("tissue_class", "diffusion_mm2_per_day", "proliferative", "vessels"):
+        assert derived in point_names
+    assert piece.find("CellData/DataArray") is None
+    # The four simulation fields lead; the derived maps follow; the mask is last.
+    assert point_names[:4] == ["drug_A", "drug_B", "sensitive", "resistant"]
+    assert point_names[-1] == "tumour_mask"
     with pytest.raises(ValueError):
         export_fields_vti(
             sim.run(MTDPolicy(), days=20, initial_resistant_fraction=0.01, seed=1),

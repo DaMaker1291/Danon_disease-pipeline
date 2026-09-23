@@ -62,6 +62,10 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
+from danon.anisotropy import (
+    DiffusionField,
+    tissue_classes_from_geometry,
+)
 from danon.cure import EvidenceStatus
 from danon.evosteer import (
     ADAPTIVE_TTP_RATIO_ANCHOR,
@@ -502,6 +506,8 @@ def export_fields_vti(
     traj: SimulationTrajectory,
     geometry: TumorGeometry,
     path: str,
+    *,
+    include_tissue: bool = True,
 ) -> str:
     """Write the final spatial fields as a VTK ImageData (.vti) XML file.
 
@@ -509,6 +515,24 @@ def export_fields_vti(
     simulation grid, loadable directly in ParaView (Output A of the
     pipeline, minus the VR claims -- ParaView's own 3D view is the
     honest version of 'interactive 3D analytics').
+
+    With ``include_tissue=True`` (default) three derived arrays are added
+    so a render can actually SHOW the heterogeneity the model integrates:
+
+    * ``tissue_class``  -- 0 necrotic core, 1 edema, 2 white matter, 3 grey
+      matter (labels from `danon.anisotropy.tissue_classes_from_geometry`,
+      derived from the geometry itself, not asserted from imaging).
+    * ``diffusion_mm2_per_day`` -- the per-voxel physical drug diffusivity
+      D(x) those classes imply, via `DiffusionField.from_tissue_classes`.
+    * ``proliferative`` / ``vessels`` -- the geometry's own growth and
+      drug-source maps.
+
+    Axis convention (pinned by test on a non-cubic grid): engine arrays are
+    indexed [x, y, z] (NIfTI dim order, axis 0 = x), and VTK ImageData is
+    x-fastest, so the bytes are written in Fortran order and the extent is
+    ``0 sx-1 0 sy-1 0 sz-1`` with sx = shape[0]. The tumour mask is PointData
+    (one value per point, same as every other array) rather than CellData,
+    which previously carried point-count values -- malformed VTK.
 
     Requires run(..., keep_fields=True). Returns the written path.
     """
@@ -524,15 +548,30 @@ def export_fields_vti(
             f"run the simulation with keep_fields=True to export {missing}"
         )
 
+    # Derived tissue/diffusion arrays, from the geometry the run consumed.
+    extra: Dict[str, np.ndarray] = {}
+    if include_tissue:
+        classes = tissue_classes_from_geometry(geometry)
+        extra["tissue_class"] = classes.astype(np.float32)
+        extra["diffusion_mm2_per_day"] = (
+            DiffusionField.from_tissue_classes(
+                classes, voxel_mm=float(geometry.voxel_mm)
+            ).d_mm2_per_day.astype(np.float32)
+        )
+        extra["proliferative"] = np.asarray(
+            geometry.proliferative, dtype=np.float32
+        )
+        extra["vessels"] = np.asarray(geometry.vessels, dtype=np.float32)
+
     shape = geometry.tumor_mask.shape
-    nz, ny, nx = (int(s) for s in shape)
+    sx, sy, sz = (int(s) for s in shape)  # axis0 = x (NIfTI dim order)
+    spacing = float(geometry.voxel_mm)
     header = (
         '<?xml version="1.0"?>\n'
         f'<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian">\n'
-        f'  <ImageData WholeExtent="0 {nx - 1} 0 {ny - 1} 0 {nz - 1}" '
-        f'Origin="0 0 0" Spacing="{geometry.voxel_mm} {geometry.voxel_mm} '
-        f'{geometry.voxel_mm}">\n'
-        f'    <Piece Extent="0 {nx - 1} 0 {ny - 1} 0 {nz - 1}">\n'
+        f'  <ImageData WholeExtent="0 {sx - 1} 0 {sy - 1} 0 {sz - 1}" '
+        f'Origin="0 0 0" Spacing="{spacing} {spacing} {spacing}">\n'
+        f'    <Piece Extent="0 {sx - 1} 0 {sy - 1} 0 {sz - 1}">\n'
         f'      <PointData Scalars="drug_A">\n'
     )
     body = []
@@ -550,14 +589,30 @@ def export_fields_vti(
             f"</DataArray>\n"
         )
         offset += len(raw)
+    for name, arr in extra.items():
+        raw = np.asfortranarray(arr).astype("<f4").tobytes(order="F")
+        b64 = base64.b64encode(raw).decode("ascii")
+        body.append(
+            f'        <DataArray type="Float32" Name="{name}" '
+            f'NumberOfComponents="1" format="binary" offset="{offset}">'
+            f"{b64}"
+            f"</DataArray>\n"
+        )
+        offset += len(raw)
+    # The mask rides with the point data (one value per point, like the
+    # fields) -- previously it was declared CellData with point-count
+    # values, which is not a well-formed VTK ImageData.
+    raw_mask = geometry.tumor_mask.astype("u1").tobytes(order="F")
+    b64_mask = base64.b64encode(raw_mask).decode("ascii")
+    body.append(
+        f'        <DataArray type="UInt8" Name="tumour_mask" '
+        f'NumberOfComponents="1" format="binary" offset="{offset}">'
+        f"{b64_mask}"
+        f"</DataArray>\n"
+    )
+    offset += len(raw_mask)
     footer = (
         f"      </PointData>\n"
-        f"      <CellData>\n"
-        f"        <DataArray type=\"UInt8\" Name=\"tumour_mask\" "
-        f"NumberOfComponents=\"1\" format=\"binary\" offset=\"{offset}\">"
-        f"{base64.b64encode(geometry.tumor_mask.astype('u1').tobytes(order='F')).decode('ascii')}"
-        f"</DataArray>\n"
-        f"      </CellData>\n"
         f"    </Piece>\n"
         f"  </ImageData>\n"
         f"</VTKFile>\n"

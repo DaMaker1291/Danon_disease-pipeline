@@ -2,15 +2,16 @@
  * VtiViewer — the simulated tumour evolution rendered in-browser.
  *
  * Consumes the base64 VTI the twin endpoint returns (the same file ParaView
- * opens), decodes the four Float32 point scalars (drug_A, drug_B, sensitive,
- * resistant) plus the tumour mask, and renders them as an instanced voxel
- * field with OrbitControls. Field selection, isovalue, and the cutaway
- * re-threshold the instanced set client-side — no extra engine calls.
+ * opens), decodes the Float32 point scalars (drug_A, drug_B, sensitive,
+ * resistant, plus the derived tissue_class / diffusion_mm2_per_day /
+ * proliferative / vessels maps) and the tumour mask, and renders them as an
+ * instanced voxel field with OrbitControls. Field selection, isovalue, and
+ * the cutaway re-threshold the instanced set client-side — no extra engine
+ * calls.
  *
- * Axis convention: the exporter writes arrays Fortran-order (axis 0 fastest),
- * so voxel [a, b, c] is placed at grid coordinate (a, b, c) here. Every field
- * and the mask share that mapping, so the render is self-consistent; this is
- * the same data ParaView reads, possibly under a different axis labelling.
+ * Axis convention: the exporter writes arrays Fortran-order (axis 0 fastest)
+ * and declares the extent as (0 sx-1)(0 sy-1)(0 sz-1) for engine shape
+ * (sx, sy, sz) — VTK x/y/z are the array axes in order.
  */
 import React, { useMemo, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
@@ -30,14 +31,6 @@ function decodeBase64(b64: string): Uint8Array {
   return out;
 }
 
-function parseVti(b64: string): VtiData {
-  const xml = new DOMParser().parseFromString(decodeBase64(b64).reduce(
-    (s, b) => s + String.fromCharCode(b), '',
-  ) || '', 'text/xml');
-  // decodeBase64 already yields bytes; rebuild the text safely:
-  return parseVtiFromBytes(decodeBase64(b64));
-}
-
 function parseVtiFromBytes(bytes: Uint8Array): VtiData {
   let text = '';
   const chunk = 0x8000;
@@ -49,9 +42,9 @@ function parseVtiFromBytes(bytes: Uint8Array): VtiData {
   if (!img) throw new Error('not a VTK ImageData file');
   const extent = (img.getAttribute('WholeExtent') || '').split(/\s+/).map(Number);
   if (extent.length !== 6) throw new Error('malformed WholeExtent');
-  const dx = extent[1] + 1, dy = extent[3] + 1, dz = extent[5] + 1;
-  // Exporter wrote shape (s0, s1, s2) with extent (0 s2-1)(0 s1-1)(0 s0-1).
-  const dims: [number, number, number] = [dz, dy, dx];
+  // Exporter writes engine arrays (axis0 = x, NIfTI dim order) with extent
+  // (0 sx-1)(0 sy-1)(0 sz-1): VTK x/y/z are the array axes in order.
+  const dims: [number, number, number] = [extent[1] + 1, extent[3] + 1, extent[5] + 1];
   const fields: Record<string, Float32Array> = {};
   let mask = new Uint8Array(0);
   doc.querySelectorAll('DataArray').forEach(el => {
@@ -72,7 +65,18 @@ const FIELD_COLORS: Record<string, string> = {
   resistant: '#f43f5e',
   drug_A: '#3b82f6',
   drug_B: '#8b5cf6',
+  tissue_class: '#f59e0b',
+  diffusion_mm2_per_day: '#34d399',
+  proliferative: '#eab308',
+  vessels: '#fb923c',
 };
+
+/** Renderable fields in chip order; tissue/diffusion maps only exist in
+ * VTIs exported with include_tissue=True. */
+const FIELDS = [
+  'sensitive', 'resistant', 'drug_A', 'drug_B',
+  'tissue_class', 'diffusion_mm2_per_day', 'proliferative', 'vessels',
+];
 
 function ramp(t: number, hex: string): THREE.Color {
   // low -> dim, high -> saturated field color
@@ -83,7 +87,7 @@ function ramp(t: number, hex: string): THREE.Color {
 interface Props { vtiBase64: string | null }
 
 export default function VtiViewer({ vtiBase64 }: Props) {
-  const [field, setField] = useState<'sensitive' | 'resistant' | 'drug_A' | 'drug_B'>('sensitive');
+  const [field, setField] = useState<string>('sensitive');
   const [iso, setIso] = useState(0.0);
   const [cut, setCut] = useState(0);      // 0..1 fraction of axis0 hidden from the front
   const [overlayR, setOverlayR] = useState(true);
@@ -119,7 +123,7 @@ export default function VtiViewer({ vtiBase64 }: Props) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, height: '100%' }}>
       <div className="vti-controls">
         <div className="vti-ctrl-group">
-          {(['sensitive', 'resistant', 'drug_A', 'drug_B'] as const).map(f => (
+          {FIELDS.filter(f => data.fields[f]).map(f => (
             <button key={f} className={`chip ${field === f ? 'active' : ''}`} onClick={() => setField(f)}>
               <span className="chip-dot" style={{ background: FIELD_COLORS[f] }} />{f}
             </button>
