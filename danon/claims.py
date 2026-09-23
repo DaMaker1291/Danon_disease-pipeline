@@ -38,6 +38,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import numpy as np
 from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Optional, Tuple
 
@@ -589,6 +590,59 @@ def _clinical_cases() -> List[dict]:
         return []
 
 
+def check_holdout_emulator_is_measured() -> CheckResult:
+    """The 0.90+ emulator claim must exist as a one-shot holdout measurement.
+
+    Delegates to the single reusable measurement (locked feature subset, one
+    fit, one prediction). A re-run below 0.90 fails the claim rather than
+    letting the sentence survive as stale.
+    """
+    import os as _os
+
+    from danon.high_ceiling import HOLDOUT_PATH, LOCKED_LAMBDA, holdout_measurement
+
+    train_path = _os.path.join(ROOT, "data/synthetic_emulator_dataset.json")
+    hold_path = _os.path.join(ROOT, HOLDOUT_PATH)
+    if not (_os.path.exists(train_path) and _os.path.exists(hold_path)):
+        return CheckResult(
+            supported=False,
+            detail="emulator train/holdout datasets missing; the 0.90 claim has no measurement",
+        )
+    m = holdout_measurement()
+    return CheckResult(
+        supported=m.meets_claim,
+        detail=(
+            f"one-shot holdout R^2 = {m.r2:.4f} (95% bootstrap CI "
+            f"{m.ci[0]:.4f}-{m.ci[1]:.4f}) on {m.n_test} untouched "
+            f"configurations (features locked on the training half, single "
+            f"refit, lambda={LOCKED_LAMBDA}); claim band R^2 >= 0.90"
+        ),
+    )
+
+
+def check_mgmt_status_is_measured_not_faked() -> CheckResult:
+    """The MGMT classifier result must be the real measured AUC, low as it is.
+
+    Pins the honest miss: from age/sex/diagnosis the held-out AUC is near
+    chance, and the claim recorded here is that the measurement exists and is
+    labelled, not that it is high.
+    """
+    from danon.high_ceiling import mgmt_status_target
+
+    m = mgmt_status_target()
+    v = m.verdict
+    low = np.isfinite(m.auc) and m.auc < 0.70
+    chance_in_ci = m.auc_ci[0] <= 0.5 <= m.auc_ci[1]
+    return CheckResult(
+        supported=bool(np.isfinite(m.auc) and low and chance_in_ci and v.n >= 100),
+        detail=(
+            f"real-patient MGMT-status classifier: OOF AUC {m.auc:.4f} "
+            f"(CI {m.auc_ci[0]:.4f}-{m.auc_ci[1]:.4f}) on {v.n} patients; "
+            f"reported as indistinguishable from chance, NOT as a 0.90+ result"
+        ),
+    )
+
+
 CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "evidence_status_vocabulary": check_evidence_status_vocabulary,
     "censoring_is_preserved": check_censoring_is_preserved,
@@ -597,6 +651,8 @@ CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "no_inflated_estimand": check_no_inflated_estimand_is_claimed,
     "gdsc_ic50s_not_all_measured": check_gdsc_ic50s_are_not_all_measurements,
     "untestable_tiers_refused": check_untestable_tiers_are_refused,
+    "holdout_emulator_measured": check_holdout_emulator_is_measured,
+    "mgmt_status_measured_not_faked": check_mgmt_status_is_measured_not_faked,
     "dice_degenerate_case": check_dice_degenerate_case_is_not_perfect,
     "spatial_agreement_not_claimed": check_spatial_agreement_is_not_claimed,
     "potency_is_measured": check_potency_is_measured,
@@ -913,6 +969,33 @@ CLAIMS: Tuple[Claim, ...] = (
         "danon/predictive.py::engine_discrimination_verdict",
         "engine_c_index_absent",
         "Stating the absence is the honest position; it is not a finding.",
+    ),
+    Claim(
+        "holdout_emulator_090",
+        "A physics-feature ridge surrogate predicts the engine's final tumour "
+        "burden at one-shot holdout R^2 = 0.9211 (95% bootstrap CI 0.8615-"
+        "0.9536) on 48 configurations never used for feature selection or "
+        "fitting: the engine's outcome surface is predictable from its inputs "
+        "to better than 0.90. This is a property of the SIMULATOR, not an "
+        "accuracy on patients, and is bound to the one-shot re-measurement.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/claims.py::check_holdout_emulator_is_measured",
+        "holdout_emulator_measured",
+        "Synthetic ground truth (the engine itself). Never present beside "
+        "patient numbers as if it raised them.",
+    ),
+    Claim(
+        "mgmt_status_not_predictable_from_open_covariates",
+        "Predicting the published MGMT promoter call from age, sex and "
+        "diagnosis yields out-of-fold AUC 0.5387 (95% CI 0.4850-0.5964) on "
+        "396 real TCGA-GBM patients -- indistinguishable from chance. The "
+        "0.90 band on this target requires per-patient molecular features the "
+        "open cache does not carry; the measurement is reported at its real "
+        "value instead of being dropped or inflated.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/claims.py::check_mgmt_status_is_measured_not_faked",
+        "mgmt_status_measured_not_faked",
+        "A real miss with a real CI is worth more than a claimed number.",
     ),
 )
 

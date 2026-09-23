@@ -618,6 +618,26 @@ from danon.imaging import (
     imaging_what_this_model_cannot_know,
 )
 
+# High-ceiling predictive targets: the engine emulator (one-shot holdout
+# R^2 vs the simulator) and the real-patient MGMT-status classifier, both
+# rendered as honest TargetVerdicts. Physics-derived features live in
+# danon.emulator_features.
+from danon.high_ceiling import (
+    EmulatorDataset,
+    EmulatorResult,
+    MgmtStatusResult,
+    FEATURE_NAMES,
+    FEATURE_BOUNDS,
+    emulator_target,
+    mgmt_status_target,
+    load_or_build_emulator_dataset,
+)
+from danon.emulator_features import (
+    FEATURE_ORDER,
+    feature_matrix,
+    geometry_features,
+)
+
 # Digital-twin planning bridge: uploaded segmentation mask -> paired 365-day
 # simulation -> schedule text, daily curves, VTI export, UI payload. Honesty
 # labels travel with every field.
@@ -1027,6 +1047,9 @@ __all__ = [
     "PatientIntake", "ScheduleEvent", "DosingScheduleReport",
     "compile_dosing_schedule", "extract_schedule_events", "export_fields_vti",
     "TwinPlanResult", "DEFAULT_R0", "DEFAULT_R0_SOURCE", "downsample_mask_to_budget", "plan_from_mask",
+    "EmulatorDataset", "EmulatorResult", "MgmtStatusResult", "FEATURE_NAMES", "FEATURE_BOUNDS",
+    "emulator_target", "mgmt_status_target", "load_or_build_emulator_dataset",
+    "FEATURE_ORDER", "feature_matrix", "geometry_features",
     "format_schedule_text", "schedule_provenance",
     "print_schedule_disclaimer", "schedule_what_this_model_cannot_know",
     "POSTER_PITCH_CLAIMS", "poster_summary",

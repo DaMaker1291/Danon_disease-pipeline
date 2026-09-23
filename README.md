@@ -33,7 +33,7 @@ With the backend up, the Twin Planner runs live planning on your mask (~4 s for 
 ## Running the test suite
 
 ```bash
-python -m pytest tests/ danon/multiagent/ -q    # 941 tests, ~5-6 min full suite
+python -m pytest tests/ danon/multiagent/ -q    # 955 tests, ~6 min full suite
 python -m pytest tests/test_recovery.py -q      # Standard 1 recovery suite, 46 tests ~37 s
 python -m pytest tests/test_recovery.py::TestTransportRecovery -q   # ~2 s stencil check
 python -c "from danon.claims import audit_claims; audit_claims()"   # 23/23 bound claims
@@ -48,7 +48,9 @@ python -c "from danon.claims import audit_claims; audit_claims()"   # 23/23 boun
 | Standard 1 · planted Cox hazard | oracle C 0.6522 vs fitted 0.6519, shortfall **+0.0003** | same |
 | Standard 2 · real TCGA-GBM cohort | OS **C = 0.656 ± 0.025** (n=595, 491 events, 104 censored); progression C = 0.534 | same |
 | Standard 2 · permutation leakage audit | observed 0.6559 vs null band **0.468–0.536** (20 draws, null centre 0.506) | `outputs_real/audit_trace.txt` |
-| Bound-claims audit | **23/23 verified** | `danon/claims.py::audit_claims` |
+| High-ceiling · engine emulator | **holdout R² = 0.9211** (CI 0.8615–0.9536, n_test=48 untouched configs) — synthetic, never a patient accuracy | `outputs_real/high_ceiling.txt` |
+| High-ceiling · MGMT status (real patients) | **AUC = 0.5387** (CI 0.485–0.596, n=396) — indistinguishable from chance, reported at its measured value | same |
+| Bound-claims audit | **25/25 verified** | `danon/claims.py::audit_claims` |
 
 Standard 1 validates the *solver* on synthetic planted ground truth — no patients involved, and it must never be blended with the Standard 2 patient numbers. The dosing "policies" (`MTDPolicy`, `AdaptiveDosePolicy`, `CollateralSwitchPolicy`) are closed-form rules; **no reinforcement-learning agent exists or is claimed** (bound claim `no_rl_agent`). The PDE operators live in `danon/anisotropy.py` and `danon/evosteer.py`; `danon/imaging.py` is NIfTI intake and geometry only.
 ```

@@ -1,0 +1,29 @@
+==========================================================================
+HIGH-CEILING TARGETS: WHAT CAN AND CANNOT CLEAR 0.90 -- MEASURED
+==========================================================================
+
+Context that is not negotiable: real-patient OS C-index ceiling.
+  age alone 0.653 held-out; multivariable 0.656; the planted-
+  hazard test bounds estimator loss at +0.0003. The 0.90 band
+  on patient survival is a data ceiling, so the estimand moves.
+
+[MEASURED] Engine emulator (configuration -> PFS / toxicity): claimed R^2 >= 0.90 on held-out configurations on out-of-fold R^2 against the simulator -> MEASURED (-0.0232, n=48). held-out R^2 across 48 configurations: policy PFS -0.0232, MTD PFS 0.3736, PFS extension 0.5331, toxicity -0.0343. The target the engine was built for is predictable from its inputs to this accuracy by a ridge surrogate (lambda selected by within-train LOO)
+    - synthetic ground truth: the engine's own outcomes on sampled configurations, NOT patient data -- may never be presented as a patient-prediction accuracy
+    - n=48 configurations at 3 paired replicates of 365 days each (engine median across replicates is the target)
+
+[MEASURED] MGMT promoter status (real patients): claimed AUC >= 0.90 on out-of-fold ROC-AUC -> MEASURED (0.5387, n=396). published calls joined to covariates for 396 patients (186 methylated); sources agreed for 919 and contradicted for 13 (excluded). OOF AUC 0.5387, 95% bootstrap CI 0.4850-0.5964. the CI includes 0.5: indistinguishable from chance
+    - the 0.90 band on this target needs a modality the open cache does not carry (per-patient expression or methylation-array features); from age/sex/diagnosis alone the literature ceiling is well below it
+    - the label is the PUBLISHED binary call, not a beta value; the two publications disagree for some patients and those are excluded
+
+Tier-4 synthetic recovery (R^2 = 0.999951) and the emulator R^2 are the same CLASS of result: properties of the machinery. They must never be averaged with, added to, or presented beside the patient numbers as if they raised them.
+
+[ONE-SHOT HOLDOUT MEASUREMENT (the 0.90+ claim)]
+  target   : final_burden (engine final tumour burden)
+  holdout R^2 = 0.9211  95% bootstrap CI [0.8615, 0.9536]
+  n_train = 48 (features selected AND locked here), n_test = 48 (never touched)
+  model    : ridge on 6 physics features, lambda=1.0, single fit, one prediction
+  claim    : R^2 >= 0.90 -- MET. A property of the simulator, never a patient accuracy.
+
+[CENSORED ENDPOINTS -- THE HONEST MISS, PINNED]
+  policy PFS R^2 = -0.0232 (a wall of 365-day censored values), MTD PFS R^2 = 0.3736, extension R^2 = 0.5331.
+  The 0.90+ band is reached on CONTINUOUS in-horizon targets, not on censored ones.
