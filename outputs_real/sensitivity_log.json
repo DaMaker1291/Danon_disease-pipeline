@@ -1,0 +1,2858 @@
+[
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "tumour_growth",
+  "scale": 0.02,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 365.0,
+  "extension": null,
+  "toxicity_reduction": 0.1557534246575371,
+  "policy_wins": true,
+  "burden_ratio": 0.4338868273605954,
+  "paired_burden_ratios": [
+   0.4339725293250395,
+   0.43380112539615134
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 0,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   365.0
+  ],
+  "policy_mean_burden": [
+   14.459744782638923,
+   14.446749722246702
+  ],
+  "mtd_mean_burden": [
+   33.31949329863866,
+   33.30270226720549
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "tumour_growth",
+  "scale": 0.05,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 365.0,
+  "extension": null,
+  "toxicity_reduction": 0.15739726027397552,
+  "policy_wins": true,
+  "burden_ratio": 0.40266525045600876,
+  "paired_burden_ratios": [
+   0.4047547600326257,
+   0.40057574087939185
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 0,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   365.0
+  ],
+  "policy_mean_burden": [
+   14.5517360075186,
+   14.538679885124607
+  ],
+  "mtd_mean_burden": [
+   35.95198239631732,
+   36.29445920316481
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "tumour_growth",
+  "scale": 0.1,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 365.0,
+  "extension": null,
+  "toxicity_reduction": 0.1549315068493179,
+  "policy_wins": true,
+  "burden_ratio": 0.34574832208263595,
+  "paired_burden_ratios": [
+   0.35077276854575473,
+   0.34072387561951717
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 0,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   365.0
+  ],
+  "policy_mean_burden": [
+   14.706956819472486,
+   14.695160328068997
+  ],
+  "mtd_mean_burden": [
+   41.9273049058086,
+   43.12923566436222
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "tumour_growth",
+  "scale": 0.25,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 365.0,
+  "extension": null,
+  "toxicity_reduction": 0.15369863013698917,
+  "policy_wins": true,
+  "burden_ratio": 0.17755938258846593,
+  "paired_burden_ratios": [
+   0.1815691183762859,
+   0.17354964680064597
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 0,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   365.0
+  ],
+  "policy_mean_burden": [
+   15.20311137912934,
+   15.188671220655893
+  ],
+  "mtd_mean_burden": [
+   83.73181251903333,
+   87.51773052066713
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "tumour_growth",
+  "scale": 0.5,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 365.0,
+  "extension": null,
+  "toxicity_reduction": 0.1508219178082217,
+  "policy_wins": true,
+  "burden_ratio": 0.06249514465312182,
+  "paired_burden_ratios": [
+   0.06159198552693909,
+   0.06339830377930455
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 0,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   365.0
+  ],
+  "policy_mean_burden": [
+   16.21381690169444,
+   16.203889033517765
+  ],
+  "mtd_mean_burden": [
+   263.2455629247874,
+   255.5886840431098
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "tumour_growth",
+  "scale": 1.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.16027397260274315,
+  "policy_wins": true,
+  "burden_ratio": 0.022064052170624113,
+  "paired_burden_ratios": [
+   0.021627117631208365,
+   0.022500986710039864
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   18.65894809003004,
+   18.649095675257644
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "tumour_growth",
+  "scale": 2.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 168.0,
+  "extension": null,
+  "toxicity_reduction": 0.1319178082191805,
+  "policy_wins": true,
+  "burden_ratio": 0.014351380226110797,
+  "paired_burden_ratios": [
+   0.014154568566581762,
+   0.01454819188563983
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   166.0,
+   170.0
+  ],
+  "policy_mean_burden": [
+   28.14512771721054,
+   28.32679378843948
+  ],
+  "mtd_mean_burden": [
+   1988.4129696230937,
+   1947.1006439226428
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "drug_a_kill",
+  "scale": 0.02,
+  "policy_median_pfs": 8.0,
+  "mtd_median_pfs": 8.0,
+  "extension": 0.0,
+  "toxicity_reduction": 0.0,
+  "policy_wins": false,
+  "burden_ratio": 1.0,
+  "paired_burden_ratios": [
+   1.0,
+   1.0
+  ],
+  "pfs_discriminating": true,
+  "policy_events": 2,
+  "mtd_events": 2,
+  "policy_pfs": [
+   8.0,
+   8.0
+  ],
+  "mtd_pfs": [
+   8.0,
+   8.0
+  ],
+  "policy_mean_burden": [
+   3517.2144131813784,
+   3514.575146574144
+  ],
+  "mtd_mean_burden": [
+   3517.2144131813784,
+   3514.575146574144
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "drug_a_kill",
+  "scale": 0.05,
+  "policy_median_pfs": 11.0,
+  "mtd_median_pfs": 11.0,
+  "extension": 0.0,
+  "toxicity_reduction": 0.0,
+  "policy_wins": false,
+  "burden_ratio": 1.0,
+  "paired_burden_ratios": [
+   1.0,
+   1.0
+  ],
+  "pfs_discriminating": true,
+  "policy_events": 2,
+  "mtd_events": 2,
+  "policy_pfs": [
+   11.0,
+   11.0
+  ],
+  "mtd_pfs": [
+   11.0,
+   11.0
+  ],
+  "policy_mean_burden": [
+   2566.508883284993,
+   2560.1651316766365
+  ],
+  "mtd_mean_burden": [
+   2566.508883284993,
+   2560.1651316766365
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "drug_a_kill",
+  "scale": 0.1,
+  "policy_median_pfs": 29.5,
+  "mtd_median_pfs": 29.5,
+  "extension": 0.0,
+  "toxicity_reduction": 0.008219178082192092,
+  "policy_wins": true,
+  "burden_ratio": 0.781836401322269,
+  "paired_burden_ratios": [
+   0.778169729137433,
+   0.7855030735071048
+  ],
+  "pfs_discriminating": true,
+  "policy_events": 2,
+  "mtd_events": 2,
+  "policy_pfs": [
+   29.0,
+   30.0
+  ],
+  "mtd_pfs": [
+   29.0,
+   30.0
+  ],
+  "policy_mean_burden": [
+   1383.1244918975328,
+   1385.283356887902
+  ],
+  "mtd_mean_burden": [
+   1777.4072160718274,
+   1763.5619816265078
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "drug_a_kill",
+  "scale": 0.25,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 276.0,
+  "extension": null,
+  "toxicity_reduction": 0.022191780821918337,
+  "policy_wins": true,
+  "burden_ratio": 0.21763132600746832,
+  "paired_burden_ratios": [
+   0.21598883556098558,
+   0.21927381645395103
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   272.0,
+   280.0
+  ],
+  "policy_mean_burden": [
+   236.42290761622624,
+   231.46687476194666
+  ],
+  "mtd_mean_burden": [
+   1094.6070754174282,
+   1055.606540284559
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "drug_a_kill",
+  "scale": 0.5,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 266.5,
+  "extension": null,
+  "toxicity_reduction": 0.06452054794520691,
+  "policy_wins": true,
+  "burden_ratio": 0.044214693764346946,
+  "paired_burden_ratios": [
+   0.04337326816348461,
+   0.04505611936520928
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   263.0,
+   270.0
+  ],
+  "policy_mean_burden": [
+   43.00684232687595,
+   42.947971043158084
+  ],
+  "mtd_mean_burden": [
+   991.5518047838242,
+   953.2106104175712
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "drug_a_kill",
+  "scale": 1.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.16027397260274315,
+  "policy_wins": true,
+  "burden_ratio": 0.022064052170624113,
+  "paired_burden_ratios": [
+   0.021627117631208365,
+   0.022500986710039864
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   18.65894809003004,
+   18.649095675257644
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "drug_a_kill",
+  "scale": 2.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 322.5,
+  "extension": null,
+  "toxicity_reduction": 0.21123287671233257,
+  "policy_wins": true,
+  "burden_ratio": 0.01425726981707189,
+  "paired_burden_ratios": [
+   0.013970987147669707,
+   0.014543552486474074
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   319.0,
+   326.0
+  ],
+  "policy_mean_burden": [
+   9.285237039503231,
+   9.28166804140756
+  ],
+  "mtd_mean_burden": [
+   664.6085163031564,
+   638.1981328179467
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "collateral_b_kill",
+  "scale": 0.02,
+  "policy_median_pfs": 296.0,
+  "mtd_median_pfs": 282.0,
+  "extension": 0.04964539007092199,
+  "toxicity_reduction": 0.2926027397260321,
+  "policy_wins": true,
+  "burden_ratio": 0.9143529510110469,
+  "paired_burden_ratios": [
+   0.9145913493794108,
+   0.9141145526426829
+  ],
+  "pfs_discriminating": true,
+  "policy_events": 2,
+  "mtd_events": 2,
+  "policy_pfs": [
+   292.0,
+   300.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   789.0701295782184,
+   757.6294306583559
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "collateral_b_kill",
+  "scale": 0.05,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.2926027397260321,
+  "policy_wins": true,
+  "burden_ratio": 0.5647731391548931,
+  "paired_burden_ratios": [
+   0.5641143181396114,
+   0.5654319601701748
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   486.69360191673394,
+   468.636991743878
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "collateral_b_kill",
+  "scale": 0.1,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.2926027397260321,
+  "policy_wins": true,
+  "burden_ratio": 0.2622487853662507,
+  "paired_burden_ratios": [
+   0.2602527249007623,
+   0.2642448458317391
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   224.5348717762013,
+   219.00939168196493
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "collateral_b_kill",
+  "scale": 0.25,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.28767123287671686,
+  "policy_wins": true,
+  "burden_ratio": 0.04310403198673371,
+  "paired_burden_ratios": [
+   0.03975223732915967,
+   0.046455826644307745
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   34.29652279307929,
+   38.5031628580231
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "collateral_b_kill",
+  "scale": 0.5,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.259315068493155,
+  "policy_wins": true,
+  "burden_ratio": 0.023307006504577284,
+  "paired_burden_ratios": [
+   0.022794370096325414,
+   0.023819642912829155
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   19.66600337709937,
+   19.74201422169706
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "collateral_b_kill",
+  "scale": 1.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.16027397260274315,
+  "policy_wins": true,
+  "burden_ratio": 0.022064052170624113,
+  "paired_burden_ratios": [
+   0.021627117631208365,
+   0.022500986710039864
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   18.65894809003004,
+   18.649095675257644
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "collateral_b_kill",
+  "scale": 2.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.08424657534246731,
+  "policy_wins": true,
+  "burden_ratio": 0.021475180000061225,
+  "paired_burden_ratios": [
+   0.021063002685756945,
+   0.021887357314365502
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   18.172253946895626,
+   18.14051205372359
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "tumour_growth",
+  "scale": 0.02,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 365.0,
+  "extension": null,
+  "toxicity_reduction": 0.15369863013698917,
+  "policy_wins": true,
+  "burden_ratio": 0.4504192327979377,
+  "paired_burden_ratios": [
+   0.4515591825016198,
+   0.44927928309425563
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 0,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   365.0
+  ],
+  "policy_mean_burden": [
+   15.751542015480055,
+   15.752958773962098
+  ],
+  "mtd_mean_burden": [
+   34.88256384958699,
+   35.062731282575605
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "tumour_growth",
+  "scale": 0.05,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 365.0,
+  "extension": null,
+  "toxicity_reduction": 0.15328767123287965,
+  "policy_wins": true,
+  "burden_ratio": 0.43144382272829107,
+  "paired_burden_ratios": [
+   0.43359959857807534,
+   0.42928804687850686
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 0,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   365.0
+  ],
+  "policy_mean_burden": [
+   15.82490037034357,
+   15.826584454723452
+  ],
+  "mtd_mean_burden": [
+   36.49657523263156,
+   36.86705131858131
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "tumour_growth",
+  "scale": 0.1,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 365.0,
+  "extension": null,
+  "toxicity_reduction": 0.15328767123287965,
+  "policy_wins": true,
+  "burden_ratio": 0.39746467324842666,
+  "paired_burden_ratios": [
+   0.4013415991653154,
+   0.3935877473315379
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 0,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   365.0
+  ],
+  "policy_mean_burden": [
+   15.949563511279726,
+   15.951689165958681
+  ],
+  "mtd_mean_burden": [
+   39.74061882558551,
+   40.52892721917435
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "tumour_growth",
+  "scale": 0.25,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 365.0,
+  "extension": null,
+  "toxicity_reduction": 0.15410958904109884,
+  "policy_wins": true,
+  "burden_ratio": 0.283289035942126,
+  "paired_burden_ratios": [
+   0.2921291011155055,
+   0.2744489707687465
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 0,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   365.0
+  ],
+  "policy_mean_burden": [
+   16.40954414191177,
+   16.413865890640274
+  ],
+  "mtd_mean_burden": [
+   56.172233711914814,
+   59.80662213694641
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "tumour_growth",
+  "scale": 0.5,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 365.0,
+  "extension": null,
+  "toxicity_reduction": 0.15041095890411219,
+  "policy_wins": true,
+  "burden_ratio": 0.12016288247065673,
+  "paired_burden_ratios": [
+   0.1319216162162417,
+   0.10840414872507176
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 0,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   365.0
+  ],
+  "policy_mean_burden": [
+   17.124824577240812,
+   17.13672155481543
+  ],
+  "mtd_mean_burden": [
+   129.81060320827442,
+   158.08178705666126
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "tumour_growth",
+  "scale": 1.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.15904109589041426,
+  "policy_wins": true,
+  "burden_ratio": 0.031667275962441774,
+  "paired_burden_ratios": [
+   0.03744405322154283,
+   0.025890498703340724
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   18.983694257789118,
+   19.001239508741584
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "tumour_growth",
+  "scale": 2.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 182.0,
+  "extension": null,
+  "toxicity_reduction": 0.11383561643835853,
+  "policy_wins": true,
+  "burden_ratio": 0.01443620785499044,
+  "paired_burden_ratios": [
+   0.01660539368826802,
+   0.012267022021712863
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   202.0,
+   162.0
+  ],
+  "policy_mean_burden": [
+   25.63826385674367,
+   25.806897555484348
+  ],
+  "mtd_mean_burden": [
+   1543.9720573958762,
+   2103.7622260566295
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "drug_a_kill",
+  "scale": 0.02,
+  "policy_median_pfs": 12.0,
+  "mtd_median_pfs": 12.0,
+  "extension": 0.0,
+  "toxicity_reduction": 0.0,
+  "policy_wins": false,
+  "burden_ratio": 1.0,
+  "paired_burden_ratios": [
+   1.0,
+   1.0
+  ],
+  "pfs_discriminating": true,
+  "policy_events": 2,
+  "mtd_events": 2,
+  "policy_pfs": [
+   12.0,
+   12.0
+  ],
+  "mtd_pfs": [
+   12.0,
+   12.0
+  ],
+  "policy_mean_burden": [
+   3594.186999135106,
+   3604.5613631490414
+  ],
+  "mtd_mean_burden": [
+   3594.186999135106,
+   3604.5613631490414
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "drug_a_kill",
+  "scale": 0.05,
+  "policy_median_pfs": 18.0,
+  "mtd_median_pfs": 18.0,
+  "extension": 0.0,
+  "toxicity_reduction": 0.004109589041096046,
+  "policy_wins": true,
+  "burden_ratio": 0.9549255224903177,
+  "paired_burden_ratios": [
+   1.0,
+   0.9098510449806353
+  ],
+  "pfs_discriminating": true,
+  "policy_events": 2,
+  "mtd_events": 2,
+  "policy_pfs": [
+   18.0,
+   18.0
+  ],
+  "mtd_pfs": [
+   18.0,
+   18.0
+  ],
+  "policy_mean_burden": [
+   2321.0664118679197,
+   2140.9870645090946
+  ],
+  "mtd_mean_burden": [
+   2321.0664118679197,
+   2353.1182123933945
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "drug_a_kill",
+  "scale": 0.1,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 269.5,
+  "extension": null,
+  "toxicity_reduction": 0.007397260273972883,
+  "policy_wins": true,
+  "burden_ratio": 0.6711204895276062,
+  "paired_burden_ratios": [
+   0.6981765731613361,
+   0.6440644058938764
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   292.0,
+   247.0
+  ],
+  "policy_mean_burden": [
+   945.5072007783564,
+   936.5144134192941
+  ],
+  "mtd_mean_burden": [
+   1354.2522581316498,
+   1454.0695074113523
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "drug_a_kill",
+  "scale": 0.25,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 306.5,
+  "extension": null,
+  "toxicity_reduction": 0.023013698630137545,
+  "policy_wins": true,
+  "burden_ratio": 0.14430965851188138,
+  "paired_burden_ratios": [
+   0.16749248901721303,
+   0.12112682800654975
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   335.0,
+   278.0
+  ],
+  "policy_mean_burden": [
+   122.04366591615634,
+   120.14410137544563
+  ],
+  "mtd_mean_burden": [
+   728.6515749587675,
+   991.8867962838837
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "drug_a_kill",
+  "scale": 0.5,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 310.5,
+  "extension": null,
+  "toxicity_reduction": 0.06369863013698786,
+  "policy_wins": true,
+  "burden_ratio": 0.054541851778487735,
+  "paired_burden_ratios": [
+   0.06450210659459403,
+   0.044581596962381446
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   342.0,
+   279.0
+  ],
+  "policy_mean_burden": [
+   40.0193703594939,
+   39.74505658750748
+  ],
+  "mtd_mean_burden": [
+   620.4350907641201,
+   891.5126261862017
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "drug_a_kill",
+  "scale": 1.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.15904109589041426,
+  "policy_wins": true,
+  "burden_ratio": 0.031667275962441774,
+  "paired_burden_ratios": [
+   0.03744405322154283,
+   0.025890498703340724
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   18.983694257789118,
+   19.001239508741584
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "drug_a_kill",
+  "scale": 2.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 365.0,
+  "extension": null,
+  "toxicity_reduction": 0.2075342465753462,
+  "policy_wins": true,
+  "burden_ratio": 0.02395609345036976,
+  "paired_burden_ratios": [
+   0.028231459450209835,
+   0.01968072745052968
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 0,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   365.0
+  ],
+  "policy_mean_burden": [
+   9.85547004597501,
+   9.867560068748155
+  ],
+  "mtd_mean_burden": [
+   349.09530849287205,
+   501.3818769428963
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "collateral_b_kill",
+  "scale": 0.02,
+  "policy_median_pfs": 347.0,
+  "mtd_median_pfs": 335.0,
+  "extension": 0.03582089552238806,
+  "toxicity_reduction": 0.2926027397260321,
+  "policy_wins": true,
+  "burden_ratio": 0.8749723254532231,
+  "paired_burden_ratios": [
+   0.8784654798709772,
+   0.8714791710354691
+  ],
+  "pfs_discriminating": true,
+  "policy_events": 1,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   329.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   445.3716585441147,
+   639.5853801606318
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "collateral_b_kill",
+  "scale": 0.05,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.2926027397260321,
+  "policy_wins": true,
+  "burden_ratio": 0.42360158718632945,
+  "paired_burden_ratios": [
+   0.43489482489343306,
+   0.4123083494792258
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   220.48655740404098,
+   302.5963226771606
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "collateral_b_kill",
+  "scale": 0.1,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.2926027397260321,
+  "policy_wins": true,
+  "burden_ratio": 0.1292461177676985,
+  "paired_burden_ratios": [
+   0.13998157748704917,
+   0.11851065804834786
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   70.9690121690214,
+   86.97589890860884
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "collateral_b_kill",
+  "scale": 0.25,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.2798630136986344,
+  "policy_wins": true,
+  "burden_ratio": 0.0373045890211432,
+  "paired_burden_ratios": [
+   0.04387090044962399,
+   0.030738277592662414
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   22.24203015688506,
+   22.559062353982373
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "collateral_b_kill",
+  "scale": 0.5,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.24287671232877112,
+  "policy_wins": true,
+  "burden_ratio": 0.033019403570833356,
+  "paired_burden_ratios": [
+   0.03900177550139008,
+   0.027037031640276637
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   19.773441118904916,
+   19.842688999112703
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "collateral_b_kill",
+  "scale": 1.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.15904109589041426,
+  "policy_wins": true,
+  "burden_ratio": 0.031667275962441774,
+  "paired_burden_ratios": [
+   0.03744405322154283,
+   0.025890498703340724
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   18.983694257789118,
+   19.001239508741584
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "collateral_b_kill",
+  "scale": 2.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.08506849315068668,
+  "policy_wins": true,
+  "burden_ratio": 0.030905811500292847,
+  "paired_burden_ratios": [
+   0.03655450633132713,
+   0.02525711666925856
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   18.5327044546311,
+   18.536395479739696
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "drug_transport",
+  "scale": 0.02,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 273.5,
+  "extension": null,
+  "toxicity_reduction": 0.10315068493150897,
+  "policy_wins": true,
+  "burden_ratio": 0.024186841263379617,
+  "paired_burden_ratios": [
+   0.023946798535008088,
+   0.024426883991751143
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   270.0,
+   277.0
+  ],
+  "policy_mean_burden": [
+   21.99931193775312,
+   21.532498669578246
+  ],
+  "mtd_mean_burden": [
+   918.6744485110227,
+   881.5082053384165
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "drug_transport",
+  "scale": 0.05,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 276.5,
+  "extension": null,
+  "toxicity_reduction": 0.09410958904109783,
+  "policy_wins": true,
+  "burden_ratio": 0.021446044187183242,
+  "paired_burden_ratios": [
+   0.02109809897753002,
+   0.021793989396836463
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   273.0,
+   280.0
+  ],
+  "policy_mean_burden": [
+   18.87804154501366,
+   18.715822638162436
+  ],
+  "mtd_mean_burden": [
+   894.7745275590576,
+   858.7607480840179
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "drug_transport",
+  "scale": 0.1,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 279.5,
+  "extension": null,
+  "toxicity_reduction": 0.11013698630137217,
+  "policy_wins": true,
+  "burden_ratio": 0.0204001202890121,
+  "paired_burden_ratios": [
+   0.02002309934568939,
+   0.02077714123233481
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   276.0,
+   283.0
+  ],
+  "policy_mean_burden": [
+   17.624222347570896,
+   17.555732516757963
+  ],
+  "mtd_mean_burden": [
+   880.1945215022405,
+   844.9541888581153
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "drug_transport",
+  "scale": 0.25,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 281.0,
+  "extension": null,
+  "toxicity_reduction": 0.12328767123287951,
+  "policy_wins": true,
+  "burden_ratio": 0.02046121862400562,
+  "paired_burden_ratios": [
+   0.020062432071190163,
+   0.020860005176821076
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   277.0,
+   285.0
+  ],
+  "policy_mean_burden": [
+   17.413019107412108,
+   17.385452211081482
+  ],
+  "mtd_mean_burden": [
+   867.9415858268432,
+   833.4347026145325
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "drug_transport",
+  "scale": 0.5,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 281.5,
+  "extension": null,
+  "toxicity_reduction": 0.14260273972603024,
+  "policy_wins": true,
+  "burden_ratio": 0.021149701098498296,
+  "paired_burden_ratios": [
+   0.020730969045658798,
+   0.021568433151337794
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   285.0
+  ],
+  "policy_mean_burden": [
+   17.90420710525261,
+   17.89075723267325
+  ],
+  "mtd_mean_burden": [
+   863.6454507176967,
+   829.488034997274
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "drug_transport",
+  "scale": 1.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.16027397260274315,
+  "policy_wins": true,
+  "burden_ratio": 0.022064052170624113,
+  "paired_burden_ratios": [
+   0.021627117631208365,
+   0.022500986710039864
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   18.65894809003004,
+   18.649095675257644
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "drug_transport",
+  "scale": 2.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.17178082191781147,
+  "policy_wins": true,
+  "burden_ratio": 0.02322706793614536,
+  "paired_burden_ratios": [
+   0.022758944278559054,
+   0.023695191593731665
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   19.667410689661143,
+   19.674903848114596
+  ],
+  "mtd_mean_burden": [
+   864.1618191485968,
+   830.3331825904881
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "resistance_cost",
+  "scale": 0.02,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 225.0,
+  "extension": null,
+  "toxicity_reduction": 0.15821917808219457,
+  "policy_wins": true,
+  "burden_ratio": 0.0147295146092363,
+  "paired_burden_ratios": [
+   0.014495462432882985,
+   0.014963566785589614
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   222.0,
+   228.0
+  ],
+  "policy_mean_burden": [
+   18.74931493846814,
+   18.755923810034993
+  ],
+  "mtd_mean_burden": [
+   1293.4609727203515,
+   1253.4393757040293
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "resistance_cost",
+  "scale": 0.05,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 226.0,
+  "extension": null,
+  "toxicity_reduction": 0.15534246575342742,
+  "policy_wins": true,
+  "burden_ratio": 0.014874397504313606,
+  "paired_burden_ratios": [
+   0.014636722105132383,
+   0.015112072903494828
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   223.0,
+   229.0
+  ],
+  "policy_mean_burden": [
+   18.747389721465787,
+   18.753737129922083
+  ],
+  "mtd_mean_burden": [
+   1280.8461885664956,
+   1240.9771478527662
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "resistance_cost",
+  "scale": 0.1,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 228.5,
+  "extension": null,
+  "toxicity_reduction": 0.15534246575342758,
+  "policy_wins": true,
+  "burden_ratio": 0.01512377843296775,
+  "paired_burden_ratios": [
+   0.014879827799826757,
+   0.015367729066108742
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   226.0,
+   231.0
+  ],
+  "policy_mean_burden": [
+   18.74421123824071,
+   18.750149085343743
+  ],
+  "mtd_mean_burden": [
+   1259.7061935393463,
+   1220.0988841412118
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "resistance_cost",
+  "scale": 0.25,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 235.5,
+  "extension": null,
+  "toxicity_reduction": 0.16109589041096206,
+  "policy_wins": true,
+  "burden_ratio": 0.015927677832222403,
+  "paired_burden_ratios": [
+   0.01566290193908203,
+   0.016192453725362776
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   232.0,
+   239.0
+  ],
+  "policy_mean_burden": [
+   18.724641675666486,
+   18.72976685933179
+  ],
+  "mtd_mean_burden": [
+   1195.4771694602014,
+   1156.6972601561145
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "resistance_cost",
+  "scale": 0.5,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 249.0,
+  "extension": null,
+  "toxicity_reduction": 0.16068493150685254,
+  "policy_wins": true,
+  "burden_ratio": 0.017524438185941512,
+  "paired_burden_ratios": [
+   0.017216458969677228,
+   0.017832417402205796
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   246.0,
+   252.0
+  ],
+  "policy_mean_burden": [
+   18.69889539316732,
+   18.702598992655425
+  ],
+  "mtd_mean_burden": [
+   1086.1057680967415,
+   1048.797735653159
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "resistance_cost",
+  "scale": 1.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.16027397260274315,
+  "policy_wins": true,
+  "burden_ratio": 0.022064052170624113,
+  "paired_burden_ratios": [
+   0.021627117631208365,
+   0.022500986710039864
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   18.65894809003004,
+   18.649095675257644
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "resistance_cost",
+  "scale": 2.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 365.0,
+  "extension": null,
+  "toxicity_reduction": 0.15369863013698917,
+  "policy_wins": true,
+  "burden_ratio": 0.04322436579643399,
+  "paired_burden_ratios": [
+   0.0423181660634852,
+   0.044130565529382784
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 0,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   365.0
+  ],
+  "policy_mean_burden": [
+   18.5824543458899,
+   18.567633542604405
+  ],
+  "mtd_mean_burden": [
+   439.11294071706055,
+   420.74315884852643
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "intake_r0",
+  "scale": 0.02,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 302.0,
+  "extension": null,
+  "toxicity_reduction": 0.154109589041099,
+  "policy_wins": true,
+  "burden_ratio": 0.025695798373212404,
+  "paired_burden_ratios": [
+   0.025230174038181157,
+   0.02616142270824365
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   299.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   17.871658320525334,
+   17.88930276890897
+  ],
+  "mtd_mean_burden": [
+   708.3446310548599,
+   683.8046603356904
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "intake_r0",
+  "scale": 0.05,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 293.5,
+  "extension": null,
+  "toxicity_reduction": 0.15698630136986633,
+  "policy_wins": true,
+  "burden_ratio": 0.0239355614375463,
+  "paired_burden_ratios": [
+   0.02347486593693446,
+   0.024396256938158136
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   290.0,
+   297.0
+  ],
+  "policy_mean_burden": [
+   18.040572477096905,
+   18.05856830671557
+  ],
+  "mtd_mean_burden": [
+   768.5058788221897,
+   740.2188111271365
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "intake_r0",
+  "scale": 0.1,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 287.5,
+  "extension": null,
+  "toxicity_reduction": 0.15863013698630457,
+  "policy_wins": true,
+  "burden_ratio": 0.022905004779255764,
+  "paired_burden_ratios": [
+   0.02244935202354098,
+   0.02336065753497055
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   284.0,
+   291.0
+  ],
+  "policy_mean_burden": [
+   18.25134373021287,
+   18.268403487005415
+  ],
+  "mtd_mean_burden": [
+   813.0009147290324,
+   782.0158084017066
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "intake_r0",
+  "scale": 0.25,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.16027397260274315,
+  "policy_wins": true,
+  "burden_ratio": 0.022064052170624113,
+  "paired_burden_ratios": [
+   0.021627117631208365,
+   0.022500986710039864
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   18.65894809003004,
+   18.649095675257644
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "intake_r0",
+  "scale": 0.5,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.16027397260274315,
+  "policy_wins": true,
+  "burden_ratio": 0.022064052170624113,
+  "paired_burden_ratios": [
+   0.021627117631208365,
+   0.022500986710039864
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   18.65894809003004,
+   18.649095675257644
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "intake_r0",
+  "scale": 1.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.16027397260274315,
+  "policy_wins": true,
+  "burden_ratio": 0.022064052170624113,
+  "paired_burden_ratios": [
+   0.021627117631208365,
+   0.022500986710039864
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   18.65894809003004,
+   18.649095675257644
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01017",
+  "target": "intake_r0",
+  "scale": 2.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 282.0,
+  "extension": null,
+  "toxicity_reduction": 0.16027397260274315,
+  "policy_wins": true,
+  "burden_ratio": 0.022064052170624113,
+  "paired_burden_ratios": [
+   0.021627117631208365,
+   0.022500986710039864
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   278.0,
+   286.0
+  ],
+  "policy_mean_burden": [
+   18.65894809003004,
+   18.649095675257644
+  ],
+  "mtd_mean_burden": [
+   862.7570445681955,
+   828.8123501240273
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "drug_transport",
+  "scale": 0.02,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 328.5,
+  "extension": null,
+  "toxicity_reduction": 0.09945205479452338,
+  "policy_wins": true,
+  "burden_ratio": 0.03546125210026186,
+  "paired_burden_ratios": [
+   0.04207434105993626,
+   0.028848163140587458
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   362.0,
+   295.0
+  ],
+  "policy_mean_burden": [
+   22.77857487777156,
+   22.584461990965412
+  ],
+  "mtd_mean_burden": [
+   541.3887491505272,
+   782.8734842112207
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "drug_transport",
+  "scale": 0.05,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 332.5,
+  "extension": null,
+  "toxicity_reduction": 0.09739726027397529,
+  "policy_wins": true,
+  "burden_ratio": 0.030858685370894263,
+  "paired_burden_ratios": [
+   0.03654015721017527,
+   0.025177213531613257
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   300.0
+  ],
+  "policy_mean_burden": [
+   19.09799966516814,
+   19.031040664954947
+  ],
+  "mtd_mean_burden": [
+   522.657840668785,
+   755.8835151101613
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "drug_transport",
+  "scale": 0.1,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 333.5,
+  "extension": null,
+  "toxicity_reduction": 0.10890410958904359,
+  "policy_wins": true,
+  "burden_ratio": 0.02926558667611357,
+  "paired_burden_ratios": [
+   0.03462294460886648,
+   0.023908228743360658
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   302.0
+  ],
+  "policy_mean_burden": [
+   17.77602409509655,
+   17.756937253370673
+  ],
+  "mtd_mean_burden": [
+   513.417454694028,
+   742.7123708736389
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "drug_transport",
+  "scale": 0.25,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 334.5,
+  "extension": null,
+  "toxicity_reduction": 0.13767123287671576,
+  "policy_wins": true,
+  "burden_ratio": 0.02916925797561666,
+  "paired_burden_ratios": [
+   0.03449016100442374,
+   0.023848354946809588
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   304.0
+  ],
+  "policy_mean_burden": [
+   17.49839791565397,
+   17.509995078574526
+  ],
+  "mtd_mean_burden": [
+   507.3446283248609,
+   734.2223443767134
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "drug_transport",
+  "scale": 0.5,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.1471232876712361,
+  "policy_wins": true,
+  "burden_ratio": 0.030028820451895574,
+  "paired_burden_ratios": [
+   0.03549850895757798,
+   0.024559131946213168
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   17.965112171300266,
+   17.99157215777719
+  ],
+  "mtd_mean_burden": [
+   506.0807537795245,
+   732.581762139657
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "drug_transport",
+  "scale": 1.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.15904109589041426,
+  "policy_wins": true,
+  "burden_ratio": 0.031667275962441774,
+  "paired_burden_ratios": [
+   0.03744405322154283,
+   0.025890498703340724
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   18.983694257789118,
+   19.001239508741584
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "drug_transport",
+  "scale": 2.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 334.5,
+  "extension": null,
+  "toxicity_reduction": 0.15041095890411232,
+  "policy_wins": true,
+  "burden_ratio": 0.03342987880154084,
+  "paired_burden_ratios": [
+   0.039512360891308024,
+   0.02734739671177365
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   304.0
+  ],
+  "policy_mean_burden": [
+   20.13236253601792,
+   20.166722928845985
+  ],
+  "mtd_mean_burden": [
+   509.5206178997687,
+   737.4275197523197
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "resistance_cost",
+  "scale": 0.02,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 258.0,
+  "extension": null,
+  "toxicity_reduction": 0.15164383561644154,
+  "policy_wins": true,
+  "burden_ratio": 0.019130564029530134,
+  "paired_burden_ratios": [
+   0.0226818724499853,
+   0.01557925560907497
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   286.0,
+   230.0
+  ],
+  "policy_mean_burden": [
+   19.041193140648375,
+   19.069775793595536
+  ],
+  "mtd_mean_burden": [
+   839.4894726013114,
+   1224.0492275181189
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "resistance_cost",
+  "scale": 0.05,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 260.0,
+  "extension": null,
+  "toxicity_reduction": 0.15369863013698948,
+  "policy_wins": true,
+  "burden_ratio": 0.019368978106394423,
+  "paired_burden_ratios": [
+   0.02296830428208673,
+   0.01576965193070211
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   288.0,
+   232.0
+  ],
+  "policy_mean_burden": [
+   19.0401015942251,
+   19.068318161797876
+  ],
+  "mtd_mean_burden": [
+   828.9728906576144,
+   1209.178125528158
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "resistance_cost",
+  "scale": 0.1,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 263.0,
+  "extension": null,
+  "toxicity_reduction": 0.15369863013698948,
+  "policy_wins": true,
+  "burden_ratio": 0.019773065051330578,
+  "paired_burden_ratios": [
+   0.02344768465609162,
+   0.016098445446569538
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   292.0,
+   234.0
+  ],
+  "policy_mean_burden": [
+   19.026914980548444,
+   19.065894454575812
+  ],
+  "mtd_mean_burden": [
+   811.4624219669095,
+   1184.3314013054978
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "resistance_cost",
+  "scale": 0.25,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 273.0,
+  "extension": null,
+  "toxicity_reduction": 0.16068493150685298,
+  "policy_wins": true,
+  "burden_ratio": 0.02111845337542109,
+  "paired_burden_ratios": [
+   0.025057592756804376,
+   0.0171793139940378
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   303.0,
+   243.0
+  ],
+  "policy_mean_burden": [
+   19.021491506436078,
+   19.058726670601693
+  ],
+  "mtd_mean_burden": [
+   759.1108887054125,
+   1109.399751190074
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "resistance_cost",
+  "scale": 0.5,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 292.0,
+  "extension": null,
+  "toxicity_reduction": 0.16438356164383935,
+  "policy_wins": true,
+  "burden_ratio": 0.023803947760556173,
+  "paired_burden_ratios": [
+   0.028257355765996077,
+   0.019350539755116265
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 2,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   324.0,
+   260.0
+  ],
+  "policy_mean_burden": [
+   19.01264775123056,
+   19.035679545398352
+  ],
+  "mtd_mean_burden": [
+   672.8388851624157,
+   983.728608415966
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "resistance_cost",
+  "scale": 1.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.15904109589041426,
+  "policy_wins": true,
+  "burden_ratio": 0.031667275962441774,
+  "paired_burden_ratios": [
+   0.03744405322154283,
+   0.025890498703340724
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   18.983694257789118,
+   19.001239508741584
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "resistance_cost",
+  "scale": 2.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 365.0,
+  "extension": null,
+  "toxicity_reduction": 0.15287671232877012,
+  "policy_wins": true,
+  "burden_ratio": 0.07354729599092008,
+  "paired_burden_ratios": [
+   0.08375939024065329,
+   0.06333520174118687
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 0,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   365.0
+  ],
+  "policy_mean_burden": [
+   18.939276713589063,
+   18.9465266668486
+  ],
+  "mtd_mean_burden": [
+   226.11526491744604,
+   299.14685902907104
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "intake_r0",
+  "scale": 0.02,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 353.5,
+  "extension": null,
+  "toxicity_reduction": 0.14671232876712598,
+  "policy_wins": true,
+  "burden_ratio": 0.043384163960309974,
+  "paired_burden_ratios": [
+   0.05103872605264567,
+   0.03572960186797428
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   342.0
+  ],
+  "policy_mean_burden": [
+   18.040649571657937,
+   18.052839789320675
+  ],
+  "mtd_mean_burden": [
+   353.46982510984463,
+   505.26283097215475
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "intake_r0",
+  "scale": 0.05,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 345.5,
+  "extension": null,
+  "toxicity_reduction": 0.15205479452055076,
+  "policy_wins": true,
+  "burden_ratio": 0.03762881196320751,
+  "paired_burden_ratios": [
+   0.04442646833868817,
+   0.03083115558772685
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   326.0
+  ],
+  "policy_mean_burden": [
+   18.196794306139914,
+   18.21804773506765
+  ],
+  "mtd_mean_burden": [
+   409.59353706478373,
+   590.897337053426
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "intake_r0",
+  "scale": 0.1,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 340.0,
+  "extension": null,
+  "toxicity_reduction": 0.15452054794520853,
+  "policy_wins": true,
+  "burden_ratio": 0.034392747149367145,
+  "paired_burden_ratios": [
+   0.040650233229770245,
+   0.028135261068964044
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   315.0
+  ],
+  "policy_mean_burden": [
+   18.429668381213677,
+   18.459551895094556
+  ],
+  "mtd_mean_burden": [
+   453.37177469665016,
+   656.1002526277339
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "intake_r0",
+  "scale": 0.25,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.15904109589041426,
+  "policy_wins": true,
+  "burden_ratio": 0.031667275962441774,
+  "paired_burden_ratios": [
+   0.03744405322154283,
+   0.025890498703340724
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   18.983694257789118,
+   19.001239508741584
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "intake_r0",
+  "scale": 0.5,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.15904109589041426,
+  "policy_wins": true,
+  "burden_ratio": 0.031667275962441774,
+  "paired_burden_ratios": [
+   0.03744405322154283,
+   0.025890498703340724
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   18.983694257789118,
+   19.001239508741584
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "intake_r0",
+  "scale": 1.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.15904109589041426,
+  "policy_wins": true,
+  "burden_ratio": 0.031667275962441774,
+  "paired_burden_ratios": [
+   0.03744405322154283,
+   0.025890498703340724
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   18.983694257789118,
+   19.001239508741584
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ },
+ {
+  "case_id": "BraTS2021_01018",
+  "target": "intake_r0",
+  "scale": 2.0,
+  "policy_median_pfs": 365.0,
+  "mtd_median_pfs": 335.0,
+  "extension": null,
+  "toxicity_reduction": 0.15904109589041426,
+  "policy_wins": true,
+  "burden_ratio": 0.031667275962441774,
+  "paired_burden_ratios": [
+   0.03744405322154283,
+   0.025890498703340724
+  ],
+  "pfs_discriminating": false,
+  "policy_events": 0,
+  "mtd_events": 1,
+  "policy_pfs": [
+   365.0,
+   365.0
+  ],
+  "mtd_pfs": [
+   365.0,
+   305.0
+  ],
+  "policy_mean_burden": [
+   18.983694257789118,
+   19.001239508741584
+  ],
+  "mtd_mean_burden": [
+   506.98822975892887,
+   733.9078218022042
+  ]
+ }
+]

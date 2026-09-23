@@ -1,0 +1,3171 @@
+{
+ "calls": {
+  "TCGA-02-0001": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0003": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0006": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0007": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0009": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0010": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0011": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0014": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0021": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0024": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0027": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0028": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0033": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0034": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0037": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0038": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0043": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0046": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0047": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0052": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0054": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0055": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0057": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0058": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0060": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0064": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0069": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0071": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0074": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0075": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0080": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0083": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0085": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0086": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0089": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0099": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0102": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0107": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0113": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-0114": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0115": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-0116": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-2466": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-2470": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-2483": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-02-2485": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-02-2486": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0119": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-0121": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-0122": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0124": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-0125": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-0126": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0128": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-0129": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-0130": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0133": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0137": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0139": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0140": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0141": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0142": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0143": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0145": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-0147": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-0148": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0155": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0169": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0650": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0875": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0876": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-0877": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-0878": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0879": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-0881": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0882": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-0939": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-1084": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-1086": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-1087": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-1800": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-1801": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-1802": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-1804": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-1805": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-1806": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-2557": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-2558": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-2559": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-2561": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-2562": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-2563": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-2564": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-2565": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-2566": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-2567": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-2569": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-2570": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-5408": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-5410": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-5411": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-5412": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-5413": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-5414": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-5415": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-5416": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-5417": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-5418": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-5856": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-5858": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-5859": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-6388": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-6389": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-6390": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-6391": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-6693": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-6694": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-6695": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-6697": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-6698": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-6699": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-6700": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-6701": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-A5U0": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-A5U1": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-A6S0": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-A6S1": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-06-A7TK": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-06-A7TL": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-0670": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-0818": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-0819": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-0820": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-0821": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-0822": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-0826": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-0827": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-0828": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-0829": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-1088": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-1089": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-1090": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-1091": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-1092": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-1093": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-1094": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-1095": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-1096": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-1097": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-1098": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-1099": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-1597": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-1598": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-1599": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-1600": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-1601": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-1602": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-3644": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-3646": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-3648": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-3649": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-3650": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-3651": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-3652": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-3653": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-5295": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-12-5299": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-12-5301": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-0736": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-0740": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-0781": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-0783": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-0786": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-0787": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-0789": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-0790": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-0812": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-0813": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-0817": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-0862": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-0865": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-0866": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-0867": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-0871": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-1034": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-1037": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-1043": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-1395": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-1396": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-1401": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-1402": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-1450": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-1451": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-1452": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-1453": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-1454": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-1455": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-1456": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-1458": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-1459": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-1794": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-1795": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-1821": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-1823": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-1825": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-1827": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-1829": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-2554": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-2555": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-14-3476": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-3477": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-14-4157": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-15-1444": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-15-1446": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-15-1447": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-15-1449": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-16-0846": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-16-0848": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-16-0849": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-16-0850": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-16-0861": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-16-1045": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-16-1047": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-16-1048": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-16-1055": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-16-1056": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-16-1060": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-16-1062": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-16-1063": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-16-1460": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-0955": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-0957": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-0960": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-0962": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-0963": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-0964": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-1385": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-1386": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-1387": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-1388": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-1389": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-1390": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-1392": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-1786": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-1787": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-1788": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-1789": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-1790": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-1791": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-2619": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-2620": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-2621": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-2623": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-2624": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-2625": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-2629": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-2631": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-4065": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-4068": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-5947": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-5950": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-5951": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-5952": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-5953": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-5954": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-5955": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-5956": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-5958": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-5959": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-5960": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-A60I": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-19-A6J4": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-19-A6J5": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-26-1438": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-26-1439": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-26-1440": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-26-1442": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-26-1443": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-26-1799": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-26-5132": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-26-5133": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-26-5134": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-26-5135": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-26-5136": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-26-5139": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-26-6173": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-26-6174": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-26-A7UX": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-27-1830": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-27-1831": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-27-1832": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-27-1833": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-27-1834": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-27-1835": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-27-1836": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-27-1837": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-27-1838": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-27-2518": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-27-2519": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-27-2521": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-27-2523": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-27-2524": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-27-2526": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-27-2527": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-27-2528": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-28-1745": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-1746": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-28-1747": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-28-1749": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-1750": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-1751": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-1752": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-28-1753": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-1755": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-1756": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-28-1757": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-28-1760": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-2499": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-2501": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-28-2502": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-2506": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-28-2509": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-28-2510": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-2512": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-2513": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-2514": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-5204": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-5207": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-5208": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-28-5209": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-28-5211": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-5213": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-5214": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-5215": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-28-5216": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-5218": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-5219": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-28-5220": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-28-6450": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-1970": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-1973": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-32-1976": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-32-1977": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-32-1978": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-1979": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-1980": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-1982": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-32-1986": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-1987": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-1991": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-2491": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-2494": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-32-2495": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-2498": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-2615": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-2616": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-32-2632": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-2634": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-32-2638": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-32-4208": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-32-4209": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-32-4210": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-4211": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-4213": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-32-4719": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-32-5222": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-41-2571": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-41-2572": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-41-2573": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-41-2575": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-41-3392": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-41-3393": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-41-3915": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-41-4097": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-41-5651": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-41-6646": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-4W-AA9R": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-4W-AA9S": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-4W-AA9T": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-74-6573": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-74-6575": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-74-6577": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-74-6578": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-74-6581": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-74-6584": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-76-4925": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-76-4926": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-76-4927": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-76-4928": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-76-4929": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-76-4931": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-76-4932": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-76-4934": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-76-4935": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "METHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-76-6191": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-76-6192": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-76-6193": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-76-6280": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-76-6282": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-76-6283": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-76-6285": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-76-6286": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-76-6656": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-76-6657": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-76-6660": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-76-6661": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-76-6662": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-76-6663": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-76-6664": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-81-5910": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-81-5911": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-87-5896": {
+   "gbm_tcga_pub2013:MGMT_STATUS": "UNMETHYLATED",
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-CS-4938": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-CS-4941": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-CS-4942": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-CS-4943": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-CS-4944": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-CS-5390": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-CS-5393": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-CS-5394": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-CS-5395": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-CS-5396": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-CS-5397": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-CS-6186": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-CS-6188": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-CS-6290": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-CS-6665": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-CS-6666": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-CS-6667": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-CS-6668": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-CS-6669": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-CS-6670": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-5270": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-5273": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DB-5274": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-5275": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-5276": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-5277": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-5278": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-5279": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-5280": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-5281": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A4X9": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A4XA": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A4XB": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A4XC": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A4XD": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A4XE": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A4XF": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A4XG": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A4XH": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A64L": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A64O": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DB-A64P": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A64Q": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A64R": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A64S": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DB-A64U": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A64V": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A64W": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A64X": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A75K": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A75L": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A75M": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A75O": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DB-A75P": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DH-5140": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DH-5141": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DH-5142": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DH-5143": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DH-5144": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DH-A669": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DH-A66B": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DH-A66D": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DH-A66F": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DH-A66G": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DH-A7UR": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DH-A7US": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DH-A7UT": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DH-A7UU": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DH-A7UV": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-5847": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-5849": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-5851": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-5852": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-5853": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-5854": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-5855": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-5870": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-5871": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-5872": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-5874": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-6392": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-6393": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-6394": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-6395": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-6396": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-6397": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-6399": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-6400": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-6401": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-6402": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-6403": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-6404": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-6405": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-6406": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-6407": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-6408": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-6410": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-6542": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7006": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7007": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7008": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7009": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7010": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7011": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-7012": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7013": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-7014": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7015": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7018": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7019": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7290": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-7292": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7294": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7298": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7299": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7300": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7301": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7302": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7304": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7306": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-7309": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-8158": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-8161": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-8162": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-8163": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-8164": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-8165": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-8166": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-8167": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-8168": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A5TP": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A5TR": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A5TS": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A5TT": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A5TU": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A5TW": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A5TY": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A6S2": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A6S3": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A6S6": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A6S7": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A6S8": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A76K": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-A76L": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A76O": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A76R": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A7T6": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A7T8": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A7TA": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A7TB": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-A7TC": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A7TD": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-DU-A7TG": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A7TI": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-DU-A7TJ": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-5302": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-5303": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-5304": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-E1-5305": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-5307": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-5311": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-5318": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-5319": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-5322": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-A7YD": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-E1-A7YE": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-E1-A7YH": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-A7YI": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-A7YJ": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-E1-A7YK": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-A7YL": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-E1-A7YM": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-E1-A7YN": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-A7YO": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-A7YQ": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-E1-A7YS": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-A7YU": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-A7YV": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-A7YW": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-A7YY": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-A7Z2": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-E1-A7Z3": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-A7Z4": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-E1-A7Z6": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-EZ-7264": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-F6-A8O3": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-F6-A8O4": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-5962": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-5963": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-FG-5964": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-5965": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-6688": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-6689": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-6690": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-6691": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-FG-6692": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-7634": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-7636": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-7637": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-7638": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-7641": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-7643": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-8181": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-FG-8182": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-8185": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-8186": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-8187": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-8188": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-8189": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-8191": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-FG-A4MT": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A4MU": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A4MW": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A4MX": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A4MY": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A60J": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A60K": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A60L": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A6IZ": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A6J1": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A6J3": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A70Y": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A70Z": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A710": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A711": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-FG-A713": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A87N": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FG-A87Q": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-FN-7833": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7467": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7468": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7469": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7470": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7471": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7472": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7473": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-7474": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7475": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7476": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7477": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7478": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-7479": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7480": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7481": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7482": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7483": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-7485": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7601": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7602": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7603": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7604": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7605": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7606": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-7607": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7608": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7609": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7610": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7611": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7616": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7620": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7676": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-7677": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7680": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-7681": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7684": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7686": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7687": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7688": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7689": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7690": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7691": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-7692": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7693": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7694": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7695": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7854": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-7855": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7856": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7857": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-7858": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7860": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7873": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7874": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7875": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7877": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7879": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7880": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7881": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7882": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7884": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-7902": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-8010": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-8011": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-8012": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-8013": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-8015": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-8018": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-8019": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-8104": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-8105": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-8106": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-8107": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-8108": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-8109": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-8110": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-8111": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-8113": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-8114": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-8558": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-8563": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-8564": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-A4DS": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-A4DV": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-A5R5": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-A5R7": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-A5R9": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-A5RA": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-A5RB": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-A5RC": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-A614": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-A615": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-A616": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-A617": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-A618": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-A619": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-A61A": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-A61B": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-A61C": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-A74H": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-A74J": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HT-A74K": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-A74L": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HT-A74O": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HW-7486": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HW-7487": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HW-7489": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HW-7490": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HW-7491": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HW-7493": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HW-7495": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HW-8319": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-HW-8320": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HW-8321": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HW-8322": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HW-A5KJ": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HW-A5KK": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HW-A5KL": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-HW-A5KM": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-IK-7675": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-IK-8125": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-KT-A74X": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-KT-A7W1": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-OX-A56R": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A5ET": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A5EU": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-P5-A5EV": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A5EW": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A5EX": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A5EY": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-P5-A5EZ": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A5F0": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A5F1": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-P5-A5F2": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A5F4": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A5F6": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-P5-A72U": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A72W": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-P5-A72X": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A72Z": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A730": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A731": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A733": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A735": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A736": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A737": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A77W": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A77X": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A780": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-P5-A781": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A65R": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A65S": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A65V": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A65X": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A65Z": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A6CS": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-QH-A6CU": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A6CV": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-QH-A6CW": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A6CX": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-QH-A6CY": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A6CZ": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A6X3": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A6X4": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A6X5": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A6X8": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A6X9": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A6XA": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A6XC": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A86X": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-QH-A870": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-R8-A6MK": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-R8-A6ML": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-R8-A6MO": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-R8-A6YH": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-R8-A73M": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-RR-A6KA": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-RR-A6KB": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-RR-A6KC": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-RY-A83X": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-RY-A83Y": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-RY-A83Z": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-RY-A840": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-RY-A843": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-RY-A845": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-RY-A847": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6TS": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6TU": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6TV": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6TW": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6TX": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6TY": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6TZ": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6U0": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6U1": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6U2": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6U5": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6U6": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6U8": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6U9": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6UA": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6UB": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6WD": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6WE": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6WG": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6WH": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6WI": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6WL": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6WM": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-S9-A6WN": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6WO": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6WP": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A6WQ": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7IQ": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7IS": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7IX": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-S9-A7IY": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7IZ": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7J0": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7J1": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7J2": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7J3": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7QW": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7QX": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7QY": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7QZ": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7R1": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7R2": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-S9-A7R3": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7R4": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7R7": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A7R8": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A89V": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-S9-A89Z": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A7C3": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A7C4": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A7C5": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A7CA": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A7CF": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A84B": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-TM-A84C": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-TM-A84F": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A84G": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A84H": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A84I": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A84J": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-TM-A84L": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A84M": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A84O": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A84Q": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A84R": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A84S": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TM-A84T": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A7RF": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-TQ-A7RG": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A7RH": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A7RI": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A7RJ": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A7RK": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A7RM": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A7RN": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A7RO": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A7RP": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A7RQ": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A7RR": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-TQ-A7RS": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A7RU": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A7RV": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A7RW": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-TQ-A8XE": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-VM-A8C8": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-VM-A8C9": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-VM-A8CA": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-VM-A8CB": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-VM-A8CD": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-VM-A8CE": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-VM-A8CF": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-VM-A8CH": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-VV-A829": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-VV-A86M": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-VW-A7QS": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-VW-A8FI": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-W9-A837": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-WH-A86K": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-WY-A858": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-WY-A859": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-WY-A85A": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-WY-A85B": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-WY-A85C": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  },
+  "TCGA-WY-A85D": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Unmethylated"
+  },
+  "TCGA-WY-A85E": {
+   "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": "Methylated"
+  }
+ },
+ "note": "published calls, not recomputed here; a binary call is not a beta, so it is used as a binary covariate and never as a continuous one",
+ "sources": [
+  [
+   "lgggbm_tcga_pub",
+   "MGMT_PROMOTER_STATUS"
+  ],
+  [
+   "gbm_tcga_pub2013",
+   "MGMT_STATUS"
+  ]
+ ],
+ "vocabulary": {
+  "gbm_tcga_pub2013:MGMT_STATUS": {
+   "METHYLATED": 170,
+   "UNMETHYLATED": 180
+  },
+  "lgggbm_tcga_pub:MGMT_PROMOTER_STATUS": {
+   "Methylated": 613,
+   "Unmethylated": 319
+  }
+ }
+}

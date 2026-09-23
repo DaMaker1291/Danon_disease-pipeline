@@ -5,6 +5,10 @@ data/_remote_cache/
 data/real_screening_*.json
 data/synthetic_*.json
 data/validation_package/
+# Bulk public data caches fetched at runtime, not sources: the GDSC fitted
+# release alone is 40 MB and the raw dose-response files are 0.78-2.11 GB.
+data/gdsc/
+data/gdc_methylation/
 *.log
 checkpoints/
 checkpoints_danon/
@@ -23,3 +27,13 @@ node_modules/
 frontend/node_modules/
 frontend/build/
 frontend/dist/
+# Twin-planner smoke artifacts and bulk image caches (never commit scans)
+data/twin_smoke/
+data/brats/
+data/tcia/
+data/tcia_probe/
+# GDC expression caches are runtime downloads, not sources (same rule as gdsc/)
+data/gdc/
+# local agent tool state
+.freebuff/
+.wakatime-project

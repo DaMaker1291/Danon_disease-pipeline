@@ -1,0 +1,24 @@
+DIFFUSION UNITS: the engine's constants are voxel^2/day, not mm^2/day
+  phantom voxel 1 mm; real decimation (4, 4, 3) of a 1 mm scan -> 3.667 mm edge
+  the same number is 13.44x larger in physical units on real geometry than on the phantom
+
+  drug diffusion (DrugParams.diffusion): 0.35 voxel^2/day = 0.35 mm^2/day on the phantom (1 mm voxel) but 4.706 mm^2/day on real geometry (3.67 mm voxel); reference [0.35, 0.35] mm^2/day; OUTSIDE. on the phantom this coincidentally equals the white-matter value, which is why the mismatch is invisible until a real grid is used
+  cell motility (hardcoded 0.02 in run()): 0.02 voxel^2/day = 0.02 mm^2/day on the phantom (1 mm voxel) but 0.2689 mm^2/day on real geometry (3.67 mm voxel); reference [0.001, 0.005] mm^2/day; OUTSIDE. even on the phantom this sits above the literature motility range, and `voxel_mm` is documented as bookkeeping only, so nothing raises when it moves to a real grid
+
+  This is not a modelling choice that can be left implicit: a value
+  tuned on the phantom changes its physical meaning by that factor the
+  moment it is used on a real case. `d_to_engine` / `d_to_physical` are
+  the bridge, and `DiffusionField.from_tissue_classes` applies it.
+
+==========================================================================
+SCALAR vs HETEROGENEOUS OPERATOR, ON THIS GEOMETRY
+==========================================================================
+
+  1728 voxels: uniform 0.35 mm^2/day vs core 0.01 and fibre 0.35 -> 35x contrast; `D*laplacian` and `div(D grad)` differ by 20.0% of the divergence at the core face
+
+  The heterogeneous operator is a strict generalisation: on a uniform
+  field it reproduces the scalar path exactly (pinned by
+  tests/test_anisotropy.py::TestSimulatorIntegration).
+  With a mean-one relative pattern the drug's calibrated mean
+  diffusivity is unchanged, so any measured difference is spatial
+  structure and not a change of absolute scale.

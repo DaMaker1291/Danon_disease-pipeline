@@ -3,8 +3,8 @@ Danon Pipeline API Server
 ==========================
 FastAPI bridge that exposes the real 18-phase AAV9-LAMP2B optimization pipeline
 to the frontend. The frontend does NOT paste sequences — it sends target
-constraints, the backend runs the NSGA-II Pareto optimizer + PDB 3J1S
-Poisson-Boltzmann charge-masking modules, selects the top engineered capsid,
+constraints, the backend runs the NSGA-II Pareto optimizer + PDB 3UX1
+(AAV9) Poisson-Boltzmann charge-masking modules, selects the top engineered capsid,
 and returns the generated candidate sequence, its VR-IV / VR-VIII electrostatic
 surface profiles, and the exact amino-acid substitutions per 3-fold protrusion.
 
@@ -16,7 +16,7 @@ from contextlib import asynccontextmanager
 from typing import Dict, List, Optional
 
 import numpy as np
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -27,7 +27,7 @@ from danon.epitope_masker import (
     AA_CHARGE,
     KNOWN_NAB_EPITOPE_RESIDUES,
     CARDIAC_DOCKING_RESIDUES,
-    AAV9_PDB_3J1S_VR_COORDINATES,
+    AAV9_VR_COORDINATES,
 )
 from danon.pareto_optimizer import ParetoOptimizer, ParetoPoint
 from danon.microfluidics_core import MicrofluidicsCore, MicrofluidicConfig
@@ -43,13 +43,18 @@ from danon.synthesis_guard import SynthesisGuard
 from danon.mirna_detarget import miRNADetargetEngine
 from danon.translational_readiness import TranslationalReadinessEngine
 from danon.stoichiometric_calc import StoichiometricCalculator
-from danon.platform_validator import PlatformValidator
+from danon.platform_validator import PlatformValidator, CLINICAL_ASSUMED_INPUTS
 from danon.tropism_filter import DanonTropismFilter, CARDIAC_RECEPTORS, HEPATIC_RECEPTORS, CHARGE_PROFILE
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("danon.api")
 
-VP1_OFFSET = 263  # stored sequence index 1 == VP1 residue 263
+# Positions in every payload below are 1-based design positions: the residue
+# edited is sequence[position - 1], and its VP1 number is
+# position + VP1_POSITION_OFFSET. Both offsets are named because the frame used
+# to be labelled with one of them and indexed with the other.
+VP1_OFFSET = 263            # sequence index = VP1 - VP1_OFFSET
+VP1_POSITION_OFFSET = 262   # VP1 = position + VP1_POSITION_OFFSET
 
 
 def _snake_to_camel(obj):
@@ -104,7 +109,7 @@ def _region_profile(masker: EpitopeMasker, sequence: str, region: str) -> Dict:
     for p in prof.residue_profiles:
         residues.append({
             "position": p["position"],
-            "positionVp1": p["position"] + VP1_OFFSET,
+            "positionVp1": p["position"] + VP1_POSITION_OFFSET,
             "aa": p["aa"],
             "charge": round(p["charge"], 4),
             "surfaceAccessibility": round(p["surface_accessibility"], 3),
@@ -131,7 +136,7 @@ def _mutation_records(masker: EpitopeMasker, wt: str, masked: str,
     for pos, orig, new in mutations:
         out.append({
             "position": pos,
-            "positionVp1": pos + VP1_OFFSET,
+            "positionVp1": pos + VP1_POSITION_OFFSET,
             "original": orig,
             "mutated": new,
             "region": region,
@@ -153,7 +158,7 @@ def run_full_pipeline(c: PipelineConstraints) -> Dict:
     )
     generator = DanonAAVGenerator(cfg)
     masker = EpitopeMasker()
-    masker.load_pdb_structure()  # BioPython 3J1S if present, else embedded coords
+    masker.load_pdb_structure()  # BioPython parse of data/pdb/3UX1.pdb
     optimizer = ParetoOptimizer()
     promoter_engine = PromoterSpecEngine()
 
@@ -191,18 +196,19 @@ def run_full_pipeline(c: PipelineConstraints) -> Dict:
     feasible.sort(key=lambda x: x.fitness, reverse=True)
     top = feasible[:12]
 
-    # 3) Promoter score (cardiac-restricted) used as a Pareto objective
-    promoter_score = 0.85
-    try:
-        promoter_score = float(np.clip(promoter_engine.our_best_score(), 0.0, 1.0))
-    except Exception:
-        pass
+    # 3) Promoter score (cardiac-restricted) used as a Pareto objective.
+    # Computed, never defaulted: this value feeds every Pareto ranking below and
+    # the clinical chart the user sees, so substituting a plausible constant on
+    # failure would silently corrupt the result. The engine is pure Python with
+    # no optional dependencies, so an exception here is a real defect and should
+    # surface as one.
+    promoter_score = float(np.clip(promoter_engine.our_best_score(), 0.0, 1.0))
 
     # Compute miRNA de-targeting score using wild-type AAV9 as baseline (target sites conserved)
     mirna_engine = miRNADetargetEngine()
     mirna_score = mirna_engine.score_candidate_for_mirna_compatibility(WILD_TYPE_AAV9_CAPSID)
 
-    # 4) Apply PDB 3J1S Poisson-Boltzmann dual-region charge masking to each
+    # 4) Apply PDB 3UX1 Poisson-Boltzmann dual-region charge masking to each
     best = None
     best_score = -1.0
     pareto_inputs: List[ParetoPoint] = []
@@ -266,8 +272,10 @@ def run_full_pipeline(c: PipelineConstraints) -> Dict:
         _mutation_records(masker, mask_iv.masked_sequence, masked_seq, mask_viii.mutations, "VR_VIII")
     )
 
-    # UCL/GOSH baseline: wild-type AAV9 + CMV, no epitope masking (immune escape ~0.15)
-    ucl_immune = masker.utcl_score()
+    # UCL/GOSH baseline: wild-type AAV9 + CMV, no epitope masking. Computed as a
+    # zero-substitution run of the *same* 50/50 VR-IV + VR-VIII objective the
+    # design is scored on, so 'improvement' is a like-for-like ratio.
+    ucl_immune = masker.utcl_composite_score(cand.sequence)
     improvement = float(best["immune"] / max(ucl_immune, 1e-6))
 
     # ----- Accurate LAMP2B cargo estimate for the single-vs-dual vector gate -----
@@ -278,12 +286,46 @@ def run_full_pipeline(c: PipelineConstraints) -> Dict:
     # ----- Horizon-2: phases 19-24 on the winning capsid + LAMP2B payload -----
     horizon2 = run_horizon2(c, cand.sequence, masked_seq, mutations, promoter_score, vector_capacity)
 
-    try:
-        mixing_eff = MicrofluidicsCore().simulate().mixing_efficiency
-    except Exception:
-        mixing_eff = 0.72
+    # Real Navier-Stokes-derived mixing efficiency. As with promoter_score, a
+    # fabricated fallback would put an invented number into a reported metric,
+    # so a failure propagates instead of being papered over.
+    mixing_eff = float(MicrofluidicsCore().simulate().mixing_efficiency)
 
     docking_ok = mask_iv.cardiac_docking_preserved and mask_viii.cardiac_docking_preserved
+
+    # ----- Regulatory readiness rubric: computed, not asserted -----
+    # Only values this pipeline actually derives are supplied. The clinical and
+    # programme evidence it does not measure arrives through the explicitly
+    # labelled assumed block, so the result is tagged as default-padded rather
+    # than reading as measurement. There is no dosing score on this endpoint, so
+    # ``clinical_efficacy`` is a gating dimension that stays unscored and the
+    # verdict reads UNKNOWN -- which is the honest report, not a pass and not a
+    # fail. The verdict is a self-assessment; MHRA publishes no such scale.
+    reg_assessment = PlatformValidator().evaluate_candidate(
+        {
+            "cardiac_tropism": cand.cardiac_tropism_score,
+            "hepatic_accumulation": 1.0 - cand.hepatic_avoidance_score,
+            "immune_evasion": best["immune"],
+            "lamp2b_expression": cand.lamp2b_compatibility,
+            "promoter_score": promoter_score,
+            "mirna_score": mirna_score,
+        },
+        assumed_inputs=CLINICAL_ASSUMED_INPUTS,
+    )
+    if reg_assessment.weighted_score is None:
+        # Propagate rather than pad: a fabricated fallback here would put an
+        # invented number into a reported phase score.
+        raise RuntimeError(
+            "regulatory rubric produced no scored dimension; refusing to "
+            "report a phase score"
+        )
+    reg_phase = (
+        "Regulatory Readiness (self-assessment)", "Regulatory",
+        float(np.clip(reg_assessment.weighted_score, 0, 1)),
+        f"rubric verdict {reg_assessment.verdict} \u00b7 "
+        f"{reg_assessment.scored_dimensions}/{reg_assessment.total_dimensions} "
+        f"dimensions scored \u00b7 not an MHRA determination",
+    )
     phases_18 = [
         ("Data Ingress & QC", "Data", 1.0, f"{len(scored)} variants ingested · template mapped"),
         ("AAV9 Capsid Generation", "Generation", 1.0, f"{len(scored)} VP1 variants sampled from pool of {c.candidate_pool}"),
@@ -304,22 +346,7 @@ def run_full_pipeline(c: PipelineConstraints) -> Dict:
         ("Stoichiometric Decoy Optimization", "Formulation", float(np.clip(StoichiometricCalculator().our_best_score(), 0, 1)),
          f"empty:full capsid ratio optimized for NAb decoy"),
         ("Microfluidic LNP Formulation", "Formulation", float(np.clip(mixing_eff, 0, 1)), f"mixing efficiency {mixing_eff:.2f}"),
-            ("Regulatory (MHRA ILAP)", "Regulatory", float(np.clip(PlatformValidator().evaluate_candidate({
-                "cardiac_tropism": cand.cardiac_tropism_score,
-                "hepatic_accumulation": 1.0 - cand.hepatic_avoidance_score,
-                "immune_evasion": best["immune"],
-                "complement_activation": 0.30,
-                "liver_toxicity": 0.20,
-                "cardiac_inflammation": 0.15,
-                "decoy_protection": 0.40,
-                "itr_integrity": 0.95,
-                "empty_full_ratio_optimal": 0.50,
-                "rc_aav_risk": 0.02,
-                "vector_titer": 1e14,
-                "gonadal_transduction_risk": 0.05,
-                "shedding_risk": 0.10,
-            }).weighted_score, 0, 1)),
-         "ILAP FastTrack surrogate endpoint met"),
+        reg_phase,
     ]
     all_specs = phases_18 + horizon2["_new_phases"]
     phases = []
@@ -346,8 +373,8 @@ def run_full_pipeline(c: PipelineConstraints) -> Dict:
             "VR_VIII": _region_profile(masker, masked_seq, "VR_VIII"),
         },
         "regionResidueRanges": {
-            "VR_IV": {"start": 186, "end": 206, "startVp1": 186 + VP1_OFFSET, "endVp1": 206 + VP1_OFFSET},
-            "VR_VIII": {"start": 308, "end": 338, "startVp1": 308 + VP1_OFFSET, "endVp1": 338 + VP1_OFFSET},
+            "VR_IV": {"start": 187, "end": 207, "startVp1": 187 + VP1_POSITION_OFFSET, "endVp1": 207 + VP1_POSITION_OFFSET},
+            "VR_VIII": {"start": 309, "end": 339, "startVp1": 309 + VP1_POSITION_OFFSET, "endVp1": 339 + VP1_POSITION_OFFSET},
         },
         "scores": {
             "cardiacTropism": round(cand.cardiac_tropism_score, 4),
@@ -395,8 +422,8 @@ def _junction_segments(peptide: str, split_positions, half: int = 8):
 def run_horizon2(c: PipelineConstraints, wt_seq: str, masked_seq: str,
                  mutations, promoter_score: float, vector_capacity: dict) -> Dict:
     vr_coords = {
-        "VR_IV": AAV9_PDB_3J1S_VR_COORDINATES["VR_IV"]["coordinates_3j1s"],
-        "VR_VIII": AAV9_PDB_3J1S_VR_COORDINATES["VR_VIII"]["coordinates_3j1s"],
+        "VR_IV": AAV9_VR_COORDINATES["VR_IV"]["coordinates"],
+        "VR_VIII": AAV9_VR_COORDINATES["VR_VIII"]["coordinates"],
     }
     mut_tuples = [(m["position"], m["original"], m["mutated"]) for m in mutations]
 
@@ -416,7 +443,7 @@ def run_horizon2(c: PipelineConstraints, wt_seq: str, masked_seq: str,
 
     # PHASE 22 — codon elongation / tAI
     codon = CodonElongationEngine(c.min_codon_elongation_index).evaluate(protein=DEFAULT_LAMP2B_PEPTIDE)
-    codon_score = float(np.clip(codon.tai, 0, 1))
+    codon_score = float(np.clip(codon.tai_before, 0, 1))
 
     # PHASE 23 — HLA-DRB1 junction decoupling; pick least-immunogenic split site
     hla_engine = HLADecoupler(c.hla_binding_cutoff_nm)
@@ -478,10 +505,11 @@ def run_horizon2(c: PipelineConstraints, wt_seq: str, masked_seq: str,
             "clinicalJustification": vector_capacity["clinical_justification"],
         },
         "codon": {
-            "tai": codon.tai, "minWindowTai": codon.min_window_tai,
-            "nCodons": codon.n_codons, "stallSites": len(codon.stall_sites),
-            "codonOptimized": codon.codon_optimized, "threshold": codon.min_index_threshold,
-            "meanElongationRate": codon.mean_elongation_rate,
+            "tai": codon.tai_before, "minWindowTai": getattr(codon, 'min_window_tai', 0.0),
+            "nCodons": codon.n_codons,             "stallSites": len(getattr(codon, 'stall_sites', [])),
+            "codonOptimized": getattr(codon, 'codon_optimized', False), "threshold": getattr(codon, 'min_index_threshold', 0.88),
+            "taiAfter": getattr(codon, 'tai_after', 0.0),
+            "meanElongationRate": getattr(codon, 'mean_elongation_rate', 0.0),
         },
         "hla": {
             "chosenSplitPosition": best_split,
@@ -512,8 +540,7 @@ def run_horizon2(c: PipelineConstraints, wt_seq: str, masked_seq: str,
          f"ΔΔG_solv {sol.ddg_solv_total:+.2f} kcal/mol · {'soluble' if sol.plasma_soluble else 'aggregation risk'}"),
         ("CpG Depletion / Anti-Silencing", "Expression", smar_score,
          f"CpG {cpg_report.raw_cpg_density:.2f}→{cpg_report.depleted_cpg_density:.2f}/100bp · -{cpg_report.cpg_reduction_pct:.0f}% · {'depleted' if cpg_report.cpg_within_threshold else 'high'}"),
-        ("Codon Elongation / tAI", "Translation", codon_score,
-         f"tAI {codon.tai:.3f} · min-window {codon.min_window_tai:.2f} · {len(codon.stall_sites)} stalls"),
+        ("Codon Elongation / tAI", "Translation", codon_score,          f"tAI {codon.tai_before:.3f} · min-window {getattr(codon, 'min_window_tai', 0.0):.2f} · {len(codon.stall_sites)} stalls"),
         ("HLA-DRB1 Junction Decoupler", "Immunology", hla_score,
          f"split@{best_split} · strongest IC50 {best_hla.strongest_binder_ic50_nm:.0f} nM · {best_hla.high_affinity_hits} hits"),
         ("Synthesis Feasibility Screen", "Manufacturing", synth_score,
@@ -698,7 +725,7 @@ class SolvationRequest(BaseModel):
 
 @app.post("/api/phase/solvation")
 def phase_solvation(req: SolvationRequest):
-    coords = {r: AAV9_PDB_3J1S_VR_COORDINATES[r]["coordinates_3j1s"] for r in ("VR_IV", "VR_VIII")}
+    coords = {r: AAV9_VR_COORDINATES[r]["coordinates"] for r in ("VR_IV", "VR_VIII")}
     return SolvationEnergyEngine(req.max_delta_g).evaluate(req.wild_type, req.mutant, coords).model_dump()
 
 
@@ -742,6 +769,111 @@ class SynthesisRequest(BaseModel):
 @app.post("/api/phase/synthesis")
 def phase_synthesis(req: SynthesisRequest):
     return SynthesisGuard((req.gc_low, req.gc_high)).evaluate(req.dna).model_dump()
+
+
+# --------------------------------------------------------------------------- #
+# Digital-twin planning: MRI mask in, treatment plan out
+# --------------------------------------------------------------------------- #
+TWIN_MAX_UPLOAD_BYTES = 64 * 1024 * 1024
+
+
+def read_nifti_from_bytes(raw: bytes):
+    """Parse a NIfTI-1 buffer via the repo's own parser (temp-file hop).
+
+    read_nifti takes a path; the upload arrives as bytes. The temp file lives
+    only for the parse and is deleted in a finally block.
+    """
+    import tempfile, os
+    from danon.imaging import read_nifti
+    fd, tmp = tempfile.mkstemp(suffix=".nii")
+    try:
+        with os.fdopen(fd, "wb") as fh:
+            fh.write(raw)
+        return read_nifti(tmp)
+    finally:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+
+
+@app.post("/api/twin/plan")
+def twin_plan(file: UploadFile = File(...)):
+    """Run the paired twin simulation on an uploaded segmentation mask.
+
+    Returns the full planning payload (geometry summary, schedule text,
+    daily curves, paired metrics, events, provenance) plus the final-field
+    VTI as base64 -- the exact file ParaView opens, also rendered in-browser
+    by VtiViewer. Oversize grids are block-max-downsampled (tumour-preserving)
+    to the engine budget and the applied factors are reported, never silent.
+    """
+    import base64
+    import os
+    import tempfile
+    from danon.imaging import MAX_TOTAL_VOXELS
+    from danon.twin_plan import downsample_mask_to_budget, plan_from_mask
+
+    name = (file.filename or "").lower()
+    if not (name.endswith(".nii") or name.endswith(".nii.gz")):
+        raise HTTPException(415, "only .nii / .nii.gz segmentation masks are accepted")
+    raw = file.file.read(TWIN_MAX_UPLOAD_BYTES + 1)
+    if len(raw) > TWIN_MAX_UPLOAD_BYTES:
+        raise HTTPException(
+            413, f"upload exceeds {TWIN_MAX_UPLOAD_BYTES // (1024 * 1024)} MB limit"
+        )
+
+    # Validate and size-check before running anything expensive.
+    try:
+        arr, hdr = read_nifti_from_bytes(raw)
+    except Exception as e:
+        raise HTTPException(422, f"could not parse NIfTI-1: {e}")
+    if int((arr > 0).sum()) == 0:
+        raise HTTPException(422, "mask has no nonzero voxels: nothing to simulate")
+
+    downsample_factors: List[int] = []
+    tmp: Optional[str] = None
+    try:
+        if arr.size > MAX_TOTAL_VOXELS:
+            # Oversize grid: block-max downsample (tumour-preserving), then
+            # rewrite as a clean uint8 .nii carrying the file's voxel sizes.
+            downsampled, downsample_factors = downsample_mask_to_budget(arr > 0)
+            fd, tmp = tempfile.mkstemp(suffix=".nii")
+            os.close(fd)
+            from danon.imaging import write_nifti
+            write_nifti(
+                tmp, downsampled.astype(np.uint8), voxel_sizes=tuple(hdr.voxel_sizes)
+            )
+        else:
+            fd, tmp = tempfile.mkstemp(
+                suffix=".nii.gz" if name.endswith(".gz") else ".nii"
+            )
+            with os.fdopen(fd, "wb") as fh:
+                fh.write(raw)
+        try:
+            result = plan_from_mask(tmp, export_vti=True)
+        except ValueError as e:
+            raise HTTPException(422, str(e))
+    finally:
+        if tmp is not None:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+
+    vti_b64 = (
+        base64.b64encode(result.vti_bytes).decode("ascii") if result.vti_bytes else None
+    )
+    payload = result.to_json_dict()
+    # The plan was computed on a temp path; report the user's filename.
+    payload["geometry"]["mask_path"] = file.filename
+    if downsample_factors:
+        payload["geometry"]["downsample_factors"] = downsample_factors
+        payload["notes"].append(
+            f"grid exceeded the engine budget and was block-max-downsampled by "
+            f"{downsample_factors} per axis (tumour-preserving max-pooling: a "
+            f"block containing tumour stays tumour) -- reported, not silent"
+        )
+    return _snake_to_camel({**payload, "vti_base64": vti_b64})
 
 
 if __name__ == "__main__":

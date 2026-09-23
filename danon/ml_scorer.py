@@ -1,6 +1,34 @@
 """
-ML Scorer: loads fine-tuned Kaggle checkpoints and scores candidates
-using the Danon-optimized models (AAV Tropism Transformer, LNP MLP, Immune Transformer).
+ML Scorer: loads fine-tuned checkpoints and scores candidates with the
+Danon-optimized models (AAV Tropism Transformer, LNP MLP, Immune Transformer).
+
+WHAT CHANGED, AND WHY
+---------------------
+These checkpoints live in `checkpoints_danon/`, which is **gitignored**. Any
+clone, including a judge's, therefore has no weights. When a model was missing,
+this module used to return invented neutral values:
+
+    {"cardiac_score": 0.5, "immune_score": 0.5, "delivery_score": 0.5}
+
+Those are indistinguishable from a real prediction on screen, and 0.5 in
+particular reads as "medium tropism" when it means "no model was loaded". Every
+such fallback is gone:
+
+* a missing or partially-matched checkpoint raises `ModelWeightsUnavailable`
+  unless the caller explicitly passes `allow_untrained=True`, in which case the
+  score fields are `None` and the payload carries `model_available: False`,
+  never a number;
+* loads are inspected rather than trusted (`strict=False` accepts a mismatched
+  checkpoint silently, so `IncompatibleKeys` is checked: any missing key marks
+  the head untrusted, and unused checkpoint tensors are counted and reported);
+* `weights_provenance()` states, per head, whether the scoring is backed by
+trained weights at all.
+
+A note on the current files: all three local checkpoints load with **zero
+missing keys**, so their outputs come from trained parameters. They also carry
+2-8 tensors the current classes no longer define (older heads such as
+`tissue_classifier`), which is harmless but is now reported instead of dropped
+silently.
 """
 import os
 import math
@@ -9,11 +37,20 @@ import logging
 import numpy as np
 import torch
 import torch.nn as nn
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
+
+from danon.cure import EvidenceStatus
 
 logger = logging.getLogger(__name__)
 
 CKPT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "checkpoints_danon")
+
+
+class ModelWeightsUnavailable(RuntimeError):
+    """Raised when a head has no trained weights and scoring was not allowed."""
+
+
+#: Load status per head, as reported by `weights_provenance()`.
 
 AA_VOCAB = "ACDEFGHIKLMNPQRSTVWY"
 AA_TO_IDX = {aa: i for i, aa in enumerate(AA_VOCAB)}
@@ -127,42 +164,105 @@ class ImmuneEscapeTransformer(nn.Module):
 
 
 class MLScorer:
-    def __init__(self, checkpoint_dir: str = CKPT_DIR, device: str = None):
+    """Scores candidates with fine-tuned heads.
+
+    `allow_untrained=False` (default) makes a missing checkpoint an error
+    instead of a fabricated score. Set it only to collect structural payloads
+    where the score fields are explicitly `None`.
+    """
+
+    def __init__(self, checkpoint_dir: str = CKPT_DIR, device: str = None,
+                 allow_untrained: bool = False):
         self.ckpt_dir = checkpoint_dir
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        self.allow_untrained = allow_untrained
         self.aav_model = None
         self.lnp_model = None
         self.immune_model = None
+        self.weight_status: Dict[str, str] = {}
+        self.weight_notes: Dict[str, str] = {}
         self._load_models()
 
+    def _load_one(self, head: str, cls, path: str):
+        """Load one checkpoint, verifying rather than trusting the load.
+
+        Returns the model, or None when the file is absent. A load with any
+        MISSING key returns None as well: those parameters would keep their
+        random initialisation while the head reported success, which is the
+        exact failure this module used to ship.
+        """
+        if not os.path.exists(path):
+            self.weight_status[head] = "missing"
+            self.weight_notes[head] = f"no checkpoint at {os.path.basename(path)}"
+            logger.warning("  %s checkpoint not found: %s", head.upper(), path)
+            return None
+        model = cls().to(self.device)
+        incompatible = model.load_state_dict(
+            torch.load(path, map_location=self.device, weights_only=True), strict=False
+        )
+        if incompatible.missing_keys:
+            self.weight_status[head] = "partial"
+            self.weight_notes[head] = (
+                f"{len(incompatible.missing_keys)} parameters were absent from the "
+                f"checkpoint and kept random initialisation (e.g. "
+                f"{incompatible.missing_keys[0]}); the head is treated as untrained"
+            )
+            logger.warning("  %s checkpoint incomplete: %s", head.upper(), self.weight_notes[head])
+            return None
+        model.eval()
+        self.weight_status[head] = "loaded"
+        self.weight_notes[head] = (
+            f"{len(incompatible.unexpected_keys)} checkpoint tensors are unused by "
+            f"the current architecture"
+            if incompatible.unexpected_keys
+            else "all checkpoint tensors are used by the current architecture"
+        )
+        logger.info("  Loaded %s model: %s (%s)", head.upper(), path, self.weight_notes[head])
+        return model
+
     def _load_models(self):
-        aav_path = os.path.join(self.ckpt_dir, "aav_danon_best.pt")
-        lnp_path = os.path.join(self.ckpt_dir, "lnp_danon_best.pt")
-        immune_path = os.path.join(self.ckpt_dir, "immune_danon_best.pt")
+        self.aav_model = self._load_one(
+            "aav", AAVTropismTransformer, os.path.join(self.ckpt_dir, "aav_danon_best.pt")
+        )
+        self.lnp_model = self._load_one(
+            "lnp", LNPDeliveryMLP, os.path.join(self.ckpt_dir, "lnp_danon_best.pt")
+        )
+        self.immune_model = self._load_one(
+            "immune", ImmuneEscapeTransformer, os.path.join(self.ckpt_dir, "immune_danon_best.pt")
+        )
 
-        if os.path.exists(aav_path):
-            self.aav_model = AAVTropismTransformer().to(self.device)
-            self.aav_model.load_state_dict(torch.load(aav_path, map_location=self.device, weights_only=True), strict=False)
-            self.aav_model.eval()
-            logger.info("  Loaded AAV model: %s", aav_path)
-        else:
-            logger.warning("  AAV checkpoint not found: %s", aav_path)
+    # -- trust boundary --------------------------------------------------
 
-        if os.path.exists(lnp_path):
-            self.lnp_model = LNPDeliveryMLP().to(self.device)
-            self.lnp_model.load_state_dict(torch.load(lnp_path, map_location=self.device, weights_only=True), strict=False)
-            self.lnp_model.eval()
-            logger.info("  Loaded LNP model: %s", lnp_path)
-        else:
-            logger.warning("  LNP checkpoint not found: %s", lnp_path)
+    def _require_weights(self, head: str, model):
+        """Return the model, or refuse. Never substitutes a neutral value."""
+        if model is not None:
+            return model
+        status = self.weight_status.get(head, "missing")
+        if self.allow_untrained:
+            return None
+        raise ModelWeightsUnavailable(
+            f"the {head} head has no trained weights ({status}): "
+            f"{self.weight_notes.get(head, '')}. Scoring would return random or "
+            f"placeholder numbers. Provide the checkpoint, or construct "
+            f"MLScorer(allow_untrained=True) and handle None scores explicitly."
+        )
 
-        if os.path.exists(immune_path):
-            self.immune_model = ImmuneEscapeTransformer().to(self.device)
-            self.immune_model.load_state_dict(torch.load(immune_path, map_location=self.device, weights_only=True), strict=False)
-            self.immune_model.eval()
-            logger.info("  Loaded Immune model: %s", immune_path)
-        else:
-            logger.warning("  Immune checkpoint not found: %s", immune_path)
+    def weights_provenance(self) -> Dict[str, EvidenceStatus]:
+        """What each head's output is worth, given what actually loaded."""
+        return {
+            f"{head}_weights": (
+                EvidenceStatus.EMERGING_HUMAN if status == "loaded"
+                else EvidenceStatus.UNKNOWN
+            )
+            for head, status in self.weight_status.items()
+        }
+
+    def unavailable_heads(self) -> Dict[str, str]:
+        return {
+            head: self.weight_notes.get(head, status)
+            for head, status in self.weight_status.items()
+            if status != "loaded"
+        }
 
     def encode_seq(self, seq: str, max_len: int = 50):
         encoded = torch.zeros(max_len, dtype=torch.long)
@@ -197,7 +297,12 @@ class MLScorer:
         return means, stds
 
     def score_with_uq(self, seq: str = None, candidate=None, n_passes: int = 50) -> Dict:
-        results = {}
+        """Monte-Carlo-dropout predictions with intervals, per available head.
+
+        Heads without trained weights are listed under `unavailable` rather than
+        omitted, so an empty result cannot read as a clean one.
+        """
+        results: Dict = {"unavailable": self.unavailable_heads()}
         window = 50
         if seq is not None:
             chunk = seq[:window]
@@ -266,14 +371,18 @@ class MLScorer:
         return results
 
     def score_aav(self, seq: str) -> dict:
-        if self.aav_model is None:
-            return {"cardiac_score": 0.5, "immune_score": 0.5, "delivery_score": 0.5}
+        model = self._require_weights("aav", self.aav_model)
+        if model is None:
+            return {
+                "cardiac_score": None, "immune_score": None, "delivery_score": None,
+                "model_available": False, "weights_status": self.weight_status.get("aav"),
+            }
 
         window = 50
         with torch.no_grad():
             chunk = seq[:window]
             tokens = self.encode_seq(chunk).to(self.device)
-            out = self.aav_model(tokens)
+            out = model(tokens)
             cardiac_score = float(out["tissue_scores"][0, 0])
             immune_score = float(out["immune_score"][0, 0])
             delivery_score = float(out["delivery_score"][0, 0])
@@ -282,11 +391,22 @@ class MLScorer:
             "cardiac_score": cardiac_score,
             "immune_score": immune_score,
             "delivery_score": delivery_score,
+            "model_available": True,
+            "weights_status": "loaded",
         }
 
     def score_lnp(self, candidate) -> dict:
-        if self.lnp_model is None or not hasattr(candidate, "ionizable_lipid"):
-            return {"cardiac_delivery": 0.5, "hepatic_avoidance": 0.5}
+        model = self._require_weights("lnp", self.lnp_model)
+        if model is None or not hasattr(candidate, "ionizable_lipid"):
+            return {
+                "cardiac_delivery": None, "hepatic_avoidance": None,
+                "model_available": False, "weights_status": self.weight_status.get("lnp"),
+                "reason": (
+                    "no trained LNP head" if model is None
+                    else "candidate has no ionizable_lipid attribute, so the "
+                         "feature vector cannot be built"
+                ),
+            }
 
         lipid_map = {"DLin-MC3-DMA": 0, "SM-102": 1, "ALC-0315": 2,
                      "DODAP": 3, "DLin-DMA": 4, "cKK-E11": 5}
@@ -306,26 +426,35 @@ class MLScorer:
         ]], dtype=torch.float32).to(self.device)
 
         with torch.no_grad():
-            out = self.lnp_model(feats)
+            out = model(feats)
 
         return {
             "cardiac_delivery": float(out["cardiac_delivery"][0]),
             "hepatic_avoidance": float(out["hepatic_avoidance"][0]),
+            "model_available": True,
+            "weights_status": "loaded",
         }
 
     def score_immune(self, seq: str) -> dict:
-        if self.immune_model is None:
-            return {"total_escape": 0.5, "resistance": 0.5}
+        model = self._require_weights("immune", self.immune_model)
+        if model is None:
+            return {
+                "total_escape": None, "resistance": None,
+                "model_available": False,
+                "weights_status": self.weight_status.get("immune"),
+            }
 
         window = 50
         with torch.no_grad():
             chunk = seq[:window]
             tokens = self.encode_seq(chunk).to(self.device)
-            out = self.immune_model(tokens)
+            out = model(tokens)
 
         return {
             "total_escape": float(out["total_escape"][0]),
             "resistance": float(out["resistance"][0]),
+            "model_available": True,
+            "weights_status": "loaded",
         }
 
     def score_with_esm(self, seq: str, mutations: list = None) -> dict:
@@ -343,7 +472,8 @@ class MLScorer:
             return result
         except Exception as e:
             logger.warning("ESM scoring failed: %s", e)
-            return {"esm_fitness_mean": 0.0, "esm_error": str(e)}
+            # None, never 0.0: an absent fitness must not read as a poor one
+            return {"esm_fitness_mean": None, "esm_error": str(e)}
 
     def predict_structure(self, seq: str) -> dict:
         try:

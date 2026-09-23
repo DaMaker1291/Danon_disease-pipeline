@@ -1,0 +1,243 @@
+{
+ "key": "lnp",
+ "title": "LNP formulation search",
+ "generated_utc": "2026-09-21T22:17:25Z",
+ "source": "danon.lnp_generator.DanonLNPGenerator(DanonConfig()).generate_candidates(0, 48) + score_candidates",
+ "notes": [
+  "formulation scores come from the generator's own heuristic model (cardiac delivery, hepatic avoidance, endosomal escape, size, immune activation); they are design priorities, not measured potencies",
+  "particle size is predicted, not light-scattering measured",
+  "no formulation has been manufactured or dosed"
+ ],
+ "provenance": {
+  "lipid_chemistry_vocabulary": "established",
+  "fitness_model": "unknown",
+  "predicted_size_matches_measured_size": "unknown",
+  "formulation_is_a_validated_medicine": "proven_failed"
+ },
+ "data": {
+  "best": {
+   "candidate_id": 1,
+   "ionizable_lipid": "DLin-MC3-DMA",
+   "peg_lipid": "DMG-PEG2000",
+   "helper_lipid": "DOPE",
+   "ionizable_frac": 0.39553302346427,
+   "peg_frac": 0.021243374575509864,
+   "helper_frac": 0.26122702610396153,
+   "cholesterol_frac": 0.3219965758562586,
+   "tail_length": 15,
+   "unsaturation": 2,
+   "pka": 6.394592837510691,
+   "cardiac_delivery_score": 0.9488874838721467,
+   "hepatic_avoidance_score": 0.4547972401512961,
+   "endosomal_escape_score": 0.9999064512411242,
+   "immune_activation": 0.20200782480167803,
+   "particle_size_nm": 97.41619140604656,
+   "fitness": 0.8220438288785459
+  },
+  "top_candidates": [
+   {
+    "candidate_id": 1,
+    "ionizable_lipid": "DLin-MC3-DMA",
+    "peg_lipid": "DMG-PEG2000",
+    "helper_lipid": "DOPE",
+    "ionizable_frac": 0.39553302346427,
+    "peg_frac": 0.021243374575509864,
+    "helper_frac": 0.26122702610396153,
+    "cholesterol_frac": 0.3219965758562586,
+    "tail_length": 15,
+    "unsaturation": 2,
+    "pka": 6.394592837510691,
+    "cardiac_delivery_score": 0.9488874838721467,
+    "hepatic_avoidance_score": 0.4547972401512961,
+    "endosomal_escape_score": 0.9999064512411242,
+    "immune_activation": 0.20200782480167803,
+    "particle_size_nm": 97.41619140604656,
+    "fitness": 0.8220438288785459
+   },
+   {
+    "candidate_id": 23,
+    "ionizable_lipid": "cKK-E11",
+    "peg_lipid": "DSPE-PEG2000",
+    "helper_lipid": "DSPC",
+    "ionizable_frac": 0.42165057317080257,
+    "peg_frac": 0.016933108125901063,
+    "helper_frac": 0.19386968190801301,
+    "cholesterol_frac": 0.3675466367952833,
+    "tail_length": 13,
+    "unsaturation": 0,
+    "pka": 6.27292998848395,
+    "cardiac_delivery_score": 0.92728512163201,
+    "hepatic_avoidance_score": 0.46319941283753807,
+    "endosomal_escape_score": 0.6548619957272095,
+    "immune_activation": 0.11922841766149568,
+    "particle_size_nm": 83.90680568452757,
+    "fitness": 0.7826470054541453
+   },
+   {
+    "candidate_id": 5,
+    "ionizable_lipid": "DLin-DMA",
+    "peg_lipid": "DSPC-PEG2000",
+    "helper_lipid": "DOPE",
+    "ionizable_frac": 0.3719015801147572,
+    "peg_frac": 0.01374063907598683,
+    "helper_frac": 0.25971310142016624,
+    "cholesterol_frac": 0.3546446793890897,
+    "tail_length": 17,
+    "unsaturation": 3,
+    "pka": 6.443031789425984,
+    "cardiac_delivery_score": 0.899963190366662,
+    "hepatic_avoidance_score": 0.2837469348314542,
+    "endosomal_escape_score": 0.934339343466859,
+    "immune_activation": 0.22952224849166752,
+    "particle_size_nm": 84.90390616800583,
+    "fitness": 0.7771871784839496
+   },
+   {
+    "candidate_id": 25,
+    "ionizable_lipid": "ALC-0315",
+    "peg_lipid": "DSPC-PEG2000",
+    "helper_lipid": "DPPC",
+    "ionizable_frac": 0.3424780997780617,
+    "peg_frac": 0.009448864487736375,
+    "helper_frac": 0.36526062967368617,
+    "cholesterol_frac": 0.2828124060605158,
+    "tail_length": 19,
+    "unsaturation": 2,
+    "pka": 6.2733311129597125,
+    "cardiac_delivery_score": 0.8743065819692459,
+    "hepatic_avoidance_score": 0.3131347014610081,
+    "endosomal_escape_score": 0.8318146560302446,
+    "immune_activation": 0.10365436143868277,
+    "particle_size_nm": 82.06379479809604,
+    "fitness": 0.7753791740633662
+   },
+   {
+    "candidate_id": 8,
+    "ionizable_lipid": "cKK-E11",
+    "peg_lipid": "DSPC-PEG2000",
+    "helper_lipid": "DSPC",
+    "ionizable_frac": 0.32763659026972275,
+    "peg_frac": 0.00893164723360107,
+    "helper_frac": 0.35812298689753164,
+    "cholesterol_frac": 0.3053087755991446,
+    "tail_length": 15,
+    "unsaturation": 2,
+    "pka": 6.197618019540895,
+    "cardiac_delivery_score": 0.8509207866838627,
+    "hepatic_avoidance_score": 0.37777547128188327,
+    "endosomal_escape_score": 0.7682409663411356,
+    "immune_activation": 0.059197234747419634,
+    "particle_size_nm": 74.65129939383334,
+    "fitness": 0.7732347341410089
+   },
+   {
+    "candidate_id": 36,
+    "ionizable_lipid": "SM-102",
+    "peg_lipid": "DMG-PEG2000",
+    "helper_lipid": "DPPC",
+    "ionizable_frac": 0.3436805709623846,
+    "peg_frac": 0.014103376303866745,
+    "helper_frac": 0.26038559146712803,
+    "cholesterol_frac": 0.3818304612666207,
+    "tail_length": 17,
+    "unsaturation": 0,
+    "pka": 6.234779334246488,
+    "cardiac_delivery_score": 0.9040038932171577,
+    "hepatic_avoidance_score": 0.4438060477369683,
+    "endosomal_escape_score": 0.6248607123864938,
+    "immune_activation": 0.08076199185694367,
+    "particle_size_nm": 85.37822735048718,
+    "fitness": 0.770429041234115
+   },
+   {
+    "candidate_id": 4,
+    "ionizable_lipid": "DODAP",
+    "peg_lipid": "DSPE-PEG2000",
+    "helper_lipid": "POPC",
+    "ionizable_frac": 0.34331007088487436,
+    "peg_frac": 0.007704363468109042,
+    "helper_frac": 0.35036441447803446,
+    "cholesterol_frac": 0.29862115116898214,
+    "tail_length": 19,
+    "unsaturation": 2,
+    "pka": 6.277725110482308,
+    "cardiac_delivery_score": 0.877879844513,
+    "hepatic_avoidance_score": 0.27410309029859603,
+    "endosomal_escape_score": 0.8349068491403011,
+    "immune_activation": 0.10669839765652317,
+    "particle_size_nm": 78.08389098345114,
+    "fitness": 0.7688555372647633
+   },
+   {
+    "candidate_id": 30,
+    "ionizable_lipid": "DODAP",
+    "peg_lipid": "DMG-PEG2000",
+    "helper_lipid": "DSPC",
+    "ionizable_frac": 0.48947411809778485,
+    "peg_frac": 0.019617116135403158,
+    "helper_frac": 0.2028175193775581,
+    "cholesterol_frac": 0.2880912463892539,
+    "tail_length": 18,
+    "unsaturation": 2,
+    "pka": 6.303340248944798,
+    "cardiac_delivery_score": 0.8251952415515442,
+    "hepatic_avoidance_score": 0.48901571816261913,
+    "endosomal_escape_score": 0.8511920884772934,
+    "immune_activation": 0.15352138844149954,
+    "particle_size_nm": 97.80201251717301,
+    "fitness": 0.7683568206519292
+   }
+  ],
+  "composition": [
+   {
+    "name": "DLin-MC3-DMA",
+    "role": "ionizable",
+    "color": "#3b82f6",
+    "frac": 0.39553302346427
+   },
+   {
+    "name": "Cholesterol",
+    "role": "structural",
+    "color": "#f59e0b",
+    "frac": 0.3219965758562586
+   },
+   {
+    "name": "DOPE",
+    "role": "helper",
+    "color": "#22c55e",
+    "frac": 0.26122702610396153
+   },
+   {
+    "name": "DMG-PEG2000",
+    "role": "PEG",
+    "color": "#a78bfa",
+    "frac": 0.021243374575509864
+   }
+  ],
+  "summary": {
+   "n_candidates": 48,
+   "mean_size_nm": 85.14956715700771,
+   "sd_size_nm": 11.971707686114833,
+   "mean_fitness": 0.707200812988772,
+   "best_fitness": 0.8220438288785459,
+   "worst_fitness": 0.5418753443095857,
+   "size_range_nm": [
+    57.96832186715526,
+    108.65224267874424
+   ]
+  },
+  "ionizable_lipids_seen": [
+   "ALC-0315",
+   "DLin-DMA",
+   "DLin-MC3-DMA",
+   "DODAP",
+   "SM-102",
+   "cKK-E11"
+  ],
+  "peg_lipids_seen": [
+   "DMG-PEG2000",
+   "DSPC-PEG2000",
+   "DSPE-PEG2000"
+  ]
+ }
+}

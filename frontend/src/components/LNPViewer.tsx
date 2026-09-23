@@ -4,13 +4,16 @@ import { OrbitControls, Environment, Line, ContactShadows } from '@react-three/d
 import { EffectComposer, Bloom, N8AO, ToneMapping, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import ErrorBoundary from './ErrorBoundary';
+import { useArtifact, artifactStamp } from '../utils/artifacts';
+import type { LNPArtifactData } from '../types/artifacts';
 
-const LIPID_TYPES = [
-  { name: 'Ionizable (DLin-MC3-DMA)', color: '#3b82f6', frac: 0.50 },
-  { name: 'Cholesterol', color: '#f59e0b', frac: 0.385 },
-  { name: 'Helper (DSPC)', color: '#22c55e', frac: 0.10 },
-  { name: 'PEG (DMG-PEG2000)', color: '#a78bfa', frac: 0.015 },
-];
+/**
+ * Lipid composition and particle size come from `artifacts/lnp.json`, which
+ * `danon.lnp_generator.DanonLNPGenerator` produced by scoring real candidates.
+ * The previous version of this file hardcoded a composition (DLin-MC3-DMA at
+ * 50%, 38.5% cholesterol, …) that no module in this repository generates.
+ */
+interface LipidBand { name: string; color: string; frac: number }
 
 interface Lipid {
   dir: THREE.Vector3;
@@ -32,7 +35,7 @@ function fibonacciSphere(n: number): THREE.Vector3[] {
   return pts;
 }
 
-function LipidBilayer({ radius, n2p }: { radius: number; n2p: number }) {
+function LipidBilayer({ radius, n2p, bands }: { radius: number; n2p: number; bands: LipidBand[] }) {
   const groupRef = useRef<THREE.Group>(null!);
   const nLipids = 320;
   const compactness = 0.85 + (n2p / 12) * 0.3;
@@ -40,10 +43,10 @@ function LipidBilayer({ radius, n2p }: { radius: number; n2p: number }) {
   const lipids: Lipid[] = useMemo(() => {
     const dirs = fibonacciSphere(nLipids);
     let cum = 0;
-    const bands = LIPID_TYPES.map(t => { const b = { ...t, from: cum, to: cum + t.frac }; cum += t.frac; return b; });
+    const scaled = bands.map(t => { const b = { ...t, from: cum, to: cum + t.frac }; cum += t.frac; return b; });
     return dirs.map((dir, i) => {
       const f = i / nLipids;
-      const band = bands.find(b => f >= b.from && f <= b.to) || bands[0];
+      const band = scaled.find(b => f >= b.from && f <= b.to) || scaled[0];
       return {
         dir,
         color: new THREE.Color(band.color),
@@ -52,7 +55,7 @@ function LipidBilayer({ radius, n2p }: { radius: number; n2p: number }) {
         phase: Math.random() * Math.PI * 2,
       };
     });
-  }, [radius, compactness]);
+  }, [radius, compactness, bands]);
 
   useFrame((_, dt) => {
     groupRef.current.rotation.y += dt * 0.09;
@@ -119,8 +122,7 @@ function MRNACore({ radius }: { radius: number }) {
   );
 }
 
-function Scene({ n2p }: { n2p: number }) {
-  const radius = 1.7;
+function Scene({ n2p, bands, radius }: { n2p: number; bands: LipidBand[]; radius: number }) {
   return (
     <>
       <color attach="background" args={['#05080f']} />
@@ -139,7 +141,7 @@ function Scene({ n2p }: { n2p: number }) {
       </mesh>
 
       <MRNACore radius={radius - 0.35} />
-      <LipidBilayer radius={radius} n2p={n2p} />
+      <LipidBilayer radius={radius} n2p={n2p} bands={bands} />
 
       <ContactShadows position={[0, -2.6, 0]} opacity={0.4} scale={10} blur={2.5} far={4} />
       <OrbitControls enablePan={false} minDistance={3} maxDistance={10} enableDamping autoRotate autoRotateSpeed={0.35} />
@@ -155,30 +157,62 @@ function Scene({ n2p }: { n2p: number }) {
 
 export default function LNPViewer() {
   const [n2p, setN2p] = useState(6);
+  const { artifact, loading, error } = useArtifact<LNPArtifactData>('lnp');
+
+  const bands: LipidBand[] = (artifact?.data.composition ?? []).map(c => ({
+    name: c.name, color: c.color, frac: c.frac,
+  }));
+  const best = artifact?.data.best;
+  const summary = artifact?.data.summary;
+
+  if (loading) return <div className="panel-title">💊 Lipid Nanoparticle — loading formulation artifact…</div>;
+  if (error || !artifact || !best || !summary) {
+    return <div className="panel-title" style={{ color: 'var(--warning)' }}>💊 LNP artifact unavailable: {error}</div>;
+  }
+
+  // The sphere scales with the PREDICTED particle size from the artifact, so the
+  // visual and the number cannot disagree about which formulation is shown.
+  const radius = Math.max(0.9, Math.min(2.4, best.particle_size_nm / 60));
 
   return (
     <>
       <div className="panel-title" style={{ marginBottom: 6 }}>
-        💊 Lipid Nanoparticle — Bilayer Self-Assembly with Encapsulated mRNA Cargo
+        💊 Lipid Nanoparticle — best of {summary.n_candidates} scored candidates ({best.particle_size_nm.toFixed(1)} nm predicted)
       </div>
       <div className="canvas-container" style={{ minHeight: 400 }}>
         <ErrorBoundary label="LNPViewer">
           <Canvas shadows dpr={[1, 2]} camera={{ position: [4, 2.5, 4], fov: 40 }} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}>
-            <Scene n2p={n2p} />
+            <Scene n2p={n2p} bands={bands} radius={radius} />
           </Canvas>
         </ErrorBoundary>
       </div>
       <div style={{ marginTop: 10, display: 'flex', gap: 20, alignItems: 'flex-end', flexWrap: 'wrap' }}>
         <div className="input-group" style={{ flex: 1, minWidth: 160 }}>
-          <label>N/P Ratio: {n2p}</label>
+          <label>N/P Ratio: {n2p} <span style={{ color: 'var(--text3)' }}>(visual only — compaction of the drawn core)</span></label>
           <input type="range" min={2} max={12} step={1} value={n2p} onChange={e => setN2p(+e.target.value)} />
         </div>
       </div>
+
+      <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12 }}>
+        <div className="stat-chip"><span>ionizable lipid</span><strong>{best.ionizable_lipid}</strong></div>
+        <div className="stat-chip"><span>helper lipid</span><strong>{best.helper_lipid}</strong></div>
+        <div className="stat-chip"><span>PEG lipid</span><strong>{best.peg_lipid}</strong></div>
+        <div className="stat-chip"><span>pKa</span><strong>{best.pka.toFixed(1)}</strong></div>
+        <div className="stat-chip ok"><span>fitness</span><strong>{best.fitness.toFixed(3)}</strong></div>
+        <div className="stat-chip"><span>size spread (mean ± sd)</span><strong>{summary.mean_size_nm.toFixed(1)} ± {summary.sd_size_nm.toFixed(1)} nm</strong></div>
+      </div>
+
       <div style={{ marginTop: 8, display: 'flex', gap: 16, fontSize: 10, color: '#64748b', flexWrap: 'wrap' }}>
-        {LIPID_TYPES.map(t => (
-          <span key={t.name}><span style={{ color: t.color }}>■</span> {t.name} ({(t.frac * 100).toFixed(1)}%)</span>
+        {bands.map(t => (
+          <span key={t.name}><span style={{ color: t.color }}>■</span> {t.name} ({(t.frac * 100).toFixed(1)} mol%)</span>
         ))}
-        <span style={{ color: '#fbbf24' }}>■ mRNA payload</span>
+        <span style={{ color: '#fbbf24' }}>■ mRNA payload (schematic)</span>
+      </div>
+
+      <div style={{ marginTop: 6, color: 'var(--text3)', fontSize: 10.5, lineHeight: 1.6 }}>
+        {artifactStamp(artifact)}
+        <br />Predicted size range across the cohort: {summary.size_range_nm[0].toFixed(1)}–{summary.size_range_nm[1].toFixed(1)} nm ·
+        ionizable lipids seen: {artifact.data.ionizable_lipids_seen.join(', ')}
       </div>
     </>
   );

@@ -1,7 +1,7 @@
 import logging
 import numpy as np
 from dataclasses import dataclass
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +56,25 @@ HEPATIC_AVOIDANCE = {
 }
 
 
+#: Objectives that measure *distance from the parental sequence* rather than an
+#: intrinsic property. They are 1.0 for an unmodified capsid by construction, so
+#: ``total_fitness`` carries 0.40 of its weight as credit for doing nothing.
+#: Consequence, and it matters: ``total_fitness`` is only meaningful for ranking
+#: designs *against each other*, and must not be reported as a win over the
+#: wild type. A real comparison needs a reference-free stability predictor
+#: (Rosetta ddG, ProteinMPNN log-likelihood) rather than an identity penalty.
+DELTA_OBJECTIVES = ("structural_stability", "fold_quality")
+
+
 @dataclass
 class InverseFoldedCapsid:
+    """One designed capsid variant and its objectives.
+
+    Read ``DELTA_OBJECTIVES`` before comparing ``total_fitness`` to a wild-type
+    baseline: two of the five weighted terms are identity penalties, so the
+    unmodified sequence scores a perfect 1.0 on both.
+    """
+
     candidate_id: int
     parent_sequence: str
     mutated_sequence: str
@@ -86,11 +103,49 @@ class InverseFoldingEngine:
     but 10,000x faster.
     """
 
-    def __init__(self):
+    def __init__(self, site_temperature: float = 0.35, seed_base: int = 0):
         self.regions = AAV9_STRUCTURE_REGIONS
         self.props = AA_PROPERTIES
         self.cardiac_rec = CARDIAC_RECEPTOR_PREFERENCES
         self.hepatic = HEPATIC_AVOIDANCE
+        #: Softmax temperature for edit-site sampling (0 = purely greedy).
+        self.site_temperature = site_temperature
+        #: Offset so two engines can explore disjoint candidate streams.
+        self.seed_base = seed_base
+
+    def _best_substitution(self, seq_list: List[str], pos: int, region: Dict,
+                           prefers: List[str], avoids: List[str],
+                           surface_exposure: float) -> Tuple[float, str]:
+        """Best-scoring amino acid at one position, with its score.
+
+        Scoring terms are, in order: cardiac-receptor preference, preservation of
+        hydrophobicity, preservation of side-chain volume, and a proline
+        guardrail that blocks helix/sheet breakers in structured contexts. The
+        whole score is scaled by solvent exposure, because an edit that isn't
+        solvent-exposed cannot change receptor engagement.
+        """
+        original = seq_list[pos]
+        best_score = -np.inf
+        best_aa = original
+        for aa in AA_VOCAB:
+            if aa == original:
+                continue
+            score = 0.0
+            if aa in prefers:
+                score += 2.0
+            elif aa in avoids:
+                score -= 1.0
+
+            score -= abs(self.props[aa]["hydrophobicity"]
+                         - self.props[original]["hydrophobicity"]) * 0.1
+            size_ratio = self.props[aa]["size"] / self.props[original]["size"]
+            score -= abs(1.0 - size_ratio) * 0.5
+            score -= self._proline_guardrail(pos, original, aa, region) * 2.0
+            score *= surface_exposure
+
+            if score > best_score:
+                best_score, best_aa = score, aa
+        return float(best_score), best_aa
 
     def _proline_guardrail(self, pos: int, original: str, new: str, region: Dict) -> float:
         penalty = 0.0
@@ -157,41 +212,63 @@ class InverseFoldingEngine:
         if len(positions) < num_mutations:
             num_mutations = len(positions)
 
-        np.random.seed(candidate_id)
-        target_positions = np.random.choice(positions, size=num_mutations, replace=False)
+        # A sequence shorter than the stored VP1 frame exposes no editable sites.
+        # Returning the parental sequence unchanged is correct here; silently
+        # drawing edits from an empty site list is not.
+        if num_mutations <= 0 or not positions:
+            logger.warning(
+                "no editable positions in region %s for a %d-residue sequence; "
+                "returning the parental sequence unmodified",
+                target_region, len(wild_type_seq),
+            )
+            return self._finalize(wild_type_seq, wild_type_seq, [], target_region,
+                                  target_receptor, region, start, end)
+
+        # Score every candidate substitution at every position in the target
+        # region *first*, then choose which positions to edit. That inversion is
+        # what makes this structure-aware design rather than random mutagenesis:
+        # the site of each edit is selected because of its predicted benefit, not
+        # drawn uniformly from the loop.
+        best_per_position = [self._best_substitution(seq_list, pos, region, prefers, avoids,
+                                                     surface_exposure)
+                             for pos in positions]
+        gains = np.array([score for score, _ in best_per_position], dtype=float)
+
+        # Sample the edit sites without replacement, weighted by their predicted
+        # gain. A softmax keeps the search directed while letting later
+        # candidates explore different (still sensible) sites, so `stream_designs`
+        # returns a diverse panel rather than one design repeated.
+        temperature = max(float(self.site_temperature), 1e-6)
+        shifted = gains - float(np.max(gains))
+        weights = np.exp(shifted / temperature)
+        total = float(np.sum(weights))
+        if total <= 0 or not np.isfinite(total):
+            weights = np.ones_like(gains)
+            total = float(weights.size)
+        weights = weights / total
+
+        # Local generator: seeding must never touch numpy's global state, and a
+        # given candidate_id must reproduce the same design every time.
+        rng = np.random.default_rng(self.seed_base + int(candidate_id))
+        chosen = rng.choice(len(positions), size=num_mutations, replace=False, p=weights)
+        target_positions = sorted(positions[int(i)] for i in chosen)
 
         for pos in target_positions:
-            idx = pos
-            original = seq_list[idx]
-
-            allowed = [aa for aa in AA_VOCAB if aa != original]
-            scores = []
-            for aa in allowed:
-                score = 0.0
-                if aa in prefers:
-                    score += 2.0
-                elif aa in avoids:
-                    score -= 1.0
-
-                prop_diff = abs(self.props[aa]["hydrophobicity"] - self.props[original]["hydrophobicity"])
-                score -= prop_diff * 0.1
-
-                size_ratio = self.props[aa]["size"] / self.props[original]["size"]
-                score -= abs(1.0 - size_ratio) * 0.5
-
-                pg_penalty = self._proline_guardrail(pos, original, aa, region)
-                score -= pg_penalty * 2.0
-
-                score *= surface_exposure
-
-                scores.append(score)
-
-            best_idx = int(np.argmax(scores))
-            new_aa = allowed[best_idx]
-            seq_list[idx] = new_aa
+            original = seq_list[pos]
+            _, new_aa = best_per_position[positions.index(pos)]
+            seq_list[pos] = new_aa
             mutations.append((pos, original, new_aa))
 
         mutated = "".join(seq_list)
+        return self._finalize(candidate_id, wild_type_seq, mutations, target_region,
+                              target_receptor, region, start, end, mutated=mutated)
+
+    def _finalize(self, candidate_id: int, wild_type_seq: str, mutations: List[tuple],
+                  target_region: str, target_receptor: str, region: Dict,
+                  start: int, end: int, mutated: Optional[str] = None,
+                  ) -> "InverseFoldedCapsid":
+        """Score a (possibly unmodified) sequence and package the design."""
+        mutated = mutated if mutated is not None else wild_type_seq
 
         cardiac_score = self._score_cardiac_receptor(mutated, [start, end],
                                                       target_receptor)
@@ -297,19 +374,41 @@ class InverseFoldingEngine:
         return float(np.clip(1.0 - total_prop_change / max(len(mutations), 1), 0, 1))
 
     def stream_designs(self, wild_type: str, n_designs: int,
-                       target_region: str = "VR_IV") -> List[InverseFoldedCapsid]:
+                       target_region: str = "VR_IV",
+                       seed: Optional[int] = None,
+                       avoid_hepatic: bool = True) -> List[InverseFoldedCapsid]:
+        """Generate a ranked panel of designs for a *real* parental sequence."""
+        if not wild_type:
+            raise ValueError("a wild-type capsid sequence is required to design against")
+        rng = np.random.default_rng(self.seed_base if seed is None else seed)
         designs = []
         for i in range(n_designs):
-            design = self.design_candidate(i, wild_type, target_region,
-                                            num_mutations=np.random.randint(2, 6))
+            design = self.design_candidate(
+                i, wild_type, target_region,
+                num_mutations=int(rng.integers(2, 6)),
+                avoid_hepatic=avoid_hepatic,
+            )
             designs.append(design)
         designs.sort(key=lambda x: x.total_fitness, reverse=True)
         return designs
 
-    def utcl_score(self) -> float:
-        """UCL: wild-type AAV9, no structure-aware design."""
-        return 0.35
+    def utcl_score(self, wild_type: str) -> float:
+        """Baseline: the unmodified wild-type capsid, scored by the same model.
 
-    def our_best_score(self) -> float:
-        designs = self.stream_designs("A" * 750, 100)
+        This used to return a hardcoded 0.35, which made every "we beat the
+        baseline by Nx" claim unverifiable. Running the identical scoring
+        pipeline on the parental sequence makes the comparison apples-to-apples
+        and makes it obvious that the baseline is the model's opinion too.
+        """
+        baseline = self.design_candidate(0, wild_type, num_mutations=0)
+        return float(baseline.total_fitness)
+
+    def our_best_score(self, wild_type: str, n_designs: int = 100,
+                       target_region: str = "VR_IV", seed: Optional[int] = None) -> float:
+        """Best design fitness for a real parental sequence.
+
+        The previous implementation scored ``"A" * 750`` - a poly-alanine string
+        that is not an AAV9 capsid - so the returned number described nothing.
+        """
+        designs = self.stream_designs(wild_type, n_designs, target_region, seed=seed)
         return designs[0].total_fitness if designs else 0.0

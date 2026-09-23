@@ -1,0 +1,108 @@
+{
+ "key": "construct",
+ "title": "Synthesis-ready AAV9-LAMP2B plasmid",
+ "generated_utc": "2026-09-21T22:17:26Z",
+ "source": "danon.construct_builder.ConstructBuilder().build_construct()",
+ "notes": [
+  "the elemental sequences (ITR, LAMP2B CDS, WPRE, polyA) are real published sequences; the assembled plasmid has not been synthesised",
+  "the promoter and the 4x miRNA detarget cassette are designed, not experimentally validated",
+  "this construct fits in a single AAV vector, which is why the dual-vector split-intein route is unused for LAMP2B"
+ ],
+ "provenance": {
+  "elemental_sequences": "established",
+  "assembled_plasmid": "unknown",
+  "promoter_specificity_in_vivo": "unknown",
+  "construct_has_been_synthesised_and_tested": "proven_failed"
+ },
+ "data": {
+  "name": "pAAV9-LAMP2B_MHC_promoter_with_ca_Capsid1",
+  "promoter_name": "MHC_promoter_with_cardiac_super_enhancer_MHC_enhancer_1",
+  "segments": [
+   {
+    "id": "itr5",
+    "label": "5' ITR",
+    "start_bp": 0,
+    "end_bp": 130,
+    "length_bp": 130,
+    "color": "#8b5cf6",
+    "desc": "AAV2 inverted terminal repeat",
+    "start_frac": 0.0,
+    "end_frac": 0.04579077139837971
+   },
+   {
+    "id": "promoter",
+    "label": "MHC_promoter_with_cardiac_super_enhancer_MHC_enhancer_1",
+    "start_bp": 130,
+    "end_bp": 586,
+    "length_bp": 456,
+    "color": "#3b82f6",
+    "desc": "Cardiac-specific promoter (not the trials' CMV)",
+    "start_frac": 0.04579077139837971,
+    "end_frac": 0.20641070799577316
+   },
+   {
+    "id": "cds",
+    "label": "LAMP2B CDS",
+    "start_bp": 586,
+    "end_bp": 1711,
+    "length_bp": 1125,
+    "color": "#22c55e",
+    "desc": "Full LAMP2B coding sequence (410 aa)",
+    "start_frac": 0.20641070799577316,
+    "end_frac": 0.6026769989432899
+   },
+   {
+    "id": "utr",
+    "label": "4x miRNA detarget UTR",
+    "start_bp": 1711,
+    "end_bp": 2071,
+    "length_bp": 360,
+    "color": "#f59e0b",
+    "desc": "miR-122/142/1/208 target sites for hepatic + immune detargeting",
+    "start_frac": 0.6026769989432899,
+    "end_frac": 0.7294822120464952
+   },
+   {
+    "id": "wpre",
+    "label": "WPRE",
+    "start_bp": 2071,
+    "end_bp": 2660,
+    "length_bp": 589,
+    "color": "#ec4899",
+    "desc": "Post-transcriptional regulatory element",
+    "start_frac": 0.7294822120464952,
+    "end_frac": 0.9369496301514618
+   },
+   {
+    "id": "polya",
+    "label": "bGH polyA",
+    "start_bp": 2660,
+    "end_bp": 2709,
+    "length_bp": 49,
+    "color": "#64748b",
+    "desc": "Polyadenylation signal",
+    "start_frac": 0.9369496301514618,
+    "end_frac": 0.9542092286016203
+   },
+   {
+    "id": "itr3",
+    "label": "3' ITR",
+    "start_bp": 2709,
+    "end_bp": 2839,
+    "length_bp": 130,
+    "color": "#a78bfa",
+    "desc": "AAV2 inverted terminal repeat",
+    "start_frac": 0.9542092286016203,
+    "end_frac": 1.0
+   }
+  ],
+  "total_length_bp": 2839,
+  "cargo_length_bp": 2579,
+  "packaging_limit_bp": 4700,
+  "has_mirna_detarget": true,
+  "synthesis_vendor": "PackGene",
+  "synthesis_cost_usd": 1492.65,
+  "segment_bp_sum": 2839,
+  "sequence_length_bp": 2839
+ }
+}

@@ -1,6 +1,17 @@
 """
 Epitope Masker: Structural charge-masking algorithm for AAV9 capsid.
-Uses verified coordinates from RCSB PDB 3J1S (AAV9 cryo-EM capsid).
+
+Coordinates come from RCSB PDB **3UX1** (AAV9), loaded through
+`danon.structure`, which reads the deposited C-alpha coordinates and generates
+the 60-subunit T=1 assembly from the entry's own `REMARK 350 BIOMT` operators.
+
+CORRECTION (carried in the record on purpose): this module previously claimed
+"verified coordinates from RCSB PDB 3J1S (AAV9 cryo-EM capsid)". Both halves of
+that were wrong. PDB 3J1S is AAV **serotype 2** in complex with neutralising
+antibody A20 (McCraw et al., J Virol 2012;86(23):12722-12730), and the numbers
+carried under its name were hand-written, not deposited -- they placed the VR-IV
+loop ~38 A from the capsid centre, where the real VR-IV sits at 117-144 A and
+defines the capsid surface.
 
 HORIZON 2 UPGRADE — Elastic Network Model + Poisson-Boltzmann:
   1. ENM: Computes CA-CA contact Hessian, eigenvalues, and per-residue RMSF
@@ -9,12 +20,14 @@ HORIZON 2 UPGRADE — Elastic Network Model + Poisson-Boltzmann:
      to design charge-reversal mutations that maximally perturb NAb epitopes.
   3. Combined scoring: charge-masking benefit MINUS structural destabilization cost.
 
-Reference: DiMattia et al. 2012 (PDB 3J1S), J Virol 86(23):12722-30.
+Reference: DiMattia et al. 2012 (PDB 3UX1, AAV9), J Virol 86(12):6947-58.
+          McCraw et al. 2012 (PDB 3J1S, AAV2+A20), J Virol 86(23):12722-30.
           Baker et al. 2001 (APBS), PNAS 98(18):10037-41.
           Tirion 1996 (ENM), Phys Rev Lett 77:1905.
           Bahar et al. 1997 (GNM), Biophys J 72:1623.
           Tama et al. 2002 (ANM), Proteins 47:185.
-VP1 offset: 263 (stored sequence = VP1 residues 263-819 truncated).
+VP1 offset: 263 (stored sequence = VP1 residues 263-736, the range chain A of
+3UX1 resolves; the deposited residue numbers are VP1 numbers).
 """
 import os
 import logging
@@ -215,55 +228,39 @@ AA_HYDRO = {"A": 1.8, "C": 2.5, "D": -3.5, "E": -3.5, "F": 2.8,
             "M": 1.9, "N": -3.5, "P": -1.6, "Q": -3.5, "R": -4.5,
             "S": -0.8, "T": -0.7, "V": 4.2, "W": -0.9, "Y": -1.3}
 
-# PDB 3J1S — AAV9 VP1 positions 263-819 (stored sequence indices)
-# VR-IV: VP1 positions 448-468 -> stored positions 186-206
-# VR-VIII: VP1 positions 570-600 -> stored positions 308-338
-# Fields: (sequence_idx_1based, wt_aa, ca_x, ca_y, ca_z, surface_accessibility)
-# Surface accessibility: 0=buried, 1=fully exposed
-# Coordinates in Angstroms (approximate, from PDB 3J1S cryo-EM)
-AAV9_PDB_3J1S_VR_COORDINATES = {
-    "VR_IV": {
-        "residues": list(range(186, 207)),
-        "surface_exposed": 0.85,
-        "role": "receptor_binding_antigenic",
-        "coordinates_3j1s": {
-            186: (12.4, -8.7, 35.2, 0.72), 187: (14.1, -6.3, 33.8, 0.81),
-            188: (15.8, -4.2, 32.4, 0.89), 189: (13.9, -2.1, 30.9, 0.92),
-            190: (11.2, -3.5, 31.8, 0.85), 191: (10.4, -6.1, 33.2, 0.78),
-            192: (8.7, -8.4, 34.6, 0.74), 193: (6.9, -6.2, 35.9, 0.67),
-            194: (8.2, -3.9, 34.1, 0.88), 195: (10.1, -5.8, 32.7, 0.91),
-            196: (12.3, -7.9, 31.3, 0.95), 197: (14.5, -9.6, 30.1, 0.93),
-            198: (16.2, -7.8, 28.9, 0.90), 199: (14.8, -5.4, 27.5, 0.86),
-            200: (12.6, -3.9, 28.8, 0.82), 201: (10.8, -2.1, 30.2, 0.79),
-            202: (9.1, -4.4, 31.6, 0.76), 203: (7.4, -6.7, 32.9, 0.71),
-            204: (5.8, -8.9, 34.1, 0.65), 205: (7.6, -10.5, 35.5, 0.68),
-            206: (9.9, -8.8, 34.0, 0.73),
-        }
-    },
-    "VR_VIII": {
-        "residues": list(range(308, 339)),
-        "surface_exposed": 0.93,
-        "role": "major_antigenic_site",
-        "coordinates_3j1s": {
-            308: (25.6, -15.2, 42.1, 0.88), 309: (27.3, -13.4, 40.8, 0.91),
-            310: (29.1, -11.5, 39.5, 0.93), 311: (30.8, -9.7, 38.2, 0.95),
-            312: (28.9, -7.9, 36.9, 0.94), 313: (26.7, -9.6, 38.1, 0.92),
-            314: (24.9, -11.8, 39.4, 0.90), 315: (23.2, -13.6, 40.7, 0.89),
-            316: (21.5, -11.4, 41.9, 0.87), 317: (19.8, -9.2, 43.2, 0.86),
-            318: (18.1, -7.3, 44.5, 0.91), 319: (16.4, -5.5, 45.8, 0.95),
-            320: (14.7, -7.2, 44.6, 0.93), 321: (12.9, -9.1, 43.3, 0.90),
-            322: (11.2, -11.3, 42.0, 0.88), 323: (13.1, -13.2, 40.7, 0.86),
-            324: (15.0, -15.0, 39.4, 0.84), 325: (16.9, -13.1, 38.1, 0.82),
-            326: (18.8, -11.2, 36.8, 0.85), 327: (20.7, -9.4, 35.5, 0.89),
-            328: (22.6, -7.6, 34.2, 0.92), 329: (24.5, -5.8, 32.9, 0.94),
-            330: (26.4, -7.6, 34.2, 0.91), 331: (28.3, -9.5, 35.5, 0.89),
-            332: (30.2, -11.3, 36.8, 0.87), 333: (28.5, -13.2, 38.1, 0.85),
-            334: (26.8, -15.0, 39.4, 0.83), 335: (25.1, -13.1, 40.7, 0.86),
-            336: (23.4, -11.2, 42.0, 0.90), 337: (21.7, -9.4, 43.3, 0.93),
-            338: (20.0, -7.6, 44.6, 0.94),
-        }
-    }
-}
+# Structural coordinates are NOT written here. They are read from the deposited
+# model at data/pdb/3UX1.pdb by `danon.structure`, so that the numbers this
+# module scores against are the ones RCSB holds -- and so that a reader can
+# check them with a text editor.
+from danon.structure import (
+    AAV9_STRUCTURE_ID,
+    AAV9_STRUCTURE_REFERENCE,
+    DEFAULT_STRUCTURE_DIR,
+    VP1_OFFSET,
+    VP1_POSITION_OFFSET,
+    VR_REGION_WINDOWS,
+    load_aav9_capsid,
+)
+
+
+def _build_vr_tables() -> Dict[str, Dict]:
+    """Load the real VR-IV / VR-VIII coordinate tables from the deposit.
+
+    Raises rather than degrading: a structural scorer handed an empty coordinate
+    set would still return scores, and every one of them would be meaningless.
+    """
+    capsid = load_aav9_capsid(directory=DEFAULT_STRUCTURE_DIR)
+    return capsid.build_vr_coordinate_map()
+
+
+AAV9_VR_COORDINATES: Dict[str, Dict] = _build_vr_tables()
+
+
+def region_role(region: str) -> str:
+    return {
+        "VR_IV": "receptor_binding_antigenic",
+        "VR_VIII": "major_antigenic_site",
+    }.get(region, "unknown")
 
 # Known epitope residues from published antibody mapping (shifted by -263)
 KNOWN_NAB_EPITOPE_RESIDUES = {
@@ -336,7 +333,8 @@ class SurfaceElectrostaticProfile:
 
 class EpitopeMasker:
     def __init__(self, pdb_path: Optional[str] = None):
-        self.vr_data = AAV9_PDB_3J1S_VR_COORDINATES
+        self.vr_data = AAV9_VR_COORDINATES
+        self.structure_id = AAV9_STRUCTURE_ID
         self.epitopes = KNOWN_NAB_EPITOPE_RESIDUES
         self.substitution_matrix = CHARGE_SUBSTITUTION_MATRIX
         self.docking_residues = CARDIAC_DOCKING_RESIDUES
@@ -349,18 +347,24 @@ class EpitopeMasker:
 
     def load_pdb_structure(self, pdb_path: Optional[str] = None) -> bool:
         """
-        Try to load PDB 3J1S coordinates via BioPython for structural distance matrix.
-        Falls back gracefully to embedded coordinates if PDB file is unavailable.
-        Returns True if BioPython-based coords were loaded.
+        Load the AAV9 capsid C-alpha coordinates via BioPython for the structural
+        distance matrix. Defaults to the deposited file that `danon.structure`
+        caches (PDB 3UX1), so the scoring path and the geometry path read the
+        same coordinates. Returns True if BioPython-based coords were loaded.
         """
         path = pdb_path or self.pdb_path
-        if not path or not os.path.exists(path):
-            logger.info("PDB file not found at %s; using embedded coordinate map", path)
+        if path is None:
+            path = os.path.join(DEFAULT_STRUCTURE_DIR, f"{AAV9_STRUCTURE_ID}.pdb")
+        if not os.path.exists(path):
+            logger.warning(
+                "PDB file not found at %s; falling back to the coordinate tables "
+                "loaded from the same deposit", path,
+            )
             return False
         try:
             from Bio.PDB import PDBParser
             parser = PDBParser(QUIET=True)
-            structure = parser.get_structure("3J1S", path)
+            structure = parser.get_structure(AAV9_STRUCTURE_ID, path)
             model = structure[0]
             ca_coords = {}
             for chain in model:
@@ -372,15 +376,13 @@ class EpitopeMasker:
             self._pdb_coords = ca_coords
             res_ids = sorted(ca_coords.keys())
             n = len(res_ids)
-            dist_mat = np.zeros((n, n))
-            for i in range(n):
-                for j in range(i, n):
-                    d = np.linalg.norm(ca_coords[res_ids[i]] - ca_coords[res_ids[j]])
-                    dist_mat[i, j] = d
-                    dist_mat[j, i] = d
-            self._pdb_distance_matrix = dist_mat
+            coords = np.array([ca_coords[r] for r in res_ids])
+            # pairwise distances, vectorised: the 518-residue model makes this small
+            self._pdb_distance_matrix = np.linalg.norm(
+                coords[:, None, :] - coords[None, :, :], axis=2
+            )
             logger.info("Loaded PDB %s: %d CA coords, distance matrix shape %s",
-                        path, n, dist_mat.shape)
+                        path, n, self._pdb_distance_matrix.shape)
             return True
         except Exception as e:
             logger.warning("BioPython PDB parsing failed (%s); using embedded coordinates", e)
@@ -397,13 +399,15 @@ class EpitopeMasker:
 
     def _coords_for_region(self, region: str) -> Dict:
         region_data = self.vr_data.get(region, self.vr_data["VR_IV"])
-        embedded = region_data["coordinates_3j1s"]
+        embedded = region_data["coordinates"]
         if self._pdb_coords is None:
             return embedded
         enriched = {}
         for pos, (x, y, z, access) in embedded.items():
-            if pos in self._pdb_coords:
-                bc = self._pdb_coords[pos]
+            # positions are 1-based design positions; the deposit is numbered in VP1
+            deposited = pos + VP1_POSITION_OFFSET
+            if deposited in self._pdb_coords:
+                bc = self._pdb_coords[deposited]
                 enriched[pos] = (float(bc[0]), float(bc[1]), float(bc[2]), access)
             else:
                 enriched[pos] = (x, y, z, access)
@@ -605,7 +609,7 @@ class EpitopeMasker:
     def _proline_glycine_guardrail(self, pos: int, original_aa: str, new_aa: str,
                                      region_data: Dict, sequence: str) -> float:
         penalty = 0.0
-        coords = region_data.get("coordinates_3j1s", {})
+        coords = region_data.get("coordinates", {})
         if pos not in coords:
             return 0.0
         if new_aa == "P":
@@ -725,12 +729,45 @@ class EpitopeMasker:
                     pg_penalty * 2.0 -
                     enm_penalty * 3.0  # ENM: penalize mutations that destabilize vibrational modes
                 )
-                scoring_positions.append((pos, aa, target, score))
+                scoring_positions.append(
+                    (pos, aa, target, score, bool(is_epitope), float(charge_change))
+                )
+
+        if not scoring_positions:
+            # Silence here is dangerous: the caller gets a well-formed design with
+            # a plausible score, but no edits were made. That happens whenever the
+            # supplied sequence is shorter than the stored VP1 frame, because every
+            # coordinate in the region falls outside it. Warn loudly enough that a
+            # no-op cannot be mistaken for a masking result.
+            region_positions = sorted(coords)
+            needed = (min(region_positions), max(region_positions)) if region_positions else (0, 0)
+            logger.warning(
+                "no maskable positions in region %s: sequence is %d residues but the "
+                "region spans %d-%d in the stored VP1 frame. Returning the sequence "
+                "UNMODIFIED; the reported score describes the wild-type capsid, not a "
+                "masking design.",
+                region, len(sequence), needed[0], needed[1],
+            )
 
         scoring_positions.sort(key=lambda x: x[3], reverse=True)
-        selected = scoring_positions[:max_mutations]
 
-        for pos, orig, target, score in selected:
+        # The objective is to perturb the antibody footprint, so a substitution
+        # that changes charge *inside* a mapped epitope outranks one that does not.
+        # Ranking purely by score let this module report 0.0 epitope coverage
+        # while every pick landed next to the footprint instead of on it -- a
+        # design engine scoring zero on its own stated objective. Charged,
+        # docking-safe epitope positions are therefore taken first, and the
+        # remaining slots go to the highest-scoring positions overall.
+        maskable = [c for c in scoring_positions if c[4] and c[5] > 0.0]
+        selected = maskable[:max_mutations]
+        if len(selected) < max_mutations:
+            chosen = {c[0] for c in selected}
+            selected += [
+                c for c in scoring_positions
+                if c[0] not in chosen and not (c[4] and c[5] > 0.0)
+            ][: max_mutations - len(selected)]
+
+        for pos, orig, target, score, _is_epitope, _dq in selected:
             seq_list[pos - 1] = target
             mutations.append((pos, orig, target))
             if pos in self.epitopes:
@@ -766,7 +803,10 @@ class EpitopeMasker:
             if abs(AA_CHARGE.get(o, 0) - AA_CHARGE.get(n, 0)) > 0.1
         ) / max(len(mutations), 1)
 
-        lo, hi = (186, 206) if region == "VR_IV" else (308, 338)
+        # window comes from the structural definition, translated into this
+        # repository's design frame -- not a second hardcoded copy of it
+        vp1_lo, vp1_hi = VR_REGION_WINDOWS.get(region, VR_REGION_WINDOWS["VR_IV"])
+        lo, hi = vp1_lo - VP1_POSITION_OFFSET, vp1_hi - VP1_POSITION_OFFSET
         epitope_region_count = sum(1 for p in self.epitopes if lo <= p <= hi)
         epitope_coverage = epitope_hits / max(epitope_region_count, 1)
 
@@ -841,8 +881,38 @@ class EpitopeMasker:
     def score_masked_capsid(self, design: ChargeMaskDesign) -> float:
         return design.overall_mask_score
 
-    def utcl_score(self) -> float:
-        return 0.15
+    def utcl_score(self, sequence: str) -> float:
+        """Baseline: the unmodified capsid, scored by the identical objective.
+
+        This used to return the constant ``0.15``. Running the same masking
+        objective with zero permitted substitutions isolates what the masking
+        strategy actually contributes; a constant cannot be falsified by data.
+
+        Scores the VR-VIII region only, pairing with :meth:`our_best_score`.
+        """
+        baseline = self.design_charge_mutations(sequence, "VR_VIII", 0, True)
+        return float(baseline.overall_mask_score)
+
+    def composite_immune_score(self, sequence: str) -> float:
+        """The 50/50 VR-IV + VR-VIII immune objective used by the API pipeline.
+
+        Exists so a baseline can be computed against the *same* objective as
+        the design. Comparing a two-region average against a single-region
+        baseline inflates the reported improvement by the VR-IV contribution.
+        """
+        mask_iv, mask_viii = self.design_dual_region_masking(sequence)
+        return float(0.5 * mask_iv.overall_mask_score + 0.5 * mask_viii.overall_mask_score)
+
+    def utcl_composite_score(self, sequence: str) -> float:
+        """Zero-substitution baseline under the same 50/50 objective.
+
+        Each region is masked with ``max_mutations=0``, so the returned score
+        isolates what epitope masking contributes rather than what the
+        starting capsid already had.
+        """
+        iv = self.design_charge_mutations(sequence, "VR_IV", 0, True)
+        viii = self.design_charge_mutations(sequence, "VR_VIII", 0, True)
+        return float(0.5 * iv.overall_mask_score + 0.5 * viii.overall_mask_score)
 
     def our_best_score(self, sequence: str) -> float:
         _, mask_viii = self.design_dual_region_masking(sequence)

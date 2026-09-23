@@ -1,4 +1,6 @@
 import logging, numpy as np
+
+from danon.biology import WILD_TYPE_AAV9
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Tuple
 
@@ -36,6 +38,16 @@ class DualVectorMoiDesign:
     total_capsid_dose: float
     toxicity_risk_index: float
     efficiency_score: float
+    #: Expected number of *reconstituted* split-gene copies per transduced cell.
+    #:
+    #: ``dual_hit_fraction`` saturates: at therapeutic AAV doses every
+    #: cardiomyocyte receives tens of vector copies, so the probability of
+    #: receiving at least one of each half-vector is 1.0000 from MOI 1 to MOI 100
+    #: (it moved by 1e-4 across an 18-fold tropism range). The quantity that
+    #: actually varies, and that decides whether a dual-vector design produces
+    #: enough protein, is how many *reconstituted* copies land per cell - a
+    #: Poisson mean, not a saturating probability.
+    reconstituted_copies_per_cell: float = 0.0
 
 @dataclass
 class MultiplicityProfile:
@@ -43,9 +55,13 @@ class MultiplicityProfile:
     optimal_empty_full_ratio: float
     optimal_moi_a: float
     optimal_moi_b: float
+    #: Saturates at ~1.0 across the whole therapeutic dose range; retained for
+    #: continuity, but see ``expected_reconstituted_copies_per_cell`` for the
+    #: discriminating quantity.
     expected_dual_hit: float
     expected_therapeutic_outcome: float
     cardiac_target_cells_reached: float
+    expected_reconstituted_copies_per_cell: float = 0.0
 
 class DualVectorMOIOptimizer:
     def __init__(self):
@@ -105,6 +121,16 @@ class DualVectorMOIOptimizer:
         integrated_splicing = split_intein_efficiency * dual_hit
         full_length_frac = integrated_splicing * self.eff["co_transduction_bottleneck_factor"]
 
+        # Reconstitution events per cell. Poisson mean: the rarer half-vector sets
+        # the ceiling, scaled by the intein-splicing and co-transduction terms.
+        # Unlike the dual-hit *fraction* this does not saturate, because it counts
+        # molecules rather than asking a yes/no question.
+        own_full_fraction = 1.0 / (1.0 + empty_full_ratio)
+        reconstituted_copies = (min(moi_a, moi_b) * own_full_fraction * cardiac_tropism
+                                * (1.0 - 0.5 * hepatic_sequestration)
+                                * split_intein_efficiency
+                                * self.eff["co_transduction_bottleneck_factor"])
+
         score = (
             0.30 * dual_hit +
             0.25 * full_length_frac +
@@ -125,6 +151,7 @@ class DualVectorMOIOptimizer:
             total_capsid_dose=float(total_dose),
             toxicity_risk_index=float(np.clip(tox_risk, 0, 1)),
             efficiency_score=float(np.clip(score, 0, 1)),
+            reconstituted_copies_per_cell=float(reconstituted_copies),
         )
 
     def profile_dose_range(self, cardiac_tropism: float = 0.7,
@@ -145,7 +172,7 @@ class DualVectorMOIOptimizer:
                 continue
 
         if best is None:
-            return MultiplicityProfile(0, 0, 0, 0, 0, 0, 0)
+            return MultiplicityProfile(0, 0, 0, 0, 0, 0, 0, 0.0)
 
         dose, design = best
         hit = self.compute_dual_hit_probability(design.moi_a, design.moi_b, cardiac_tropism, hepatic_sequestration, empty_full_ratio)
@@ -159,6 +186,7 @@ class DualVectorMOIOptimizer:
             expected_dual_hit=design.dual_hit_fraction,
             expected_therapeutic_outcome=design.effective_full_length_fraction,
             cardiac_target_cells_reached=target_cells * design.dual_hit_fraction,
+            expected_reconstituted_copies_per_cell=design.reconstituted_copies_per_cell,
         )
 
     def optimize_vector_prep_purity(self, target_dual_hit: float = 0.75,
@@ -192,10 +220,37 @@ class DualVectorMOIOptimizer:
             "cost_benefit_ratio": design.effective_full_length_fraction / max(dose_multiplier, 0.1),
         }
 
-    def utcl_score(self) -> float:
-        return 0.25
+    def _paired_profile(self, cardiac_tropism: float, hepatic_sequestration: float,
+                        seed: int = 42) -> float:
+        """Score a dose profile from a pinned RNG state, then restore it.
+
+        The baseline arm and the optimized arm must be evaluated on the same
+        stochastic draws for the comparison to isolate the design change.
+        """
+        state = self.rng.get_state()
+        try:
+            self.rng.seed(seed)
+            profile = self.profile_dose_range(cardiac_tropism, hepatic_sequestration)
+            return float(profile.expected_reconstituted_copies_per_cell)
+        finally:
+            self.rng.set_state(state)
+
+    def utcl_score(self, seed: int = 42) -> float:
+        """Baseline: unmodified AAV9 tropism with its native hepatic uptake.
+
+        Previously this returned the constant ``0.25``, which made every
+        "dual-vector split beats single-vector" claim unverifiable. The baseline
+        now runs the same dose-range optimizer with the wild-type parameters from
+        :data:`danon.biology.WILD_TYPE_AAV9`.
+
+        The returned quantity is reconstituted gene copies per cell, **not** the
+        dual-hit fraction: the fraction saturates at 1.0 throughout the
+        therapeutic dose range and cannot rank two designs.
+        """
+        return self._paired_profile(WILD_TYPE_AAV9["cardiac_tropism"],
+                                    WILD_TYPE_AAV9["hepatic_sequestration"], seed)
 
     def our_best_score(self, cardiac_tropism: float = 0.72,
-                       hepatic_sequestration: float = 0.25) -> float:
-        profile = self.profile_dose_range(cardiac_tropism, hepatic_sequestration)
-        return profile.expected_dual_hit
+                       hepatic_sequestration: float = 0.25,
+                       seed: int = 42) -> float:
+        return self._paired_profile(cardiac_tropism, hepatic_sequestration, seed)

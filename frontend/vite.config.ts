@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/Danon_disease-pipeline/',
+  base: '/CANCER_SIM/',
   build: {
     outDir: 'dist',
   },

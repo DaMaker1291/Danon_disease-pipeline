@@ -250,7 +250,7 @@ export default function StructureViewer({ sequence }: Props) {
             </div>
           )}
 
-          <div style={{ marginTop: 8, fontSize: 9px, color: '#475569' }}>
+          <div style={{ marginTop: 8, fontSize: 9, color: '#475569' }}>
             ESM-2 ({structData.modelVersion || 'esm2_t6_8M_UR50D'}) · {structData.sequenceLength} residues · structural features predicted from protein language model embeddings
           </div>
         </>

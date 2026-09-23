@@ -20,7 +20,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from danon.promoter_spec import PromoterSpecEngine
 from danon.epitope_masker import EpitopeMasker
 from danon.stoichiometric_calc import StoichiometricCalculator
-from danon.platform_validator import PlatformValidator
+from danon.platform_validator import (
+    PlatformValidator,
+    CLINICAL_ASSUMED_INPUTS,
+    REQUIRED_INPUTS,
+)
 from danon.microfluidics_core import MicrofluidicsCore, MicrofluidicConfig
 from danon.dual_vector import DualVectorEngine
 from danon.data_ingress import DataIngressEngine
@@ -102,7 +106,12 @@ class TestBioConstraints:
             "Higher titer should need more decoys"
         )
 
-    def test_mhra_ilap_candidate_composite_above_threshold(self):
+    def test_regulatory_rubric_scores_fully_specified_candidate(self):
+        """A complete evidence package scores on every dimension.
+
+        Renamed from ``test_mhra_ilap_...``: this is an authored self-assessment
+        rubric, not an MHRA instrument (MHRA publishes no ordinal scale).
+        """
         validator = PlatformValidator()
         candidate = {
             "cardiac_tropism": 0.68,
@@ -140,14 +149,108 @@ class TestBioConstraints:
             "patient_advocacy": 0.75,
         }
         assessment = validator.evaluate_candidate(candidate)
-        assert assessment.composite_score >= 0.60, (
-            f"MHRA ILAP composite {assessment.composite_score:.3f} < 0.60"
+        assert assessment.scored_dimensions == assessment.total_dimensions, (
+            f"only {assessment.scored_dimensions}/{assessment.total_dimensions} "
+            f"dimensions scored; missing: {assessment.missing_inputs}"
         )
-        assert assessment.is_ilap_eligible, "Candidate not ILAP-eligible"
+        assert assessment.coverage == 1.0
+        assert assessment.composite_score >= 0.60, (
+            f"rubric composite {assessment.composite_score:.3f} < 0.60"
+        )
+        # Tri-state, but a fully specified package yields an actual verdict.
+        assert isinstance(assessment.is_ilap_eligible, bool)
+        assert assessment.verdict in {"READY", "NOT READY"}
 
-    def test_pipeline_scores_improve_over_ucl_baseline(self):
+    def test_regulatory_rubric_refuses_verdict_without_inputs(self):
+        """The regression that motivated the rewrite.
+
+        ``evaluate_candidate({})`` used to return a full scorecard: every
+        dimension fell back to a hard-coded default, so no evidence produced a
+        score and an ``is_ilap_eligible`` verdict. Missing evidence is now a
+        refusal, not an average.
+        """
+        assessment = PlatformValidator().evaluate_candidate({})
+        assert assessment.weighted_score is None
+        assert assessment.composite_score is None
+        assert assessment.is_ilap_eligible is None, (
+            "no evidence must not produce a regulatory verdict"
+        )
+        assert assessment.verdict == "UNKNOWN"
+        assert assessment.scored_dimensions == 0
+        assert set(REQUIRED_INPUTS) <= set(assessment.missing_inputs)
+        assert "UNKNOWN" in PlatformValidator().generate_regulatory_summary(assessment)
+
+    def test_regulatory_rubric_never_rewards_omitted_inputs(self):
+        """Dropping an input must not raise the score.
+
+        Default-padding could only ever help a candidate: the removed fallbacks
+        were mostly flattering. Omitting inputs must lower coverage, never
+        inflate the composite.
+        """
         validator = PlatformValidator()
-        ucl_val = validator.utcl_regulatory_score()
+        complete = dict(CLINICAL_ASSUMED_INPUTS)
+        complete.update({
+            "cardiac_tropism": 0.68, "hepatic_accumulation": 0.18,
+            "immune_evasion": 0.55, "lamp2b_expression": 0.72,
+            "promoter_score": 0.85, "mirna_score": 0.88, "dosing_score": 0.62,
+        })
+        full = validator.evaluate_candidate(complete)
+        partial = dict(complete)
+        del partial["dosing_score"]
+        holed = validator.evaluate_candidate(partial)
+
+        assert holed.scored_dimensions == full.scored_dimensions - 1
+        assert not holed.clinical_efficacy.scored
+        assert "dosing_score" in holed.clinical_efficacy.missing_inputs
+        assert holed.is_ilap_eligible is None, (
+            "clinical_efficacy gates the verdict, so an unscored gating "
+            "dimension must yield UNKNOWN rather than inherit the full score"
+        )
+        assert (holed.weighted_score or 0.0) <= (full.weighted_score or 0.0) + 1e-12
+
+    def test_derived_control_comparator_is_not_the_authored_constant(self):
+        """The comparator must be derived, not an authored constant.
+
+        ``utcl_regulatory_score()`` sums ``UCL_REGULATORY_BASELINE``, eight
+        invented values that were previously presented as a real trial's
+        regulatory scores. The comparison a report should use is
+        ``control_rubric_score()``, which runs this same rubric on the
+        unmodified configuration.
+        """
+        validator = PlatformValidator()
+        authored = validator.utcl_regulatory_score()
+        control = dict(CLINICAL_ASSUMED_INPUTS)
+        control.update({
+            "cardiac_tropism": 0.25, "hepatic_accumulation": 0.55,
+            "immune_evasion": 0.0, "lamp2b_expression": 0.72,
+            "promoter_score": 0.30, "mirna_score": 0.0, "dosing_score": 0.30,
+        })
+        derived = validator.control_rubric_score(control)
+
+        assert derived is not None
+        assert derived != pytest.approx(authored), (
+            "derived control equals the authored constant, so the comparator "
+            "is still a hard-coded number"
+        )
+        # The authored baseline is documentation of its own provenance, not a
+        # measurement: it must be labelled as such for anyone who reads it.
+        assert validator.ucl_baseline is not None
+        assert all(isinstance(v, float) for v in validator.ucl_baseline.values())
+
+    def test_design_beats_derived_control_on_shared_rubric(self):
+        """Like-for-like: design vs unmodified control through one rubric.
+
+        Both arms receive the identical assumed-input block, so the authored
+        values cancel and the difference is attributable to the dimensions the
+        pipeline actually measured.
+        """
+        validator = PlatformValidator()
+        control = dict(CLINICAL_ASSUMED_INPUTS)
+        control.update({
+            "cardiac_tropism": 0.25, "hepatic_accumulation": 0.55,
+            "immune_evasion": 0.0, "lamp2b_expression": 0.72,
+            "promoter_score": 0.30, "mirna_score": 0.0, "dosing_score": 0.30,
+        })
         candidate = {
             "cardiac_tropism": 0.68,
             "hepatic_accumulation": 0.18,
@@ -184,7 +287,13 @@ class TestBioConstraints:
             "patient_advocacy": 0.75,
         }
         our_val = validator.our_regulatory_score(candidate)
-        assert our_val > ucl_val, f"Our regulatory score {our_val:.3f} <= UCL {ucl_val:.3f}"
+        derived_control = validator.control_rubric_score(control)
+        assert our_val is not None and derived_control is not None
+        # On the dimensions both arms actually measure, the design must beat the
+        # unmodified control. The authored inputs are shared, so they cancel.
+        assert our_val > derived_control, (
+            f"Design rubric {our_val:.3f} <= derived control {derived_control:.3f}"
+        )
 
     # ------------------------------------------------------------------
     # PHASE 1: Biomechanical Verification Assertions
@@ -226,7 +335,7 @@ from danon.codon_elongation import CodonElongationEngine, DEFAULT_LAMP2B_PEPTIDE
 from danon.hla_decoupler import HLADecoupler
 from danon.synthesis_guard import SynthesisGuard, revcomp
 from danon.translational_readiness import TranslationalReadinessEngine, PreclinicalValidationMilestones
-from danon.epitope_masker import AAV9_PDB_3J1S_VR_COORDINATES
+from danon.epitope_masker import AAV9_VR_COORDINATES
 
 
 class TestHorizon2Phases:
@@ -249,7 +358,7 @@ class TestHorizon2Phases:
 
     # ---- PHASE 20: solvation free energy ----
     def test_solvation_delta_g_within_bound_for_masked_capsid(self):
-        coords = {r: AAV9_PDB_3J1S_VR_COORDINATES[r]["coordinates_3j1s"]
+        coords = {r: AAV9_VR_COORDINATES[r]["coordinates"]
                   for r in ("VR_IV", "VR_VIII")}
         masker = EpitopeMasker()
         _, mask = masker.design_dual_region_masking(WILD_TYPE_AAV9_CAPSID)
@@ -286,7 +395,7 @@ class TestHorizon2Phases:
     def test_codon_optimized_lamp2b_meets_min_tai(self):
         engine = CodonElongationEngine(min_tai=0.88)
         result = engine.evaluate(protein=DEFAULT_LAMP2B_PEPTIDE)
-        assert result.tai >= 0.88, f"tAI {result.tai:.3f} < 0.88 minimum"
+        assert result.tai_before >= 0.88, f"tAI {result.tai_before:.3f} < 0.88 minimum"
         assert result.codon_optimized
 
     def test_back_translation_preserves_protein(self):

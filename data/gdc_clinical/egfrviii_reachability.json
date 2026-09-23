@@ -1,0 +1,7 @@
+{
+  "n_maf_controlled": 9325,
+  "n_open_maf_files": 464,
+  "n_structural_variation_controlled": 1847,
+  "n_structural_variation_files": 1847,
+  "source": "https://api.gdc.cancer.gov/files"
+}

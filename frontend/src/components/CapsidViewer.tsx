@@ -1,17 +1,21 @@
-import React, { useRef, useMemo, useCallback, useState } from 'react';
+import React, { useRef, useMemo, useCallback, useState, useEffect } from 'react';
 import { Canvas, useFrame, ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, Environment, Sparkles, Html, ContactShadows } from '@react-three/drei';
 import { EffectComposer, Bloom, N8AO, ToneMapping, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import ErrorBoundary from './ErrorBoundary';
 import {
-  buildCapsidShell,
+  buildBackbone,
   buildProtrusionGeometry,
-  computeSpikeDescriptors,
-  chargeToColor,
-  type SpikeDescriptor,
+  buildProtrusions,
+  decodeStructure,
+  MUTATION_COLOR,
+  type DecodedStructure,
+  type ProtrusionPlacement,
 } from '../utils/capsidGeometry';
+import { useArtifact } from '../utils/artifacts';
 import type { PipelineResult } from '../types';
+import type { StructureArtifactData } from '../types/artifacts';
 
 interface Props {
   result: PipelineResult | null;
@@ -19,59 +23,69 @@ interface Props {
   onSelectSpike: (i: number | null) => void;
 }
 
-function emissiveShader(shader: any) {
-  shader.vertexShader = 'attribute float aEmissive;\nvarying float vEmissive;\n' +
-    shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  vEmissive = aEmissive;');
-  shader.fragmentShader = 'varying float vEmissive;\n' +
-    shader.fragmentShader.replace(
-      '#include <emissivemap_fragment>',
-      '#include <emissivemap_fragment>\n  totalEmissiveRadiance += vColor.rgb * vEmissive * 1.6;'
-    );
+/* ------------------------------------------------------------------ scene -- */
+
+function AxisFrame({ structure }: { structure: DecodedStructure }) {
+  // The capsid's own symmetry elements, drawn from the deposited operators.
+  const geometries = useMemo(() => {
+    const line = (axes: THREE.Vector3[], color: string, opacity: number) => {
+      const pts: number[] = [];
+      const r = structure.outerRadiusScene * 1.08;
+      for (const a of axes) {
+        pts.push(a.x * r, a.y * r, a.z * r, -a.x * r, -a.y * r, -a.z * r);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+      return (
+        <lineSegments key={color} geometry={g}>
+          <lineBasicMaterial color={color} transparent opacity={opacity} />
+        </lineSegments>
+      );
+    };
+    return [
+      line(structure.threeFoldLines, '#7dd3fc', 0.5),
+      line(structure.fiveFoldLines, '#a78bfa', 0.4),
+      line(structure.twoFoldLines, '#64748b', 0.25),
+    ];
+  }, [structure]);
+  return <>{geometries}</>;
 }
 
-const R = 2.0;
-const icosa = new THREE.IcosahedronGeometry(R * 1.005, 1);
-
-function IcosaEdges() {
-  const geo = useMemo(() => {
-    const eg = new THREE.EdgesGeometry(icosa, 1);
-    return eg;
-  }, []);
-  return (
-    <lineSegments geometry={geo}>
-      <lineBasicMaterial color="#7dd3fc" transparent opacity={0.35} />
-    </lineSegments>
-  );
-}
-
-function SpikeLabels({ spikes }: { spikes: SpikeDescriptor[] }) {
+function SpikeLabels({ protrusions }: { protrusions: ProtrusionPlacement[] }) {
   return (
     <>
-      {spikes.map(s => (
-        <Html key={`lbl-${s.index}`} center distanceFactor={10} position={s.position} zIndexRange={[10, 0]}>
-          <div className="spike-num">{s.index + 1}</div>
+      {protrusions.map((p) => (
+        <Html
+          key={`lbl-${p.index}`}
+          center
+          distanceFactor={10}
+          position={p.position}
+          zIndexRange={[10, 0]}
+        >
+          <div className="spike-num">{p.index + 1}</div>
         </Html>
       ))}
     </>
   );
 }
 
-function Assembly({ result, selectedSpike, onSelectSpike }: Props) {
+function Assembly({ result, selectedSpike, onSelectSpike, structure }: Props & { structure: DecodedStructure }) {
   const groupRef = useRef<THREE.Group>(null!);
   const [hover, setHover] = useState<number | null>(null);
 
-  const netIV = result?.regions?.VR_IV?.netCharge ?? 0;
-  const netVIII = result?.regions?.VR_VIII?.netCharge ?? 0;
+  const mutations = result?.mutations ?? [];
+  const epitopeStored = useMemo(() => {
+    const ep = result?.regions?.VR_IV?.residueProfiles ?? [];
+    const ep8 = result?.regions?.VR_VIII?.residueProfiles ?? [];
+    return [...ep, ...ep8].filter((r) => r.isEpitope).map((r) => r.position);
+  }, [result]);
 
-  const { geometry: shellGeo, radius } = useMemo(
-    () => buildCapsidShell(6, netIV, netVIII),
-    [netIV, netVIII]
+  const backbone = useMemo(
+    () => buildBackbone(structure, mutations, epitopeStored),
+    [structure, mutations, epitopeStored],
   );
-  const { apex, shoulder } = useMemo(() => buildProtrusionGeometry(), []);
-  const spikes = useMemo<SpikeDescriptor[]>(
-    () => computeSpikeDescriptors(radius, netIV, netVIII),
-    [radius, netIV, netVIII]
-  );
+  const { apex } = useMemo(() => buildProtrusionGeometry(), []);
+  const protrusions = useMemo(() => buildProtrusions(structure), [structure]);
 
   useFrame((_, dt) => {
     groupRef.current.rotation.y += dt * 0.14;
@@ -83,62 +97,57 @@ function Assembly({ result, selectedSpike, onSelectSpike }: Props) {
     onSelectSpike(selectedSpike === i ? null : i);
   }, [onSelectSpike, selectedSpike]);
 
+  const active = (i: number) => selectedSpike === i || hover === i;
+
   return (
     <group ref={groupRef}>
-      <mesh geometry={shellGeo} castShadow receiveShadow>
-        <meshPhysicalMaterial
+      {/* the deposited C-alpha backbone: 60 subunits x 518 residues */}
+      <points geometry={backbone.geometry}>
+        <pointsMaterial
+          size={0.032}
           vertexColors
-          roughness={0.4}
-          metalness={0.5}
-          clearcoat={0.5}
-          clearcoatRoughness={0.35}
-          reflectivity={0.55}
-          envMapIntensity={1.0}
-          onBeforeCompile={emissiveShader}
+          transparent
+          opacity={0.95}
+          sizeAttenuation
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
         />
-      </mesh>
+      </points>
 
-      <IcosaEdges />
+      <AxisFrame structure={structure} />
 
-      {spikes.map((s) => {
-        const active = selectedSpike === s.index || hover === s.index;
-        const emis = active ? 1.4 : 0.25;
-        const scale = active ? 1.18 : 1.0;
+      {protrusions.map((p) => {
+        const on = active(p.index);
+        const colour = on ? MUTATION_COLOR : new THREE.Color('#334155');
         return (
           <group
-            key={s.index}
-            position={s.position}
-            quaternion={s.quaternion}
-            scale={scale}
-            onClick={(e) => handleClick(e, s.index)}
-            onPointerOver={(e) => { e.stopPropagation(); setHover(s.index); document.body.style.cursor = 'pointer'; }}
+            key={p.index}
+            position={p.position}
+            quaternion={p.quaternion}
+            scale={on ? 1.22 : 1.0}
+            onClick={(e) => handleClick(e, p.index)}
+            onPointerOver={(e) => { e.stopPropagation(); setHover(p.index); document.body.style.cursor = 'pointer'; }}
             onPointerOut={() => { setHover(null); document.body.style.cursor = 'auto'; }}
           >
-            <mesh geometry={shoulder} castShadow>
+            <mesh geometry={apex} castShadow>
               <meshPhysicalMaterial
-                color={s.colorIV}
-                emissive={s.colorIV}
-                emissiveIntensity={emis * 0.5}
-                roughness={0.35}
-                metalness={0.4}
+                color={colour}
+                emissive={colour}
+                emissiveIntensity={on ? 1.2 : 0.2}
+                roughness={0.32}
+                metalness={0.42}
                 clearcoat={0.6}
               />
             </mesh>
-            <mesh geometry={apex} position={[0, 0.18, 0]} castShadow>
-              <meshPhysicalMaterial
-                color={s.colorVIII}
-                emissive={s.colorVIII}
-                emissiveIntensity={emis}
-                roughness={0.3}
-                metalness={0.45}
-                clearcoat={0.7}
-              />
-            </mesh>
-            {active && (
-              <Html center distanceFactor={9} position={[0, 1.1, 0]}>
+            {on && (
+              <Html center distanceFactor={9} position={[0, 0.9, 0]}>
                 <div className="spike-tag">
-                  Protrusion #{s.index + 1}
-                  <span>VR-IV {netIV >= 0 ? '+' : ''}{netIV.toFixed(1)} · VR-VIII {netVIII >= 0 ? '+' : ''}{netVIII.toFixed(1)}</span>
+                  Three-fold operator #{p.index + 1}
+                  <span>
+                    {result
+                      ? `VR-IV ${result.regions?.VR_IV?.netCharge >= 0 ? '+' : ''}${(result.regions?.VR_IV?.netCharge ?? 0).toFixed(2)} · VR-VIII ${result.regions?.VR_VIII?.netCharge >= 0 ? '+' : ''}${(result.regions?.VR_VIII?.netCharge ?? 0).toFixed(2)}`
+                      : 'engine charge profile loads with the pipeline run'}
+                  </span>
                 </div>
               </Html>
             )}
@@ -146,71 +155,38 @@ function Assembly({ result, selectedSpike, onSelectSpike }: Props) {
         );
       })}
 
-      {result && <OrbitingIons netIV={netIV} netVIII={netVIII} />}
-      {result && <SpikeLabels spikes={spikes} />}
+      {/* mutated positions, drawn at their real coordinates on every subunit */}
+      {backbone.mutatedSceneIndices.map((idx) => {
+        const r = structure.residues[idx];
+        const c = new THREE.Vector3(r.x, r.y, r.z);
+        return structure.operators.map((m, s) => {
+          const p = c.clone().applyMatrix4(m);
+          return (
+            <mesh key={`mut-${idx}-${s}`} position={p} scale={0.05}>
+              <sphereGeometry args={[1, 10, 10]} />
+              <meshBasicMaterial color={MUTATION_COLOR} />
+            </mesh>
+          );
+        });
+      })}
     </group>
   );
 }
 
-function OrbitingIons({ netIV, netVIII }: { netIV: number; netVIII: number }) {
-  const count = 220;
-  const ref = useRef<THREE.Points>(null!);
-  const { positions, initialY, colors, speeds } = useMemo(() => {
-    const p = new Float32Array(count * 3);
-    const iy = new Float32Array(count);
-    const col = new Float32Array(count * 3);
-    const s = new Float32Array(count);
-    const bias = (netIV + netVIII) / 2;
-    for (let i = 0; i < count; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const r = 2.8 + Math.random() * 1.7;
-      p[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      p[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      p[i * 3 + 2] = r * Math.cos(phi);
-      iy[i] = p[i * 3 + 1];
-      s[i] = 0.2 + Math.random() * 0.6;
-      const c = chargeToColor(-bias * (0.5 + Math.random()), 1.4);
-      col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
-    }
-    return { positions: p, initialY: iy, colors: col, speeds: s };
-  }, [netIV, netVIII]);
-
-  useFrame(() => {
-    ref.current.rotation.y -= 0.0015;
-    const arr = ref.current.geometry.attributes.position.array as Float32Array;
-    for (let i = 0; i < count; i++) {
-      const t = Date.now() * 0.0004 * speeds[i] + i;
-      arr[i * 3 + 1] = initialY[i] + Math.sin(t) * 0.15;
-    }
-    ref.current.geometry.attributes.position.needsUpdate = true;
-  });
-
-  return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-        <bufferAttribute attach="attributes-color" args={[colors, 3]} />
-      </bufferGeometry>
-      <pointsMaterial size={0.05} vertexColors transparent opacity={0.8} sizeAttenuation depthWrite={false} blending={THREE.AdditiveBlending} />
-    </points>
-  );
-}
-
-function Scene(props: Props) {
+function Scene(props: Props & { structure: DecodedStructure }) {
   return (
     <>
       <color attach="background" args={['#05080f']} />
       <fog attach="fog" args={['#05080f', 9, 20]} />
-      <ambientLight intensity={0.28} />
-      <directionalLight position={[6, 8, 5]} intensity={1.6} castShadow shadow-mapSize={[2048, 2048]} />
+      <ambientLight intensity={0.3} />
+      <directionalLight position={[6, 8, 5]} intensity={1.5} castShadow shadow-mapSize={[2048, 2048]} />
       <directionalLight position={[-6, -3, -6]} intensity={0.6} color="#2563eb" />
       <pointLight position={[0, 4, 0]} intensity={0.8} color="#60a5fa" distance={14} />
       <spotLight position={[-4, 6, 4]} angle={0.5} penumbra={0.8} intensity={1.2} color="#a78bfa" castShadow />
       <Environment preset="night" />
 
       <Assembly {...props} />
-      <Sparkles count={70} scale={[10, 10, 10]} size={1.3} speed={0.25} color="#93c5fd" opacity={0.35} />
+      <Sparkles count={70} scale={[10, 10, 10]} size={1.3} speed={0.25} color="#93c5fd" opacity={0.3} />
 
       <ContactShadows position={[0, -3.6, 0]} opacity={0.5} scale={16} blur={2.4} far={5} />
       <OrbitControls enablePan={false} minDistance={3.5} maxDistance={14} enableDamping dampingFactor={0.05} />
@@ -225,11 +201,45 @@ function Scene(props: Props) {
   );
 }
 
+/* ------------------------------------------------------------------ shell -- */
+
+function MissingStructure() {
+  return (
+    <div className="canvas-overlay">
+      <div className="overlay-card">
+        <span className="overlay-icon">🧬</span>
+        <strong>No structure artifact</strong>
+        <p>
+          This view renders the deposited AAV9 capsid (PDB&nbsp;3UX1). It has no
+          coordinates loaded, so it draws nothing rather than an idealised shell.
+          Generate it with <code>write_app_artifacts()</code>.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function CapsidViewer(props: Props) {
+  const { artifact, error, loading } = useArtifact<StructureArtifactData>('structure');
+  const [decoded, setDecoded] = useState<DecodedStructure | null>(null);
+
+  useEffect(() => {
+    if (!artifact) return;
+    try {
+      setDecoded(decodeStructure(artifact.data));
+    } catch {
+      setDecoded(null);
+    }
+  }, [artifact]);
+
+  const g = artifact?.data.geometry;
+
   return (
     <>
       <div className="panel-title" style={{ marginBottom: 6 }}>
-        🧬 AAV9 Capsid — Icosahedral Assembly · 20 Three-Fold Protrusions · PDB 3J1S Electrostatics
+        🧬 AAV9 Capsid — {g ? `${g.subunits}-subunit T=1 assembly` : 'T=1 assembly'} ·{' '}
+        PDB&nbsp;{artifact?.data.structure_id ?? '3UX1'} deposited coordinates ·{' '}
+        {g ? `${g.protrusions} three-fold protrusions on ${g.three_fold_axis_lines} axis lines` : 'symmetry from REMARK 350'}
       </div>
       <div className="canvas-container" style={{ position: 'relative' }}>
         <ErrorBoundary label="CapsidViewer">
@@ -239,24 +249,25 @@ export default function CapsidViewer(props: Props) {
             camera={{ position: [5.5, 3, 5.5], fov: 38 }}
             gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
           >
-            <Scene {...props} />
+            {decoded && <Scene {...props} structure={decoded} />}
           </Canvas>
         </ErrorBoundary>
-        {!props.result && (
-          <div className="canvas-overlay">
-            <div className="overlay-card">
-              <span className="overlay-icon">🧬</span>
-              <strong>No engineered capsid yet</strong>
-              <p>Set target constraints and run the optimization pipeline. The backend NSGA-II + PDB&nbsp;3J1S Poisson-Boltzmann modules will generate the capsid and paint these protrusions.</p>
-            </div>
+        {!decoded && !loading && <MissingStructure />}
+        {error && (
+          <div className="canvas-overlay" style={{ top: 'auto', bottom: 8, padding: 0 }}>
+            <div className="overlay-card" style={{ fontSize: 11 }}>{error}</div>
           </div>
         )}
       </div>
       <div className="capsid-legend">
-        <span><i style={{ background: '#1d4ed8' }} /> Positive patch (R/K)</span>
-        <span><i style={{ background: '#dc2626' }} /> Negative patch (D/E)</span>
-        <span><i style={{ background: '#7c8ba1' }} /> Neutral surface</span>
-        <span className="hint">Click a protrusion → highlights VR-IV / VR-VIII substitutions →</span>
+        <span><i style={{ background: '#8fa3bd' }} /> Backbone Cα, shaded by burial (contact number)</span>
+        <span><i style={{ background: '#fbbf24' }} /> Engineered substitution</span>
+        <span><i style={{ background: '#f472b6' }} /> Wild-type epitope residue</span>
+        <span className="hint">
+          {g
+            ? `outer radius ${g.outer_radius_a.toFixed(1)} Å · ${g.ca_atoms.toLocaleString()} Cα atoms · sha256 ${artifact?.data.sha256?.slice(0, 12) ?? '—'}`
+            : 'structure artifact not loaded'}
+        </span>
       </div>
     </>
   );

@@ -66,8 +66,10 @@ AA_HYDRO = {"A": 1.8, "C": 2.5, "D": -3.5, "E": -3.5, "F": 2.8, "G": -0.4,
             "P": -1.6, "Q": -3.5, "R": -4.5, "S": -0.8, "T": -0.7, "V": 4.2,
             "W": -0.9, "Y": -1.3}
 
-# Conserved structural pockets in stored VP1 frame (263-819). Mutations here are
-# high risk. Derived from AAV9 buried/interface residues (DiMattia 2012, 3J1S).
+# Conserved structural pockets in stored VP1 frame (263-736, the range chain A of
+# PDB 3UX1 resolves). Mutations here are high risk. Derived from AAV9
+# buried/interface residues (DiMattia et al. 2012, PDB 3UX1 -- the AAV9 entry;
+# the older "3J1S" label in this file named an AAV2 structure).
 CONSERVED_POCKETS = {
     "beta_barrel_core": list(range(1, 20)) + list(range(90, 110)),
     "fivefold_channel": list(range(52, 60)),

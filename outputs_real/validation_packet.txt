@@ -1,0 +1,43 @@
+==============================================================================
+EXTERNAL VALIDATION PACKET -- real clinical outcomes (TCGA-GBM)
+==============================================================================
+
+source: GDC API cases endpoint, project TCGA-GBM, expand demographic/diagnoses/follow_ups
+cohort: 617 cases; progression arm n=595 (267 events, 328 censored); OS arm n=593 (491 deaths)
+observed KM median progression: 450.0 d; dated-event IQR: (101.0, 320.5)
+observed KM median OS: 427.0 d
+
+LAYER 1 -- ingestion anchor (validates the DATA HANDLING)
+  reconstructed cohort median OS 427 d is INSIDE the published band [330, 550] d (Stupp et al., NEJM 352:987-996 (2005): 14.6 months median survival for radiotherapy + temozolomide; TCGA-GBM cohort reports 12-15 months)
+
+LAYER 2 -- control-arm timescale plausibility (weakest layer)
+  PLAUSIBILITY CHECK -- model MTD arm vs observed TCGA-GBM progression
+     day  observed S(t)   model S(t)      gap
+     100          0.878        1.000   +0.122
+     200          0.721        1.000   +0.279
+     365          0.548        0.074   -0.473
+  max |gap| = 0.473
+  [model MTD arm vs observed TCGA-GBM progression] model MTD-arm median progression 267 d (n=54, 50 events) vs observed cohort KM median 450 d: inside the observed dated-event IQR, i.e. CONSISTENT WITH the real timescale. This is a timescale sanity check on the CONTROL arm, not validation: no patient matching, no regimen matching, endpoints not matched.
+    caveat: the model endpoint is a RANO-fraction burden threshold crossing; the observed endpoint is a recorded clinical progression date
+    caveat: the observed KM median is inflated by heavy short-follow-up censoring; the dated-event IQR is the comparator used above
+    caveat: the model's MTD arm is a constant-parameter model, not a patient or a trial: agreement is a timescale sanity check only
+    caveat: the model is NOT fitted to this cohort, so agreement is not a calibration result and disagreement is a re-calibration target
+
+LAYER 3 -- parametric robustness (structure, not correctness)
+  cells: 84 over 6 perturbation targets; policy better on mean burden in 81/84
+    collateral_b_kill  worst burden ratio 0.91 at scale 0.02 (still better)
+    drug_a_kill        worst burden ratio 1.00 at scale 0.02 (LOSES)
+    drug_transport     worst burden ratio 0.04 at scale 0.02 (still better)
+    intake_r0          worst burden ratio 0.04 at scale 0.02 (still better)
+    resistance_cost    worst burden ratio 0.07 at scale 2.00 (still better)
+    tumour_growth      worst burden ratio 0.45 at scale 0.02 (still better)
+
+LAYER 4 -- paired baseline control (policy vs MTD, same geometry/seeds)
+  model MTD arm: n=54, 50 events, median 267.0 d
+  automated test count at time of packet: 582
+
+WHAT THIS PACKET DOES NOT SHOW
+  - the model endpoint is a RANO-fraction burden threshold crossing; the observed endpoint is a recorded clinical progression date
+  - the observed KM median is inflated by heavy short-follow-up censoring; the dated-event IQR is the comparator used above
+  - the model's MTD arm is a constant-parameter model, not a patient or a trial: agreement is a timescale sanity check only
+  - the model is NOT fitted to this cohort, so agreement is not a calibration result and disagreement is a re-calibration target

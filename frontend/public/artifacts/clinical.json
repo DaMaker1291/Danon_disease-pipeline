@@ -1,0 +1,109 @@
+{
+ "key": "clinical",
+ "title": "Modelled cardiomyocyte rescue (8-ODE cell simulator)",
+ "generated_utc": "2026-09-21T22:17:26Z",
+ "source": "danon.cell_simulator.DanonCellSimulator.dose_response_panel + compare_mutation_types(vcn=10.0) + benchmark scores",
+ "notes": [
+  "every curve here is an 8-ODE MODEL of one cardiomyocyte with literature-calibrated parameters, not a measurement and not patient data",
+  "the UCL comparison is a score against a published trial's reported figures, not a head-to-head result",
+  "no cell, animal, or human has been exposed to this construct"
+ ],
+ "provenance": {
+  "lamp2b_loss_mechanism": "established",
+  "ode_parameterisation": "unknown",
+  "model_matches_measured_rescue": "unknown",
+  "model_is_clinical_evidence": "proven_failed"
+ },
+ "data": {
+  "dose_response": [
+   {
+    "vector_copy_number": 0,
+    "lamp2_restoration_pct": 2.0000000000000004,
+    "glycogen_clearance_pct": 72.5576169527939,
+    "autophagic_flux": 7.119101123595509,
+    "functional_cure_score": 0.3627110397651878,
+    "is_cure": false,
+    "survival_5y": 0.46812884325481546
+   },
+   {
+    "vector_copy_number": 1,
+    "lamp2_restoration_pct": 5.920695257599999,
+    "glycogen_clearance_pct": 75.32869858941412,
+    "autophagic_flux": 9.44508662473348,
+    "functional_cure_score": 0.40085882359807834,
+    "is_cure": false,
+    "survival_5y": 0.5827047188874496
+   },
+   {
+    "vector_copy_number": 3,
+    "lamp2_restoration_pct": 13.762085772799997,
+    "glycogen_clearance_pct": 79.46881807076494,
+    "autophagic_flux": 14.097057627009434,
+    "functional_cure_score": 0.4635692289684841,
+    "is_cure": false,
+    "survival_5y": 0.7606932174121617
+   },
+   {
+    "vector_copy_number": 5,
+    "lamp2_restoration_pct": 21.603476287999996,
+    "glycogen_clearance_pct": 82.41390199574468,
+    "autophagic_flux": 18.74902862928538,
+    "functional_cure_score": 0.5134852886733117,
+    "is_cure": false,
+    "survival_5y": 0.8705695888341751
+   },
+   {
+    "vector_copy_number": 10,
+    "lamp2_restoration_pct": 41.20695257599999,
+    "glycogen_clearance_pct": 87.834269962897,
+    "autophagic_flux": 33.230410846541126,
+    "functional_cure_score": 0.7147618269873677,
+    "is_cure": true,
+    "survival_5y": 0.9749459363488147
+   }
+  ],
+  "mutation_comparison": [
+   {
+    "mutation": "null",
+    "lamp2_pct": 41.20695257599999,
+    "glycogen_clearance_pct": 87.834269962897,
+    "flux_restoration_pct": 33.230410846541126,
+    "cure_score": 0.7147618269873677,
+    "is_cure": true,
+    "survival_10y": 0.9505195788030669
+   },
+   {
+    "mutation": "splice_site",
+    "lamp2_pct": 41.20695257599999,
+    "glycogen_clearance_pct": 86.67734310273859,
+    "flux_restoration_pct": 33.230410846541126,
+    "cure_score": 0.7132684253878456,
+    "is_cure": true,
+    "survival_10y": 0.9544428713420128
+   },
+   {
+    "mutation": "missense_catalytic",
+    "lamp2_pct": 41.20695257599999,
+    "glycogen_clearance_pct": 85.2010109677681,
+    "flux_restoration_pct": 33.230410846541126,
+    "cure_score": 0.7112866880337496,
+    "is_cure": true,
+    "survival_10y": 0.9582252140865727
+   },
+   {
+    "mutation": "partial_deletion",
+    "lamp2_pct": 41.20695257599999,
+    "glycogen_clearance_pct": 86.26972005737291,
+    "flux_restoration_pct": 33.230410846541126,
+    "cure_score": 0.7127283469222011,
+    "is_cure": true,
+    "survival_10y": 0.9556014989635313
+   }
+  ],
+  "vector_copy_number": 10.0,
+  "benchmark": {
+   "ucl_trial_score": 0.3897906145196861,
+   "platform_best_score": 0.7147618269873677
+  }
+ }
+}

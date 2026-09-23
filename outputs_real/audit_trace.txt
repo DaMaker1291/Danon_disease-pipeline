@@ -1,0 +1,85 @@
+========================================================================================
+            RECONCILIATION AUDIT: TEMPORAL LEAKAGE & OUT-OF-SAMPLE TRACE
+========================================================================================
+
+[PART 1: INGESTION BOUNDARY -- WHAT EXISTED BEFORE ANY FORECAST]
+{
+  "imaging_source": "BraTS 2021 training data: TCGA-GBM/TCIA-derived de-identified patient glioma MRI with expert segmentations; Zenodo record 19541844 (CC-BY-4.0); original collection TCGA-GBM via The Cancer Imaging Archive",
+  "imaging_timepoints_available": 1,
+  "engine_grid_voxel_mm": 3.6666666666666665,
+  "decimation_is_lossy": true,
+  "clinical_endpoints_available": [
+    "demographic.days_to_death (overall survival)",
+    "follow_ups.days_to_progression (recorded progression)"
+  ],
+  "molecular_assay": "bulk RNA-seq (GDC open STAR counts)",
+  "single_cell_assay_available": false,
+  "patient_level_imaging_outcome_join_available": false,
+  "engine_per_patient_prediction_available": false,
+  "potency_source": "CHEMBL810 (IC50)",
+  "potency_exact_records": 31,
+  "potency_right_censored_records": 19,
+  "tcia_glioma_candidates_absent": [
+    "BraTS",
+    "TCGA-GBM",
+    "TCGA-LGG"
+  ],
+  "tcia_glioma_candidates_present": [
+    "ICDC-Glioma",
+    "UPENN-GBM"
+  ]
+}
+
+boundary notes:
+  - The engine consumes ONE imaging timepoint per case: the BraTS 2021 release is pre-operative only, so there is no future frame in memory to leak from -- the invariant holds because the data does not exist, not because a mask function blocked it.
+  - No patient in this repository carries baseline imaging and an observed outcome together. TCIA no longer serves TCGA-GBM or TCGA-LGG, and the reachable glioma collections anonymise separately from the GDC export, so no patient-level imaging/outcome pair can be assembled.
+  - The engine's forecast varies by patient geometry, so it does carry patient-dependence. What it has no per-patient prediction to blind is for a different reason: no cohort pairs geometry with outcome, and the model endpoint is not translated into clinical time.
+
+[PART 2: OUT-OF-SAMPLE STRUCTURE]
+  [PASS] design_matrix_excludes_outcome: does the covariate matrix contain any outcome column? -- columns = 3.0000
+        design columns = ('age_years', 'male', 'is_glioblastoma'); forbidden columns present: none; unpermitted columns present: none
+  [PASS] out_of_sample_fold_membership: is every patient scored exactly once, by a model fitted without them? -- patients scored once / total = 595.0000
+        595 patients, 5 folds: test appearances 1-1, train appearances 4-4 (expected exactly 4); split re-derived from seed 0
+
+[PART 3: LEAKAGE DETECTION -- PERMUTATION NULL]
+  [PASS] permutation_leakage_null: does held-out discrimination collapse to chance when the outcome is permuted across patients? -- os held-out C-index = 0.6559 [null centre 0.506, band 0.468-0.536]
+        20 permutation(s) of (time, event) across 595 patients with covariates fixed; null median 0.506; observed 0.656. A null centred at chance is the required result: it means discrimination comes from the covariates, not from leaked outcome information. Null centre sits 0.006 from chance against a tolerance of 0.060 (its own half-band at 20 draws). Observed value clears the null band by +0.120 (strength, not a leakage requirement).
+
+[PART 4: DETERMINISM AND THE SECTION THAT CANNOT BE FILLED]
+  [PASS] seeded_reproducibility: does a fixed seed reproduce a trajectory exactly, and a different seed diverge? -- same-seed identical / different-seed different = n/a
+        same seed 7 reproduces exactly: True; seed 8 diverges: True. Runs are stochastic and seeded, which is the honest claim -- a claim of full determinism would be false.
+  [PASS] per_patient_relapse_prediction: is there a per-patient relapse prediction to compare to a real relapse date? -- estimable = n/a
+        NOT ESTIMABLE, and the audit says so rather than omitting the section: no patient-level dataset pairs baseline tumour state, administered schedule and observed outcome, and the engine emits a burden trajectory whose endpoint (a RANO-fraction threshold crossing) is not yet translated into the clinical endpoint (recorded progression date) that a C-index would require. Therefore no prediction-error-in-days figure exists for any patient in this repository, and a trace reporting one would be fabricated. Note what is NOT the obstacle: the engine's forecast does vary by geometry, so the gap is data linkage and endpoint translation, not a model that ignores the patient.
+
+[MEASURED OUT-OF-SAMPLE RESULT ON THE REAL COHORT]
+  os: C = 0.656 +/- 0.025 over 5 folds (age alone 0.653) -- real but weak discrimination on held-out patients, consistent with the published prognostic value of age and diagnosis in GBM
+  n = 595 patients (595 patients with a usable os endpoint; 491 events, 104 censored at last contact; 1 patient(s) recorded Dead with no days_to_death: censored at last contact because there is no event time; 21 dropped: no age recorded; 1 dropped: no usable time or endpoint)
+
+[MODEL STANDARD-OF-CARE ARM vs OBSERVED PROGRESSION]
+  observed: 617 TCGA-GBM case(s), 267 progression event(s), dated-event IQR [101.0, 320.5] days
+  model MTD arm over 9 real geometr(ies): median progression 288 days, range 272-365
+    day | observed S(t) | model S(t) | diff
+     100 |        0.878 |      1.000 | +0.122
+     200 |        0.721 |      1.000 | +0.279
+     365 |        0.548 |      0.111 | -0.436
+  reading: timescale plausible = True; too optimistic early = True; too pessimistic late = True; max |diff| = 0.436
+  The model's standard-of-care arm progresses on a plausible timescale (its median sits inside the observed dated-event IQR) but its distribution is too narrow: it over-predicts progression-free survival at 100-200 days and under-predicts it at 365. That is a calibration target for the growth and mutation parameters, and it is NOT a validation of the treatment engine.
+    caveat: the model endpoint is a RANO-fraction burden threshold crossing; the observed endpoint is a recorded clinical progression date
+    caveat: the observed KM median is inflated by heavy short-follow-up censoring; the dated-event IQR is the comparator used above
+    caveat: the model's MTD arm is a constant-parameter model, not a patient or a trial: agreement is a timescale sanity check only
+    caveat: the model is NOT fitted to this cohort, so agreement is not a calibration result and disagreement is a re-calibration target
+
+[WHAT IS DELIBERATELY ABSENT]
+  - No per-patient predicted-vs-actual relapse day. The engine's forecast
+    DOES vary by geometry (01017/01018/01019 give day-365 MTD burdens of
+    2259/1386/3677), so patient-dependence is not the blocker: no patient
+    here has baseline imaging, molecular state, administered schedule and
+    observed outcome together, and the model's burden-threshold endpoint
+    is not yet translated into a clinical progression date.
+  - No percent-error figure against a hospital relapse date, because
+    producing one would require inventing the pairing.
+  - No single-cell derived initial resistant fraction: the pipeline reads
+    bulk RNA-seq and marks single-cell inference PROVEN_FAILED.
+
+[AUDIT COMPLETE in 18.2s]  5/5 checks passed
+========================================================================================

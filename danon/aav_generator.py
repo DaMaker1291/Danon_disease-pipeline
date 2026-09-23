@@ -5,32 +5,70 @@ from typing import List, Optional
 
 logger = logging.getLogger(__name__)
 
+# ---------------------------------------------------------------------------
+# Wild-type AAV9 capsid, VP1 residues 263-736 (the T=1 VP3 region this pipeline
+# engineers), stored frame: sequence index i == VP1 residue 263 + i.
+#
+# PROVENANCE -- this constant used to be a 557-residue string with no source
+# attached. It was not AAV9, and it was not any AAV: it contained none of the
+# motifs every AAV serotype carries (WGYFDFNRF, FNIQVKEV, FMIPQYGYL, LYYLSK,
+# SGQNQQTLKFS), and its longest stretch identical to the real AAV9 VP1 was 4
+# residues against the 518 resolved residues of PDB 3UX1.
+#
+# The sequence below is the deposited chain A of **PDB 3UX1** (AAV9), residues
+# 263-736, read directly from the structure this pipeline's epitope masker,
+# ENM and Poisson-Boltzmann terms score against. `tests/test_structure.py::
+# TestWildTypeSequence::test_wild_type_sequence_matches_deposit` re-derives it
+# from the PDB file on every run, so the two cannot drift apart again.
+# ---------------------------------------------------------------------------
 WILD_TYPE_AAV9_CAPSID = (
-    "ADLGNSSGVNYYNLKGSTLPNRLSFPGAITYHTYNQESQVPEN"
-    "YIAPKLYDLPSMFAPATVKAPLNIQKRTQYTLTHSGSNPTTAG"
-    "HPITNFYVPVTGTTLTTNISLPQYVNVPVVYKMQTTKYEDGVL"
-    "PVRGSIMQTYQVSSYSTNWQIQVTLQFNTTSEVQPVFEVVYTR"
-    "QVQGRVILPDVDKNITQLIHCINEMINTFNYNKLIVTPPMQLNN"
-    "YTYWHQLQPEQNFQVKTTTTSVNVNFTITGQVPAQFVVTRNVNT"
-    "MVTMKMQTTASSGSTARSFEKVRQYHTDKSGTLPRYVLQISSV"
-    "NTYGTQTRVIESLKENAQFGQVGAITYTDIENTLQVHTANQVLK"
-    "NTTIYAGTNLHTYIQENLSPASQSVATAFITKYVSKRVKAEGES"
-    "SITYLWEILNNKMDQIRVQVNGVQVNINTTVQAVTALMINTIYV"
-    "QTNITTITLQEKNITLSVTKLNEQVNATVQIHTISGSIIGPGQN"
-    "NAVTKLQVTAGATANITVQNVTLDNQVTQRVKVSYVNAGGTNTT"
-    "TFTLKVLPDKVINTYRGTHATRYSNFSLKIGSSN"
+    "STSGGSSNDNAYFGYSTPWGYFDFNRFHCHFSPRDWQRLINN"
+    "NWGFRPKRLNFKLFNIQVKEVTDNNGVKTIANNLTSTVQVFT"
+    "DSDYQLPYVLGSAHEGCLPPFPADVFMIPQYGYLTLNDGSQA"
+    "VGRSSFYCLEYFPSQMLRTGNNFQFSYEFENVPFHSSYAHSQ"
+    "SLDRLMNPLIDQYLYYLSKTINGSGQNQQTLKFSVAGPSNMA"
+    "VQGRNYIPGPSYRQQRVSTTVTQNNNSEFAWPGASSWALNGR"
+    "NSLMNPGPAMASHKEGEDRFFPLSGSLIFGKQGTGRDNVDAD"
+    "KVMITNEEEIKTTNPVATESYGQVATNHQSAQAQAQTGWVQN"
+    "QGILPGMVWQDRDVYLQGPIWAKIPHTDGNFHPSPLMGGFGM"
+    "KHPPPQILIKNTPVPADPPTAFNKDKLNSFITQYSTGQVSVE"
+    "IEWELQKENSKRWNPEIQYTSNYYKSNNVEFAVNTEGVYSEP"
+    "RPIGTRYLTRNL"
 )
+
+#: Frame convention shared across the repository: positions are stored-frame
+#: indices into the sequence above, i.e. VP1 residue 263 + position.
+VP1_FRAME_OFFSET = 263
+
+#: Structural regions, given in VP1 numbering (translated to the stored frame
+#: by `VP1_FRAME_OFFSET` wherever they index the sequence).
+CAPSID_STRUCTURAL_INTERFACES_VP1 = {
+    "VP1_VP2_interface": (263, 340),
+    "VP1_VP3_interface": (340, 450),
+    "spike_region_VR_VIII": (570, 600),
+    "spike_region_VR_IX": (450, 485),
+    "receptor_binding_patch": (263, 290),
+    "epitope_hotspot_1": (450, 475),
+    "epitope_hotspot_2": (570, 590),
+}
 
 AA_VOCAB = "ACDEFGHIKLMNPQRSTVWY"
 
+
+def _stored_range(vp1_lo: int, vp1_hi: int) -> List[int]:
+    """VP1-numbered interval -> stored-frame indices that index the sequence.
+
+    These used to be bare `range(570, 600)` lists dropped straight onto a
+    557-residue string: VP1 570-600 is stored 307-337, and reading them as
+    indices addressed the wrong residues (or, past the end of a shorter
+    sequence, nothing at all).
+    """
+    return list(range(vp1_lo - VP1_FRAME_OFFSET, vp1_hi - VP1_FRAME_OFFSET))
+
+
 CAPSID_STRUCTURAL_INTERFACES = {
-    "VP1_VP2_interface": list(range(263, 340)),
-    "VP1_VP3_interface": list(range(340, 450)),
-    "spike_region_VR_VIII": list(range(570, 600)),
-    "spike_region_VR_IX": list(range(450, 485)),
-    "receptor_binding_patch": list(range(263, 290)),
-    "epitope_hotspot_1": list(range(450, 475)),
-    "epitope_hotspot_2": list(range(570, 590)),
+    name: _stored_range(lo, hi)
+    for name, (lo, hi) in CAPSID_STRUCTURAL_INTERFACES_VP1.items()
 }
 
 AA_RADIUS = {

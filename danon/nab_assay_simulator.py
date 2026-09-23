@@ -177,10 +177,38 @@ class NAbAssaySimulator:
         ic50_est = next((t for pt in curve if pt["inhibition_pct"] / 100.0 >= 0.5), titer_range[-1])
         return {"curve": curve, "estimated_ic50_titer": ic50_est}
 
-    def utcl_score(self) -> float:
-        return 0.25
+    def _paired_panel(self, n_donors: int, capsid_type: str,
+                      charge_mask_score: float, glycan_shield_score: float,
+                      seed: int) -> List[NAbAssayResult]:
+        """Draw a donor panel from a pinned RNG state, then restore it.
+
+        The baseline arm and the engineered arm must be judged on the *same*
+        randomly drawn donors. Drawing them from a shared generator made the two
+        scores depend on call order, which silently turned a paired comparison
+        into an unpaired one.
+        """
+        state = self.rng.get_state()
+        try:
+            self.rng.seed(seed)
+            return self.simulate_donor_panel(n_donors, capsid_type,
+                                             charge_mask_score, glycan_shield_score)
+        finally:
+            self.rng.set_state(state)
+
+    def utcl_score(self, n_donors: int = 50, seed: int = 42) -> float:
+        """Baseline: the unmodified capsid, scored through the same panel.
+
+        ``neutralization_escape`` is defined as ``(wt - engineered) / wt``, so the
+        wild-type arm scores exactly zero *by construction of the metric*. The
+        previous implementation returned a hardcoded ``0.25``, which is not a
+        value the metric can even take for an unmodulated capsid.
+        """
+        panel = self._paired_panel(n_donors, "wildtype", 0.0, 0.0, seed)
+        return float(np.mean([r.neutralization_escape for r in panel]))
 
     def our_best_score(self, charge_mask_score: float = 0.6,
-                       glycan_shield_score: float = 0.6) -> float:
-        panel = self.simulate_donor_panel(50, "engineered", charge_mask_score, glycan_shield_score)
+                       glycan_shield_score: float = 0.6,
+                       n_donors: int = 50, seed: int = 42) -> float:
+        panel = self._paired_panel(n_donors, "engineered", charge_mask_score,
+                                   glycan_shield_score, seed)
         return float(np.mean([r.neutralization_escape for r in panel]))

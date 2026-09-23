@@ -4,33 +4,44 @@ import { OrbitControls, Environment, Float } from '@react-three/drei';
 import { EffectComposer, Bloom, ToneMapping } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import ErrorBoundary from './ErrorBoundary';
+import { useArtifact, artifactStamp } from '../utils/artifacts';
+import type { ConstructArtifactData, ConstructSegment } from '../types/artifacts';
 
 interface GeneSegment {
   id: string; label: string; start: number; end: number; color: string; desc: string;
+  startBp: number; endBp: number; lengthBp: number;
 }
 
-const SEGMENTS: GeneSegment[] = [
-  { id: 'enh1', label: 'cTnT Enhancer', start: 0.0, end: 0.09, color: '#8b5cf6', desc: 'Cardiac-specific enhancer' },
-  { id: 'smar', label: 'SMAR Insulator', start: 0.09, end: 0.14, color: '#a78bfa', desc: 'Prevents hepatic silencing (<0.01% leakage)' },
-  { id: 'prom', label: 'CMV Promoter', start: 0.14, end: 0.23, color: '#3b82f6', desc: 'Strong constitutive promoter' },
-  { id: 'sp', label: 'Signal Peptide', start: 0.23, end: 0.26, color: '#f59e0b', desc: 'ER targeting (MCFRLFVPLL...)' },
-  { id: 'lum', label: 'Lumenal Domain', start: 0.26, end: 0.54, color: '#22c55e', desc: 'LAMP2B lumenal domain (1–356 aa)' },
-  { id: 'intN', label: 'Intein-N', start: 0.44, end: 0.51, color: '#ef4444', desc: 'Npu DnaE N-intein (102 aa) — split @ aa200' },
-  { id: 'intC', label: 'Intein-C', start: 0.51, end: 0.55, color: '#dc2626', desc: 'Npu DnaE C-intein (36 aa)' },
-  { id: 'tm', label: 'Transmembrane', start: 0.55, end: 0.60, color: '#06b6d4', desc: 'TM domain (357–380 aa)' },
-  { id: 'cyt', label: 'Cytoplasmic Tail', start: 0.60, end: 0.66, color: '#f97316', desc: 'GYQTI tail (381–410 aa)' },
-  { id: 'wpre', label: 'WPRE', start: 0.66, end: 0.88, color: '#ec4899', desc: 'Post-transcriptional regulatory element' },
-  { id: 'polyA', label: 'bGH polyA', start: 0.88, end: 1.0, color: '#64748b', desc: 'Polyadenylation signal' },
-];
+/**
+ * The segment map comes from `artifacts/construct.json`, which
+ * `danon.construct_builder.ConstructBuilder` produced from the engine's own
+ * plasmid: ITR / cardiac promoter / LAMP2B CDS / 4x miRNA detarget / WPRE /
+ * bGH polyA / ITR, in real base pairs. The previous version of this file drew
+ * an invented map (a CMV promoter and a split-intein dual vector) that does
+ * not match the construct the repository actually builds.
+ */
+function toGeneSegments(segments: ConstructSegment[]): GeneSegment[] {
+  return segments.map(s => ({
+    id: s.id,
+    label: s.label,
+    start: s.start_frac,
+    end: s.end_frac,
+    color: s.color,
+    desc: s.desc,
+    startBp: s.start_bp,
+    endBp: s.end_bp,
+    lengthBp: s.length_bp,
+  }));
+}
 
-function colorAt(t: number): THREE.Color {
-  for (const s of SEGMENTS) {
+function colorAt(t: number, segments: GeneSegment[]): THREE.Color {
+  for (const s of segments) {
     if (t >= s.start && t <= s.end) return new THREE.Color(s.color);
   }
   return new THREE.Color('#334155');
 }
 
-function DoubleHelix() {
+function DoubleHelix({ segments }: { segments: GeneSegment[] }) {
   const groupRef = useRef<THREE.Group>(null!);
   const N = 220;
   const turns = 9;
@@ -45,7 +56,7 @@ function DoubleHelix() {
       const t = i / (N - 1);
       const angle = t * Math.PI * 2 * turns;
       const x = (t - 0.5) * length;
-      const col = colorAt(t);
+      const col = colorAt(t, segments);
       const pa = new THREE.Vector3(x, Math.cos(angle) * radius, Math.sin(angle) * radius);
       const pb = new THREE.Vector3(x, Math.cos(angle + Math.PI) * radius, Math.sin(angle + Math.PI) * radius);
       a.push({ pos: pa, color: col });
@@ -53,7 +64,7 @@ function DoubleHelix() {
       if (i % 4 === 0) r.push({ a: pa, b: pb, color: col });
     }
     return { strandA: a, strandB: b, rungs: r };
-  }, []);
+  }, [segments]);
 
   const tubeA = useMemo(() => {
     const curve = new THREE.CatmullRomCurve3(strandA.map(s => s.pos));
@@ -107,7 +118,7 @@ function DoubleHelix() {
   );
 }
 
-function Scene() {
+function Scene({ segments }: { segments: GeneSegment[] }) {
   return (
     <>
       <color attach="background" args={['#05080f']} />
@@ -118,7 +129,7 @@ function Scene() {
       <pointLight position={[0, 0, 4]} intensity={0.6} color="#a78bfa" />
       <Environment preset="night" />
       <Float speed={1} rotationIntensity={0.15} floatIntensity={0.3}>
-        <DoubleHelix />
+        <DoubleHelix segments={segments} />
       </Float>
       <OrbitControls enablePan={false} minDistance={6} maxDistance={18} enableDamping autoRotate autoRotateSpeed={0.3} />
       <EffectComposer>
@@ -131,23 +142,33 @@ function Scene() {
 
 export default function GeneViewer() {
   const [hovered, setHovered] = useState<string | null>(null);
+  const { artifact, loading, error } = useArtifact<ConstructArtifactData>('construct');
+  const segments = useMemo(() => (artifact ? toGeneSegments(artifact.data.segments) : []), [artifact]);
+
+  if (loading) {
+    return <div className="panel-title">🧪 LAMP2B Transgene — loading construct artifact…</div>;
+  }
+  if (error || !artifact) {
+    return <div className="panel-title" style={{ color: 'var(--warning)' }}>🧪 Construct artifact unavailable: {error}</div>;
+  }
+  const construct = artifact.data;
 
   return (
     <>
       <div className="panel-title" style={{ marginBottom: 6 }}>
-        🧪 LAMP2B Transgene — 3D DNA Double Helix & Split-Intein Dual-Vector Map
+        🧪 LAMP2B Transgene — the engine's own single-vector construct ({construct.total_length_bp} bp)
       </div>
       <div className="canvas-container" style={{ minHeight: 300 }}>
         <ErrorBoundary label="GeneViewer">
           <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 3, 11], fov: 42 }} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}>
-            <Scene />
+            <Scene segments={segments} />
           </Canvas>
         </ErrorBoundary>
       </div>
 
       <div style={{ marginTop: 10 }}>
         <div style={{ display: 'flex', height: 30, borderRadius: 6, overflow: 'hidden', border: '1px solid #334155' }}>
-          {SEGMENTS.map(s => (
+          {segments.map(s => (
             <div
               key={s.id}
               onMouseEnter={() => setHovered(s.id)}
@@ -170,17 +191,32 @@ export default function GeneViewer() {
       {hovered && (
         <div style={{ marginTop: 8, padding: 10, background: '#1f2937', borderRadius: 8, border: '1px solid #334155', fontSize: 12 }}>
           {(() => {
-            const s = SEGMENTS.find(x => x.id === hovered);
+            const s = segments.find(x => x.id === hovered);
             if (!s) return null;
-            return <><strong style={{ color: s.color }}>{s.label}</strong><span style={{ color: '#94a3b8', marginLeft: 8 }}>{s.desc}</span></>;
+            return (
+              <>
+                <strong style={{ color: s.color }}>{s.label}</strong>
+                <span style={{ color: '#94a3b8', marginLeft: 8 }}>{s.desc}</span>
+                <span style={{ color: '#64748b', marginLeft: 8 }}>
+                  bp {s.startBp.toLocaleString()}–{s.endBp.toLocaleString()} ({s.lengthBp} bp)
+                </span>
+              </>
+            );
           })()}
         </div>
       )}
 
       <div style={{ marginTop: 8, display: 'flex', gap: 20, fontSize: 10, color: '#64748b', flexWrap: 'wrap' }}>
-        <span>~2.0 kb construct (AAV9 limit 4.7 kb)</span>
-        <span>Npu DnaE split intein (138 aa)</span>
+        <span>{construct.total_length_bp.toLocaleString()} bp plasmid · cargo {construct.cargo_length_bp.toLocaleString()} bp (AAV limit {construct.packaging_limit_bp.toLocaleString()} bp)</span>
+        <span>promoter: {construct.promoter_name}</span>
+        <span>{construct.has_mirna_detarget ? '4x miRNA detarget cassette present' : 'no miRNA detarget cassette'}</span>
+        <span>vendor: {construct.synthesis_vendor} · quoted ${construct.synthesis_cost_usd.toFixed(0)}</span>
         <span>Hover backbone segments to inspect</span>
+      </div>
+
+      <div style={{ marginTop: 6, color: '#475569', fontSize: 10.5, lineHeight: 1.6 }}>
+        {artifactStamp(artifact)}
+        <br />Single vector: the LAMP2B cargo fits in one AAV, so the split-intein dual-vector route is not used.
       </div>
     </>
   );

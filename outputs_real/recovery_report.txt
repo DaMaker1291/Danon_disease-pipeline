@@ -1,0 +1,43 @@
+RECOVERY AND DISCRIMINATION: TWO STANDARDS, TWO QUESTIONS
+============================================================================
+
+[ STANDARD 1 -- MECHANISTIC GROUND TRUTH ]
+  Question: does the pipeline recover constants it planted?
+
+  Transport operator (planted analytically, recovered by the engine stencil)
+    D       planted 0.3500  -> recovered 0.3625   (3.56% error)
+    lambda  planted 0.1000  -> recovered 0.0988   (1.25% error)
+    fit R^2 0.999951 over 210,912 equations, cond(A) = 2.7
+    grid (32, 32, 32), derivative step 0.01, series 8.93-25.00 d, blob sigma 2.5 voxels
+
+  Identifiability limit (the axis that decides which drugs are
+  calibratable at all: diffusion length sqrt(2*D/lambda) vs grid pitch)
+    lambda=0.050: diffusion length 3.74 voxels -- D error 3.68%, lambda error 2.58%, R^2 0.99990, signal 1.944
+    lambda=0.100: diffusion length 2.65 voxels -- D error 3.60%, lambda error 1.28%, R^2 0.99995, signal 0.952
+    lambda=0.200: diffusion length 1.87 voxels -- D error 3.67%, lambda error 0.68%, R^2 0.99998, signal 0.497
+    lambda=0.400: diffusion length 1.32 voxels -- NOT IDENTIFIABLE (clearance outruns diffusion: reported as undefined rather than fitted)
+    lambda=0.800: diffusion length 0.94 voxels -- NOT IDENTIFIABLE (clearance outruns diffusion: reported as undefined rather than fitted)
+    lambda=1.600: diffusion length 0.66 voxels -- NOT IDENTIFIABLE (clearance outruns diffusion: reported as undefined rather than fitted)
+
+  Hazard estimator (planted Cox coefficients, exponential survival)
+    hazard ratios over 5 planted cohort(s) (age_years: planted 1.030 -> recovered 1.035 +/- 0.002 (2.2 SE), male: planted 1.649 -> recovered 1.554 +/- 0.048 (2.0 SE), is_glioblastoma: planted 3.320 -> recovered 3.528 +/- 0.350 (0.6 SE)); C-index oracle 0.6522 vs fitted 0.6519 +/- 0.0354 over 5 folds on 6000 patient-draws (534 events in the last cohort); shortfall vs oracle +0.0003
+    max hazard-ratio error 6.25%
+    C-index shortfall against the oracle ceiling: +0.0003 -- this is the number that makes the
+    real-cohort C below interpretable: the estimator is not losing signal.
+
+[ STANDARD 2 -- REAL COHORT ]
+  Question: is the model useful on patients? Source: python -m danon.audit
+    os: os: C = 0.656 +/- 0.025 over 5 folds (age alone 0.653) -- real but weak discrimination on held-out patients, consistent with the published prognostic value of age and diagnosis in GBM
+        n=595 patients; 595 patients with a usable os endpoint; 491 events, 104 censored at last contact; 1 patient(s) recorded Dead with no days_to_death: censored at last contact because there is no event time; 21 dropped: no age recorded; 1 dropped: no usable time or endpoint
+    progression: progression: C = 0.534 +/- 0.053 over 5 folds (age alone 0.539) -- no usable held-out discrimination from these covariates
+        n=594 patients; 594 patients with a usable progression endpoint; 372 events, 222 censored at last contact; 21 dropped: no age recorded; 2 dropped: no usable time or endpoint
+
+  These two blocks answer different questions and must never be blended.
+  A high R^2 in block 1 does not raise any number in block 2.
+
+[ WHAT THE R^2 IS NOT ]
+  - Recovering a planted constant is evidence about the estimator, not the biology. An R^2 of 0.99 here means the pipeline inverts a PDE it was handed; it is not predictive accuracy on cancer, and presenting it as an accuracy figure invites a question the benchmark cannot answer.
+  - The planted transport field is a smooth analytic solution on an infinite domain sampled away from the boundary. Real tissue has heterogeneous diffusivity, binding, cellular uptake and convection, none of which the benchmark contains, so a small recovery error says nothing about transport accuracy in vivo.
+  - The planted Cox cohort has exponential survival, proportional hazards and no unmeasured confounding. Real progression data has none of those properties, so recovering the planted coefficients to 1% is not evidence that the same estimator recovers real coefficients.
+  - A recovery benchmark cannot fail on a bug it does not exercise. It covers the transport operator and the hazard estimator; it does not cover the clonal dynamics, the switch rule, or the endpoint translation, each of which carries its own assumptions.
+  - Success here does not raise the real-cohort numbers. The held-out discrimination on real patients stays whatever it is, and the two measurements must be reported separately rather than blended.

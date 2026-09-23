@@ -47,12 +47,15 @@ class DanonConfig(BaseModel):
         default=0.65, description="Minimum AT-content for a functional S/MAR insulator flank."
     )
     lamp2b_split_position: int = Field(
-        default=200, description="Npu DnaE split-intein position in LAMP2B (aa)."
+        default=200, description="Optional Npu DnaE split-intein position in LAMP2B (aa). Only relevant if cargo exceeds single-vector 4.7kb limit; LAMP2B (~1.2kb CDS) fits in a single vector."
     )
 
     api_proxy_port: int = 6006
     backend_server_port: int = 8000
-    primary_pdb_template: str = "3J1S"
+    # AAV9 reference structure. 3J1S was wrong twice over (it is AAV2 + the A20
+    # antibody, and the "coordinates" previously carried under its name were
+    # hand-written); see danon/structure.py for the correction record.
+    primary_pdb_template: str = "3UX1"
 
     aav_total_candidates: int = 1_000_000_000
     lnp_total_candidates: int = 1_000_000_000

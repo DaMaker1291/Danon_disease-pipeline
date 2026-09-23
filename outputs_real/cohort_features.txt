@@ -1,0 +1,41 @@
+==========================================================================
+COVARIATE INTAKE: measured effects on the corrected endpoint
+==========================================================================
+
+endpoint: os
+  595 patients with a usable os endpoint
+  491 events, 104 censored at last contact
+  1 patient(s) recorded Dead with no days_to_death: censored at last contact because there is no event time
+  21 dropped: no age recorded
+  1 dropped: no usable time or endpoint
+
+-- KPS timepoint census (why the baseline gate exists) --
+  Follow-up                  records=  839 kps=   0 numeric=   0  median day 336
+  Last Contact               records=  595 kps=   0 numeric=   0  median day 368
+  Post Initial Treatment     records=  553 kps=   0 numeric=   0  median day 204
+  Prior to Adjuvant Therapy  records=  135 kps= 128 numeric= 128  NO DAY STAMP <-- baseline
+  Preoperative               records=  122 kps= 121 numeric= 121  NO DAY STAMP <-- baseline
+  Post Adjuvant Therapy      records=  107 kps= 101 numeric= 101  NO DAY STAMP
+  Not Reported               records=  102 kps= 100 numeric=  96  NO DAY STAMP
+  Other                      records=   28 kps=  25 numeric=  25  NO DAY STAMP
+  Adjuvant Therapy           records=    1 kps=   1 numeric=   1  NO DAY STAMP
+
+-- KPS: 247/617 patients have a pre-treatment value (40.0%), 101 have a post-treatment value, 442 have a numeric value anywhere; baseline range 40-100, median 80
+-- univariate KPS: pre-treatment C=0.5971 (n=247) vs post-adjuvant C=0.6842 (n=101) -- LEAKAGE: a post-treatment KPS outranks a pre-treatment one by +0.0871 C. The post-treatment value is partly determined by the outcome, so it must not be used as a baseline feature
+
+-- measured effect of each proposed covariate --
+  kps_baseline: n=247 (200 events, 47 censored)  base C=0.6297+/-0.0476 -> +covariate C=0.6561+/-0.0581  delta=+0.0264  HR=0.9791  folds=5/5  [no measurable gain]
+      note: 348 of 595 cohort patients dropped: covariate absent
+      note: requiring this covariate changes the cohort, so base C on the subset is not comparable to base C on the full cohort
+
+  Not measured here, and why:
+    mgmt_methylation     -- 450 open beta files exist across 200 patients (142 on 450k), so wiring MGMT in caps the fitting cohort at 142 patients -- fewer than the 595 the baseline design uses. The delta must be measured on that subset, not asserted
+    subregion_segmentation -- refused: no collection with expert masks is retrievable (danon.multimodal.spatial_dice_verdict derives this from live counts)
+
+-- treatments: 3444 records over 617 cases, 442 with a named agent, 356 with RT+temozolomide, 2022 records day-stamped -- 356/617 cases record radiotherapy plus temozolomide somewhere in their history, but only 58.7% of treatment records carry a start day, so 'received temozolomide' cannot be separated from first-line therapy. This is a treatment-EXPOSURE restriction, not a protocol restriction
+     top agents: Temozolomide (606), Bevacizumab (137), Dexamethasone (78), Lomustine (71), Carmustine (45), Irinotecan Hydrochloride (44)
+
+-- GDC methylation: 450 beta files, 200 patients, 450k=142 27k=200, open=True -- MGMT reachable for 142 patients on the 450k platform (200 across both platforms). Adding MGMT therefore caps the fitting cohort at 142 patients
+
+A covariate whose delta is inside the fold-to-fold sd is reported as
+'no measurable gain'. Nothing in this report is an estimate.

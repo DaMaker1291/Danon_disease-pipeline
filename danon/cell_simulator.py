@@ -1,4 +1,6 @@
 import logging, numpy as np
+
+from danon.biology import WILD_TYPE_AAV9
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Tuple, Callable
 from scipy.integrate import solve_ivp
@@ -404,12 +406,39 @@ class DanonCellSimulator:
             "trial_feasible": power >= 0.80 and pop["cure_rate"] >= 0.4,
         }
 
-    def utcl_score(self) -> float:
-        return 0.10
+    def _paired_cell(self, cardiac_tropism: float, vector_copy_number: float,
+                     seed: int = 42) -> float:
+        """Run the cell simulation from a pinned RNG state, then restore it.
+
+        ``simulate_cell`` draws stochastic noise for copy number, tropism and
+        immune evasion. The baseline arm and the engineered arm must see the same
+        draws, otherwise the difference between the two scores includes the
+        difference between two random cohorts.
+        """
+        state = self.rng.get_state()
+        try:
+            self.rng.seed(seed)
+            result = self.simulate_cell(
+                mutation_type="null",
+                vector_copy_number=vector_copy_number,
+                cardiac_tropism=cardiac_tropism,
+            )
+            return float(result.functional_cure_score)
+        finally:
+            self.rng.set_state(state)
+
+    def utcl_score(self, seed: int = 42) -> float:
+        """Baseline: an unmodified AAV9 vector, through the same cell model.
+
+        This used to be the constant ``0.10``. It now runs the identical ODE
+        simulation as :meth:`our_best_score`, differing only in the tropism and
+        dose of an unmodified vector (:data:`danon.biology.WILD_TYPE_AAV9`),
+        which are explicit assumptions rather than a hidden number.
+        """
+        return self._paired_cell(WILD_TYPE_AAV9["cardiac_tropism"],
+                                 WILD_TYPE_AAV9["vector_copy_number"], seed)
 
     def our_best_score(self, cardiac_tropism: float = 0.72,
-                       vector_copy_number: float = 10.0) -> float:
-        r = self.simulate_cell(mutation_type="null",
-                                vector_copy_number=vector_copy_number,
-                                cardiac_tropism=cardiac_tropism)
-        return r.functional_cure_score
+                       vector_copy_number: float = 10.0,
+                       seed: int = 42) -> float:
+        return self._paired_cell(cardiac_tropism, vector_copy_number, seed)

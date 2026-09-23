@@ -10,21 +10,29 @@ import UploadPortal from './components/UploadPortal';
 import TelemetryPanel from './components/TelemetryPanel';
 import PhaseMatrix from './components/PhaseMatrix';
 import TranslationalGateway from './components/TranslationalGateway';
+import StructureViewer from './components/StructureViewer';
 import ErrorBoundary from './components/ErrorBoundary';
+import Day365Outcome from './components/Day365Outcome';
+import TwinPlanner from './components/TwinPlanner';
+import VtiViewer from './components/VtiViewer';
 import { runPipeline } from './utils/api';
+import { useArtifact } from './utils/artifacts';
 import type { FlowTelemetry, ParetoPoint, UploadResult, PipelineResult, PipelineConstraints } from './types';
+import type { MicrofluidicsArtifactData, PipelineArtifactData } from './types/artifacts';
 
-type TabId = 'capsid' | 'phases' | 'lnp' | 'gene' | 'microfluidics' | 'clinical' | 'upload';
+type TabId = 'capsid' | 'phases' | 'lnp' | 'gene' | 'microfluidics' | 'clinical' | 'outcome' | 'upload' | 'twin';
 interface TabDef { id: TabId; label: string; icon: string; desc: string }
 
 const TABS: TabDef[] = [
+  { id: 'twin', label: 'MRI Twin Planner', icon: '🧠', desc: 'Scan in, treatment plan out' },
+  { id: 'outcome', label: '365-Day Outcome', icon: '📅', desc: 'Exact day-365 engine state' },
   { id: 'capsid', label: '3D Capsid', icon: '🧬', desc: 'AAV9 structural viewer' },
   { id: 'phases', label: '24 Phases', icon: '🔬', desc: 'Hyper-dimensional matrix' },
   { id: 'lnp', label: 'LNP Simulator', icon: '💊', desc: 'Lipid nanoparticle assembly' },
   { id: 'gene', label: 'Gene Construct', icon: '🧪', desc: 'LAMP2B transgene map' },
   { id: 'microfluidics', label: 'Microfluidics', icon: '💧', desc: 'Y-junction flow simulation' },
   { id: 'clinical', label: 'Clinical', icon: '📊', desc: 'Pareto fronts & outcomes' },
-  { id: 'upload', label: 'Upload', icon: '📤', desc: 'Data ingress portal' },
+  { id: 'upload', label: 'Upload', icon: '📤', desc: 'Sequence data ingress' },
 ];
 
 const DEFAULT_CONSTRAINTS: PipelineConstraints = {
@@ -51,13 +59,16 @@ function Slider({ label, value, min, max, step, unit, onChange }: {
 }
 
 export default function App() {
-  const [tab, setTab] = useState<TabId>('capsid');
+  // Default view is the MRI twin planner: the front door of the app.
+  const [tab, setTab] = useState<TabId>('twin');
   const [constraints, setConstraints] = useState<PipelineConstraints>(DEFAULT_CONSTRAINTS);
   const [result, setResult] = useState<PipelineResult | null>(null);
   const [selectedSpike, setSelectedSpike] = useState<number | null>(null);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
+  const [twinVti, setTwinVti] = useState<string | null>(null);
+  const setTwinVtiCb = useCallback((b64: string | null) => setTwinVti(b64), []);
 
   const setC = useCallback(<K extends keyof PipelineConstraints>(k: K, v: PipelineConstraints[K]) => {
     setConstraints(prev => ({ ...prev, [k]: v }));
@@ -79,14 +90,29 @@ export default function App() {
     }
   }, [constraints]);
 
-  const fallbackCandidates: ParetoPoint[] = result?.paretoFront ?? [];
+  // Precomputed real runs, so every tab renders engine output with no backend.
+  // A live pipeline result (from the API) always takes precedence.
+  const { artifact: pipelineArtifact } = useArtifact<PipelineArtifactData>('pipeline');
+  const { artifact: fluidicsArtifact } = useArtifact<MicrofluidicsArtifactData>('microfluidics');
 
-  const telemetry: FlowTelemetry = {
-    reynoldsNumberAqueous: 1.83, reynoldsNumberOrganic: 0.92, reynoldsNumberMixed: 1.62,
-    wallShearStressPa: 0.32, maxShearStressPa: 0.48, mixingEfficiency: 0.72,
-    pecletNumber: 8520, pressureDropPa: 125.0, flowRegime: 'laminar',
-    shearStressSafe: true, frr: 0.33,
-  };
+  const effectiveResult = result ?? pipelineArtifact?.data ?? null;
+  const artifactMode = result === null && pipelineArtifact !== null;
+  const fallbackCandidates: ParetoPoint[] = effectiveResult?.paretoFront ?? [];
+
+  const flow = fluidicsArtifact?.data.telemetry ?? null;
+  const telemetry: FlowTelemetry | null = flow ? {
+    reynoldsNumberAqueous: flow.reynolds_number_aqueous,
+    reynoldsNumberOrganic: flow.reynolds_number_organic,
+    reynoldsNumberMixed: flow.reynolds_number_mixed,
+    wallShearStressPa: flow.wall_shear_stress_pa,
+    maxShearStressPa: flow.max_shear_stress_pa,
+    mixingEfficiency: flow.mixing_efficiency,
+    pecletNumber: flow.peclet_number,
+    pressureDropPa: flow.pressure_drop_pa,
+    flowRegime: flow.flow_regime,
+    shearStressSafe: flow.shear_stress_safe,
+    frr: flow.frr,
+  } : null;
 
   const renderCapsidTab = () => (
     <div className="capsid-layout">
@@ -111,57 +137,72 @@ export default function App() {
       </aside>
 
       <div className="panel glass capsid-canvas-panel">
-        <CapsidViewer result={result} selectedSpike={selectedSpike} onSelectSpike={setSelectedSpike} />
+        <CapsidViewer result={effectiveResult} selectedSpike={selectedSpike} onSelectSpike={setSelectedSpike} />
       </div>
 
       <div className="panel glass seq-out-panel">
-        <SequenceOutputPanel result={result} selectedSpike={selectedSpike} />
+        <SequenceOutputPanel result={effectiveResult} selectedSpike={selectedSpike} />
       </div>
 
       <div className="tg-col">
-        <TranslationalGateway readiness={result?.translationalReadiness ?? null} />
+        <TranslationalGateway readiness={effectiveResult?.translationalReadiness ?? null} />
       </div>
 
-      {result?.sequence && (
+      {effectiveResult?.sequence && (
         <div className="panel glass" style={{ gridColumn: '1 / -1' }}>
           <ErrorBoundary label="StructureViewer">
-            <StructureViewer sequence={result.sequence} />
+            <StructureViewer sequence={effectiveResult.sequence} />
           </ErrorBoundary>
         </div>
       )}
     </div>
-  );
-
-  const renderContent = () => {
+  );  const renderContent = () => {
     switch (tab) {
-      case 'capsid': return renderCapsidTab();
+      case 'twin':
+        return (
+          <div className="content-grid" style={{ gridTemplateColumns: '1.05fr 0.95fr' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
+              <ErrorBoundary label="TwinPlanner"><TwinPlanner onVti={setTwinVtiCb} /></ErrorBoundary>
+            </div>
+            <div className="panel glass" style={{ minHeight: 640, display: 'flex', flexDirection: 'column' }}>
+              <div className="panel-title">3D evolution viewer — same fields ParaView opens</div>
+              <ErrorBoundary label="VtiViewer"><VtiViewer vtiBase64={twinVti} /></ErrorBoundary>
+            </div>
+          </div>
+        );
+      case 'capsid':
+        return renderCapsidTab();
       case 'phases':
         return (
           <div className="content-grid">
             <div className="panel glass" style={{ gridColumn: '1 / -1' }}>
-              <PhaseMatrix result={result} />
+              <PhaseMatrix result={effectiveResult} />
             </div>
           </div>
         );
       case 'lnp':
+        // The LNP view carries its own real formulation summary from the lnp
+        // artifact; the flow-telemetry panel belongs on the microfluidics tab.
         return (
           <div className="content-grid">
-            <div className="panel glass" style={{ gridColumn: '1 / -1', height: 560 }}><LNPViewer /></div>
-            <div className="panel glass"><TelemetryPanel telemetry={telemetry} title="LNP Formulation Parameters" /></div>
+            <div className="panel glass" style={{ gridColumn: '1 / -1', height: 620 }}><LNPViewer /></div>
           </div>
         );
       case 'gene':
         return (
           <div className="content-grid">
-            <div className="panel glass" style={{ gridColumn: '1 / -1', height: 500 }}><GeneViewer /></div>
-            <div className="panel glass"><TelemetryPanel telemetry={telemetry} title="Construct Specifications" /></div>
+            <div className="panel glass" style={{ gridColumn: '1 / -1', height: 560 }}><GeneViewer /></div>
           </div>
         );
       case 'microfluidics':
         return (
-          <div className="content-grid">
-            <div className="panel glass" style={{ gridColumn: '1 / -1', height: 500 }}><MicrofluidicViewer /></div>
-            <div className="panel glass"><TelemetryPanel telemetry={telemetry} title="Flow Telemetry" /></div>
+          <div className="content-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+            <div className="panel glass"><MicrofluidicViewer /></div>
+            <div className="panel glass">
+              {telemetry
+                ? <TelemetryPanel telemetry={telemetry} title="Flow Telemetry (engine artifact)" />
+                : <div className="seq-empty">Microfluidics artifact not loaded — no telemetry to show.</div>}
+            </div>
           </div>
         );
       case 'clinical':
@@ -173,6 +214,14 @@ export default function App() {
                 : <div className="seq-empty">Run the pipeline (3D Capsid tab) to populate the Pareto front from real optimizer output.</div>}
             </div>
             <div className="panel glass"><ClinicalDashboard /></div>
+          </div>
+        );
+      case 'outcome':
+        return (
+          <div className="content-grid">
+            <div style={{ gridColumn: '1 / -1' }}>
+              <ErrorBoundary label="Day365Outcome"><Day365Outcome /></ErrorBoundary>
+            </div>
           </div>
         );
       case 'upload':
@@ -193,16 +242,17 @@ export default function App() {
         <div className="h-left">
           <div className="logo-wrap">
             <span className="logo-icon">🧬</span>
-            <div><h1>Danon Pipeline</h1><span className="h-sub">AAV9-LAMP2B Discovery Platform</span></div>
+            <div><h1>EvoTwin-10X</h1><span className="h-sub">Digital-Twin Oncology · MRI → Adaptive Treatment Plan</span></div>
           </div>
           <div className="h-badges">
             <span className="badge-status live">● LIVE</span>
-            {result && <span className="badge-accent">{result.phasesPassed}/24 phases</span>}
-            {result && result.combinatorialAdvantage >= 1e12 && (
-              <span className="badge-accent violet">{(result.combinatorialAdvantage / 1e12).toFixed(1)}T× space</span>
+            {artifactMode && <span className="badge-accent cyan">PRECOMPUTED ENGINE RUN</span>}
+            {effectiveResult && <span className="badge-accent">{effectiveResult.phasesPassed}/24 phases</span>}
+            {effectiveResult && effectiveResult.combinatorialAdvantage >= 1e12 && (
+              <span className="badge-accent violet">{(effectiveResult.combinatorialAdvantage / 1e12).toFixed(1)}T× space</span>
             )}
-            {result && (
-              result.translationalReadiness?.clinicalTrialEligibility
+            {effectiveResult && (
+              effectiveResult.translationalReadiness?.clinicalTrialEligibility
                 ? <span className="badge-accent">CLINIC ELIGIBLE</span>
                 : <span className="badge-warn">PRECLINICAL STEP 0.5</span>
             )}
@@ -227,8 +277,10 @@ export default function App() {
       <main className="app-main"><ErrorBoundary label="TabContent">{renderContent()}</ErrorBoundary></main>
 
       <footer className="app-footer glass">
-        <span>Danon Disease Pipeline v2.1 · AAV9-LAMP2B Cardiomyocyte Delivery</span>
-        <span className="f-right">UCL/GOSH NCT03882437 Benchmark · 18-Phase Pareto Optimization</span>
+        <span>
+          EvoTwin-10X · spatial tumour-evolution twin engine · every number on this page is a recorded engine output or clearly labelled as refused
+        </span>
+        <span className="f-right">paired steering-vs-MTD trials · ParaView VTI export · 924-test audit suite</span>
       </footer>
     </div>
   );

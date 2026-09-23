@@ -20,6 +20,20 @@ logger = logging.getLogger(__name__)
 # Avogadro constant
 AVOGADRO = 6.022e23
 
+#: Complement activation that occurs independently of antibody-capsid complexes.
+#:
+#: AAV capsids activate complement directly, so even a fully decoyed dose is not
+#: at zero. This is an **ASSUMED** order-of-magnitude estimate, not a measured
+#: value, and it is registered as such in :func:`danon.biology.biological_provenance`.
+#: It is the first quantity to replace with a CH50 / C3a assay on the real
+#: construct. It is named here rather than inlined so the assumption is visible
+#: at the call site and cannot be mistaken for a fitted parameter.
+BASELINE_COMPLEMENT_SCORE = 0.15
+
+#: Marginal complement contribution of saturating antibody-capsid complexes.
+#: Also ASSUMED; scaled by the C50-relative complex drive and clipped to 1.0.
+COMPLEMENT_COMPLEX_COEFFICIENT = 0.60
+
 # Typical AAV9 capsid physical parameters
 CAPSID_PARAMS = {
     "diameter_nm": 25.0,
@@ -94,68 +108,144 @@ class StoichiometricCalculator:
                 return cls
         return "very_high" if nab_titer >= self.titers["very_high"]["range"][0] else "negative"
 
+    # --- concentration model -------------------------------------------------
+    # An AAV neutralising-antibody "titer" is a dilution endpoint, not a
+    # concentration, so an explicit conversion must be stated rather than
+    # implied. Calibration: titer 1:1000 is taken as ~7e-8 M (70 nM) total
+    # antibody within a 5 L distribution volume. This puts a 1:1000 titer on
+    # the same order as the epitope load delivered by a 5e13 vg/kg dose, which
+    # is the regime where decoy competition actually matters.
+    TITER_TO_MOLAR = 7.0e-11
+    DISTRIBUTION_VOLUME_L = 5.0
+
+    # Cost penalty per decade of empty capsids, used to price the trade-off in
+    # optimize_ratio(). Chosen so the optimum ratio tracks the patient titer
+    # (seronegative -> 1:1, moderate -> ~10:1, high -> ~100:1) instead of
+    # collapsing to a constant.
+    COST_PENALTY_PER_DECADE = 0.08
+
+    # Complex concentration (M) at which antibody-capsid complexes are taken to
+    # drive half-maximal complement activation.
+    COMPLEMENT_C50_M = 7.0e-9
+
+    def _equilibrium_free_antibody(
+        self, a_total_M: float, s_full_M: float, s_empty_M: float
+    ) -> Tuple[float, float, float]:
+        """Solve competitive Langmuir equilibrium for free antibody.
+
+        Two epitope pools (therapeutic full capsids and sacrificial empty
+        capsids) share one antibody pool:
+
+            C_i = S_i * A / (Kd_i + A)
+            A_total = A + C_full + C_empty
+
+        The residual is monotonically increasing in A, so a bisection is both
+        sufficient and unconditionally stable. Returns (A_free, C_full, C_empty)
+        in molar units.
+        """
+        kd_full = self.kinetics["full_capsid_KD_nM"] * 1e-9
+        kd_empty = self.kinetics["empty_capsid_KD_nM"] * 1e-9
+
+        def residual(a: float) -> float:
+            if a <= 0.0:
+                return -a_total_M
+            c_full = s_full_M * a / (kd_full + a)
+            c_empty = s_empty_M * a / (kd_empty + a)
+            return a + c_full + c_empty - a_total_M
+
+        if a_total_M <= 0.0:
+            return 0.0, 0.0, 0.0
+
+        lo, hi = 0.0, a_total_M
+        for _ in range(200):
+            mid = 0.5 * (lo + hi)
+            if residual(mid) > 0.0:
+                hi = mid
+            else:
+                lo = mid
+        a_free = 0.5 * (lo + hi)
+        c_full = s_full_M * a_free / (kd_full + a_free) if a_free > 0.0 else 0.0
+        c_empty = s_empty_M * a_free / (kd_empty + a_free) if a_free > 0.0 else 0.0
+        return a_free, c_full, c_empty
+
     def simulate_decoy_dose(self, nab_titer: float, dose_vg_per_kg: float,
                              empty_full_ratio: float, weight_kg: float = 70.0) -> StoichiometricProfile:
+        """Dose-level antibody sequestration profile.
+
+        Rebuilt on competitive Langmuir equilibrium so that the outputs respond
+        monotonically to both titer and decoy ratio. The previous formulation
+        was degenerate: it reported a free-NAb fraction of exactly zero at every
+        titer (an algebraic identity, not a physical result) and saturated
+        therapeutic efficacy at 1.0 for all conditions.
+
+        Returned field semantics:
+          free_capsid_fraction        fraction of *full* capsids left unbound
+                                      (i.e. therapeutically active)
+          bound_capsid_fraction       fraction of full-capsid epitopes occupied
+          free_nab_fraction           antibody still unbound. Note this tends
+                                      toward zero whenever epitope load far
+                                      exceeds antibody load; that is physical,
+                                      not a bug.
+          complement_deposition_score driven by full-capsid immune complexes
+          therapeutic_efficacy_score  == free_capsid_fraction, explicitly bounded
+          overall_decoy_efficiency    composite of efficacy, complement sparing
+                                      and how much antibody the decoys absorbed
+        """
+        v = self.DISTRIBUTION_VOLUME_L
+        epitopes = self.capsid["surface_epitope_copies"]
+
         dose_full = dose_vg_per_kg * weight_kg
         dose_empty = dose_full * empty_full_ratio
 
-        total_capsids = dose_full + dose_empty
-        full_fraction = dose_full / max(total_capsids, 1)
+        # Epitope site concentrations (M) for each pool.
+        s_full_M = (dose_full * epitopes) / (AVOGADRO * v)
+        s_empty_M = (dose_empty * epitopes) / (AVOGADRO * v)
+        a_total_M = nab_titer * self.TITER_TO_MOLAR
 
-        KD_full = self.kinetics["full_capsid_KD_nM"] * 1e-9
-        KD_empty = self.kinetics["empty_capsid_KD_nM"] * 1e-9
-
-        nab_conc_M = nab_titer * 1e-12
-
-        total_nab_sites = nab_conc_M * AVOGADRO * 5.0
-
-        full_binding_sites = dose_full * self.capsid["surface_epitope_copies"]
-        empty_binding_sites = dose_empty * self.capsid["surface_epitope_copies"]
-        total_binding_sites = full_binding_sites + empty_binding_sites
-
-        if total_binding_sites < 1:
+        if s_full_M <= 0.0:
             return StoichiometricProfile(
                 patient_id=0, nab_titer=nab_titer,
                 empty_full_ratio=empty_full_ratio,
-                free_capsid_fraction=1.0, bound_capsid_fraction=0.0,
+                free_capsid_fraction=0.0, bound_capsid_fraction=0.0,
                 free_nab_fraction=1.0,
-                complement_deposition_score=0.0,
-                therapeutic_efficacy_score=1.0,
-                overall_decoy_efficiency=1.0,
+                complement_deposition_score=1.0,
+                therapeutic_efficacy_score=0.0,
+                overall_decoy_efficiency=0.0,
             )
 
-        empty_fraction = empty_binding_sites / max(total_binding_sites, 1)
-        full_fraction = full_binding_sites / max(total_binding_sites, 1)
-
-        bound_fraction = min(
-            total_nab_sites / max(total_binding_sites, 1),
-            1.0
+        a_free, c_full, c_empty = self._equilibrium_free_antibody(
+            a_total_M, s_full_M, s_empty_M
         )
 
-        nab_bound_to_full = bound_fraction * full_fraction
-        nab_bound_to_empty = bound_fraction * empty_fraction
+        # Fraction of therapeutic full-capsid epitopes occupied by antibody.
+        occupancy = float(np.clip(c_full / s_full_M, 0.0, 1.0))
+        free_full_fraction = 1.0 - occupancy
 
-        free_full_fraction = full_fraction * (1.0 - nab_bound_to_full / max(full_fraction, 0.01))
-        free_full_fraction = max(free_full_fraction, 0.0)
+        free_nab_fraction = float(np.clip(a_free / a_total_M, 0.0, 1.0)) if a_total_M > 0 else 1.0
 
-        free_nab = max(0, total_nab_sites - total_binding_sites * bound_fraction)
-        free_nab_fraction = free_nab / max(total_nab_sites, 1)
+        # Complement is driven by antibody-capsid complexes, dominated by the
+        # full-capsid species (the RP-A501 safety-hold mechanism), on top of the
+        # antibody-independent baseline activation of the capsid itself.
+        complex_drive = c_full / self.COMPLEMENT_C50_M
+        complement_score = float(
+            np.clip(
+                BASELINE_COMPLEMENT_SCORE
+                + COMPLEMENT_COMPLEX_COEFFICIENT * min(complex_drive, 1.0),
+                0.0,
+                1.0,
+            )
+        )
 
-        nabs_occupying_full = total_nab_sites * bound_fraction * full_fraction
-        nabs_per_full_capsid = nabs_occupying_full / max(dose_full, 1)
+        efficacy = float(np.clip(free_full_fraction, 0.0, 1.0))
 
-        baseline_complement = 0.15
-        nab_complement = min(nabs_per_full_capsid * 50.0, 0.60)
-        complement_score = float(np.clip(baseline_complement + nab_complement, 0, 1))
+        # How much of the antibody load the sacrificial empties actually absorbed.
+        total_complex = c_full + c_empty
+        decoy_coverage = float(c_empty / total_complex) if total_complex > 0 else 1.0
 
-        free_full_ratio = free_full_fraction / max(full_fraction, 0.01)
-        efficacy = float(np.clip(free_full_ratio * 1.5, 0, 1))
-
-        complement_efficiency = float(np.clip(complement_score, 0, 1))
         decoy_efficiency = (
-            0.50 * (1.0 - complement_efficiency) +
-            0.30 * efficacy +
-            0.20 * (1.0 - free_nab_fraction)
+            0.45 * efficacy +
+            0.35 * (1.0 - complement_score) +
+            0.20 * decoy_coverage
         )
 
         return StoichiometricProfile(
@@ -163,11 +253,11 @@ class StoichiometricCalculator:
             nab_titer=nab_titer,
             empty_full_ratio=empty_full_ratio,
             free_capsid_fraction=float(free_full_fraction),
-            bound_capsid_fraction=float(bound_fraction),
-            free_nab_fraction=float(np.clip(free_nab_fraction, 0, 1)),
+            bound_capsid_fraction=float(occupancy),
+            free_nab_fraction=float(free_nab_fraction),
             complement_deposition_score=float(complement_score),
             therapeutic_efficacy_score=float(efficacy),
-            overall_decoy_efficiency=float(np.clip(decoy_efficiency, 0, 1)),
+            overall_decoy_efficiency=float(np.clip(decoy_efficiency, 0.0, 1.0)),
         )
 
     def optimize_ratio(self, nab_titer: float, dose_vg_per_kg: float = 5e13,
@@ -176,12 +266,16 @@ class StoichiometricCalculator:
         best_efficiency = -1.0
         best_profile = None
 
-        for ratio in np.logspace(np.log10(1), np.log10(100), 50):
+        # Objective: maximise therapeutic efficacy (unbound full capsids) net of
+        # the manufacturing cost of added empties. Pricing the trade-off this
+        # way is what makes the optimum track the patient's titer rather than
+        # collapsing to a constant.
+        for ratio in np.logspace(np.log10(1), np.log10(200), 60):
             profile = self.simulate_decoy_dose(
                 nab_titer, dose_vg_per_kg, ratio, weight_kg
             )
-            cost_penalty = 0.08 * np.log10(ratio) / 2.0
-            adjusted = profile.overall_decoy_efficiency - cost_penalty
+            cost_penalty = self.COST_PENALTY_PER_DECADE * np.log10(ratio)
+            adjusted = profile.therapeutic_efficacy_score - cost_penalty
 
             if adjusted > best_efficiency:
                 best_efficiency = adjusted
@@ -232,15 +326,36 @@ class StoichiometricCalculator:
 
     def required_empty_to_full_for_target(self, nab_titer: float,
                                            target_free_nab: float = 0.15) -> float:
-        for ratio in np.linspace(1, 200, 200):
+        """Minimum empty:full ratio that clears a therapeutic-efficacy floor.
+
+        The floor is expressed as ``1 - target_free_nab`` for backwards
+        compatibility with the original signature, but it is now applied to
+        therapeutic efficacy (unbound full capsids) rather than to the free
+        antibody fraction, which is stoichiometrically pinned near zero and
+        therefore useless as a control target.
+        """
+        target_efficacy = 1.0 - target_free_nab
+        for ratio in np.logspace(0, np.log10(200), 200):
             profile = self.simulate_decoy_dose(nab_titer, 5e13, ratio)
-            nab_free = profile.free_nab_fraction
-            if nab_free <= target_free_nab:
-                return ratio
+            if profile.therapeutic_efficacy_score >= target_efficacy:
+                return float(ratio)
         return 200.0
 
-    def utcl_score(self) -> float:
-        return 0.10
+    def utcl_score(self, nab_titer: float = 200.0) -> float:
+        """Baseline: the same construct dosed with **no empty-capsid decoys**.
+
+        This used to be the constant ``0.10``. Unlike that constant, this
+        baseline is produced by the identical dose model and the identical
+        scoring weights as :meth:`our_best_score`, differing only in the decoy
+        ratio - which is exactly the variable the optimization is supposed to
+        exploit. Any claimed gain is therefore attributable to the decoy
+        strategy rather than to the choice of baseline.
+        """
+        profile = self.simulate_decoy_dose(nab_titer, 5e13, 1.0, 70.0)
+        nab_neutralized = 1.0 - profile.free_nab_fraction
+        complement_avoidance = 1.0 - profile.complement_deposition_score
+        score = 0.60 * nab_neutralized + 0.40 * complement_avoidance
+        return float(np.clip(score, 0, 1))
 
     def our_best_score(self, nab_titer: float = 200.0) -> float:
         result = self.optimize_ratio(nab_titer)

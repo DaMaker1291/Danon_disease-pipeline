@@ -213,6 +213,40 @@ export interface TranslationalReadiness {
   totalGates: number;
 }
 
+/* ESM-2 protein language model endpoints (see api_server.py /api/esm/*) */
+export interface EsmResidueFitness {
+  position: number;
+  positionVp1: number;
+  wildTypeAa: string;
+  logLikelihoodRatio: number;
+  predictedClass: string;
+  confidence: number;
+}
+
+export interface EsmFitnessResult {
+  sequenceLength: number;
+  meanFitness: number;
+  minFitness: number;
+  maxFitness: number;
+  modelVersion: string;
+  perResidue: EsmResidueFitness[];
+  scoredMutations?: unknown[];
+  error?: string;
+}
+
+export interface EsmStructureResult {
+  sequenceLength: number;
+  secondaryStructure: { helix: number[]; sheet: number[]; loop: number[] };
+  solventAccessibility: number[];
+  contactMap: number[];
+  confidence: number[];
+  meanConfidence: number;
+  helixFraction: number;
+  sheetFraction: number;
+  modelVersion: string;
+  error?: string;
+}
+
 export interface PipelineResult {
   sequence: string;
   wildTypeSequence: string;

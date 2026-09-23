@@ -1,0 +1,67 @@
+==============================================================================
+PROPOSED 0.90+ TARGETS, EVALUATED AGAINST DATA THAT EXISTS
+==============================================================================
+
+  3D spatial tumour expansion  (Dice similarity coefficient)
+    claimed      : Dice 0.91-0.94
+    status       : refused_no_data
+    measured     : no number
+    n            : 0
+    detail       : 5 imaging collection(s) probed, 0 segmentation series, 0 patient(s) checked for a second timepoint. A Dice score needs a baseline scan, a follow-up scan and an expert mask on both; none of the three is retrievable
+    blockers     :
+      - TCGA-GBM, TCGA-LGG and BraTS are retired from the NBIA API
+      - UPENN-GBM is single-timepoint and carries no segmentation series
+      - no local case has a second dated timepoint
+
+  RL dosing-policy convergence  (reward retention over Monte Carlo training episodes)
+    claimed      : 95.4% normalised reward retention
+    status       : refused_no_data
+    measured     : no number
+    n            : 0
+    detail       : no reinforcement-learning agent exists in the repository. The three dosing policies are closed-form: MTDPolicy returns the constant (1.0, 0.0); AdaptiveDosePolicy one comparison against the initial burden; CollateralSwitchPolicy a threshold switch on the resistant fraction. MTDPolicy.dose() returns (1.0, 0.0) for every state, so nothing is learned, trained, or converged
+    blockers     :
+      - no RL agent, environment or training loop is present
+      - the three dosing policies are closed-form rules, one of which is a constant
+      - `normalized reward retention` is self-defined: the reward and the normalization are both chosen by the author, so the number cannot be falsified by any measurement
+      - the repo's comparable quantity is externally anchored instead: paired MTD control on identical geometry against a RANO threshold, reported as a censored lower bound
+
+  molecular responder classification  (ROC-AUC on a response label)
+    claimed      : AUC 0.91-0.94
+    status       : refused_no_label
+    measured     : 0.6155
+    n            : 529
+    detail       : no response label exists: `best_overall_response` records: 0 of 617. The nearest label is a disease-status flag with 23 positives in 529 clean cases (4.3%), 11 case(s) carrying both values at different timepoints, 77 with neither. Majority-class accuracy is 95.65%, which is where a '94% accuracy' claim would come from without any model at all. On the nearest reachable label the baseline covariates reach out-of-fold AUC 0.6155 (95% CI 0.4923-0.7321)
+    blockers     :
+      - `best_overall_response` is empty for every case
+      - the reachable flag is recorded at follow-up, not as response
+      - the flag is anti-correlated with survival (tumour-free median OS 229 d against 374 d), so it tracks when it was recorded rather than how the patient did
+      - only 23 positives in 529 patients
+
+  in-vitro cell-line dose response  (R^2 against measured IC50)
+    claimed      : R^2 > 0.93 vs GDSC IC50
+    status       : refused_incommensurable
+    measured     : no number
+    n            : 8384
+    detail       : 8384 glioma-row(s) over 286 drug(s) and 34 line(s); 76.0% of glioma IC50s lie above the highest concentration tested, and for temozolomide it is 34 of 34
+    blockers     :
+      - the engine's EC50 has no declared concentration unit, so an R^2 against a molar IC50 is incommensurable rather than inaccurate
+      - 76.0% of glioma IC50s are extrapolated beyond the highest concentration tested (34 of 34 for temozolomide), so the target values are largely lower bounds
+      - testing the engine's Hill slope (it fixes n=1) needs the raw dose-response points: 2.11 GB for GDSC2 and 0.78 GB for GDSC1, not cached here
+
+  PDE stencil convergence (SYNTHETIC, no patients)  (R^2 against analytic point-source ground truth)
+    claimed      : R^2 >= 0.9999
+    status       : measured
+    measured     : 0.999951
+    n            : 210912
+    detail       : D planted 0.3500 -> recovered 0.3625 (3.56% error); lambda planted 0.1000 -> recovered 0.0988 (1.25% error) over 210,912 equations. This validates the solver; it says nothing about patients, and a high value here raises no number in any other tier
+    blockers     :
+      - the ground truth is synthetic: no patient appears in this tier
+      - the reported R^2 is a fit residual on an analytic field, not a predictive accuracy on any clinical outcome
+      - it may not be averaged with, added to, or used to raise the overall-survival C-index
+
+  5 tier(s): 1 measurable, 4 refused.
+
+  Refusing a tier does not raise another. A measurable synthetic tier does
+  not raise a clinical one: the repository's own held-out numbers are
+  unchanged by this module -- OS C = 0.656 and progression C = 0.534, the
+  latter below age alone (0.539).

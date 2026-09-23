@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from danon.config import DanonConfig, danon_config
 from danon.aav_generator import DanonAAVGenerator, WILD_TYPE_AAV9_CAPSID
+from danon.biology import WILD_TYPE_AAV9
 from danon.lnp_generator import DanonLNPGenerator
 from danon.tropism_filter import DanonTropismFilter
 from danon.safety_engine import DanonSafetyEngine
@@ -30,7 +31,9 @@ from danon.active_learner import ActiveLearner, ExperimentalResult
 from danon.epitope_masker import EpitopeMasker, ChargeMaskDesign
 from danon.stoichiometric_calc import StoichiometricCalculator
 from danon.promoter_spec import PromoterSpecEngine
-from danon.platform_validator import PlatformValidator, MHRA_ILAP_DIMENSIONS
+from danon.platform_validator import (
+    PlatformValidator, MHRA_ILAP_DIMENSIONS, CLINICAL_ASSUMED_INPUTS,
+)
 from danon.wetlab_lims_tracker import WetlabLIMSTracker, ASSAY_TEMPLATES
 from danon.mouse_study_simulator import MouseStudySimulator
 from danon.dual_vector_moi_optimizer import DualVectorMOIOptimizer
@@ -49,6 +52,17 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+#: Assumed literature baselines for the comparison table.
+#:
+#: READ THIS BEFORE QUOTING ANY ``improvement_factor``: these are *placeholders*,
+#: not measurements. Each one was originally written as a bare constant, which
+#: meant the reported fold-change was an artefact of the constant rather than a
+#: finding. Several modules now expose a derived baseline that runs the SAME
+#: model on the unmodified configuration (``utcl_score``); those are the values
+#: that should be substituted here, one key at a time, before any superiority
+#: claim is published. Keys whose value has been superseded are marked below.
+#:
+#: Provenance: ASSUMED  (see :func:`danon.biology.biological_provenance`)
 UCL_BASELINE_SCORES = {
     "promoter": 0.35,
     "mirna": 0.10,
@@ -64,6 +78,9 @@ UCL_BASELINE_SCORES = {
     "epitope_mask": 0.15,
     "stoichiometric_decoy": 0.10,
     "promoter_spec": 0.30,
+    # SUPERSEDED: phase 18 now derives its comparator by scoring the unmodified
+    # control through the SAME rubric (see REGULATORY_ASSUMED_INPUTS below).
+    # Kept only so older reports can be read; do not cite it.
     "mhra_ilap": 0.50,
     "wetlab_lims": 0.20,
     "mouse_study": 0.25,
@@ -73,6 +90,12 @@ UCL_BASELINE_SCORES = {
     "cell_simulator": 0.10,
     "plasmid_assembly": 0.00,
 }
+
+
+#: Local alias for the shared assumed-input block; see
+#: :data:`danon.platform_validator.CLINICAL_ASSUMED_INPUTS` for what it is and
+#: why it is passed explicitly rather than hidden inside the scorer.
+REGULATORY_ASSUMED_INPUTS = CLINICAL_ASSUMED_INPUTS
 
 
 @dataclass
@@ -347,7 +370,7 @@ class DanonPipeline:
         design = self.dual_vector.design_split(opt_pos, True, True)
         ucl_score = 0.30
         self.reports.append(PipelineReport(
-            module="Dual Vector (Npu DnaE split-intein, 9.4kb capacity)",
+            module="Vector Capacity (single-vector gate: LAMP2B fits <4.7kb; no dual-vector needed)",
             our_score=design.design_score,
             utcl_baseline=ucl_score,
             improvement_factor=design.design_score / max(ucl_score, 0.01),
@@ -564,17 +587,19 @@ class DanonPipeline:
 
     def _phase15_epitope_masking(self, winners: dict,
                                   promoter_data: dict) -> dict:
-        logger.info("PHASE 15/18: Structural Charge-Masking (PDB 3J1S)")
+        logger.info("PHASE 15/18: Structural Charge-Masking (PDB 3UX1, AAV9)")
         wt_seq = WILD_TYPE_AAV9_CAPSID
 
         mask_iv, mask_viii = self.epitope_masker.design_dual_region_masking(
             wt_seq, max_mutations_iv=4, max_mutations_viii=6
         )
 
-        ucl_score = UCL_BASELINE_SCORES["epitope_mask"]
+        # Derived baseline: the identical masking objective evaluated with zero
+        # permitted substitutions. Supersedes UCL_BASELINE_SCORES["epitope_mask"].
+        ucl_score = self.epitope_masker.utcl_score(mask_viii.original_sequence)
         our_score = mask_viii.overall_mask_score
         self.reports.append(PipelineReport(
-            module="Epitope Masking (VR-IV/VR-VIII charge reversal, PDB 3J1S)",
+            module="Epitope Masking (VR-IV/VR-VIII charge reversal, PDB 3UX1)",
             our_score=our_score,
             utcl_baseline=ucl_score,
             improvement_factor=our_score / max(ucl_score, 0.01),
@@ -610,8 +635,16 @@ class DanonPipeline:
         results = self.stoichiometric_calc.simulate_population_dosing(5e13)
 
         moderate_titer = results.get("titer_200")
-        ucl_score = UCL_BASELINE_SCORES["stoichiometric_decoy"]
         high_titer = results.get("titer_500")
+
+        # Derived baseline: the SAME complement-risk transform applied to the
+        # no-decoy arm of the identical dose model. Supersedes the constant
+        # UCL_BASELINE_SCORES["stoichiometric_decoy"], which made the reported
+        # fold-change a property of the constant rather than of the design.
+        baseline_profile = self.stoichiometric_calc.simulate_decoy_dose(200.0, 5e13, 1.0)
+        ucl_score = float(np.clip(
+            (0.70 - baseline_profile.complement_deposition_score) / 0.70, 0, 1))
+
         if moderate_titer:
             with_decoy = moderate_titer.complement_activation_risk
             risk_reduction = float(np.clip((0.70 - with_decoy) / 0.70, 0, 1))
@@ -686,75 +719,110 @@ class DanonPipeline:
         best_aav = winners["aav"][0] if winners and winners.get("aav") else {}
         mirna_scores = winners.get("mirna", {}) if winners else {}
         dosing_data = winners.get("dosing", {}) if winners else {}
-        candidate_metrics = {
-            "cardiac_tropism": best_aav.get("cardiac_tropism", 0.72),
-            "hepatic_accumulation": best_promoter.get("hepatic_activity", 0.01),
-            "immune_evasion": best_aav.get("immune_evasion", 0.25),
-            "lamp2b_expression": best_aav.get("lamp2b_expression", 0.72),
-            "promoter_score": best_promoter.get("optimized_score", 0.85),
-            "mirna_score": mirna_scores.get("total_optimization", 0.10),
-            "dosing_score": dosing_data.get("regimen_score", 0.30),
-            "complement_activation": 0.20,
-            "liver_toxicity": dosing_data.get("toxicity_risk", 0.15),
-            "cardiac_inflammation": 0.12,
-            "decoy_protection": 0.70,
-            "vector_titer": 5e13,
-            "itr_integrity": 0.95,
-            "empty_full_ratio_optimal": 0.60,
-            "rc_aav_risk": 0.01,
-            "gonadal_transduction_risk": 0.03,
-            "shedding_risk": 0.08,
-            "mutation_types_covered": 0.85,
-            "age_stratification": 0.80,
-            "nab_management": 0.75,
-            "biomarker_strategy": 0.75,
-            "immunosuppression_plan": 0.70,
-            "complement_monitoring": 0.75,
-            "rescue_therapy": 0.65,
-            "stopping_rules": 0.75,
-            "juvenile_model_data": 0.65,
-            "growth_development_safety": 0.60,
-            "long_term_follow_up": 0.72,
-            "age_de_escalation": 0.55,
-            "disease_prevalence": 0.80,
-            "unmet_medical_need": 0.90,
-            "natural_history_data": 0.85,
-            "patient_advocacy": 0.75,
+
+        # ------------------------------------------------------------------
+        # Two arms, one rubric.
+        #
+        # The design arm is scored from what the pipeline actually derived. The
+        # control arm is the UNMODIFIED configuration put through the identical
+        # rubric -- the same "utcl" pattern every other phase uses. Inputs
+        # neither arm measures are passed as ASSUMED (see
+        # REGULATORY_ASSUMED_INPUTS) and are identical in both, so they cancel
+        # and cannot manufacture the comparison.
+        #
+        # A missing derived input now leaves its dimension UNSCORED instead of
+        # falling back to a flattering default, so the coverage figure in the
+        # summary is meaningful.
+        # ------------------------------------------------------------------
+        design_metrics = {
+            "cardiac_tropism": best_aav.get("cardiac_tropism"),
+            "hepatic_accumulation": (
+                None if best_aav.get("hepatic_avoidance") is None
+                else 1.0 - best_aav["hepatic_avoidance"]
+            ),
+            "immune_evasion": best_aav.get("immune_evasion"),
+            "lamp2b_expression": best_aav.get("lamp2b_expression"),
+            "promoter_score": best_promoter.get("optimized_score"),
+            "mirna_score": mirna_scores.get("total_optimization"),
+            "dosing_score": dosing_data.get("regimen_score"),
+        }
+        control_metrics = {
+            "cardiac_tropism": WILD_TYPE_AAV9["cardiac_tropism"],
+            "hepatic_accumulation": WILD_TYPE_AAV9["hepatic_sequestration"],
+            "immune_evasion": self.epitope_masker.utcl_score(WILD_TYPE_AAV9_CAPSID),
+            "promoter_score": self.promoter_spec_engine.utcl_score(),
+            "mirna_score": 0.0,  # unmodified cassette carries no detarget sites
+            "dosing_score": self.dosing.utcl_regimen_score(),
         }
 
-        assessment = self.platform_validator.evaluate_candidate(candidate_metrics)
-        ucl_score = UCL_BASELINE_SCORES["mhra_ilap"]
+        assessment = self.platform_validator.evaluate_candidate(
+            design_metrics, assumed_inputs=REGULATORY_ASSUMED_INPUTS)
+        control_assessment = self.platform_validator.evaluate_candidate(
+            control_metrics, assumed_inputs=REGULATORY_ASSUMED_INPUTS)
+
+        ucl_score = control_assessment.weighted_score
         our_score = assessment.weighted_score
 
-        self.reports.append(PipelineReport(
-            module="MHRA ILAP FastTrack Regulatory Validation",
-            our_score=our_score,
-            utcl_baseline=ucl_score,
-            improvement_factor=our_score / max(ucl_score, 0.01),
-        ))
+        if our_score is None or ucl_score is None:
+            logger.warning(
+                "  Regulatory rubric: comparison not computable "
+                "(design=%s, control=%s) -- no improvement factor reported",
+                our_score, ucl_score)
+        else:
+            self.reports.append(PipelineReport(
+                module="Regulatory Readiness Rubric (derived control)",
+                our_score=our_score,
+                utcl_baseline=ucl_score,
+                improvement_factor=our_score / max(ucl_score, 0.01),
+            ))
 
         summary = self.platform_validator.generate_regulatory_summary(assessment)
+        control_summary = self.platform_validator.generate_regulatory_summary(
+            control_assessment)
         improvements = self.platform_validator.assess_improvement_vs_ucl(assessment)
 
-        logger.info("  ILAP Composite: %.3f | Eligible: %s | Gaps: %d",
-                     assessment.composite_score,
-                     "YES" if assessment.is_ilap_eligible else "NO",
-                     len(assessment.critical_gaps))
+        logger.info(
+            "  Rubric verdict: %s | composite: %s | dimensions: %d/%d | gaps: %d",
+            assessment.verdict,
+            "n/a" if assessment.composite_score is None
+            else f"{assessment.composite_score:.3f}",
+            assessment.scored_dimensions, assessment.total_dimensions,
+            len(assessment.critical_gaps))
+        if assessment.verdict == "UNKNOWN":
+            logger.info("  (UNKNOWN = evidence missing, not a negative verdict; "
+                        "unscored inputs: %s)",
+                        ", ".join(assessment.missing_inputs) or "none")
 
         return {
             "composite_score": assessment.composite_score,
             "weighted_score": assessment.weighted_score,
+            "control_weighted_score": ucl_score,
+            "verdict": assessment.verdict,
+            "verdict_basis": (
+                "self-assessment against an authored rubric; NOT an MHRA "
+                "determination (MHRA publishes no such ordinal scale)"
+            ),
+            "rubric_provenance": assessment.rubric_provenance,
+            # Tri-state: True / False / None (None = gating dimensions unscored).
             "is_ilap_eligible": assessment.is_ilap_eligible,
             "dimension_scores": {
                 dim: {
                     "score": getattr(assessment, dim).score,
                     "passed": getattr(assessment, dim).passed,
+                    "scored": getattr(assessment, dim).scored,
+                    "missing_inputs": getattr(assessment, dim).missing_inputs,
                 }
                 for dim in MHRA_ILAP_DIMENSIONS
             },
+            "scored_dimensions": assessment.scored_dimensions,
+            "total_dimensions": assessment.total_dimensions,
+            "coverage": assessment.coverage,
+            "missing_inputs": assessment.missing_inputs,
+            "assumed_inputs_used": assessment.assumed_inputs_used,
             "critical_gaps": assessment.critical_gaps,
             "improvements_needed": assessment.improvements_needed,
             "improvements_vs_ucl": improvements,
+            "control_summary": control_summary,
             "summary": summary,
         }
 
@@ -800,7 +868,9 @@ class DanonPipeline:
                 "dosing_score": winners["dosing"]["regimen_score"],
             })
         panel = self.mouse_study.panel_of_candidates(candidate_list)
-        ucl_score = UCL_BASELINE_SCORES["mouse_study"]
+        # Derived baseline: an unmodified AAV9 control arm through the same study
+        # model. Supersedes UCL_BASELINE_SCORES["mouse_study"].
+        ucl_score = self.mouse_study.utcl_score()
         our_score = float(np.mean([r["cardiac_selectivity"] for r in panel])) if panel else 0
         self.reports.append(PipelineReport(
             module="Mouse Study (Lamp2 KO biodistribution + echo + survival)",
@@ -821,8 +891,14 @@ class DanonPipeline:
         hepatic = winners["aav"][0].get("hepatic_avoidance", 0.3) if winners["aav"] else 0.3
         profile = self.moi_opt.profile_dose_range(cardiac, 1.0 - hepatic)
         purity = self.moi_opt.optimize_vector_prep_purity()
-        ucl_score = UCL_BASELINE_SCORES["moi_optimization"]
-        our_score = profile.expected_dual_hit
+        # Derived baseline: unmodified AAV9 tropism through the same dose-range
+        # optimizer. Supersedes UCL_BASELINE_SCORES["moi_optimization"].
+        #
+        # The compared quantity is reconstituted gene copies per cell, NOT
+        # "dual-hit fraction": that fraction is 1.0000 throughout the therapeutic
+        # dose range and cannot rank two designs (see MultiplicityProfile).
+        ucl_score = self.moi_opt.utcl_score()
+        our_score = profile.expected_reconstituted_copies_per_cell
         self.reports.append(PipelineReport(
             module="Dual-Vector MOI (co-transduction probability + purity optimization)",
             our_score=our_score,
@@ -852,7 +928,9 @@ class DanonPipeline:
         panel = self.nab_assay.simulate_donor_panel(50, "engineered", charge_mask, 0.5)
         summary = self.nab_assay.population_summary(panel)
         dose_response = self.nab_assay.dose_response_curve("engineered")
-        ucl_score = UCL_BASELINE_SCORES["nab_assay"]
+        # Derived baseline: the wild-type arm of the SAME donor panel. Supersedes
+        # UCL_BASELINE_SCORES["nab_assay"].
+        ucl_score = self.nab_assay.utcl_score()
         self.reports.append(PipelineReport(
             module="NAb Assay (human serum panel + dose-response + IC50 shift)",
             our_score=summary.mean_escape,
@@ -886,7 +964,9 @@ class DanonPipeline:
         assessment = self.immunosuppression.assess_regimen(
             [0, 7, 14, 21], include_steroid_taper=True
         )
-        ucl_score = UCL_BASELINE_SCORES["immunosuppression"]
+        # Derived baseline: the no-immunosuppression arm of the same regimen
+        # panel. Supersedes UCL_BASELINE_SCORES["immunosuppression"].
+        ucl_score = self.immunosuppression.utcl_score()
         our_score = assessment.design.overall_regimen_score
         self.reports.append(PipelineReport(
             module="Immunosuppression (Rituximab+Sirolimus PK/PD + complement mitigation)",

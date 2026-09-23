@@ -245,9 +245,39 @@ class ImmunosuppressionProtocol:
             })
         return sorted(results, key=lambda x: x["score"], reverse=True)
 
-    def utcl_score(self) -> float:
-        return 0.15
+    def _seeded_regimens(self, seed: int) -> List[Dict]:
+        """Evaluate every regimen arm from a pinned RNG state, then restore it.
 
-    def our_best_score(self) -> float:
-        best = self.compare_regimens()
-        return best[0]["score"] if best else 0.0
+        Both the baseline arm and the best arm must be scored on the same
+        simulated cohort, otherwise the comparison is between two different
+        random draws rather than between two protocols.
+        """
+        state = self.rng.get_state()
+        try:
+            self.rng.seed(seed)
+            return self.compare_regimens()
+        finally:
+            self.rng.set_state(state)
+
+    def utcl_score(self, seed: int = 42) -> float:
+        """Baseline: no immunosuppression at all, from the same regimen panel.
+
+        This used to return the constant ``0.15``. The unmodified arm is already
+        modelled explicitly in :meth:`compare_regimens`, so there is no reason to
+        assert a number that the model itself can produce.
+        """
+        for result in self._seeded_regimens(seed):
+            if result["regimen"] == "No Immunosuppression":
+                return float(result["score"])
+        return 0.0
+
+    def our_best_score(self, seed: int = 42) -> float:
+        """Best *treatment* arm. Selecting "no immunosuppression" would not be a
+        protocol design, so the do-nothing arm is excluded here and reported by
+        :meth:`utcl_score` instead."""
+        panel = self._seeded_regimens(seed)
+        scored = [r for r in panel if r["regimen"] != "No Immunosuppression"]
+        best = max(scored, key=lambda r: r["score"], default=None)
+        if best is None:
+            return 0.0
+        return float(best["score"])

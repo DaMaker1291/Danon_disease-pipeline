@@ -2,17 +2,29 @@
 Plasmid Builder: Synthesis-Ready Dual-Vector Assembly Engine
 ============================================================
 Takes the winning outputs from the NSGA-II optimization front and stitches
-the actual physical FASTA/GenBank sequences for the dual-vector AAV9-LAMP2B
-gene therapy using Npu DnaE split-intein trans-splicing.
+the actual physical FASTA/GenBank sequences for the AAV9-LAMP2B gene therapy.
+
+**Design note (Phase 9 capacity gate):** LAMP2B CDS is ~1.2 kb. With cardiac
+promoter (~1.0 kb), miRNA 3' UTR (~0.4 kb), WPRE (~0.6 kb), and hGH polyA
+(~0.1 kb), total cargo is ~3.3 kb — well within the 4.7 kb AAV packaging limit.
+The pipeline's capacity gate (`danon/dual_vector.evaluate_vector_capacity`)
+therefore selects a **single-vector** design. A dual-vector split-intein design
+(Npu DnaE) is supported by this module for larger payloads but is not required
+for LAMP2B.
 
 Vector A (5' Front-End Expression Cassette):
-  [5' ITR] -> [Insulator] -> [Cardiac Promoter] -> [LAMP2B Exons 1-6] -> [N-Intein] -> [PolyA] -> [3' ITR]
+  [5' ITR] -> [Insulator] -> [Cardiac Promoter] -> [LAMP2B 5' (exons 1-6)] -> [N-Intein]* -> [PolyA] -> [3' ITR]
+  (* N-Intein only included if dual-vector design is selected)
 
 Vector B (3' Back-End Expression Cassette):
-  [5' ITR] -> [C-Intein] -> [LAMP2B Exons 7-9] -> [4x miR-122/142] -> [WPRE] -> [PolyA] -> [3' ITR]
+  [5' ITR] -> [C-Intein]* -> [Cardiac Promoter] -> [LAMP2B 3' (exons 7-9)] -> [4x miR-122/142/1/208] -> [WPRE] -> [PolyA] -> [3' ITR]
+  (* C-Intein only included if dual-vector design is selected)
+
+For the standard single-vector LAMP2B design, the cargo layout is:
+  [5' ITR] -> [S/MAR Insulator] -> [MHC + cardiac super-enhancer promoter] -> [LAMP2B full CDS] -> [4x miRNA detarget UTR] -> [WPRE] -> [hGH polyA] -> [3' ITR]
 
 Post-assembly verification:
-  1. Cargo constraint check: neither vector exceeds 4,900 bp between ITRs.
+  1. Cargo constraint check: cargo does not exceed 4,900 bp between ITRs.
   2. RNA secondary structure scan: detects internal hairpin loops that could
      cause ribosome drop-off during translation.
   3. Synthesis cost estimation from commercial vendors (PackGene, VectorBuilder,

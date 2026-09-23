@@ -6,6 +6,8 @@ import type {
   UploadResult,
   PipelineConstraints,
   PipelineResult,
+  EsmFitnessResult,
+  EsmStructureResult,
 } from '../types';
 
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -62,6 +64,17 @@ export const fetchHla = (segments: string[], cutoffNm = 500) =>
   postJson('/phase/hla', { segments, cutoff_nm: cutoffNm });
 export const fetchSynthesis = (dna: string, gcLow = 40, gcHigh = 65) =>
   postJson('/phase/synthesis', { dna, gc_low: gcLow, gc_high: gcHigh });
+
+// ESM-2 protein language model endpoints (per-residue fitness + structure).
+// The backend responses are camelCase (api_server._snake_to_camel) and carry
+// either the payload or an `error` string, so both shapes are typed.
+export const fetchEsmFitness = (
+  sequence: string,
+  mutations?: { position: number; original: string; mutated: string }[],
+) => postJson<EsmFitnessResult>('/esm/fitness', { sequence, mutations });
+
+export const fetchEsmStructure = (sequence: string) =>
+  postJson<EsmStructureResult>('/esm/structure', { sequence });
 
 export async function fetchElectrostaticProfile(sequence: string, region: string): Promise<ElectrostaticProfile> {
   const res = await fetch(`${BASE}/electrostatics`, {

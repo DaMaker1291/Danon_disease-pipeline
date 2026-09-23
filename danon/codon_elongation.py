@@ -28,7 +28,7 @@ import logging
 from typing import Dict, List, Optional
 
 import numpy as np
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 logger = logging.getLogger(__name__)
 
@@ -162,9 +162,16 @@ class StallSite(BaseModel):
 
 class CodonHarmonizationResult(BaseModel):
     """Result of codon harmonization analysis."""
+    # ``extra="forbid"`` is deliberate: a typo or a stale field name in the
+    # constructor used to be swallowed silently (pydantic's default is
+    # ``extra="ignore"``), which produced results that were missing documented
+    # attributes at runtime instead of failing loudly.
+    model_config = ConfigDict(extra="forbid")
+
     cds_length_nt: int
     n_codons: int
     # tAI metrics
+    tai: float = Field(ge=0.0, le=1.0, description="tAI of the supplied CDS")
     tai_before: float = Field(ge=0.0, le=1.0, description="tAI before harmonization")
     tai_after: float = Field(ge=0.0, le=1.0, description="tAI after harmonization")
     # Harmonization metrics
@@ -174,11 +181,25 @@ class CodonHarmonizationResult(BaseModel):
         description="Harmonization score after optimization")
     velocity_match_improvement: float = Field(
         description="Improvement in velocity profile match (positive = better)")
+    min_window_tai: float = Field(
+        default=0.0, ge=0.0, le=1.0,
+        description="Lowest sliding-window tAI (worst local stall) in the CDS")
+    mean_elongation_rate: float = Field(
+        default=0.0, description="Mean tRNA-adaptiveness weight over all codons")
+    slowest_codon_index: int = Field(
+        default=0, description="Codon index with the lowest tRNA adaptiveness")
     # Stall detection
     stall_sites: List[StallSite] = Field(default_factory=list)
     stall_sites_after: int = Field(description="Number of stall sites after harmonization")
     # Optimization
+    codon_optimized: bool = Field(
+        default=False,
+        description="True when the CDS reaches the configured minimum tAI")
+    optimized_cds: Optional[str] = Field(
+        default=None, description="Harmonized CDS (alias of harmonized_cds)")
     harmonized_cds: Optional[str] = None
+    min_index_threshold: float = Field(
+        default=0.0, description="The min_tai threshold this result was judged against")
     harmonization_threshold: float = Field(
         description="Minimum acceptable harmonization score (correlation)")
 
