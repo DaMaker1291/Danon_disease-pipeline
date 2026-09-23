@@ -15,16 +15,18 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Day365Outcome from './components/Day365Outcome';
 import TwinPlanner from './components/TwinPlanner';
 import VtiViewer from './components/VtiViewer';
+import ParaviewGallery from './components/ParaviewGallery';
 import { runPipeline } from './utils/api';
 import { useArtifact } from './utils/artifacts';
 import type { FlowTelemetry, ParetoPoint, UploadResult, PipelineResult, PipelineConstraints } from './types';
 import type { MicrofluidicsArtifactData, PipelineArtifactData } from './types/artifacts';
 
-type TabId = 'capsid' | 'phases' | 'lnp' | 'gene' | 'microfluidics' | 'clinical' | 'outcome' | 'upload' | 'twin';
+type TabId = 'capsid' | 'phases' | 'lnp' | 'gene' | 'microfluidics' | 'clinical' | 'outcome' | 'upload' | 'twin' | 'paraview';
 interface TabDef { id: TabId; label: string; icon: string; desc: string }
 
 const TABS: TabDef[] = [
   { id: 'twin', label: 'MRI Twin Planner', icon: '🧠', desc: 'Scan in, treatment plan out' },
+  { id: 'paraview', label: 'ParaView Gallery', icon: '🧊', desc: 'Real BraTS volumetric artifact' },
   { id: 'outcome', label: '365-Day Outcome', icon: '📅', desc: 'Exact day-365 engine state' },
   { id: 'capsid', label: '3D Capsid', icon: '🧬', desc: 'AAV9 structural viewer' },
   { id: 'phases', label: '24 Phases', icon: '🔬', desc: 'Hyper-dimensional matrix' },
@@ -170,6 +172,14 @@ export default function App() {
             </div>
           </div>
         );
+      case 'paraview':
+        return (
+          <div className="content-grid">
+            <div style={{ gridColumn: '1 / -1' }}>
+              <ErrorBoundary label="ParaviewGallery"><ParaviewGallery /></ErrorBoundary>
+            </div>
+          </div>
+        );
       case 'capsid':
         return renderCapsidTab();
       case 'phases':
@@ -279,8 +289,7 @@ export default function App() {
       <footer className="app-footer glass">
         <span>
           EvoTwin-10X · spatial tumour-evolution twin engine · every number on this page is a recorded engine output or clearly labelled as refused
-        </span>
-        <span className="f-right">paired steering-vs-MTD trials · ParaView VTI export · 924-test audit suite</span>
+        </span>          <span className="f-right">paired steering-vs-MTD trials · ParaView VTI export · 975-test audit suite</span>
       </footer>
     </div>
   );

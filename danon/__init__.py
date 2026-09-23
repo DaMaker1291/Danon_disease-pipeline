@@ -575,6 +575,8 @@ from danon.schedule import (
     format_schedule_text,
     poster_summary,
     print_schedule_disclaimer,
+    read_fields_vti,
+    VtiFields,
     schedule_provenance,
     what_this_model_cannot_know as schedule_what_this_model_cannot_know,
 )
@@ -1064,6 +1066,7 @@ __all__ = [
     # Schedule compiler: engine runs -> clinic-shaped deliverables
     "PatientIntake", "ScheduleEvent", "DosingScheduleReport",
     "compile_dosing_schedule", "extract_schedule_events", "export_fields_vti",
+    "read_fields_vti", "VtiFields",
     "TwinPlanResult", "DEFAULT_R0", "DEFAULT_R0_SOURCE", "downsample_mask_to_budget", "plan_from_mask",
     "MGMT_BASELINE_RESISTANCE", "BetaArmOutcome", "MgmtBetaPanel", "MgmtResistanceSweep",
     "clone_params_for_mgmt_beta", "load_mgmt_beta_panel", "load_published_mgmt_calls",

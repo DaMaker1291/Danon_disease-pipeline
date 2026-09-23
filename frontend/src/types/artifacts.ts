@@ -234,3 +234,33 @@ export interface ConstructArtifactData {
   segment_bp_sum: number;
   sequence_length_bp: number;
 }
+
+/* ------------------------------------------------------------- paraview -- */
+
+export interface FieldStats {
+  min: number;
+  max: number;
+  mean_in_tumour: number;
+}
+
+export interface ParaviewArtifactData {
+  vti_base64: string;
+  vti_sha256: string;
+  vti_size_bytes: number;
+  grid: {
+    dims: [number, number, number];
+    spacing_mm: number;
+    n_points: number;
+    tumour_voxels: number;
+  };
+  field_stats: Record<string, FieldStats>;
+  tissue_counts: Record<string, number>;
+  headline: {
+    resistant_fraction: number;
+    resistant_fraction_note: string;
+    diffusion_contrast_ratio: number;
+  };
+  arrays_present: string[];
+  captions: { short: string };
+  paraview_recipe: string[];
+}

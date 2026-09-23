@@ -623,6 +623,105 @@ def export_fields_vti(
 
 
 # ---------------------------------------------------------------------------
+# Reader: the round-trip twin of export_fields_vti
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class VtiFields:
+    """Arrays decoded from a .vti written by export_fields_vti.
+
+    ``fields`` maps array name to a Float32 array in engine index order
+    [x, y, z]; ``mask`` is the UInt8 tumour mask on the same grid; ``dims``
+    is the engine shape and ``spacing_mm`` the per-voxel physical size the
+    file declares. The app's ParaView gallery embeds exactly this payload,
+    so what the browser renders is what ParaView opens.
+    """
+
+    dims: Tuple[int, int, int]
+    spacing_mm: float
+    fields: Dict[str, np.ndarray]
+    mask: np.ndarray
+
+    @property
+    def n_points(self) -> int:
+        return int(self.dims[0]) * int(self.dims[1]) * int(self.dims[2])
+
+
+def read_fields_vti(path: str) -> VtiFields:
+    """Read back a .vti produced by export_fields_vti (stdlib only).
+
+    Validates the structural invariants the writer promises -- ImageData
+    piece, matching Piece/Whole extents, x-fastest point-count arrays --
+    and raises rather than returning a plausible-looking partial volume.
+    Unknown Float32 arrays are returned too, so the reader tolerates
+    exporters that add arrays this module does not know about.
+    """
+    import base64
+    import xml.etree.ElementTree as ET
+
+    doc = ET.parse(path).getroot()
+    if doc.get("type") != "ImageData":
+        raise ValueError(f"{path}: not a VTK ImageData file")
+    image = doc.find("ImageData")
+    piece = None if image is None else image.find("Piece")
+    if image is None or piece is None:
+        raise ValueError(f"{path}: missing ImageData/Piece element")
+
+    extent = [int(v) for v in (piece.get("Extent") or "").split()]
+    if len(extent) != 6 or any(extent[i] > extent[i + 1] for i in (0, 2, 4)):
+        raise ValueError(f"{path}: malformed Piece Extent {extent}")
+    whole = [int(v) for v in (image.get("WholeExtent") or "").split()]
+    if whole and whole != extent:
+        raise ValueError(f"{path}: Piece/Whole extent mismatch {extent} vs {whole}")
+    dims = (extent[1] + 1, extent[3] + 1, extent[5] + 1)  # axis0 = x
+    n_points = dims[0] * dims[1] * dims[2]
+
+    spacing_values = [float(v) for v in (image.get("Spacing") or "").split()]
+    if len(spacing_values) != 3:
+        raise ValueError(f"{path}: malformed Spacing attribute")
+    if any(abs(v - spacing_values[0]) > 1e-9 for v in spacing_values):
+        raise ValueError(f"{path}: anisotropic spacing unsupported: {spacing_values}")
+
+    fields: Dict[str, np.ndarray] = {}
+    mask: Optional[np.ndarray] = None
+    for da in piece.iter("DataArray"):
+        name = da.get("Name") or ""
+        dtype = da.get("type")
+        payload = (da.text or "").strip()
+        if not payload:
+            raise ValueError(f"{path}: empty DataArray {name!r}")
+        raw = base64.b64decode(payload)
+        if dtype == "Float32":
+            arr = np.frombuffer(raw, dtype="<f4")
+            if arr.size != n_points:
+                raise ValueError(
+                    f"{path}: {name} has {arr.size} values, expected {n_points}"
+                )
+            # The writer emits x-fastest bytes; frombuffer is already in
+            # that order, so no axis permutation happens here.
+            fields[name] = arr.reshape(dims, order="F")
+        elif dtype == "UInt8" and name == "tumour_mask":
+            arr = np.frombuffer(raw, dtype=np.uint8)
+            if arr.size != n_points:
+                raise ValueError(
+                    f"{path}: tumour_mask has {arr.size} values, expected {n_points}"
+                )
+            mask = arr.reshape(dims, order="F")
+        # Anything else (other dtypes/names) is ignored, matching the
+        # writer's forward-compatible additions.
+
+    if mask is None:
+        raise ValueError(f"{path}: no tumour_mask array found")
+    return VtiFields(
+        dims=dims,
+        spacing_mm=spacing_values[0],
+        fields=fields,
+        mask=mask,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Provenance and honest limits
 # ---------------------------------------------------------------------------
 

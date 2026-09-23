@@ -538,6 +538,136 @@ _ONE_TO_THREE = {
 }
 
 
+# ---------------------------------------------------------------------------
+# paraview (the committed BraTS VTI artifact, embedded verbatim)
+# ---------------------------------------------------------------------------
+
+
+# The committed ParaView artifact: final state of the 120-day MTD run on the
+# BraTS-2021 case 01017 segmentation (see PARAVIEW.md). Located relative to
+# this file so the builder works from any cwd.
+PARAVIEW_VTI_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "outputs_real", "brats_case01017_mtd_day120.vti",
+)
+
+
+def build_paraview_artifact() -> Dict[str, Any]:
+    """Embed the committed BraTS VTI so the app renders the real file.
+
+    The payload carries the full .vti bytes (base64) -- the same file
+    ParaView opens -- plus measured statistics read back through the
+    package's own VTI reader. If the artifact is missing, this raises
+    rather than fabricating a placeholder: a gallery that invents a volume
+    when its file is absent is the exact failure mode this module exists
+    to prevent.
+    """
+    import base64
+    import hashlib
+
+    from danon.schedule import read_fields_vti
+
+    if not os.path.exists(PARAVIEW_VTI_PATH):
+        raise FileNotFoundError(
+            f"ParaView artifact missing: {PARAVIEW_VTI_PATH}. Regenerate it with "
+            "PARAVIEW.md's one-call recipe (sim.run(keep_fields=True) + "
+            "export_fields_vti) before building app artifacts."
+        )
+
+    raw = open(PARAVIEW_VTI_PATH, "rb").read()
+    vti = read_fields_vti(PARAVIEW_VTI_PATH)
+
+    # Measured field statistics (from the file, not asserted).
+    f = vti.fields
+    mask_flat = vti.mask.reshape(-1).astype(bool)
+
+    def _stats(name: str) -> Dict[str, Any]:
+        arr = f[name]
+        in_mask = arr.reshape(-1)[mask_flat]
+        return {
+            "min": float(arr.min()),
+            "max": float(arr.max()),
+            "mean_in_tumour": float(in_mask.mean()) if in_mask.size else 0.0,
+        }
+
+    tissue_counts: Dict[str, int] = {}
+    for label, label_name in ((0, "necrotic_core"), (1, "edema"), (2, "white_matter"), (3, "grey_matter")):
+        tissue_counts[label_name] = int((f["tissue_class"].reshape(-1) == label).sum())
+
+    resistant_max = float(f["resistant"].max())
+    sensitive_max = float(f["sensitive"].max())
+
+    return _artifact(
+        key="paraview",
+        title="ParaView gallery: BraTS-2021 case 01017, 120-day MTD end-state",
+        source=(
+            "outputs_real/brats_case01017_mtd_day120.vti (committed artifact; "
+            "produced by export_fields_vti after sim.run(..., keep_fields=True) "
+            "on the cached BraTS-2021 case 01017 segmentation)"
+        ),
+        data={
+            # The complete .vti file, byte-identical to what ParaView opens.
+            "vti_base64": base64.b64encode(raw).decode("ascii"),
+            "vti_sha256": hashlib.sha256(raw).hexdigest(),
+            "vti_size_bytes": len(raw),
+            "grid": {
+                "dims": [int(v) for v in vti.dims],
+                "spacing_mm": float(vti.spacing_mm),
+                "n_points": vti.n_points,
+                "tumour_voxels": int(vti.mask.sum()),
+            },
+            "field_stats": {name: _stats(name) for name in sorted(f)},
+            "tissue_counts": tissue_counts,
+            "headline": {
+                "resistant_fraction": 1.0,
+                "resistant_fraction_note": (
+                    "day-120 MTD end-state on this geometry is fully resistant "
+                    "(the sanctuary effect); PARAVIEW.md carries the derivation"
+                ),
+                "diffusion_contrast_ratio": (
+                    round(float(f["diffusion_mm2_per_day"].max())
+                          / max(float(f["diffusion_mm2_per_day"].min()), 1e-12), 1)
+                ),
+            },
+            "arrays_present": sorted(f),
+            "captions": {
+                "short": (
+                    "Spatial drug sanctuary under continuous maximum-tolerated dosing. "
+                    "Final state of a 120-day simulation on a BraTS-2021 segmentation "
+                    "(14\u00d724\u00d724 voxels at 1 mm). The engine integrated a heterogeneous "
+                    "diffusion field D(x): 0.01 mm\u00b2/day in necrotic core to 0.35 mm\u00b2/day in "
+                    "healthy tissue. The red isosurface encloses the residual tumour, which "
+                    "is 100% drug-resistant; drug concentration collapses inside the core "
+                    "that D(x) marks unreachable. Simulation, not patient data."
+                ),
+            },
+            "paraview_recipe": [
+                "Open the .vti (Download button above) in ParaView, click Apply",
+                "Representation Volume, Color by drug_A, map Viridis, log-style opacity ramp",
+                "Filters > Contour by resistant at ~50% of max, color red",
+                "Filters > Clip, plane normal -X, to reveal the interior",
+                "Color the clipped surface by diffusion_mm2_per_day: D drops 35x across the tumour boundary",
+                "File > Save Screenshot at 3840x2160 with the color legend enabled",
+            ],
+        },
+        notes=[
+            "simulation output on a real BraTS-2021 segmentation, not patient imaging "
+            "of a treated tumour and not a clinical prediction",
+            "the diffusion field D(x) is derived from tissue classes the engine "
+            "assigns geometrically; the per-voxel constants are declared assumptions",
+            "the paired steering arm on the same geometry and seed eradicates the "
+            "tumour within the horizon, which is why there is no steering VTI: an "
+            "empty volume renders as nothing (PARAVIEW.md)",
+        ],
+        provenance={
+            "vti_bytes_match_committed_file": EvidenceStatus.ESTABLISHED,
+            "braTS_segmentation_geometry": EvidenceStatus.ESTABLISHED,
+            "diffusion_and_growth_constants": EvidenceStatus.UNKNOWN,
+            "clinical_relevance_of_this_run": EvidenceStatus.PROVEN_FAILED,
+        },
+    )
+
+
 BUILDERS = {
     "pipeline": build_pipeline_artifact,
     "microfluidics": build_microfluidics_artifact,
@@ -545,6 +675,7 @@ BUILDERS = {
     "clinical": build_clinical_artifact,
     "construct": build_construct_artifact,
     "structure": build_structure_artifact,
+    "paraview": build_paraview_artifact,
 }
 
 

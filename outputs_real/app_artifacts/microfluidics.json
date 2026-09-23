@@ -1,7 +1,7 @@
 {
  "key": "microfluidics",
  "title": "Microfluidic Y-junction: computed flow telemetry",
- "generated_utc": "2026-09-21T22:17:25Z",
+ "generated_utc": "2026-09-23T19:35:14Z",
  "source": "danon.microfluidics_core.MicrofluidicsCore().simulate() + profile accessors",
  "notes": [
   "analytic channel hydraulics (rectangular duct, laminar Poiseuille-style correlations), not a CFD solution and not a bench measurement",

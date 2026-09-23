@@ -288,6 +288,62 @@ def test_vti_include_tissue_false_keeps_the_original_four():
         assert names == ["drug_A", "drug_B", "sensitive", "resistant", "tumour_mask"]
 
 
+def test_read_fields_vti_round_trips_export(tmp_path):
+    """read_fields_vti recovers exactly what export_fields_vti wrote."""
+    from danon.schedule import read_fields_vti
+
+    shape = (5, 6, 7)
+    geom = _probe_geometry(shape)
+    t = _probe_trajectory(shape, geom.tumor_mask)
+    out = tmp_path / "probe.vti"
+    export_fields_vti(t, geom, str(out))
+
+    vti = read_fields_vti(str(out))
+    assert vti.dims == shape
+    assert vti.spacing_mm == 2.0
+    assert vti.n_points == 5 * 6 * 7
+    assert {"drug_A", "drug_B", "sensitive", "resistant", "tissue_class"} <= set(vti.fields)
+    np.testing.assert_array_equal(vti.fields["sensitive"], np.where(geom.tumor_mask, 100.0, 0.0))
+    np.testing.assert_array_equal(vti.fields["resistant"], np.where(geom.tumor_mask, 7.0, 0.0))
+    np.testing.assert_array_equal(vti.mask.astype(bool), geom.tumor_mask)
+
+
+def test_read_fields_vti_rejects_malformed_files(tmp_path):
+    """The reader raises on garbage instead of returning a plausible volume."""
+    from danon.schedule import read_fields_vti
+
+    bad = tmp_path / "bad.vti"
+    bad.write_text("<VTKFile type='PolyData'/>")
+    with pytest.raises(ValueError, match="not a VTK ImageData"):
+        read_fields_vti(str(bad))
+
+    empty = tmp_path / "empty.vti"
+    empty.write_text("")
+    with pytest.raises(Exception):
+        read_fields_vti(str(empty))
+
+
+def test_read_fields_vti_reads_committed_brats_artifact():
+    """The committed BraTS artifact decodes with its documented properties."""
+    import os
+
+    from danon.schedule import read_fields_vti
+
+    path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "outputs_real", "brats_case01017_mtd_day120.vti",
+    )
+    if not os.path.exists(path):
+        pytest.skip("committed BraTS VTI artifact not present")
+    vti = read_fields_vti(path)
+    assert vti.dims == (14, 24, 24)
+    assert vti.spacing_mm == 1.0
+    assert int(vti.mask.sum()) == 1774
+    d = vti.fields["diffusion_mm2_per_day"]
+    assert abs(d.max() / d.min() - 35.0) < 0.01  # 0.35 / 0.01 sanctuary contrast
+    assert vti.fields["sensitive"].shape == vti.dims
+
+
 # ---------------------------------------------------------------------------
 # .vti export (Output A without VR claims)
 # ---------------------------------------------------------------------------
