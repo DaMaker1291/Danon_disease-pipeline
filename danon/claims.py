@@ -643,6 +643,140 @@ def check_mgmt_status_is_measured_not_faked() -> CheckResult:
     )
 
 
+def check_covariate_upgrades_are_measured() -> CheckResult:
+    """The four-requested-upgrades report must exist, freshly measured.
+
+    Re-measures the ceiling on the live cache: the all-covariates model must
+    still fall below age-alone discrimination on the subset it keeps, and the
+    artifact must record each of the four upgrades with a paired delta.
+    """
+    import json as _json
+    import os as _os
+
+    from danon.cohort_features import (
+        GDC_CLINICAL_PATH,
+        TREATMENT_RECORDS_PATH,
+        baseline_kps,
+        predictive_ceiling,
+    )
+    from danon.mgmt import load_mgmt_beta_panel, load_published_mgmt_calls
+    from danon.predictive import load_cohort_rows
+
+    clinical = _os.path.join(ROOT, GDC_CLINICAL_PATH)
+    treatments = _os.path.join(ROOT, TREATMENT_RECORDS_PATH)
+    artifact = _os.path.join(ROOT, "outputs_real/covariate_upgrades.txt")
+    if not (_os.path.exists(clinical) and _os.path.exists(treatments)):
+        return CheckResult(
+            supported=False,
+            detail="cached GDC clinical/treatment exports absent; the upgrade report has no data",
+        )
+
+    rows, _ = load_cohort_rows(endpoint="os")
+    ids = [r.submitter_id for r in rows]
+    calls = load_published_mgmt_calls()
+    panel = load_mgmt_beta_panel()
+    feats = [
+        ("kps_baseline", baseline_kps(_clinical_cases())),
+        ("mgmt_methylated", calls.binaries(ids)),
+        ("mgmt_beta", panel.betas_of(ids)),
+    ]
+    ceiling = predictive_ceiling(rows, feats, n_folds=5, seed=0, n_bootstrap=100)
+    artifact_ok = _os.path.exists(artifact) and all(
+        marker in _read("outputs_real/covariate_upgrades.txt")
+        for marker in (
+            "upgrade 3: pre-treatment KPS",
+            "upgrade 1: MGMT promoter methylation",
+            "upgrade 4: restrict to patients recording RT",
+            "upgrade 2: 3D sub-region segmentation",
+        )
+    )
+    return CheckResult(
+        supported=bool(ceiling.pooled_c < ceiling.age_only_c and artifact_ok),
+        detail=(
+            f"four covariate upgrades measured on the live cache: all-covariates "
+            f"ceiling pooled C {ceiling.pooled_c:.4f} (n={ceiling.n_patients}) vs "
+            f"age-alone {ceiling.age_only_c:.4f} on the same kept subset -- stacking "
+            f"unavailable-for-most covariates costs discrimination; the artifact "
+            f"records each upgrade with its paired delta: {artifact_ok}"
+        ),
+    )
+
+
+def check_mgmt_resistance_sweep_is_measured() -> CheckResult:
+    """The beta->resistance mapping must move the engine in the methylated direction.
+
+    Re-runs a small two-beta MTD sweep live and requires the fully methylated
+    arm not to progress earlier than the unmethylated one, and the committed
+    artifact to carry the full quantile measurement it reports.
+    """
+    from danon.evosteer import MTDPolicy
+    from danon.mgmt import mgmt_resistance_sweep
+
+    sweep = mgmt_resistance_sweep(
+        (0.0, 0.8),
+        beta_source="claims audit",
+        geometry_size=8,
+        policies=[MTDPolicy()],
+        n_replicates=2,
+        seed0=0,
+    )
+    arms = {a.beta: a for a in sweep.by_policy["mtd"]}
+    direction_ok = arms[0.8].median_pfs_days >= arms[0.0].median_pfs_days
+    direction_word = "OK" if direction_ok else "REVERSED"
+    artifact_path = os.path.join(ROOT, "outputs_real/mgmt_resistance.txt")
+    artifact = _read("outputs_real/mgmt_resistance.txt") if os.path.exists(artifact_path) else ""
+    artifact_ok = "r0 = Baseline_Resistance * (1 - beta)" in artifact and "beta=" in artifact
+    return CheckResult(
+        supported=bool(direction_ok and artifact_ok),
+        detail=(
+            f"live two-beta sweep: MTD median PFS {arms[0.0].median_pfs_days:.0f}d "
+            f"(unmethylated) -> {arms[0.8].median_pfs_days:.0f}d (fully methylated), "
+            f"direction {direction_word}; committed quantile artifact present: {artifact_ok}"
+        ),
+    )
+
+
+def check_treatment_restriction_separates_membership_from_signal() -> CheckResult:
+    """The RT+temozolomide restriction must report cohort selection separately.
+
+    Re-measures on the live treatment cache: the kept subset's own baseline and
+    the full-cohort baseline must both be present, and the cohort-membership
+    delta must be reported against the full-cohort fold sd so a change in n is
+    never reported as a change in signal.
+    """
+    import json as _json
+    import os as _os
+
+    from danon.cohort_features import (
+        TREATMENT_RECORDS_PATH,
+        treatment_exposure,
+        treatment_restriction_effect,
+    )
+    from danon.predictive import load_cohort_rows
+
+    tpath = _os.path.join(ROOT, TREATMENT_RECORDS_PATH)
+    if not _os.path.exists(tpath):
+        return CheckResult(supported=False, detail="treatment cache absent")
+    hits = _json.load(open(tpath))["hits"]
+    rows, _ = load_cohort_rows(endpoint="os")
+    r = treatment_restriction_effect(
+        rows, hits, covariates=[], n_folds=5, seed=0, exposure=treatment_exposure(hits)
+    )
+    kept = 0 < r.n_restricted < r.n_cohort
+    baseline_finite = np.isfinite(r.base_c_full) and np.isfinite(r.base_c_restricted)
+    delta_in_sd = abs(r.cohort_membership_delta) <= r.base_sd_full
+    return CheckResult(
+        supported=bool(kept and baseline_finite and delta_in_sd),
+        detail=(
+            f"restriction keeps {r.n_restricted}/{r.n_cohort} patients; base C "
+            f"{r.base_c_full:.4f} (all) -> {r.base_c_restricted:.4f} (restricted); "
+            f"cohort-membership delta {r.cohort_membership_delta:+.4f} inside one "
+            f"fold sd ({r.base_sd_full:.4f}) -- selection is reported separately "
+            f"from any covariate signal"
+        ),
+    )
+
+
 CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "evidence_status_vocabulary": check_evidence_status_vocabulary,
     "censoring_is_preserved": check_censoring_is_preserved,
@@ -653,6 +787,9 @@ CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "untestable_tiers_refused": check_untestable_tiers_are_refused,
     "holdout_emulator_measured": check_holdout_emulator_is_measured,
     "mgmt_status_measured_not_faked": check_mgmt_status_is_measured_not_faked,
+    "covariate_upgrades_measured": check_covariate_upgrades_are_measured,
+    "mgmt_resistance_sweep_measured": check_mgmt_resistance_sweep_is_measured,
+    "restriction_membership_vs_signal": check_treatment_restriction_separates_membership_from_signal,
     "dice_degenerate_case": check_dice_degenerate_case_is_not_perfect,
     "spatial_agreement_not_claimed": check_spatial_agreement_is_not_claimed,
     "potency_is_measured": check_potency_is_measured,
@@ -996,6 +1133,52 @@ CLAIMS: Tuple[Claim, ...] = (
         "danon/claims.py::check_mgmt_status_is_measured_not_faked",
         "mgmt_status_measured_not_faked",
         "A real miss with a real CI is worth more than a claimed number.",
+    ),
+    Claim(
+        "mgmt_beta_moves_the_engine_in_the_methylated_direction",
+        "The requested mapping r0 = Baseline_Resistance * (1 - beta), with "
+        "Baseline_Resistance derived from the calibrated clones (0.75), moves "
+        "the engine: across the real TCGA-GBM beta range (quantiles of 140 "
+        "patients, 2 probes), MTD median progression improves 144 -> 167 days "
+        "and the resistant-clone dominance day moves 22 -> 23, while the "
+        "steering policy saturates at 365 days at every beta (zero dynamic "
+        "range under this mapping). Simulated, not clinical.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/mgmt.py::mgmt_resistance_sweep on the cached cBioPortal panel "
+        "(outputs_real/mgmt_resistance.txt)",
+        "mgmt_resistance_sweep_measured",
+        "The term reaches only the sensitivity-scale component of resistance; "
+        "the kill ceiling is untouched. No patient outcome is claimed.",
+    ),
+    Claim(
+        "covariate_upgrades_measured_not_estimated",
+        "The four covariate upgrades, each measured against a matched baseline "
+        "on the patients it keeps: KPS beside age/sex HR=0.9810 per point "
+        "(3.3 SE) with delta_C=+0.0264 vs fold sd 0.0476 (n=247); MGMT binary "
+        "HR=0.8326 with delta_C=-0.0006 (n=409); continuous beta HR=0.6627 "
+        "with delta_C=+0.0006 (n=137); RT+temozolomide restriction keeps "
+        "356/595 with cohort-membership delta -0.0112 inside fold sd 0.0247. "
+        "None produces a measurable held-out gain; stacking all of them drops "
+        "the ceiling below age alone (0.5785 vs 0.6203 at n=68).",
+        EvidenceStatus.ESTABLISHED,
+        "danon/cohort_features.py::covariate_upgrade_report "
+        "(outputs_real/covariate_upgrades.txt)",
+        "covariate_upgrades_measured",
+        "Directionally consistent with trial literature; the cohort cannot "
+        "resolve it. A change in n is never reported as a change in signal.",
+    ),
+    Claim(
+        "restriction_never_mistaken_for_signal",
+        "Restricting to patients recording RT plus temozolomide is measured as "
+        "cohort selection first: kept 356 of 595, membership delta -0.0112 C "
+        "against the full-cohort fold sd 0.0247, with within-restricted-set "
+        "covariate deltas (KPS -0.0043, MGMT +0.0046) reported separately and "
+        "below their own fold sd.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/cohort_features.py::treatment_restriction_effect",
+        "restriction_membership_vs_signal",
+        "A record is an exposure, not an ordered protocol: first-line cannot "
+        "be separated from salvage in this export.",
     ),
 )
 

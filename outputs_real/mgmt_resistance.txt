@@ -1,0 +1,40 @@
+==========================================================================
+MGMT PROMOTER METHYLATION -> RESISTANCE TERM, MEASURED
+==========================================================================
+
+-- the requested mapping --
+  r0 = Baseline_Resistance * (1 - beta)
+  Baseline_Resistance = 1 - drug_sensitivity_scale_R(DEFAULT_CLONES) = 0.7500
+  resistance audit: baseline_resistance=0.7500 (scale component 0.7500, kill ceiling ratio 0.0588) -- the mapped term moves total drug-A resistance from 0.9853 to 0.9412 -- a span of 0.0441. The remaining 95.5% of the resistance lives in the clone's kill ceiling (kill_max_R/kill_max_S = 0.0588), which this mapping does not touch
+
+-- MGMT beta panel: 140 patient(s) over 2 probe(s) [cg12434587, cg12981137], 292 record(s); calls at cutoff 0.358: methylated=37, unmethylated=103
+     note: probe selection ['cg12434587', 'cg12981137'] is literature-derived (Bady 2012), not derived from the file; a different probe set gives a different beta
+     note: records per probe: {'cg12434587': 146, 'cg12981137': 146}
+     beta quantiles (0, .25, .5, .75, 1): [0.0105, 0.0147, 0.0513, 0.3708, 0.7278]
+
+-- published MGMT calls: 932 patient(s); lgggbm_tcga_pub/MGMT_PROMOTER_STATUS: Methylated=613, Unmethylated=319; gbm_tcga_pub2013/MGMT_STATUS: METHYLATED=170, UNMETHYLATED=180
+-- MGMT call concordance: 109/134 agree (beta-only methylated 0, call-only methylated 25, not callable 0) at cutoff 0.358 -- 81.3% agreement on 134 patient(s) -- the two sources measure the same promoter, so a low agreement would mean the recomputed call is not interchangeable with the published one
+
+MGMT resistance sweep: beta values [0.0105, 0.0147, 0.0513, 0.3708, 0.7278] from cbioportal TCGA-GBM beta quantiles (140 patients, 2 probes), 3 replicate(s), 365 days
+  adaptive_dose                beta=0.0105 scale_R=0.2578 median PFS= 193.0d IQR=[193,197] progressed=100% dominance day=140
+  adaptive_dose                beta=0.0147 scale_R=0.2610 median PFS= 194.0d IQR=[194,198] progressed=100% dominance day=140
+  adaptive_dose                beta=0.0513 scale_R=0.2885 median PFS= 194.0d IQR=[194,198] progressed=100% dominance day=140
+  adaptive_dose                beta=0.3708 scale_R=0.5281 median PFS= 202.0d IQR=[202,206] progressed=100% dominance day=144
+  adaptive_dose                beta=0.7278 scale_R=0.7959 median PFS= 213.0d IQR=[213,218] progressed=100% dominance day=151
+  mtd                          beta=0.0105 scale_R=0.2578 median PFS= 144.0d IQR=[143,146] progressed=100% dominance day=22
+  mtd                          beta=0.0147 scale_R=0.2610 median PFS= 144.0d IQR=[143,147] progressed=100% dominance day=22
+  mtd                          beta=0.0513 scale_R=0.2885 median PFS= 145.0d IQR=[144,148] progressed=100% dominance day=22
+  mtd                          beta=0.3708 scale_R=0.5281 median PFS= 155.0d IQR=[154,158] progressed=100% dominance day=23
+  mtd                          beta=0.7278 scale_R=0.7959 median PFS= 167.0d IQR=[166,170] progressed=100% dominance day=23
+  switch(A->B @ R>=15%, back @ R<=5%) beta=0.0105 scale_R=0.2578 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=none
+  switch(A->B @ R>=15%, back @ R<=5%) beta=0.0147 scale_R=0.2610 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=none
+  switch(A->B @ R>=15%, back @ R<=5%) beta=0.0513 scale_R=0.2885 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=none
+  switch(A->B @ R>=15%, back @ R<=5%) beta=0.3708 scale_R=0.5281 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=none
+  switch(A->B @ R>=15%, back @ R<=5%) beta=0.7278 scale_R=0.7959 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=none
+  -- simulated, not clinical: 3 replicate(s) per beta over 365 days on GBM phantom size 20. adaptive_dose: median PFS 193-213d over the beta range; mtd: median PFS 144-167d over the beta range; switch(A->B @ R>=15%, back @ R<=5%): median PFS 365-365d over the beta range
+
+What this cannot show:
+  - that MGMT methylation changes any patient's outcome: it is a prognostic marker, and measuring its association in a cohort is not a mechanism
+  - that the mapped resistance is the real resistance: the mapping is a declared convention anchored on the calibrated default, not a fit
+  - that the simulated PFS differences are treatment effects: the engine's dynamics class is anchored to a prostate adaptive-therapy trial, and no GBM outcome is reproduced here
+  - that a beta from a donor tumour equals the patient's own: the panel is a cohort distribution, and the engine consumes one beta per simulated case

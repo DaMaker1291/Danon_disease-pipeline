@@ -1416,10 +1416,8 @@ def covariate_upgrade_report(
     restriction = treatment_restriction_effect(
         rows,
         hits,
-        covariates=[
-            ("kps_baseline", kps),
-            *((["mgmt_methylated", mgmt_values]) if mgmt_values else []),
-        ],
+        covariates=[("kps_baseline", kps)]
+        + ([("mgmt_methylated", mgmt_values)] if mgmt_values else []),
         n_folds=n_folds,
         seed=seed,
         exposure=treatment_exposure(hits),

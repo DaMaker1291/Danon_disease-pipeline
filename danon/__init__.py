@@ -649,6 +649,24 @@ from danon.twin_plan import (
     plan_from_mask,
 )
 
+# MGMT promoter methylation: the beta -> resistance bridge (r0 = Baseline
+# _Resistance * (1 - beta)), its engine sweep, and the published-call concordance.
+from danon.mgmt import (
+    BASELINE_RESISTANCE as MGMT_BASELINE_RESISTANCE,
+    BetaArmOutcome,
+    MgmtBetaPanel,
+    MgmtResistanceSweep,
+    clone_params_for_mgmt_beta,
+    load_mgmt_beta_panel,
+    load_published_mgmt_calls,
+    mgmt_call_concordance,
+    mgmt_provenance,
+    mgmt_resistance,
+    mgmt_resistance_sweep,
+    render_mgmt_report,
+    resistance_audit,
+)
+
 # Verification campaign: millions of elementary property checks (per-voxel
 # invariants, dose/burden bounds, determinism probes) accumulated across
 # paired runs -- resumable, with bootstrap CIs. Verifies the IMPLEMENTATION,
@@ -1047,6 +1065,10 @@ __all__ = [
     "PatientIntake", "ScheduleEvent", "DosingScheduleReport",
     "compile_dosing_schedule", "extract_schedule_events", "export_fields_vti",
     "TwinPlanResult", "DEFAULT_R0", "DEFAULT_R0_SOURCE", "downsample_mask_to_budget", "plan_from_mask",
+    "MGMT_BASELINE_RESISTANCE", "BetaArmOutcome", "MgmtBetaPanel", "MgmtResistanceSweep",
+    "clone_params_for_mgmt_beta", "load_mgmt_beta_panel", "load_published_mgmt_calls",
+    "mgmt_call_concordance", "mgmt_provenance", "mgmt_resistance", "mgmt_resistance_sweep",
+    "render_mgmt_report", "resistance_audit",
     "EmulatorDataset", "EmulatorResult", "MgmtStatusResult", "FEATURE_NAMES", "FEATURE_BOUNDS",
     "emulator_target", "mgmt_status_target", "load_or_build_emulator_dataset",
     "FEATURE_ORDER", "feature_matrix", "geometry_features",

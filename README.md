@@ -50,7 +50,12 @@ python -c "from danon.claims import audit_claims; audit_claims()"   # 23/23 boun
 | Standard 2 · permutation leakage audit | observed 0.6559 vs null band **0.468–0.536** (20 draws, null centre 0.506) | `outputs_real/audit_trace.txt` |
 | High-ceiling · engine emulator | **holdout R² = 0.9211** (CI 0.8615–0.9536, n_test=48 untouched configs) — synthetic, never a patient accuracy | `outputs_real/high_ceiling.txt` |
 | High-ceiling · MGMT status (real patients) | **AUC = 0.5387** (CI 0.485–0.596, n=396) — indistinguishable from chance, reported at its measured value | same |
-| Bound-claims audit | **25/25 verified** | `danon/claims.py::audit_claims` |
+| Covariate upgrades · KPS beside age/sex | HR=**0.9810**/point (3.3 SE, n=247) — real protective direction, delta_C=+0.0264 vs fold sd 0.0476: **no measurable held-out gain** | `outputs_real/covariate_upgrades.txt` |
+| Covariate upgrades · MGMT binary / continuous beta | HR=0.8326 (delta_C=−0.0006, n=409) / HR=0.6627 (delta_C=+0.0006, n=137) — directionally consistent with trial literature, unresolvable in this cohort | same |
+| Covariate upgrades · RT+temozolomide restriction | keeps **356/595**; cohort-membership delta −0.0112 inside fold sd 0.0247 — selection reported separately from signal | same |
+| Covariate upgrades · all covariates stacked | pooled C **0.5785** (n=68) vs age-alone 0.6203 on the same kept subset — stacking unavailable-for-most covariates *costs* discrimination | same |
+| MGMT β → resistance bridge | r0 = 0.75·(1−β); across the real 140-patient beta range MTD median PFS **144 → 167 days**; steering policy saturates at 365 d at every β (zero dynamic range) | `outputs_real/mgmt_resistance.txt` |
+| Bound-claims audit | **28/28 verified** | `danon/claims.py::audit_claims` |
 
 Standard 1 validates the *solver* on synthetic planted ground truth — no patients involved, and it must never be blended with the Standard 2 patient numbers. The dosing "policies" (`MTDPolicy`, `AdaptiveDosePolicy`, `CollateralSwitchPolicy`) are closed-form rules; **no reinforcement-learning agent exists or is claimed** (bound claim `no_rl_agent`). The PDE operators live in `danon/anisotropy.py` and `danon/evosteer.py`; `danon/imaging.py` is NIfTI intake and geometry only.
 ```

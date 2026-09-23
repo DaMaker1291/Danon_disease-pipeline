@@ -1,0 +1,47 @@
+==========================================================================
+COVARIATE UPGRADES: implemented or refused, each measured
+==========================================================================
+
+  595 patients with a usable os endpoint
+  491 events, 104 censored at last contact
+  1 patient(s) recorded Dead with no days_to_death: censored at last contact because there is no event time
+  21 dropped: no age recorded
+  1 dropped: no usable time or endpoint
+
+-- upgrade 3: pre-treatment KPS beside age and sex --
+  kps_baseline in the design matrix: n=247 (200 events, 47 censored); terms [age_years=1.0252+/-0.0063, male=1.3438+/-0.1538, is_glioblastoma=2.7563+/-0.4277, kps_baseline=0.9810+/-0.0059]; delta_C=+0.0264 (fold sd 0.0476, 5/5 folds) [in the design matrix with a 3.3-SE coefficient (HR=0.9810, no measurable gain)]
+  the same fit, reported per +10 KPS points: HR=0.8254
+  univariate contrast: univariate KPS: pre-treatment C=0.5971 (n=247) vs post-adjuvant C=0.6842 (n=101) -- LEAKAGE: a post-treatment KPS outranks a pre-treatment one by +0.0871 C. The post-treatment value is partly determined by the outcome, so it must not be used as a baseline feature
+      note: 348 of 595 cohort patients dropped: covariate absent
+      note: requiring this covariate changes the cohort, so base C on the subset is not comparable to base C on the full cohort
+      note: expected direction: higher KPS is better, so a hazard ratio below 1 is expected
+
+-- upgrade 1: MGMT promoter methylation --
+  binary published call: mgmt_methylated in the design matrix: n=409 (309 events, 100 censored); terms [age_years=1.0377+/-0.0046, male=1.5180+/-0.1219, is_glioblastoma=2.2803+/-0.5846, mgmt_methylated=0.8326+/-0.1176]; delta_C=-0.0006 (fold sd 0.0538, 5/5 folds) [in the design matrix but indistinguishable from no effect (HR=0.8326, z=-1.56, no measurable gain)]
+      note: 186 of 595 cohort patients dropped: covariate absent
+      note: requiring this covariate changes the cohort, so base C on the subset is not comparable to base C on the full cohort
+      note: expected direction: methylated MGMT is silenced, so a hazard ratio below 1 is expected
+  continuous beta (cbioportal TCGA-GBM methylation beta (cg12434587/cg12981137)): mgmt_beta in the design matrix: n=137 (93 events, 44 censored); terms [age_years=1.0576+/-0.0104, male=1.5653+/-0.2370, is_glioblastoma=0.7935+/-0.7454, mgmt_beta=0.6627+/-0.5118]; delta_C=+0.0006 (fold sd 0.0621, 5/5 folds) [in the design matrix but indistinguishable from no effect (HR=0.6627, z=-0.80, no measurable gain)]
+      note: 458 of 595 cohort patients dropped: covariate absent
+      note: requiring this covariate changes the cohort, so base C on the subset is not comparable to base C on the full cohort
+      note: expected direction: a higher promoter beta means less repair, so a hazard ratio below 1 is expected
+
+-- upgrade 4: restrict to patients recording RT + temozolomide --
+  treatment restriction (RT + temozolomide): kept 356 of 595 patients; base C 0.6559+/-0.0247 (all) -> 0.6447+/-0.0390 (restricted), cohort-membership delta -0.0112; age-only on the restricted set 0.6282 [restriction moves the baseline by -0.0112 C, inside one fold sd (0.0247)]
+    within the restricted set: kps_baseline: n=182 (140 events, 42 censored)  base C=0.6362+/-0.0282 -> +covariate C=0.6320+/-0.0291  delta=-0.0043  HR=0.9824  folds=5/5  [no measurable gain]
+    within the restricted set: mgmt_methylated: n=282 (199 events, 83 censored)  base C=0.6403+/-0.0505 -> +covariate C=0.6449+/-0.0514  delta=+0.0046  HR=0.6859  folds=5/5  [no measurable gain]
+      note: 356 case(s) in the treatment export record radiotherapy plus temozolomide; 239 cohort patient(s) dropped for not recording it
+      note: a record is an exposure, not an ordered protocol: start days are missing for most treatment records, so first-line therapy cannot be separated from salvage therapy in this export
+
+-- upgrade 2: 3D sub-region segmentation --
+  refused, unchanged: no collection with expert masks is retrievable, and danon.multimodal.spatial_dice_verdict derives that from live counts
+
+-- the ceiling: what the fullest model the data supports reaches --
+  ceiling [baseline + all available covariates]: covariates ['age_years', 'male', 'is_glioblastoma', 'kps_baseline', 'mgmt_methylated', 'mgmt_beta']; n=68 (43 events, 25 censored); pooled out-of-fold C = 0.5785 (95% bootstrap CI 0.4646-0.6873, the interval includes 0.5); age alone 0.6203. Majority-class accuracy on the same cohort is 63.24%, which is what an 'accuracy' claim of that size would mean without any model
+      note: 527 of 595 cohort patient(s) dropped: at least one covariate absent
+      note: risks pooled out of fold; 400 of 400 bootstrap resamples were estimable
+      note: a C-index of 0.90 would mean 90% of random patient pairs ordered correctly; accuracy on a binary outcome is a different quantity, and the majority class already scores the value above with no model
+
+Every delta above is paired on the patients its subset keeps, and every
+subset change is reported with its own baseline, so a change in n is
+never reported as a change in signal.
