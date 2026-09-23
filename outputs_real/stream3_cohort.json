@@ -1,0 +1,434 @@
+[
+ {
+  "case_id": "01017",
+  "engine_grid": [
+   14,
+   24,
+   24
+  ],
+  "tumour_voxels": 1774,
+  "mean_enhancement_in_tumour": 0.3963827194872357,
+  "max_enhancement": 0.9382215660125738,
+  "voxels_with_enhancement": 1511,
+  "r0": 0.005,
+  "seeds": [
+   101,
+   102,
+   103
+  ],
+  "arms": {
+   "mtd": {
+    "pfs_real": [
+     290,
+     296,
+     210
+    ],
+    "pfs_null": [
+     292,
+     299,
+     211
+    ],
+    "toxicity_real": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "toxicity_null": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "pfs_median_real": 290.0,
+    "pfs_median_null": 292.0,
+    "toxicity_median_real": 365.0,
+    "toxicity_median_null": 365.0
+   },
+   "steering": {
+    "pfs_real": [
+     365,
+     365,
+     365
+    ],
+    "pfs_null": [
+     365,
+     365,
+     365
+    ],
+    "toxicity_real": [
+     349.99999999999966,
+     348.7999999999996,
+     356.29999999999984
+    ],
+    "toxicity_null": [
+     309.49999999999903,
+     307.3999999999987,
+     308.8999999999987
+    ],
+    "pfs_median_real": 365.0,
+    "pfs_median_null": 365.0,
+    "toxicity_median_real": 349.99999999999966,
+    "toxicity_median_null": 308.8999999999987
+   }
+  }
+ },
+ {
+  "case_id": "01018",
+  "engine_grid": [
+   16,
+   23,
+   28
+  ],
+  "tumour_voxels": 1840,
+  "mean_enhancement_in_tumour": 0.41212947525340615,
+  "max_enhancement": 0.9686647652970994,
+  "voxels_with_enhancement": 1806,
+  "r0": 0.005,
+  "seeds": [
+   101,
+   102,
+   103
+  ],
+  "arms": {
+   "mtd": {
+    "pfs_real": [
+     365,
+     328,
+     365
+    ],
+    "pfs_null": [
+     365,
+     330,
+     365
+    ],
+    "toxicity_real": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "toxicity_null": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "pfs_median_real": 365.0,
+    "pfs_median_null": 365.0,
+    "toxicity_median_real": 365.0,
+    "toxicity_median_null": 365.0
+   },
+   "steering": {
+    "pfs_real": [
+     365,
+     365,
+     365
+    ],
+    "pfs_null": [
+     365,
+     365,
+     365
+    ],
+    "toxicity_real": [
+     327.19999999999914,
+     320.899999999999,
+     325.9999999999991
+    ],
+    "toxicity_null": [
+     310.39999999999895,
+     308.89999999999884,
+     308.59999999999883
+    ],
+    "pfs_median_real": 365.0,
+    "pfs_median_null": 365.0,
+    "toxicity_median_real": 325.9999999999991,
+    "toxicity_median_null": 308.89999999999884
+   }
+  }
+ },
+ {
+  "case_id": "01019",
+  "engine_grid": [
+   19,
+   22,
+   29
+  ],
+  "tumour_voxels": 2826,
+  "mean_enhancement_in_tumour": 0.44440927179332984,
+  "max_enhancement": 0.9793741489333297,
+  "voxels_with_enhancement": 2657,
+  "r0": 0.005,
+  "seeds": [
+   101,
+   102,
+   103
+  ],
+  "arms": {
+   "mtd": {
+    "pfs_real": [
+     289,
+     281,
+     288
+    ],
+    "pfs_null": [
+     291,
+     281,
+     288
+    ],
+    "toxicity_real": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "toxicity_null": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "pfs_median_real": 288.0,
+    "pfs_median_null": 288.0,
+    "toxicity_median_real": 365.0,
+    "toxicity_median_null": 365.0
+   },
+   "steering": {
+    "pfs_real": [
+     365,
+     365,
+     365
+    ],
+    "pfs_null": [
+     365,
+     365,
+     365
+    ],
+    "toxicity_real": [
+     331.699999999999,
+     349.99999999999966,
+     351.7999999999997
+    ],
+    "toxicity_null": [
+     312.49999999999903,
+     308.5999999999989,
+     321.49999999999903
+    ],
+    "pfs_median_real": 365.0,
+    "pfs_median_null": 365.0,
+    "toxicity_median_real": 349.99999999999966,
+    "toxicity_median_null": 312.49999999999903
+   }
+  }
+ },
+ {
+  "case_id": "01020",
+  "engine_grid": [
+   18,
+   23,
+   23
+  ],
+  "tumour_voxels": 3623,
+  "mean_enhancement_in_tumour": 0.4860715131806688,
+  "max_enhancement": 1.0,
+  "voxels_with_enhancement": 3309,
+  "r0": 0.005,
+  "seeds": [
+   101,
+   102,
+   103
+  ],
+  "arms": {
+   "mtd": {
+    "pfs_real": [
+     261,
+     202,
+     213
+    ],
+    "pfs_null": [
+     262,
+     202,
+     213
+    ],
+    "toxicity_real": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "toxicity_null": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "pfs_median_real": 213.0,
+    "pfs_median_null": 213.0,
+    "toxicity_median_real": 365.0,
+    "toxicity_median_null": 365.0
+   },
+   "steering": {
+    "pfs_real": [
+     365,
+     365,
+     365
+    ],
+    "pfs_null": [
+     365,
+     365,
+     365
+    ],
+    "toxicity_real": [
+     308.59999999999866,
+     328.99999999999903,
+     332.59999999999917
+    ],
+    "toxicity_null": [
+     304.0999999999988,
+     310.99999999999886,
+     310.69999999999885
+    ],
+    "pfs_median_real": 365.0,
+    "pfs_median_null": 365.0,
+    "toxicity_median_real": 328.99999999999903,
+    "toxicity_median_null": 310.69999999999885
+   }
+  }
+ },
+ {
+  "case_id": "01021",
+  "engine_grid": [
+   18,
+   26,
+   24
+  ],
+  "tumour_voxels": 2986,
+  "mean_enhancement_in_tumour": 0.3650311676099153,
+  "max_enhancement": 1.0,
+  "voxels_with_enhancement": 2709,
+  "r0": 0.005,
+  "seeds": [
+   101,
+   102,
+   103
+  ],
+  "arms": {
+   "mtd": {
+    "pfs_real": [
+     287,
+     208,
+     276
+    ],
+    "pfs_null": [
+     289,
+     209,
+     279
+    ],
+    "toxicity_real": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "toxicity_null": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "pfs_median_real": 276.0,
+    "pfs_median_null": 279.0,
+    "toxicity_median_real": 365.0,
+    "toxicity_median_null": 365.0
+   },
+   "steering": {
+    "pfs_real": [
+     365,
+     365,
+     365
+    ],
+    "pfs_null": [
+     365,
+     365,
+     365
+    ],
+    "toxicity_real": [
+     349.3999999999997,
+     344.59999999999945,
+     325.99999999999886
+    ],
+    "toxicity_null": [
+     299.5999999999987,
+     306.19999999999885,
+     308.5999999999989
+    ],
+    "pfs_median_real": 365.0,
+    "pfs_median_null": 365.0,
+    "toxicity_median_real": 344.59999999999945,
+    "toxicity_median_null": 306.19999999999885
+   }
+  }
+ },
+ {
+  "case_id": "01022",
+  "engine_grid": [
+   16,
+   25,
+   27
+  ],
+  "tumour_voxels": 2528,
+  "mean_enhancement_in_tumour": 0.43285352896521934,
+  "max_enhancement": 0.9895836543499028,
+  "voxels_with_enhancement": 2333,
+  "r0": 0.005,
+  "seeds": [
+   101,
+   102,
+   103
+  ],
+  "arms": {
+   "mtd": {
+    "pfs_real": [
+     307,
+     336,
+     353
+    ],
+    "pfs_null": [
+     308,
+     338,
+     354
+    ],
+    "toxicity_real": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "toxicity_null": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "pfs_median_real": 336.0,
+    "pfs_median_null": 338.0,
+    "toxicity_median_real": 365.0,
+    "toxicity_median_null": 365.0
+   },
+   "steering": {
+    "pfs_real": [
+     365,
+     365,
+     365
+    ],
+    "pfs_null": [
+     365,
+     365,
+     365
+    ],
+    "toxicity_real": [
+     343.99999999999955,
+     331.9999999999991,
+     340.99999999999943
+    ],
+    "toxicity_null": [
+     303.79999999999876,
+     301.69999999999857,
+     299.8999999999986
+    ],
+    "pfs_median_real": 365.0,
+    "pfs_median_null": 365.0,
+    "toxicity_median_real": 340.99999999999943,
+    "toxicity_median_null": 301.69999999999857
+   }
+  }
+ }
+]

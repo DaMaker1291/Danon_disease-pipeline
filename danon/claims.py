@@ -777,6 +777,124 @@ def check_treatment_restriction_separates_membership_from_signal() -> CheckResul
     )
 
 
+# ---------------------------------------------------------------------------
+# Clinical-twin stream checks (the four-hospital-datastream module)
+# ---------------------------------------------------------------------------
+
+
+def check_stream_identities_hold() -> CheckResult:
+    """Each stream's neutral value must reproduce the engine default exactly."""
+    from danon.clinical_twin import KI67_REF, stream2_growth_rate, stream2_clones, build_stream3_clearance, stream1_initial_state
+    from danon.evosteer import DEFAULT_CLONES
+
+    g = stream2_growth_rate(KI67_REF)
+    c = stream2_clones(KI67_REF)
+    ki67_ok = abs(g - DEFAULT_CLONES.growth_S) < 1e-12 and (
+        abs(c.growth_R - DEFAULT_CLONES.growth_R) < 1e-12
+    )
+    rcbv = np.full((4, 4, 4), 0.5)
+    pattern = build_stream3_clearance(rcbv)
+    clr_ok = bool(np.allclose(pattern, 1.0))
+    mask = np.ones((3, 3, 3), dtype=bool)
+    fluo = np.ones((3, 3, 3))
+    ns, nr = stream1_initial_state(fluo, mask, r0=0.05)
+    total = float(ns.sum() + nr.sum())
+    expected = 0.65 * 1.0 * int(mask.sum())
+    ala_ok = abs(total - expected) < 1e-9
+    return CheckResult(
+        supported=ki67_ok and clr_ok and ala_ok,
+        detail=(
+            f"Ki67={KI67_REF} -> calibrated growth exactly: {ki67_ok}; "
+            f"uniform rCBV -> uniform clearance: {clr_ok}; 5-ALA map preserves "
+            f"the engine fill burden ({total:.4f} == {expected:.4f}): {ala_ok}"
+        ),
+    )
+
+
+def check_stream3_cohort_is_measured() -> CheckResult:
+    """The committed stream-3 cohort file must match a live re-run of case 01017."""
+    from danon.clinical_twin import STREAM3_COHORT_PATH, stream3_report
+
+    if not os.path.exists(STREAM3_COHORT_PATH):
+        return CheckResult(
+            supported=False,
+            detail="stream-3 cohort file missing; rebuild via _stream3_cohort.py",
+        )
+    report = stream3_report()
+    n_ok = report["n_cases"] == 6 and report["n_paired_runs_per_arm"] == 18
+    mean_d = report["mtd_pfs_delta_mean_days"]
+    # Re-measure one paired seed live to confirm the committed numbers derive
+    # from the code, not from a stale file.
+    from danon.clinical_twin import build_stream3_vessels
+    from danon.imaging import from_nifti_mask
+    from danon.evosteer import MTDPolicy, TumorEvolutionSimulator
+
+    case = "01017"
+    vessels = os.path.join(
+        os.path.dirname(STREAM3_COHORT_PATH),
+        "..", "data", "engine_ready", f"BraTS2021_{case}_vessels_t1ce.nii.gz",
+    )
+    live_ok = False
+    live_delta = None
+    if os.path.exists(vessels):
+        pg_r = from_nifti_mask(
+            os.path.join(ROOT, "data", "engine_ready", f"BraTS2021_{case}_mask.nii.gz"),
+            proliferative_path=os.path.join(
+                ROOT, "data", "engine_ready", f"BraTS2021_{case}_prolif.nii.gz"
+            ),
+            vessels_path=vessels,
+        )
+        pg_n = from_nifti_mask(
+            os.path.join(ROOT, "data", "engine_ready", f"BraTS2021_{case}_mask.nii.gz"),
+            proliferative_path=os.path.join(
+                ROOT, "data", "engine_ready", f"BraTS2021_{case}_prolif.nii.gz"
+            ),
+        )
+        a = TumorEvolutionSimulator(pg_r.geometry).run(
+            MTDPolicy(), days=365, initial_resistant_fraction=0.005, seed=101
+        )
+        b = TumorEvolutionSimulator(pg_n.geometry).run(
+            MTDPolicy(), days=365, initial_resistant_fraction=0.005, seed=101
+        )
+        live_delta = (a.pfs_day or 365) - (b.pfs_day or 365)
+        committed = report["cases"][case]["mtd_pfs_median_real"]
+        live_ok = (a.pfs_day or 365) == committed
+    return CheckResult(
+        supported=n_ok and live_ok,
+        detail=(
+            f"cohort 6 cases / 18 paired runs: {n_ok}; live re-run of 01017 "
+            f"seed 101 reproduces the committed PFS: {live_ok} "
+            f"(paired delta {live_delta} d; committed mean {mean_d:+.2f} d)"
+        ),
+    )
+
+
+def check_stream_census_refuses_honestly() -> CheckResult:
+    """Streams 1/2/4 must refuse with live zero counts, not pretend availability."""
+    from danon.clinical_twin import clinical_stream_census
+
+    census = clinical_stream_census()
+    s1 = census["stream1_5ala"]
+    s2 = census["stream2_histology"]
+    s4 = census["stream4_sequential"]
+    ok = (
+        s1["status"] == "REFUSED" and s1["n_files"] == 0
+        and s2["status"] == "REFUSED" and s2["n_files"] == 0
+        and s4["status"] == "REFUSED" and s4["n_pairs"] == 0
+        and census["stream3_perfusion"]["status"] == "MEASURABLE"
+    )
+    return CheckResult(
+        supported=ok,
+        detail=(
+            "census: stream1 REFUSED({}), stream2 REFUSED({}), stream3 "
+            "MEASURABLE({} t1ce files), stream4 REFUSED({} pairs)".format(
+                s1["n_files"], s2["n_files"],
+                census["stream3_perfusion"]["n_t1ce_files"], s4["n_pairs"],
+            )
+        ),
+    )
+
+
 CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "evidence_status_vocabulary": check_evidence_status_vocabulary,
     "censoring_is_preserved": check_censoring_is_preserved,
@@ -805,6 +923,9 @@ CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "voxel_scale": check_voxel_scale,
     "runtime_365": check_runtime_365_days,
     "bulk_not_single_cell": check_parameters_are_bulk_not_single_cell,
+    "stream_identities": check_stream_identities_hold,
+    "stream3_cohort_measured": check_stream3_cohort_is_measured,
+    "stream_census_refuses": check_stream_census_refuses_honestly,
 }
 
 
@@ -1166,6 +1287,51 @@ CLAIMS: Tuple[Claim, ...] = (
         "covariate_upgrades_measured",
         "Directionally consistent with trial literature; the cohort cannot "
         "resolve it. A change in n is never reported as a change in signal.",
+    ),
+    Claim(
+        "clinical_streams_wired_with_identity_guarantees",
+        "The four-stream clinical datastream is implemented with identity "
+        "guarantees: Ki-67 at the declared reference (0.15) returns the "
+        "calibrated growth rates exactly; uniform rCBV yields uniform "
+        "clearance; a uniform 5-ALA map preserves the engine's fill burden. "
+        "Each stream's constants are declared (KI67_REF=0.15, "
+        "CLEARANCE_GAMMA=1.0), and stream 4 is an observation, not an input.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/claims.py::check_stream_identities_hold",
+        "stream_identities",
+        "Mappings are re-parameterisations, not rival models; the neutral "
+        "value is the calibrated default.",
+    ),
+    Claim(
+        "stream3_real_vasculature_measured_small_effect",
+        "Stream 3 (perfusion) is measured on real cached data: t1ce contrast "
+        "volumes block-averaged through the segmentations' exact engine "
+        "transform for 6 BraTS cases (tumour mean enhancement 0.37-0.49), "
+        "then run PAIRED (same geometry, same seeds) against the null-uniform "
+        "vasculature: MTD PFS moves by a mean of -1.17 days (sd 1.01, max 3, "
+        "18 paired runs; 5/6 cases earlier), steering stays horizon-censored "
+        "in both geometries (paired delta exactly 0). At engine scale the "
+        "vessel-source variation contributes ~1 day: the sanctuary structure "
+        "lives in D(x), which both geometries share.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/clinical_twin.py::stream3_report over "
+        "outputs_real/stream3_cohort.json (rebuildable via _stream3_cohort.py)",
+        "stream3_cohort_measured",
+        "A wired-and-measured stream whose measured effect is small is a "
+        "result, not a failure; t1ce is a vascular proxy, not Ktrans.",
+    ),
+    Claim(
+        "clinical_stream_census_refuses_with_live_counts",
+        "Streams 1 (5-ALA fluorescence), 2 (whole-slide Ki-67) and 4 "
+        "(sequential MRI) refuse with live zero counts -- no fluorescence "
+        "captures, no WSIs, and BraTS is a single pre-operative timepoint -- "
+        "while their mappings are implemented and unit-tested, activating "
+        "when real files are supplied. No stream is back-filled.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/claims.py::check_stream_census_refuses_honestly",
+        "stream_census_refuses",
+        "The census is computed live from the data directory, so acquiring "
+        "real files flips the refusal to 'available' automatically.",
     ),
     Claim(
         "restriction_never_mistaken_for_signal",

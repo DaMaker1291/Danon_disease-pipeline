@@ -580,6 +580,8 @@ class TumorEvolutionSimulator:
         fill_fraction: float = 0.65,
         immune: Optional[ImmuneParams] = None,
         observation_hook: Optional[Callable[[int, float, float], None]] = None,
+        initial_state: Optional[Tuple[np.ndarray, np.ndarray]] = None,
+        clearance_pattern: Optional[np.ndarray] = None,
     ) -> SimulationTrajectory:
         """Run one trial.
 
@@ -590,14 +592,61 @@ class TumorEvolutionSimulator:
         dosing). It receives aggregate burdens only and must not mutate
         simulator state; policies never see it, so no hidden-state leakage
         is possible through this channel.
+
+        initial_state, when given, is an (N_S, N_R) pair that REPLACES the
+        clustered seed -- the clinical-twin path where a measured t=0 map
+        (e.g. 5-ALA fluorescence) sets the initial tumour density. It must
+        match the geometry shape and be non-negative somewhere. When given,
+        initial_resistant_fraction is ignored (the fraction is whatever the
+        supplied state carries). IDENTITY: initial_state=sim.seed(r, seed=s,
+        fill_fraction=f) reproduces the default path exactly (same rng
+        consumption: seed() draws from its own generator).
+
+        clearance_pattern, when given, is a per-voxel RELATIVE multiplier on
+        both drugs' clearance (mean-normalised to 1.0, like the diffusion
+        pattern, so the calibrated mean clearance is unchanged and only the
+        spatial variation is added): lambda(x) = lambda_0 * pattern(x). The
+        clinical-twin module maps a K-trans map here. IDENTITY: None or an
+        all-ones pattern reduces to the historical uniform clearance.
         """
         if days < 2:
             raise ValueError("need at least 2 days")
+        if initial_state is not None:
+            N_S0, N_R0 = initial_state
+            N_S0 = np.asarray(N_S0, dtype=float)
+            N_R0 = np.asarray(N_R0, dtype=float)
+            if N_S0.shape != self._shape or N_R0.shape != self._shape:
+                raise ValueError(
+                    f"initial_state shapes {(N_S0.shape, N_R0.shape)} do not "
+                    f"match geometry {self._shape}"
+                )
+            if np.any(N_S0 < 0.0) or np.any(N_R0 < 0.0):
+                raise ValueError("initial_state densities must be non-negative")
+            if float(N_S0.sum() + N_R0.sum()) <= 0.0:
+                raise ValueError("initial_state is empty: no tumour cells at t=0")
+        clr_pat_norm: Optional[np.ndarray] = None
+        if clearance_pattern is not None:
+            clr_pat = np.asarray(clearance_pattern, dtype=float)
+            if clr_pat.shape != self._shape:
+                raise ValueError(
+                    f"clearance pattern shape {clr_pat.shape} does not match "
+                    f"geometry {self._shape}"
+                )
+            if np.any(clr_pat < 0.0):
+                raise ValueError("clearance pattern must be non-negative")
+            mean = float(clr_pat.mean())
+            if mean <= 0.0:
+                raise ValueError("clearance pattern has zero mean: no clearance at all")
+            clr_pat_norm = clr_pat / mean
+        self._run_clr_pattern = clr_pat_norm
         rng = np.random.default_rng(seed)
         policy.reset()  # stateful policies must not leak across replicates
-        N_S, N_R = self.seed(
-            initial_resistant_fraction, seed=seed, fill_fraction=fill_fraction
-        )
+        if initial_state is not None:
+            N_S, N_R = N_S0.copy(), N_R0.copy()
+        else:
+            N_S, N_R = self.seed(
+                initial_resistant_fraction, seed=seed, fill_fraction=fill_fraction
+            )
 
         c_A = np.zeros(self._shape)
         c_B = np.zeros(self._shape)
@@ -639,6 +688,7 @@ class TumorEvolutionSimulator:
         kmax_R = self.drugs.kill_max_R
         ec50 = self.drugs.ec50
         clr = self.drugs.clearance
+        clr_pat = getattr(self, "_run_clr_pattern", None)
         src = self.drugs.source_strength
 
         for day in range(days):
@@ -663,19 +713,23 @@ class TumorEvolutionSimulator:
             # the same model in the homogeneous limit.
             if self._diff_pattern is None:
                 for _ in range(n_sub):
-                    c_A += dts * (dA * _laplacian(c_A) + doseA * src * vessels - clr[0] * c_A)
-                    c_B += dts * (dB * _laplacian(c_B) + doseB * src * vessels - clr[1] * c_B)
+                    c_A += dts * (dA * _laplacian(c_A) + doseA * src * vessels
+                                  - (clr_pat * clr[0] if clr_pat is not None else clr[0]) * c_A)
+                    c_B += dts * (dB * _laplacian(c_B) + doseB * src * vessels
+                                  - (clr_pat * clr[1] if clr_pat is not None else clr[1]) * c_B)
                     np.maximum(c_A, 0.0, out=c_A)
                     np.maximum(c_B, 0.0, out=c_B)
             else:
+                clrA = clr[0] if clr_pat is None else clr[0] * clr_pat
+                clrB = clr[1] if clr_pat is None else clr[1] * clr_pat
                 for _ in range(n_sub):
                     c_A += dts * (
                         dA * divergence_d_grad(c_A, self._diff_pattern)
-                        + doseA * src * vessels - clr[0] * c_A
+                        + doseA * src * vessels - clrA * c_A
                     )
                     c_B += dts * (
                         dB * divergence_d_grad(c_B, self._diff_pattern)
-                        + doseB * src * vessels - clr[1] * c_B
+                        + doseB * src * vessels - clrB * c_B
                     )
                     np.maximum(c_A, 0.0, out=c_A)
                     np.maximum(c_B, 0.0, out=c_B)

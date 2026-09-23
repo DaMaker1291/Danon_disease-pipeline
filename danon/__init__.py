@@ -669,6 +669,27 @@ from danon.mgmt import (
     resistance_audit,
 )
 
+# Clinical datastream intake: four routine hospital tests -> engine
+# parameters, with identity guarantees and live-count refusals.
+from danon.clinical_twin import (
+    CLEARANCE_GAMMA,
+    DEFAULT_ALA_R0,
+    DEFAULT_ALA_R0_SOURCE,
+    KI67_REF,
+    STREAM3_COHORT_PATH,
+    TwinStreamState,
+    assemble_digital_twin_state,
+    build_stream3_clearance,
+    build_stream3_vessels,
+    clinical_stream_census,
+    decimate_t1ce_to_engine_grid,
+    stream1_initial_state,
+    stream2_clones,
+    stream2_growth_rate,
+    stream3_report,
+    stream4_velocity,
+)
+
 # Verification campaign: millions of elementary property checks (per-voxel
 # invariants, dose/burden bounds, determinism probes) accumulated across
 # paired runs -- resumable, with bootstrap CIs. Verifies the IMPLEMENTATION,
@@ -1068,6 +1089,11 @@ __all__ = [
     "compile_dosing_schedule", "extract_schedule_events", "export_fields_vti",
     "read_fields_vti", "VtiFields",
     "TwinPlanResult", "DEFAULT_R0", "DEFAULT_R0_SOURCE", "downsample_mask_to_budget", "plan_from_mask",
+    "assemble_digital_twin_state", "build_stream3_vessels", "build_stream3_clearance",
+    "stream1_initial_state", "stream2_clones", "stream2_growth_rate", "stream3_report",
+    "stream4_velocity", "clinical_stream_census", "decimate_t1ce_to_engine_grid",
+    "KI67_REF", "CLEARANCE_GAMMA", "STREAM3_COHORT_PATH", "TwinStreamState",
+    "DEFAULT_ALA_R0", "DEFAULT_ALA_R0_SOURCE",
     "MGMT_BASELINE_RESISTANCE", "BetaArmOutcome", "MgmtBetaPanel", "MgmtResistanceSweep",
     "clone_params_for_mgmt_beta", "load_mgmt_beta_panel", "load_published_mgmt_calls",
     "mgmt_call_concordance", "mgmt_provenance", "mgmt_resistance", "mgmt_resistance_sweep",

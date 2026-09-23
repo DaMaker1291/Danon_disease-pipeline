@@ -36,7 +36,7 @@ With the backend up, the Twin Planner runs live planning on your mask (~4 s for 
 python -m pytest tests/ danon/multiagent/ -q    # 955 tests, ~6 min full suite
 python -m pytest tests/test_recovery.py -q      # Standard 1 recovery suite, 46 tests ~37 s
 python -m pytest tests/test_recovery.py::TestTransportRecovery -q   # ~2 s stencil check
-python -c "from danon.claims import audit_claims; audit_claims()"   # 23/23 bound claims
+python -c "from danon.claims import audit_claims; audit_claims()"   # 31/31 bound claims
 ```
 
 ## Verification matrix (live-measured 2026-09-23; artifacts in `outputs_real/`)
@@ -55,7 +55,8 @@ python -c "from danon.claims import audit_claims; audit_claims()"   # 23/23 boun
 | Covariate upgrades · RT+temozolomide restriction | keeps **356/595**; cohort-membership delta −0.0112 inside fold sd 0.0247 — selection reported separately from signal | same |
 | Covariate upgrades · all covariates stacked | pooled C **0.5785** (n=68) vs age-alone 0.6203 on the same kept subset — stacking unavailable-for-most covariates *costs* discrimination | same |
 | MGMT β → resistance bridge | r0 = 0.75·(1−β); across the real 140-patient beta range MTD median PFS **144 → 167 days**; steering policy saturates at 365 d at every β (zero dynamic range) | `outputs_real/mgmt_resistance.txt` |
-| Bound-claims audit | **28/28 verified** | `danon/claims.py::audit_claims` |
+| Bound-claims audit | **31/31 verified** | `danon/claims.py::audit_claims` |
+| Clinical datastreams (4 tests) | streams wired with identity guarantees; stream 3 measured on real t1ce: MTD PFS paired delta −1.17 d (18 runs); streams 1/2/4 refuse with live zero counts | `danon/clinical_twin.py::stream3_report`, `outputs_real/clinical_twin.txt` |
 
 Standard 1 validates the *solver* on synthetic planted ground truth — no patients involved, and it must never be blended with the Standard 2 patient numbers. The dosing "policies" (`MTDPolicy`, `AdaptiveDosePolicy`, `CollateralSwitchPolicy`) are closed-form rules; **no reinforcement-learning agent exists or is claimed** (bound claim `no_rl_agent`). The PDE operators live in `danon/anisotropy.py` and `danon/evosteer.py`; `danon/imaging.py` is NIfTI intake and geometry only.
 ```

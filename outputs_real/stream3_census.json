@@ -1,0 +1,74 @@
+[
+ {
+  "case": "01017",
+  "engine_grid": [
+   14,
+   24,
+   24
+  ],
+  "tumour_voxels": 1774,
+  "mean_enhancement_in_tumour": 0.3963827194872357,
+  "max_enhancement": 0.9382215660125738,
+  "voxels_with_enhancement": 1511
+ },
+ {
+  "case": "01018",
+  "engine_grid": [
+   16,
+   23,
+   28
+  ],
+  "tumour_voxels": 1840,
+  "mean_enhancement_in_tumour": 0.41212947525340615,
+  "max_enhancement": 0.9686647652970994,
+  "voxels_with_enhancement": 1806
+ },
+ {
+  "case": "01019",
+  "engine_grid": [
+   19,
+   22,
+   29
+  ],
+  "tumour_voxels": 2826,
+  "mean_enhancement_in_tumour": 0.44440927179332984,
+  "max_enhancement": 0.9793741489333297,
+  "voxels_with_enhancement": 2657
+ },
+ {
+  "case": "01020",
+  "engine_grid": [
+   18,
+   23,
+   23
+  ],
+  "tumour_voxels": 3623,
+  "mean_enhancement_in_tumour": 0.4860715131806688,
+  "max_enhancement": 1.0,
+  "voxels_with_enhancement": 3309
+ },
+ {
+  "case": "01021",
+  "engine_grid": [
+   18,
+   26,
+   24
+  ],
+  "tumour_voxels": 2986,
+  "mean_enhancement_in_tumour": 0.3650311676099153,
+  "max_enhancement": 1.0,
+  "voxels_with_enhancement": 2709
+ },
+ {
+  "case": "01022",
+  "engine_grid": [
+   16,
+   25,
+   27
+  ],
+  "tumour_voxels": 2528,
+  "mean_enhancement_in_tumour": 0.43285352896521934,
+  "max_enhancement": 0.9895836543499028,
+  "voxels_with_enhancement": 2333
+ }
+]

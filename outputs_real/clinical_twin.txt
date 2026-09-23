@@ -1,0 +1,24 @@
+EVOTWIN-10X: CLINICAL DATASTREAM STATUS (four routine hospital tests)
+========================================================================
+
+Per-stream census (live counts from data/):
+  stream1_5ala           REFUSED     no 5-ALA fluorescence captures cached; mapping implemented and unit-tested, acti
+  stream2_histology      REFUSED     no whole-slide images cached; Ki-67 mapping implemented and unit-tested (KI67_RE
+  stream3_perfusion      MEASURABLE  real cached data: BraTS-2021 t1ce contrast volumes + expert segmentations; vascu
+  stream4_sequential     REFUSED     BraTS is a single pre-operative timepoint per case: no sequential scan pairs exi
+
+STREAM 3 MEASURED (6 BraTS cases, t1ce -> vasculature, paired same-seed):
+  MTD PFS paired delta (real - null), 18 runs: mean -1.17 d (sd 1.01, max 3)
+  Steering: horizon-censored in BOTH geometries (paired delta exactly 0)
+
+  case    MTD real/null   mean enhancement
+  01017     290 /   292      0.396
+  01018     365 /   365      0.412
+  01019     288 /   288      0.444
+  01020     213 /   213      0.486
+  01021     276 /   279      0.365
+  01022     336 /   338      0.433
+
+HONEST READING: at engine scale the vessel-source variation contributes
+~1 day of PFS; the sanctuary structure lives in D(x) (tissue classes),
+which both geometries share. t1ce is a vascular PROXY, not measured Ktrans.

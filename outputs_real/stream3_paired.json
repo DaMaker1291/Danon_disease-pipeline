@@ -1,0 +1,46 @@
+{
+ "info": {
+  "engine_grid": [
+   14,
+   24,
+   24
+  ],
+  "tumour_voxels": 1774,
+  "voxels_with_enhancement": 1511,
+  "mean_enhancement_in_tumour": 0.3963827194872357,
+  "max_enhancement": 0.9382215660125738,
+  "enhancement_contrast_in_tumour": 2.3669587998847823,
+  "bbox_stop_xyz": [
+   127,
+   144,
+   138
+  ],
+  "source": "BraTS-2021 t1ce (contrast-enhanced T1) block-averaged through the segmentation's engine transform; vascular PROXY, not measured Ktrans"
+ },
+ "results": {
+  "MTD": [
+   [
+    290,
+    296,
+    210
+   ],
+   [
+    292,
+    299,
+    211
+   ]
+  ],
+  "Steering": [
+   [
+    365,
+    365,
+    365
+   ],
+   [
+    365,
+    365,
+    365
+   ]
+  ]
+ }
+}
