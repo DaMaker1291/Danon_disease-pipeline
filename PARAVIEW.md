@@ -13,6 +13,12 @@ diffusion field the run integrated is heterogeneous — 0.01 mm²/day in the
 necrotic core to 0.35 mm²/day in healthy tissue (35× contrast) — and the same
 D(x) ships inside the file as `diffusion_mm2_per_day`.
 
+The same file is also rendered **inside the app**: the ParaView Gallery tab
+embeds it byte-identically (sha256-pinned in `paraview.json`), with a color
+legend, a live millimetre scale bar, cutaway, and a download button that
+serves the exact file ParaView opens. Use the in-app view for exploration;
+use the steps below for the poster-quality 4K render.
+
 The file carries nine point arrays:
 
 | array | meaning |
