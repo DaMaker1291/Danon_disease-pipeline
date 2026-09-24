@@ -23,6 +23,15 @@ sequential-scan files, so their mappings are implemented and unit-tested on
 synthetic inputs, and the module's report records the live count (zero) that
 refuses them. Supplying real files activates them -- no code changes.
 
+CACHED IS NOT THE SAME AS EXISTING, and the census now reports both. The cached
+BraTS path is one pre-operative timepoint per case, but the TCIA collection the
+repo probed (UPENN-GBM) carries a second timepoint for 41 of 630 patients, DSC
+perfusion for 456, and CaPTk-processed perfusion maps for 628. Streams 3 and 4
+are therefore blocked by a DOWNLOAD, not by the absence of data. An earlier
+version of this census reported only that stream 4 had no sequential pairs, with
+the rationale "BraTS is a single pre-operative timepoint" -- a BraTS-specific
+fact that read as a statement about what exists anywhere, and was wrong.
+
 MAPPING DETAILS (constants declared, identity pinned by test)
 --------------------------------------------------------------
 stream 3, vasculature : vessels(x) = clip(t1ce(x)/max, 0, 1) on the engine
@@ -530,11 +539,54 @@ def stream3_report() -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
-    """Live counts per stream: what exists, what refuses, and why.
+def _archive_availability() -> Dict[str, Any]:
+    """Cohort-scored availability from the recorded TCIA probe.
 
-    This is the module's honesty artefact: a caller (or judge) can see at a
-    glance that stream 3 has real data and streams 1/2/4 have none cached.
+    Read from the probe record rather than restated, so this census cannot drift
+    from the numbers the multimodal verdicts are computed from. Returns an
+    ``error`` entry if the record is missing: a census that silently reports
+    zero retrievable pairs when it cannot read the probe would be the same class
+    of mistake as the one this function exists to fix.
+    """
+    try:
+        from danon.multimodal import EVIDENCE_PATH, load_evidence
+
+        for m in load_evidence():
+            if m.key != "tcia_upenn_gbm":
+                continue
+            d = dict(m.detail)
+            return {
+                "collection": "UPENN-GBM",
+                "n_patients": d.get("n_patients"),
+                "n_patients_multi_date_any_interval": d.get(
+                    "patients_multi_date_any_interval"
+                ),
+                "n_patients_longitudinal": d.get("patients_with_multi_timepoint"),
+                "min_interval_days": d.get("min_followup_interval_days"),
+                "n_patients_dsc_perfusion": d.get("n_patients_dsc_perfusion"),
+                "n_dsc_series": d.get("n_dsc_series"),
+                "n_patients_processed_perfusion": d.get(
+                    "n_patients_processed_perfusion"
+                ),
+                "n_processed_series": d.get("n_processed_series"),
+                "n_longitudinal_with_perfusion": d.get(
+                    "n_longitudinal_with_perfusion"
+                ),
+                "n_seg_series": d.get("n_seg_series"),
+                "source": f"recorded TCIA probe ({EVIDENCE_PATH})",
+            }
+        return {"error": "UPENN-GBM entry absent from the recorded probe"}
+    except (FileNotFoundError, ImportError, AttributeError, KeyError) as exc:
+        return {"error": f"{type(exc).__name__}: {exc}"}
+
+
+def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
+    """Live counts per stream: what is cached, what refuses, and why.
+
+    This is the module's honesty artefact. For each stream it separates what is
+    on disk (which the mappings can consume today) from what the probed archive
+    would supply after a download, so a refusal cannot be mistaken for evidence
+    that the data does not exist.
     """
     t1ce_files: List[str] = []
     seg_files: List[str] = []
@@ -559,7 +611,10 @@ def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
         for f in os.listdir(root)
         if f.lower().endswith((".svs", ".ndpi", ".tiff"))
     ]
-    sequential_pairs = 0  # BraTS is a single pre-operative timepoint per case
+    # Cached pairs: BraTS is one pre-operative timepoint per case, so zero.
+    sequential_pairs_cached = 0
+    archive = _archive_availability()
+    n_retrievable = archive.get("n_patients_longitudinal")
 
     return {
         "stream1_5ala": {
@@ -583,19 +638,33 @@ def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
             "n_seg_files": len(seg_files),
             "n_buildable_cases": len(set(t1ce_files) & {s.replace('_seg', '_t1ce') for s in seg_files}),
             "status": "MEASURABLE" if t1ce_files and seg_files else "REFUSED",
+            "n_archive_dsc_patients": archive.get("n_patients_dsc_perfusion"),
+            "n_archive_processed_perfusion_patients": archive.get(
+                "n_patients_processed_perfusion"
+            ),
             "detail": (
                 "real cached data: BraTS-2021 t1ce contrast volumes + expert "
-                "segmentations; vascular proxy, not measured Ktrans"
+                "segmentations; vascular proxy, not measured Ktrans. The probed "
+                "archive carries the measured form: DSC perfusion series for "
+                f"{archive.get('n_patients_dsc_perfusion')} patients and "
+                f"CaPTk-processed rCBV/Ktrans maps for "
+                f"{archive.get('n_patients_processed_perfusion')}, neither of "
+                "which is downloaded"
             ),
         },
         "stream4_sequential": {
-            "n_pairs": sequential_pairs,
-            "status": "REFUSED" if sequential_pairs == 0 else "available",
+            "n_pairs_cached": sequential_pairs_cached,
+            "n_pairs_retrievable": n_retrievable,
+            "status": "REFUSED" if sequential_pairs_cached == 0 else "available",
+            "archive": archive,
             "detail": (
-                "BraTS is a single pre-operative timepoint per case: no "
-                "sequential scan pairs exist in the cache; mapping implemented "
-                "and unit-tested as an observation, activates when a "
-                "longitudinal series is supplied"
+                "no sequential scan pairs are CACHED (BraTS is a single "
+                "pre-operative timepoint per case). Retrievable without new "
+                f"code: {n_retrievable} UPENN-GBM patients carry a "
+                f">={archive.get('min_interval_days')}-day follow-up interval, "
+                "and all of them carry DSC perfusion series. The mapping is "
+                "implemented and unit-tested as an observation, and activates "
+                "when a longitudinal series is supplied"
             ),
         },
     }

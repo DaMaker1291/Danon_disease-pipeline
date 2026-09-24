@@ -331,6 +331,7 @@ from danon.audit import (
 from danon.multimodal import (
     CANDIDATE_GLIOMA_COLLECTIONS,
     EVIDENCE_PATH as MULTIMODAL_EVIDENCE_PATH,
+    MIN_FOLLOWUP_INTERVAL_DAYS,
     BenchmarkTest,
     ModalityEvidence,
     ModalityStatus,
@@ -339,6 +340,7 @@ from danon.multimodal import (
     benchmark_tests,
     build_evidence,
     load_evidence,
+    measure_collection_timepoints,
     load_paired_control_cards,
     measured_discrimination,
     multimodal_provenance,
@@ -1165,6 +1167,7 @@ __all__ = [
     "ModalityEvidence", "ModalityStatus", "PairedControlSummary",
     "SpatialDiceVerdict", "benchmark_tests",
     "build_evidence", "load_evidence", "load_paired_control_cards",
+    "measure_collection_timepoints", "MIN_FOLLOWUP_INTERVAL_DAYS",
     "measured_discrimination", "multimodal_provenance", "probe_collection",
     "probe_local_inventory", "probe_tcia", "render_multimodal_report",
     "save_evidence", "spatial_dice_verdict", "summarize_paired_control",

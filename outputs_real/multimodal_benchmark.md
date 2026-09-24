@@ -27,10 +27,11 @@
     cannot: any imaging-based test, including the barcode-based link to a GDC clinical export
 - TCIA collection TCGA-LGG [RETIRED] collection=TCGA-LGG
     cannot: any imaging-based test, including the barcode-based link to a GDC clinical export
-- TCIA collection UPENN-GBM [ABSENT] collection=UPENN-GBM, modalities=['MR'], n_patients=630, n_seg_series=0, n_series=3680, patients_checked_for_timepoints=2, patients_with_multi_timepoint=0
-    supports: single-timepoint anonymised MRI with a documented collection page
+- TCIA collection UPENN-GBM [ABSENT] collection=UPENN-GBM, min_followup_interval_days=28, modalities=['MR'], n_dsc_series=490, n_longitudinal_with_perfusion=41, n_patients=630, n_patients_dsc_perfusion=456, n_patients_processed_perfusion=628, n_processed_series=2607, n_seg_series=0, n_series=3680, patients_checked_for_timepoints=630, patients_multi_date_any_interval=43, patients_with_multi_timepoint=41, sampled_patients_checked=2, sampled_patients_with_multi_timepoint=0, timepoint_scope=timepoints scored over every patient in the collection-wide series listing, not a sample, timepoint_source_file=data/tcia_probe/upenn_series.json
+    supports: anonymised glioma MRI with a documented collection page
+    supports: a follow-up timepoint for 41 of 630 patients (>=28 day interval), each with DSC perfusion series
+    supports: DSC perfusion acquisition for 456 patients and CaPTk-processed maps for 628 (rCBV/Ktrans proxies for stream 3)
     cannot: an expert tumour mask to score a predicted field against
-    cannot: a second timepoint, so there is no follow-up scan to compare to
 
 ## Test battery
 - [SUPPORTED] test1_discrimination: does the model rank real patients by real outcome?
@@ -65,9 +66,9 @@ paired control over 9 card(s): progression-free 9/9 on the policy vs 3/9 on MTD;
 spatial Dice test REFUSED: no reachable glioma imaging collection carries both an expert tumour mask and a second timepoint for the same patient
   - TCIA collection TCGA-GBM: RETIRED -- not served by the API (TCGA-GBM)
   - TCIA collection TCGA-LGG: RETIRED -- not served by the API (TCGA-LGG)
-  - TCIA collection UPENN-GBM: 630 patient(s), 3680 series, modalities ['MR'], 0 segmentation series, 0/2 sampled patient(s) with more than one StudyDate
+  - TCIA collection UPENN-GBM: 630 patient(s), 3680 series, modalities ['MR'], 0 segmentation series, 41/630 patient(s) with more than one StudyDate (timepoints scored over every patient in the collection-wide series listing, not a sample)
   - TCIA collection BraTS: RETIRED -- not served by the API (BraTS)
-  - TCIA collection ICDC-Glioma: 57 patient(s), 650 series, modalities ['MR'], 0 segmentation series, 0/2 sampled patient(s) with more than one StudyDate
+  - TCIA collection ICDC-Glioma: 57 patient(s), 650 series, modalities ['MR'], 0 segmentation series, 0/2 patient(s) with more than one StudyDate (sampled)
   needs: a collection with DICOM SEG (or equivalent mask series) on glioma MRI
   needs: at least one patient with two imaging timepoints, so a predicted day-90 field can be compared to an observed recurrence scan
   needs: an explicit mapping between that patient and an administered schedule, without which a mismatch cannot be attributed to the model

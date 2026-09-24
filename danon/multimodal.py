@@ -26,17 +26,28 @@ WHAT WAS ACTUALLY PROBED (recorded in :data:`EVIDENCE_PATH`)
   * TCIA ``UPENN-GBM`` -> 630 patients, 3680 series, **MR only**, and
     ``seg_series == 0``: there are no DICOM SEG objects, so there is no expert
     tumour mask in the collection to score a predicted field against.
-  * Multi-timepoint check on UPENN-GBM patients (``-00554``, ``-00439``): 5
-    studies each, **1 distinct StudyDate** each. The ``_T`` / ``_TERA`` series
-    suffixes are re-processings, not later timepoints. The collection is
-    single-timepoint, so there is no follow-up scan to compare against even if a
-    mask existed.
+  * Multi-timepoint check on UPENN-GBM: an early probe queried 2 named patients
+    (``-00554``, ``-00439``), found 5 studies each on **1 distinct StudyDate**
+    each, and recorded the collection as single-timepoint. That generalisation
+    was wrong, and scoring the collection-wide listing (see
+    :func:`measure_collection_timepoints`) is what showed it: of 630 patients,
+    43 carry more than one distinct StudyDate and **41 carry a follow-up
+    interval of at least 28 days**. The ``_T`` / ``_TERA`` suffixes are indeed
+    re-processings rather than later timepoints -- but they are not the only
+    source of date variation, which is why the sample of 2 gave the wrong
+    answer. Every one of the 41 also carries DSC perfusion series, and 456
+    patients have a perfusion acquisition at all.
   * ChEMBL and PubChem are reachable (see :mod:`danon.pharmacology`) and supply
     real measured pharmacology, which is what makes a *pharmacological*
     benchmark possible without a lab.
 
-Consequently the spatial test is refused on two independent grounds -- no
-segmentation and no second timepoint -- and both are counts, not opinions.
+Consequently the spatial test is refused on **one** ground -- no DICOM SEG, so
+no expert mask to score a predicted field against -- and it is a count, not an
+opinion. It is *not* refused for want of a second timepoint: 41 patients carry
+one, which is why the refusal is stated as one ground rather than two. The
+second timepoint ground was withdrawn after the cohort was scored; leaving it
+in would have overstated the blocker and hidden that a follow-up scan does
+exist for a subset.
 
 WHAT THIS MODULE CANNOT SHOW
 ----------------------------
@@ -53,8 +64,9 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field
+from datetime import date
 from enum import Enum
-from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 from danon.cure import EvidenceStatus
 
@@ -83,6 +95,20 @@ EVIDENCE_PATH = "data/tcia_probe/multimodal_evidence.json"
 CANDIDATE_GLIOMA_COLLECTIONS: Tuple[str, ...] = (
     "TCGA-GBM", "TCGA-LGG", "UPENN-GBM", "BraTS", "ICDC-Glioma",
 )
+
+#: A second StudyDate counts as a follow-up timepoint only if it falls at least
+#: this many days after the first. UPENN-GBM's distinct-date pairs include 1-
+#: and 2-day gaps, which are one timepoint recorded across a midnight boundary,
+#: so an unthresholded distinct-date count overstates follow-up availability
+#: (43 patients by raw distinct dates, 41 by this criterion). The threshold is
+#: returned inside the measurement so the criterion cannot hide behind the
+#: number it produces.
+MIN_FOLLOWUP_INTERVAL_DAYS = 28
+
+#: Series-label tokens identifying raw DSC perfusion acquisition and
+#: CaPTk-processed perfusion maps (rCBV/Ktrans) in a collection listing.
+DSC_PERFUSION_TOKENS: Tuple[str, ...] = ("perf", "bolus")
+PROCESSED_PERFUSION_TOKENS: Tuple[str, ...] = ("captk",)
 
 
 class ModalityStatus(str, Enum):
@@ -304,6 +330,96 @@ def probe_collection(
     return out
 
 
+def measure_collection_timepoints(
+    series_or_path: Union[str, Sequence[Dict[str, object]]],
+    *,
+    min_interval_days: int = MIN_FOLLOWUP_INTERVAL_DAYS,
+) -> Dict[str, object]:
+    """Score timepoints and perfusion coverage over a WHOLE collection listing.
+
+    WHY THIS EXISTS
+    ---------------
+    :func:`probe_collection` queries the API once per *sampled* patient, so its
+    timepoint numbers describe a handful of patients -- the committed UPENN-GBM
+    record checked 2 of 630 and recorded zero multi-timepoint patients. "The
+    collection is single-timepoint" was generalised from that sample, and it is
+    false: scored over every patient in the same listing, 41 of 630 carry a
+    follow-up interval of at least ``min_interval_days``, and all 41 also carry
+    DSC perfusion series. A count from a 2-patient sample cannot support a
+    statement about a 630-patient collection.
+
+    This scores the collection-wide series listing instead, where every
+    patient's StudyDate is already present, so the denominator is the cohort.
+    No network call is made. ``min_interval_days`` is both an argument and a
+    returned field, so a reader can see the criterion that produced the count.
+    """
+    if isinstance(series_or_path, str):
+        with open(series_or_path) as fh:
+            rows: List[Dict[str, object]] = json.load(fh)
+        source = series_or_path
+    else:
+        rows = [dict(r) for r in series_or_path]
+        source = "in-memory listing"
+
+    dates_by_patient: Dict[str, set] = {}
+    dsc_patients: set = set()
+    processed_patients: set = set()
+    n_dsc_series = 0
+    n_processed_series = 0
+    for row in rows:
+        pid = str(row.get("PatientID") or "")
+        if not pid:
+            continue
+        raw_date = row.get("StudyDate") or row.get("SeriesDate")
+        bucket = dates_by_patient.setdefault(pid, set())
+        if raw_date:
+            bucket.add(str(raw_date)[:10])
+        # UPENN-GBM records the acquisition in ProtocolName ('ep2d_perf BOLUS')
+        # and the processed map in SeriesDescription ('Processed_CaPTk').
+        label = (
+            f"{row.get('ProtocolName') or ''} "
+            f"{row.get('SeriesDescription') or ''}"
+        ).lower()
+        if any(tok in label for tok in DSC_PERFUSION_TOKENS):
+            n_dsc_series += 1
+            dsc_patients.add(pid)
+        if any(tok in label for tok in PROCESSED_PERFUSION_TOKENS):
+            n_processed_series += 1
+            processed_patients.add(pid)
+
+    multi_date: set = set()
+    longitudinal: set = set()
+    intervals: List[int] = []
+    for pid, stamps in dates_by_patient.items():
+        if len(stamps) < 2:
+            continue
+        multi_date.add(pid)
+        try:
+            ordered = sorted(date.fromisoformat(s) for s in stamps)
+        except ValueError:
+            continue
+        gaps = [(b - a).days for a, b in zip(ordered, ordered[1:])]
+        intervals.extend(gaps)
+        if any(g >= min_interval_days for g in gaps):
+            longitudinal.add(pid)
+
+    return {
+        "collection": rows[0].get("Collection") if rows else None,
+        "n_series": len(rows),
+        "n_patients": len(dates_by_patient),
+        "min_interval_days": int(min_interval_days),
+        "n_patients_multi_date": len(multi_date),
+        "n_patients_longitudinal": len(longitudinal),
+        "longitudinal_intervals_days": sorted(intervals),
+        "n_dsc_series": n_dsc_series,
+        "n_patients_dsc_perfusion": len(dsc_patients),
+        "n_processed_series": n_processed_series,
+        "n_patients_processed_perfusion": len(processed_patients),
+        "n_longitudinal_with_perfusion": len(longitudinal & dsc_patients),
+        "source_file": source,
+    }
+
+
 def probe_local_inventory(
     *,
     brats_dir: str = "data/brats",
@@ -506,7 +622,8 @@ def build_evidence(
                 license="per-collection (see TCIA collection page)",
                 detail=detail,
                 supports=(
-                    "single-timepoint anonymised MRI with a documented collection page",
+                    "anonymised MRI with a documented collection page "
+                    "(timepoint counts: see measure_collection_timepoints)",
                 ),
                 cannot_support=tuple(lacks),
             )
@@ -566,11 +683,12 @@ def spatial_dice_verdict(
         n_seg = int(m.get("n_seg_series") or 0)
         multi = int(m.get("patients_with_multi_timepoint") or 0)
         checked = int(m.get("patients_checked_for_timepoints") or 0)
+        scope = str(m.get("timepoint_scope") or "sampled")
         deciding.append(
             f"{m.name}: {m.get('n_patients')} patient(s), {m.get('n_series')} "
             f"series, modalities {m.get('modalities')}, {n_seg} segmentation "
-            f"series, {multi}/{checked} sampled patient(s) with more than one "
-            f"StudyDate"
+            f"series, {multi}/{checked} patient(s) with more than one "
+            f"StudyDate ({scope})"
         )
         if n_seg > 0 and multi > 0:
             qualifying.append(m)

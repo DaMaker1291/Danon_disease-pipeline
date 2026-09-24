@@ -31,7 +31,13 @@ frontend/dist/
 data/twin_smoke/
 data/brats/
 data/tcia/
-data/tcia_probe/
+# ...but DO commit the record of what was probed. It is 6 KB of counts, the
+# multimodal verdicts and the stream census are both computed from it, and
+# danon/multimodal.py documents it as committed -- ignored, every fresh clone
+# raised in load_evidence() and silently skipped the whole multimodal suite.
+# The bulk series listings beside it stay ignored.
+data/tcia_probe/*
+!data/tcia_probe/multimodal_evidence.json
 # GDC expression caches are runtime downloads, not sources (same rule as gdsc/)
 data/gdc/
 # local agent tool state

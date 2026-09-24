@@ -1,0 +1,205 @@
+{
+ "modalities": [
+  {
+   "cannot_support": [
+    "patient-level joining of radiology to an external clinical export when the collection that carried the shared identifier has been withdrawn"
+   ],
+   "detail": {
+    "glioma_candidates_absent": [
+     "BraTS",
+     "TCGA-GBM",
+     "TCGA-LGG"
+    ],
+    "glioma_candidates_present": [
+     "ICDC-Glioma",
+     "UPENN-GBM"
+    ],
+    "n_collections": 156
+   },
+   "key": "tcia_nbia_api",
+   "license": "per-collection (see TCIA collection page)",
+   "name": "TCIA NBIA v1 API",
+   "source": "https://services.cancerimagingarchive.net/nbia-api/services/v1",
+   "status": "AVAILABLE",
+   "supports": [
+    "anonymised imaging for collections that are still served"
+   ]
+  },
+  {
+   "cannot_support": [
+    "any imaging-based test, including the barcode-based link to a GDC clinical export"
+   ],
+   "detail": {
+    "collection": "TCGA-GBM"
+   },
+   "key": "tcia_tcga_gbm",
+   "license": "n/a (withdrawn)",
+   "name": "TCIA collection TCGA-GBM",
+   "source": "https://services.cancerimagingarchive.net/nbia-api/services/v1",
+   "status": "RETIRED",
+   "supports": []
+  },
+  {
+   "cannot_support": [
+    "any imaging-based test, including the barcode-based link to a GDC clinical export"
+   ],
+   "detail": {
+    "collection": "TCGA-LGG"
+   },
+   "key": "tcia_tcga_lgg",
+   "license": "n/a (withdrawn)",
+   "name": "TCIA collection TCGA-LGG",
+   "source": "https://services.cancerimagingarchive.net/nbia-api/services/v1",
+   "status": "RETIRED",
+   "supports": []
+  },
+  {
+   "cannot_support": [
+    "an expert tumour mask to score a predicted field against"
+   ],
+   "detail": {
+    "collection": "UPENN-GBM",
+    "min_followup_interval_days": 28,
+    "modalities": [
+     "MR"
+    ],
+    "n_dsc_series": 490,
+    "n_longitudinal_with_perfusion": 41,
+    "n_patients": 630,
+    "n_patients_dsc_perfusion": 456,
+    "n_patients_processed_perfusion": 628,
+    "n_processed_series": 2607,
+    "n_seg_series": 0,
+    "n_series": 3680,
+    "patients_checked_for_timepoints": 630,
+    "patients_multi_date_any_interval": 43,
+    "patients_with_multi_timepoint": 41,
+    "sampled_patients_checked": 2,
+    "sampled_patients_with_multi_timepoint": 0,
+    "timepoint_scope": "timepoints scored over every patient in the collection-wide series listing, not a sample",
+    "timepoint_source_file": "data/tcia_probe/upenn_series.json"
+   },
+   "key": "tcia_upenn_gbm",
+   "license": "per-collection (see TCIA collection page)",
+   "name": "TCIA collection UPENN-GBM",
+   "source": "https://services.cancerimagingarchive.net/nbia-api/services/v1",
+   "status": "ABSENT",
+   "supports": [
+    "anonymised glioma MRI with a documented collection page",
+    "a follow-up timepoint for 41 of 630 patients (>=28 day interval), each with DSC perfusion series",
+    "DSC perfusion acquisition for 456 patients and CaPTk-processed maps for 628 (rCBV/Ktrans proxies for stream 3)"
+   ]
+  },
+  {
+   "cannot_support": [
+    "any imaging-based test, including the barcode-based link to a GDC clinical export"
+   ],
+   "detail": {
+    "collection": "BraTS"
+   },
+   "key": "tcia_brats",
+   "license": "n/a (withdrawn)",
+   "name": "TCIA collection BraTS",
+   "source": "https://services.cancerimagingarchive.net/nbia-api/services/v1",
+   "status": "RETIRED",
+   "supports": []
+  },
+  {
+   "cannot_support": [
+    "an expert tumour mask to score a predicted field against",
+    "a second timepoint, so there is no follow-up scan to compare to"
+   ],
+   "detail": {
+    "collection": "ICDC-Glioma",
+    "modalities": [
+     "MR"
+    ],
+    "n_patients": 57,
+    "n_seg_series": 0,
+    "n_series": 650,
+    "patients_checked_for_timepoints": 2,
+    "patients_with_multi_timepoint": 0
+   },
+   "key": "tcia_icdc_glioma",
+   "license": "per-collection (see TCIA collection page)",
+   "name": "TCIA collection ICDC-Glioma",
+   "source": "https://services.cancerimagingarchive.net/nbia-api/services/v1",
+   "status": "ABSENT",
+   "supports": [
+    "single-timepoint anonymised MRI with a documented collection page"
+   ]
+  },
+  {
+   "cannot_support": [
+    "a follow-up timepoint: the release is pre-operative only",
+    "vasculature: no perfusion map is distributed with the static release"
+   ],
+   "detail": {
+    "cases": 6,
+    "n_segmentation_files": 6,
+    "timepoints_per_case": 1
+   },
+   "key": "braats2021_segmentations",
+   "license": "CC-BY-4.0",
+   "name": "BraTS 2021 expert segmentations (local)",
+   "source": "BraTS 2021 training data: TCGA-GBM/TCIA-derived de-identified glioma MRI with expert multi-parametric segmentations; Zenodo record 19541844",
+   "status": "LOCAL",
+   "supports": [
+    "real pre-operative tumour geometry and a label-derived proliferative map for the engine grid"
+   ]
+  },
+  {
+   "cannot_support": [
+    "patient-level linkage to the imaging cohort: BraTS and GDC anonymise differently"
+   ],
+   "detail": {
+    "n_cases": 617,
+    "path": "data/gdc_clinical/tcga_gbm_cases.json"
+   },
+   "key": "gdc_tcga_gbm_clinical",
+   "license": "GDC open access (see GDC data-use policy)",
+   "name": "GDC TCGA-GBM clinical export (local)",
+   "source": "NCI Genomic Data Commons, open-access clinical export for TCGA-GBM",
+   "status": "LOCAL",
+   "supports": [
+    "real recorded progression and overall-survival endpoints for a real patient cohort, used as the external anchor and holdout"
+   ]
+  },
+  {
+   "cannot_support": [
+    "single-cell resolution: bulk RNA-seq cannot resolve individual sub-clones (marked PROVEN_FAILED in danon.genomics_intake)"
+   ],
+   "detail": {
+    "assay": "bulk RNA-seq STAR counts",
+    "n_expression_files": 6
+   },
+   "key": "gdc_tcga_gbm_expression",
+   "license": "GDC open access (see GDC data-use policy)",
+   "name": "GDC STAR gene-count matrices (local)",
+   "source": "NCI Genomic Data Commons, open-access STAR counts",
+   "status": "LOCAL",
+   "supports": [
+    "bulk transcriptomes that parameterise a sub-clone ratio by calibrated inference"
+   ]
+  },
+  {
+   "cannot_support": [
+    "in-vivo efficacy: 2D monolayer IC50 is not 3D tumour kill"
+   ],
+   "detail": {
+    "n_activity_files": 1,
+    "n_activity_records_in_first": 166,
+    "n_molecule_caches": 1
+   },
+   "key": "chembl_measured_potency",
+   "license": "CC-BY-SA 3.0 (ChEMBL data licence)",
+   "name": "ChEMBL measured activity records (local cache)",
+   "source": "ChEMBL (EBI) REST: molecule descriptors and measured activity records",
+   "status": "LOCAL",
+   "supports": [
+    "measured potency with units, relation and target preserved, and curated molecular descriptors"
+   ]
+  }
+ ],
+ "note": "Probe output for the retrospective multimodal benchmark. The spatial Dice verdict is computed from these numbers, so adding a collection that carries masks and a second timepoint will flip it."
+}

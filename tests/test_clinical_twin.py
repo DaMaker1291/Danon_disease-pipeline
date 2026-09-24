@@ -257,10 +257,37 @@ def test_census_refuses_empty_streams_and_reports_stream3():
     assert census["stream1_5ala"]["n_files"] == 0
     assert census["stream2_histology"]["status"] == "REFUSED"
     assert census["stream4_sequential"]["status"] == "REFUSED"
-    assert census["stream4_sequential"]["n_pairs"] == 0
+    assert census["stream4_sequential"]["n_pairs_cached"] == 0
     if HAS_BRATS:
         assert census["stream3_perfusion"]["status"] == "MEASURABLE"
         assert census["stream3_perfusion"]["n_t1ce_files"] >= 1
+
+
+def test_census_separates_cached_from_retrievable():
+    """A refusal must say what is missing, not imply the data does not exist.
+
+    Stream 4's old entry reported zero pairs with the rationale "BraTS is a
+    single pre-operative timepoint" -- true of the cached path, and read as a
+    statement about the archive. The census now carries both counts, so the
+    BraTS fact cannot stand in for the availability answer.
+    """
+    census = clinical_stream_census()
+    s4 = census["stream4_sequential"]
+    archive = s4.get("archive") or {}
+    if not archive or "error" in archive:
+        pytest.skip("recorded TCIA probe unavailable")
+    assert s4["n_pairs_cached"] == 0
+    assert s4["n_pairs_retrievable"] == 41
+    assert archive["n_patients"] == 630
+    assert archive["min_interval_days"] == 28
+    # the join: every longitudinal patient also carries perfusion series
+    assert archive["n_longitudinal_with_perfusion"] == s4["n_pairs_retrievable"]
+    # stream 3's real (measured) form is retrievable even though the cache holds
+    # only the t1ce proxy
+    s3 = census["stream3_perfusion"]
+    assert s3["n_archive_dsc_patients"] == 456
+    assert s3["n_archive_processed_perfusion_patients"] == 628
+    assert archive["n_seg_series"] == 0
 
 
 # ---------------------------------------------------------------------------

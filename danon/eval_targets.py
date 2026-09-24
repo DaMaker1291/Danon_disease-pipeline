@@ -13,12 +13,15 @@ different answers, and only one of them is a number.
 
 TARGET 1 -- 3D spatial expansion (claimed Dice 0.91-0.94): NO DATA.
 The Dice test needs paired imaging: a baseline scan, a follow-up scan, and an
-expert mask on both. None is retrievable -- `danon.multimodal.spatial_dice_verdict`
-derives that from live collection counts (TCGA-GBM, TCGA-LGG and BraTS are
-retired from the NBIA API; UPENN-GBM is single-timepoint with zero segmentation
-series). This module does not restate that; it calls the verdict and reports
-whatever it currently says, so if a segmented collection ever appears the target
-starts reporting numbers instead of staying refused.
+expert mask on both. Not all three are retrievable --
+`danon.multimodal.spatial_dice_verdict` derives that from live collection counts
+(TCGA-GBM, TCGA-LGG and BraTS are retired from the NBIA API; UPENN-GBM carries
+zero segmentation series). Only the mask is missing: an earlier version of this
+docstring said UPENN-GBM was single-timepoint, which was generalised from a
+2-patient sample and is false -- 41 of 630 patients carry a follow-up interval of
+at least 28 days. This module does not restate any of it; it calls the verdict
+and reports whatever it currently says, so if a segmented collection ever appears
+the target starts reporting numbers instead of staying refused.
 
 TARGET 2 -- molecular responder classification (claimed AUC 0.91-0.94): NO LABEL.
 `best_overall_response` is present as a field on the diagnosis node and is
@@ -198,13 +201,21 @@ def spatial_expansion_target() -> TargetVerdict:
         n=checked,
         detail=(
             f"{len(imaging)} imaging collection(s) probed, {masks} segmentation "
-            f"series, {checked} patient(s) checked for a second timepoint. A Dice "
+            f"series, {checked} patient(s) scored for a second timepoint. A Dice "
             f"score needs a baseline scan, a follow-up scan and an expert mask on "
-            f"both; none of the three is retrievable"
+            f"both: the follow-up scan exists for a subset, but {masks} "
+            f"segmentation series across the probed collections means there is no "
+            f"expert mask to score a predicted field against"
         ),
         blockers=[
             "TCGA-GBM, TCGA-LGG and BraTS are retired from the NBIA API",
-            "UPENN-GBM is single-timepoint and carries no segmentation series",
+            "UPENN-GBM carries zero segmentation series (0 of 3680), so no expert "
+            "mask exists to score a predicted field against -- this is the ground "
+            "that refuses the target",
+            "the second-timepoint ground was withdrawn after the cohort was "
+            "scored: 41 of 630 UPENN-GBM patients carry a >=28-day follow-up "
+            "interval and all 41 carry DSC perfusion series, so a follow-up scan "
+            "is retrievable",
             "no local case has a second dated timepoint",
         ],
     )

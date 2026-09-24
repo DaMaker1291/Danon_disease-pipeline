@@ -919,26 +919,37 @@ def check_stream3_cohort_is_measured() -> CheckResult:
 
 
 def check_stream_census_refuses_honestly() -> CheckResult:
-    """Streams 1/2/4 must refuse with live zero counts, not pretend availability."""
+    """Streams 1/2/4 must refuse with live counts, and stream 4 must state how
+    much is retrievable rather than implying the data does not exist."""
     from danon.clinical_twin import clinical_stream_census
 
     census = clinical_stream_census()
     s1 = census["stream1_5ala"]
     s2 = census["stream2_histology"]
+    s3 = census["stream3_perfusion"]
     s4 = census["stream4_sequential"]
+    archive = s4.get("archive") or {}
     ok = (
         s1["status"] == "REFUSED" and s1["n_files"] == 0
         and s2["status"] == "REFUSED" and s2["n_files"] == 0
-        and s4["status"] == "REFUSED" and s4["n_pairs"] == 0
-        and census["stream3_perfusion"]["status"] == "MEASURABLE"
+        and s4["status"] == "REFUSED" and s4["n_pairs_cached"] == 0
+        and s3["status"] == "MEASURABLE"
+        # the retrievable side is read from the recorded probe, not asserted
+        # from memory: a census that says "none" where 41 exist is the defect
+        # this check exists to prevent.
+        and s4["n_pairs_retrievable"] == 41
+        and archive.get("n_patients_dsc_perfusion") == 456
+        and archive.get("n_patients_processed_perfusion") == 628
     )
     return CheckResult(
         supported=ok,
         detail=(
             "census: stream1 REFUSED({}), stream2 REFUSED({}), stream3 "
-            "MEASURABLE({} t1ce files), stream4 REFUSED({} pairs)".format(
-                s1["n_files"], s2["n_files"],
-                census["stream3_perfusion"]["n_t1ce_files"], s4["n_pairs"],
+            "MEASURABLE({} t1ce files; archive carries {} DSC perfusion "
+            "patients), stream4 REFUSED({} cached / {} retrievable pairs)".format(
+                s1["n_files"], s2["n_files"], s3["n_t1ce_files"],
+                s3.get("n_archive_dsc_patients"), s4["n_pairs_cached"],
+                s4["n_pairs_retrievable"],
             )
         ),
     )
@@ -1391,15 +1402,20 @@ CLAIMS: Tuple[Claim, ...] = (
     Claim(
         "clinical_stream_census_refuses_with_live_counts",
         "Streams 1 (5-ALA fluorescence), 2 (whole-slide Ki-67) and 4 "
-        "(sequential MRI) refuse with live zero counts -- no fluorescence "
-        "captures, no WSIs, and BraTS is a single pre-operative timepoint -- "
-        "while their mappings are implemented and unit-tested, activating "
-        "when real files are supplied. No stream is back-filled.",
+        "(sequential MRI) refuse on their CACHED counts -- no fluorescence "
+        "captures, no WSIs, zero cached sequential pairs -- while their "
+        "mappings are implemented and unit-tested, activating when real files "
+        "are supplied. No stream is back-filled. The census also reports what "
+        "is RETRIEVABLE without new code, so a refusal is not mistaken for "
+        "absence: 41 of 630 probed UPENN-GBM patients carry a >=28-day "
+        "follow-up interval, and the archive carries DSC perfusion for 456 "
+        "patients and CaPTk-processed rCBV/Ktrans maps for 628.",
         EvidenceStatus.ESTABLISHED,
         "danon/claims.py::check_stream_census_refuses_honestly",
         "stream_census_refuses",
-        "The census is computed live from the data directory, so acquiring "
-        "real files flips the refusal to 'available' automatically.",
+        "The census is computed live from the data directory and the recorded "
+        "probe, so acquiring the files flips the refusal to 'available' "
+        "automatically.",
     ),
     Claim(
         "restriction_never_mistaken_for_signal",

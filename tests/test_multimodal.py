@@ -29,6 +29,7 @@ from danon.multimodal import (
     build_evidence,
     load_evidence,
     load_paired_control_cards,
+    measure_collection_timepoints,
     multimodal_provenance,
     probe_local_inventory,
     render_multimodal_report,
@@ -73,14 +74,26 @@ class TestRecordedEvidence:
         assert "TCGA-LGG" in (tcia.get("glioma_candidates_absent") or [])
         assert by_key["tcia_tcga_gbm"].status is ModalityStatus.RETIRED
 
-    def test_upenn_gbm_is_recorded_as_lacking_masks_and_timepoints(self):
-        """Both blockers, as counts -- not as a sentence."""
+    def test_upenn_gbm_records_the_mask_ground_and_drops_the_timepoint_ground(self):
+        """One blocker is left, and it is the one the data supports.
+
+        The entry used to record 0 multi-timepoint patients from a 2-patient
+        sample, which made "the collection is single-timepoint" look derived.
+        Scored over all 630 patients it is 41, so the mask is the only ground
+        left. The old sample is kept under ``sampled_*`` names: deleting it
+        would hide that a sample ever stood in for a cohort.
+        """
         by_key = {m.key: m for m in load_evidence()}
         upenn = by_key["tcia_upenn_gbm"]
         assert int(upenn.get("n_seg_series")) == 0
-        assert int(upenn.get("patients_with_multi_timepoint")) == 0
-        assert int(upenn.get("patients_checked_for_timepoints")) >= 1
+        assert int(upenn.get("patients_with_multi_timepoint")) == 41
+        assert int(upenn.get("patients_checked_for_timepoints")) == 630
+        assert int(upenn.get("sampled_patients_checked")) == 2
+        assert int(upenn.get("sampled_patients_with_multi_timepoint")) == 0
         assert int(upenn.get("n_patients")) > 100
+        # the withdrawn ground must stay withdrawn
+        assert not any("timepoint" in c for c in upenn.cannot_support)
+        assert any("mask" in c for c in upenn.cannot_support)
         assert upenn.status is ModalityStatus.ABSENT
 
     def test_local_braats_inventory_is_single_timepoint(self):
@@ -101,6 +114,79 @@ class TestRecordedEvidence:
         for m in load_evidence():
             if m.key.startswith("tcia_"):
                 assert m.cannot_support, f"{m.key} records no limitation"
+
+
+# ---------------------------------------------------------------------------
+# Full-cohort measurement (no sampling, no network)
+# ---------------------------------------------------------------------------
+
+
+UPENN_SERIES_LISTING = "data/tcia_probe/upenn_series.json"
+
+
+@pytest.mark.skipif(
+    not os.path.exists(UPENN_SERIES_LISTING),
+    reason="cached UPENN-GBM series listing absent",
+)
+class TestCohortTimepointMeasurement:
+    """The cohort-scored counts must reproduce what the evidence claims."""
+
+    def test_recorded_counts_reproduce_from_the_listing(self):
+        """No drift: the record is a function of the listing, not typed by hand."""
+        measured = measure_collection_timepoints(UPENN_SERIES_LISTING)
+        upenn = {m.key: m for m in load_evidence()}["tcia_upenn_gbm"]
+        assert measured["n_patients"] == int(upenn.get("n_patients"))
+        assert measured["n_series"] == int(upenn.get("n_series"))
+        assert measured["n_patients_longitudinal"] == int(
+            upenn.get("patients_with_multi_timepoint")
+        )
+        assert measured["n_patients_multi_date"] == int(
+            upenn.get("patients_multi_date_any_interval")
+        )
+        assert measured["min_interval_days"] == int(upenn.get("min_followup_interval_days"))
+        assert measured["n_patients_dsc_perfusion"] == int(
+            upenn.get("n_patients_dsc_perfusion")
+        )
+        assert measured["n_patients_processed_perfusion"] == int(
+            upenn.get("n_patients_processed_perfusion")
+        )
+
+    def test_the_criterion_is_what_separates_43_from_41(self):
+        """Distinct dates overstate follow-up; the threshold is the correction."""
+        strict = measure_collection_timepoints(UPENN_SERIES_LISTING, min_interval_days=28)
+        loose = measure_collection_timepoints(UPENN_SERIES_LISTING, min_interval_days=1)
+        assert strict["n_patients_multi_date"] == 43
+        assert strict["n_patients_longitudinal"] == 41
+        assert loose["n_patients_longitudinal"] == 43
+        # the criterion travels with the number it produced
+        assert strict["min_interval_days"] == 28
+        assert loose["min_interval_days"] == 1
+
+    def test_perfusion_covers_every_longitudinal_patient(self):
+        """The join that makes streams 3 and 4 co-activatable, not just present."""
+        measured = measure_collection_timepoints(UPENN_SERIES_LISTING)
+        assert measured["n_dsc_series"] == 490
+        assert measured["n_patients_dsc_perfusion"] == 456
+        assert measured["n_processed_series"] == 2607
+        assert measured["n_patients_processed_perfusion"] == 628
+        assert measured["n_longitudinal_with_perfusion"] == measured[
+            "n_patients_longitudinal"
+        ]
+
+    def test_a_patient_without_an_id_or_a_date_is_skipped(self):
+        """Malformed rows must not inflate a cohort count."""
+        rows = [
+            {"PatientID": "", "StudyDate": "2004-01-01"},
+            {"PatientID": "P1", "StudyDate": "not-a-date"},
+            {"PatientID": "P1", "SeriesDate": "2004-02-01"},
+            {"PatientID": "P2", "StudyDate": "2004-01-01"},
+            {"PatientID": "P2", "StudyDate": "2004-04-01"},
+        ]
+        m = measure_collection_timepoints(rows)
+        assert m["n_patients"] == 2  # the blank id is not a patient
+        assert m["n_patients_multi_date"] == 2
+        assert m["n_patients_longitudinal"] == 1  # only P2 has a real interval
+        assert m["source_file"] == "in-memory listing"
 
 
 # ---------------------------------------------------------------------------
