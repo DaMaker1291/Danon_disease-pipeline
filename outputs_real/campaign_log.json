@@ -4,33 +4,32 @@
   "patient_id": "TCGA-02-0016",
   "r0": 0.005,
   "policy_median_pfs": 365.0,
-  "paired_mtd_median_pfs": 267.0,
-  "pfs_extension_median": 0.36704119850187267,
-  "toxicity_reduction_median": 0.151232876712332,
+  "paired_mtd_median_pfs": 268.0,
+  "pfs_extension_median": 0.3619402985074627,
+  "toxicity_reduction_median": 0.01232876712328801,
   "progressed": false,
-  "n_events": 12,
+  "n_events": 22,
   "pfs_policy_replicates": [
    365.0,
    365.0,
    365.0
   ],
   "pfs_mtd_replicates": [
-   298.0,
-   267.0,
+   299.0,
+   268.0,
    225.0
   ],
   "toxicity_reduction_replicates": [
-   0.1405479452054823,
-   0.1668493150684971,
-   0.151232876712332
+   0.01232876712328801,
+   0.01232876712328801,
+   0.01232876712328801
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "7 regime changes occur AFTER eradication (day 116): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -41,31 +40,30 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 253.0,
   "pfs_extension_median": 0.4426877470355731,
-  "toxicity_reduction_median": 0.15369863013698992,
+  "toxicity_reduction_median": 0.017260273972603102,
   "progressed": false,
-  "n_events": 13,
+  "n_events": 20,
   "pfs_policy_replicates": [
    365.0,
    365.0,
    365.0
   ],
   "pfs_mtd_replicates": [
-   284.0,
+   285.0,
    253.0,
    210.0
   ],
   "toxicity_reduction_replicates": [
-   0.1430136986301399,
-   0.15780821917808563,
-   0.15369863013698992
+   0.017260273972603102,
+   0.017260273972603102,
+   0.016438356164383827
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "7 regime changes occur AFTER eradication (day 119): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -76,31 +74,30 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 253.0,
   "pfs_extension_median": 0.4426877470355731,
-  "toxicity_reduction_median": 0.15369863013698992,
+  "toxicity_reduction_median": 0.017260273972603102,
   "progressed": false,
-  "n_events": 13,
+  "n_events": 20,
   "pfs_policy_replicates": [
    365.0,
    365.0,
    365.0
   ],
   "pfs_mtd_replicates": [
-   284.0,
+   285.0,
    253.0,
    210.0
   ],
   "toxicity_reduction_replicates": [
-   0.1430136986301399,
-   0.15780821917808563,
-   0.15369863013698992
+   0.017260273972603102,
+   0.017260273972603102,
+   0.016438356164383827
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "7 regime changes occur AFTER eradication (day 119): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -111,9 +108,9 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 365.0,
   "pfs_extension_median": 0.1162079510703364,
-  "toxicity_reduction_median": 0.1767123287671265,
+  "toxicity_reduction_median": 0.009041095890411133,
   "progressed": false,
-  "n_events": 10,
+  "n_events": 14,
   "pfs_policy_replicates": [
    365.0,
    365.0,
@@ -125,17 +122,16 @@
    327.0
   ],
   "toxicity_reduction_replicates": [
-   0.17835616438356483,
-   0.1767123287671265,
-   0.15123287671233165
+   0.009041095890411133,
+   0.008219178082191969,
+   0.009041095890411133
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "5 regime changes occur AFTER eradication (day 137): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -146,9 +142,9 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 364.0,
   "pfs_extension_median": 0.11378973375617671,
-  "toxicity_reduction_median": 0.1717808219178112,
+  "toxicity_reduction_median": 0.013150684931507062,
   "progressed": false,
-  "n_events": 11,
+  "n_events": 10,
   "pfs_policy_replicates": [
    365.0,
    365.0,
@@ -160,17 +156,16 @@
    298.0
   ],
   "toxicity_reduction_replicates": [
-   0.1783561643835645,
-   0.1717808219178112,
-   0.16027397260274334
+   0.013150684931507062,
+   0.013150684931507062,
+   0.013150684931507062
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "6 regime changes occur AFTER eradication (day 146): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -181,9 +176,9 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 364.0,
   "pfs_extension_median": 0.11378973375617671,
-  "toxicity_reduction_median": 0.1717808219178112,
+  "toxicity_reduction_median": 0.013150684931507062,
   "progressed": false,
-  "n_events": 11,
+  "n_events": 10,
   "pfs_policy_replicates": [
    365.0,
    365.0,
@@ -195,17 +190,16 @@
    298.0
   ],
   "toxicity_reduction_replicates": [
-   0.1783561643835645,
-   0.1717808219178112,
-   0.16027397260274334
+   0.013150684931507062,
+   0.013150684931507062,
+   0.013150684931507062
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "6 regime changes occur AFTER eradication (day 146): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -214,33 +208,32 @@
   "patient_id": "TCGA-02-0016",
   "r0": 0.005,
   "policy_median_pfs": 365.0,
-  "paired_mtd_median_pfs": 334.0,
-  "pfs_extension_median": 0.09281437125748503,
-  "toxicity_reduction_median": 0.11671232876712567,
+  "paired_mtd_median_pfs": 335.0,
+  "pfs_extension_median": 0.08955223880597014,
+  "toxicity_reduction_median": 0.01232876712328801,
   "progressed": false,
-  "n_events": 11,
+  "n_events": 16,
   "pfs_policy_replicates": [
    365.0,
    365.0,
    365.0
   ],
   "pfs_mtd_replicates": [
-   334.0,
+   335.0,
    295.0,
    342.0
   ],
   "toxicity_reduction_replicates": [
-   0.09287671232876848,
-   0.11671232876712567,
-   0.13972602739726303
+   0.011506849315068735,
+   0.01232876712328801,
+   0.013150684931507173
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "6 regime changes occur AFTER eradication (day 141): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -251,9 +244,9 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 318.0,
   "pfs_extension_median": 0.14779874213836477,
-  "toxicity_reduction_median": 0.11835616438356411,
+  "toxicity_reduction_median": 0.01726027397260288,
   "progressed": false,
-  "n_events": 11,
+  "n_events": 14,
   "pfs_policy_replicates": [
    365.0,
    365.0,
@@ -262,20 +255,19 @@
   "pfs_mtd_replicates": [
    318.0,
    278.0,
-   326.0
+   327.0
   ],
   "toxicity_reduction_replicates": [
-   0.0945205479452067,
-   0.11835616438356411,
-   0.13068493150685212
+   0.016438356164383716,
+   0.01726027397260288,
+   0.01726027397260288
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "5 regime changes occur AFTER eradication (day 145): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -286,9 +278,9 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 318.0,
   "pfs_extension_median": 0.14779874213836477,
-  "toxicity_reduction_median": 0.11835616438356411,
+  "toxicity_reduction_median": 0.01726027397260288,
   "progressed": false,
-  "n_events": 11,
+  "n_events": 14,
   "pfs_policy_replicates": [
    365.0,
    365.0,
@@ -297,20 +289,19 @@
   "pfs_mtd_replicates": [
    318.0,
    278.0,
-   326.0
+   327.0
   ],
   "toxicity_reduction_replicates": [
-   0.0945205479452067,
-   0.11835616438356411,
-   0.13068493150685212
+   0.016438356164383716,
+   0.01726027397260288,
+   0.01726027397260288
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "5 regime changes occur AFTER eradication (day 145): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -321,9 +312,9 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 273.0,
   "pfs_extension_median": 0.336996336996337,
-  "toxicity_reduction_median": 0.12657534246575586,
+  "toxicity_reduction_median": 0.013150684931507062,
   "progressed": false,
-  "n_events": 13,
+  "n_events": 20,
   "pfs_policy_replicates": [
    365.0,
    365.0,
@@ -332,20 +323,19 @@
   "pfs_mtd_replicates": [
    273.0,
    221.0,
-   275.0
+   276.0
   ],
   "toxicity_reduction_replicates": [
-   0.12657534246575586,
-   0.11835616438356378,
-   0.14794520547945522
+   0.013150684931507062,
+   0.013150684931507062,
+   0.013150684931507062
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "9 regime changes occur AFTER eradication (day 115): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -356,9 +346,9 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 263.0,
   "pfs_extension_median": 0.38783269961977185,
-  "toxicity_reduction_median": 0.1356164383561672,
+  "toxicity_reduction_median": 0.018082191780822154,
   "progressed": false,
-  "n_events": 13,
+  "n_events": 18,
   "pfs_policy_replicates": [
    365.0,
    365.0,
@@ -370,17 +360,16 @@
    265.0
   ],
   "toxicity_reduction_replicates": [
-   0.1356164383561672,
-   0.12657534246575586,
-   0.15534246575342803
+   0.018082191780822265,
+   0.018082191780822154,
+   0.018082191780822154
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "8 regime changes occur AFTER eradication (day 115): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -391,9 +380,9 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 263.0,
   "pfs_extension_median": 0.38783269961977185,
-  "toxicity_reduction_median": 0.1356164383561672,
+  "toxicity_reduction_median": 0.018082191780822154,
   "progressed": false,
-  "n_events": 13,
+  "n_events": 18,
   "pfs_policy_replicates": [
    365.0,
    365.0,
@@ -405,17 +394,16 @@
    265.0
   ],
   "toxicity_reduction_replicates": [
-   0.1356164383561672,
-   0.12657534246575586,
-   0.15534246575342803
+   0.018082191780822265,
+   0.018082191780822154,
+   0.018082191780822154
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "8 regime changes occur AFTER eradication (day 115): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -426,31 +414,30 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 253.0,
   "pfs_extension_median": 0.4426877470355731,
-  "toxicity_reduction_median": 0.16191780821918123,
+  "toxicity_reduction_median": 0.017260273972603102,
   "progressed": false,
-  "n_events": 16,
+  "n_events": 24,
   "pfs_policy_replicates": [
    365.0,
    365.0,
    365.0
   ],
   "pfs_mtd_replicates": [
-   256.0,
+   257.0,
    253.0,
    252.0
   ],
   "toxicity_reduction_replicates": [
-   0.16438356164383905,
-   0.15616438356164664,
-   0.16191780821918123
+   0.015616438356164664,
+   0.017260273972603102,
+   0.017260273972603102
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "11 regime changes occur AFTER eradication (day 118): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -461,31 +448,30 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 241.0,
   "pfs_extension_median": 0.5145228215767634,
-  "toxicity_reduction_median": 0.1602739726027428,
+  "toxicity_reduction_median": 0.023013698630137358,
   "progressed": false,
-  "n_events": 16,
+  "n_events": 22,
   "pfs_policy_replicates": [
    365.0,
    365.0,
    365.0
   ],
   "pfs_mtd_replicates": [
-   244.0,
+   245.0,
    241.0,
    240.0
   ],
   "toxicity_reduction_replicates": [
-   0.16027397260274256,
-   0.1602739726027428,
-   0.16602739726027715
+   0.023013698630137358,
+   0.023013698630137247,
+   0.02383561643835641
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "10 regime changes occur AFTER eradication (day 122): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -496,31 +482,30 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 241.0,
   "pfs_extension_median": 0.5145228215767634,
-  "toxicity_reduction_median": 0.1602739726027428,
+  "toxicity_reduction_median": 0.023013698630137358,
   "progressed": false,
-  "n_events": 16,
+  "n_events": 22,
   "pfs_policy_replicates": [
    365.0,
    365.0,
    365.0
   ],
   "pfs_mtd_replicates": [
-   244.0,
+   245.0,
    241.0,
    240.0
   ],
   "toxicity_reduction_replicates": [
-   0.16027397260274256,
-   0.1602739726027428,
-   0.16602739726027715
+   0.023013698630137358,
+   0.023013698630137247,
+   0.02383561643835641
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "10 regime changes occur AFTER eradication (day 122): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -531,9 +516,9 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 260.0,
   "pfs_extension_median": 0.40384615384615385,
-  "toxicity_reduction_median": 0.16602739726027715,
+  "toxicity_reduction_median": 0.011506849315068735,
   "progressed": false,
-  "n_events": 12,
+  "n_events": 18,
   "pfs_policy_replicates": [
    365.0,
    365.0,
@@ -545,17 +530,16 @@
    260.0
   ],
   "toxicity_reduction_replicates": [
-   0.16602739726027715,
-   0.16684931506849665,
-   0.15945205479452396
+   0.011506849315068735,
+   0.011506849315068735,
+   0.011506849315068735
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "8 regime changes occur AFTER eradication (day 107): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -566,9 +550,9 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 242.0,
   "pfs_extension_median": 0.5082644628099173,
-  "toxicity_reduction_median": 0.16191780821918123,
+  "toxicity_reduction_median": 0.016438356164383716,
   "progressed": false,
-  "n_events": 12,
+  "n_events": 16,
   "pfs_policy_replicates": [
    365.0,
    365.0,
@@ -580,17 +564,16 @@
    242.0
   ],
   "toxicity_reduction_replicates": [
-   0.16191780821918123,
-   0.1627397260274006,
-   0.15863013698630457
+   0.016438356164383827,
+   0.016438356164383716,
+   0.016438356164383716
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "7 regime changes occur AFTER eradication (day 107): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  },
@@ -601,9 +584,9 @@
   "policy_median_pfs": 365.0,
   "paired_mtd_median_pfs": 242.0,
   "pfs_extension_median": 0.5082644628099173,
-  "toxicity_reduction_median": 0.16191780821918123,
+  "toxicity_reduction_median": 0.016438356164383716,
   "progressed": false,
-  "n_events": 12,
+  "n_events": 16,
   "pfs_policy_replicates": [
    365.0,
    365.0,
@@ -615,17 +598,16 @@
    242.0
   ],
   "toxicity_reduction_replicates": [
-   0.16191780821918123,
-   0.1627397260274006,
-   0.15863013698630457
+   0.016438356164383827,
+   0.016438356164383716,
+   0.016438356164383716
   ],
   "notes": [
    "the switch rule acts on the simulated resistant fraction, which is NOT clinically observable in real time; operationalising this schedule requires a validated surrogate biomarker (serial biopsy clone fractions, ctDNA, or imaging), not the simulation itself",
    "day precision is the simulation's daily resolution, not a claim about when a real switch should occur",
    "PFS is the RANO-fraction burden endpoint of the simulator, not a clinical measurement",
    "all growth/kill/diffusion constants are ASSUMED pending the tier-3 bench campaign (danon.validation); every number here inherits that uncertainty",
-   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction",
-   "7 regime changes occur AFTER eradication (day 107): at near-zero burden the resistant fraction is noise-dominated and threshold policies chatter between drugs -- events past this point are a numeric artifact, not interpretable schedule steps"
+   "headline metrics are computed per-patient against a paired MTD control; the mCRPC anchor ratio is 2.34 and is a dynamics-class context, not this patient's prediction"
   ],
   "vti": []
  }

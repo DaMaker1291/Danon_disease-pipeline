@@ -55,7 +55,7 @@ python -c "from danon.claims import audit_claims; audit_claims()"   # 31/31 boun
 | Covariate upgrades · MGMT binary / continuous beta | HR=0.8326 (delta_C=−0.0006, n=409) / HR=0.6627 (delta_C=+0.0006, n=137) — directionally consistent with trial literature, unresolvable in this cohort | same |
 | Covariate upgrades · RT+temozolomide restriction | keeps **356/595**; cohort-membership delta −0.0112 inside fold sd 0.0247 — selection reported separately from signal | same |
 | Covariate upgrades · all covariates stacked | pooled C **0.5785** (n=68) vs age-alone 0.6203 on the same kept subset — stacking unavailable-for-most covariates *costs* discrimination | same |
-| MGMT β → resistance bridge | r0 = 0.75·(1−β); across the real 140-patient beta range MTD median PFS **144 → 167 days**; steering policy saturates at 365 d at every β (zero dynamic range) | `outputs_real/mgmt_resistance.txt` |
+| MGMT β → resistance bridge | r0 = 0.75·(1−β); across the real 140-patient beta range MTD median PFS **144 → 168 days**; steering policy saturates at 365 d at every β (zero dynamic range) | `outputs_real/mgmt_resistance.txt` |
 | Bound-claims audit | **31/31 verified** | `danon/claims.py::audit_claims` |
 | Clinical datastreams (4 tests) | streams wired with identity guarantees; stream 3 measured on real t1ce: MTD PFS paired delta −1.17 d (18 runs); streams 1/2/4 refuse with live zero counts | `danon/clinical_twin.py::stream3_report`, `outputs_real/clinical_twin.txt` |
 

@@ -78,10 +78,17 @@ def test_seed_layout(gbm):
     assert 9 <= n_r_voxels <= 0.03 * gbm.tumor_mask.sum()
     # Seeded below spatial carrying capacity so dynamics can run.
     assert n_s.max() <= DEFAULT_CLONES.carrying_capacity * 0.66
-    with pytest.raises(ValueError):
-        sim.seed(0.0)
+    # Fraction 0.0 is a DEFINED configuration, not an error: no resistant
+    # clone at diagnosis, so any resistance in the run has to be created by
+    # mutation. Without it, 'resistance evolves' is untestable -- the
+    # clustered-seed path always places R in at least 9 voxels.
+    n_s0, n_r0 = sim.seed(0.0, seed=11)
+    assert n_r0.sum() == 0.0
+    assert n_s0.sum() > 0.0
     with pytest.raises(ValueError):
         sim.seed(1.0)
+    with pytest.raises(ValueError):
+        sim.seed(-0.1)
 
 
 # ---------------------------------------------------------------------------

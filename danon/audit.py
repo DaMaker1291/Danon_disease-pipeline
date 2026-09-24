@@ -628,7 +628,7 @@ def render_audit_trace(
         "[WHAT IS DELIBERATELY ABSENT]",
         "  - No per-patient predicted-vs-actual relapse day. The engine's forecast",
         "    DOES vary by geometry (01017/01018/01019 give day-365 MTD burdens of",
-        "    2259/1386/3677), so patient-dependence is not the blocker: no patient",
+        "    2244/1384/3661), so patient-dependence is not the blocker: no patient",
         "    here has baseline imaging, molecular state, administered schedule and",
         "    observed outcome together, and the model's burden-threshold endpoint",
         "    is not yet translated into a clinical progression date.",

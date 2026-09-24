@@ -69,7 +69,7 @@ progression curve at fixed time points:
 | 200 | 0.721 | 1.000 | +0.279 |
 | 365 | 0.548 | 0.074 | **−0.473** |
 
-Model MTD-arm median progression **267 d** (n = 54, 50 events) sits **inside** the
+Model MTD-arm median progression **268 d** (n = 54, 50 events) sits **inside** the
 observed dated-event IQR (101–321 d) — consistent with the real timescale. The late
 discrepancy is expected and explainable: the real cohort received maximal resection and
 radiotherapy, and the model's control arm has **no resection or radiotherapy term**, so
@@ -93,30 +93,48 @@ perturbed world) — 84 cells over 6 targets × 7 scales × 2 real BraTS geometr
 horizon. Primary criterion is mean tumour burden (defined for every replicate, so
 nothing is dropped); PFS is secondary and reported only where *both* arms progressed.
 
-Policy better on mean burden in **81/84** cells; materially better (ratio ≤ 0.75) in
-**77/84**. Median burden ratio (policy / MTD) per target and scale:
+Policy better on mean burden in **80/84** cells; materially better (ratio ≤ 0.75) in
+**70/84**. Median burden ratio (policy / MTD) per target and scale:
 
 | target scaled | 0.02 | 0.05 | 0.10 | 0.25 | 0.50 | 1.00 | 2.00 |
 |---|---|---|---|---|---|---|---|
-| `collateral_b_kill` (the mechanism) | 0.89 | 0.49 | 0.20 | 0.04 | 0.03 | 0.03 | 0.03 |
-| `drug_a_kill` (selective pressure) | **1.00** | **0.98** | 0.73 | 0.18 | 0.05 | 0.03 | 0.02 |
-| `tumour_growth` | 0.44 | 0.42 | 0.37 | 0.23 | 0.09 | 0.03 | 0.01 |
-| `resistance_cost` | 0.02 | 0.02 | 0.02 | 0.02 | 0.02 | 0.03 | 0.06 |
-| `drug_transport` | 0.03 | 0.03 | 0.02 | 0.02 | 0.03 | 0.03 | 0.03 |
-| `intake_r0` | 0.03 | 0.03 | 0.03 | 0.03 | 0.03 | 0.03 | 0.03 |
+| `collateral_b_kill` (the mechanism) | 0.91 | 0.55 | 0.23 | 0.09 | 0.08 | 0.07 | 0.06 |
+| `drug_a_kill` (selective pressure) | **1.00** | **1.00** | 0.84 | 0.27 | 0.10 | 0.07 | 0.08 |
+| `tumour_growth` | 0.85 | 0.83 | 0.81 | 0.67 | 0.31 | 0.07 | 0.03 |
+| `resistance_cost` | 0.04 | 0.04 | 0.04 | 0.05 | 0.05 | 0.07 | 0.18 |
+| `drug_transport` | 0.07 | 0.07 | 0.06 | 0.07 | 0.07 | 0.07 | 0.07 |
+| `intake_r0` | 0.16 | 0.13 | 0.12 | 0.10 | 0.08 | 0.07 | 0.06 |
 
-Two results worth stating plainly:
+Three results worth stating plainly:
 
 1. **The binding constraint is not the collateral mechanism — it is the primary drug.**
-   Below ~10% of the assumed Drug-A kill rate, the schedule's advantage collapses to
+   At or below 5% of the assumed Drug-A kill rate the schedule's advantage collapses to
    parity (ratio 1.00): holidays only work if the on-treatment phase applies real
    selective pressure. This is a *testable prediction for bench work*: measure the
    temozolomide kill rate first, not the collateral effect.
-2. **The conclusion is insensitive to intake uncertainty within a 100× range**
-   (`intake_r0` from 0.02× to 2× moves the ratio only 0.030 → 0.034) — and, separately,
-   insensitive to the resistance cost, transport and growth constants over the same
-   range. The `observer.py` finding that the controller keys on the projected
-   *trajectory* rather than the absolute resistant fraction explains why.
+2. **The conclusion is now measurably sensitive to `intake_r0`** — the pre-existing
+   resistant fraction — moving the ratio from 0.16 to 0.06 across the 0.02×–2× grid.
+   This REVERSES the earlier reading of this same sweep (a flat 0.030 → 0.034, i.e.
+   "insensitive to intake uncertainty"), and the reversal is a direct consequence of
+   the extinction/detection floors: with mutation unable to supply resistance at the
+   calibrated rate, the seeded fraction is the only source of resistance, so it is
+   load-bearing. Direction: *more* pre-existing resistance makes the policy look
+   better, because MTD then fails harder on its own. This is the correct place for
+   the model's sensitivity to sit, and it is uncomfortable — `intake_r0` is an
+   ASSUMED input (a calibrated transcriptome mapping, not a measured clonal
+   fraction), so the headline contrast is now known to depend on a number this
+   project does not measure.
+3. **The engine's verdict, not just its magnitude, depends on that input.** With no
+   pre-existing resistant clone, the same dose eradicates the tumour under MTD and the
+   adaptive policy buys nothing at all (see the CORRECTION section in
+   `danon/evosteer.py`). The sensitivity grid above perturbs r0 but never sets it to
+   zero, so it cannot see that regime; the emergence tests in
+   `tests/test_resistance_emergence.py` cover it instead.
+
+*Re-measured after the resistance floors landed (extinction floor at half a cell per
+voxel, detection floor at ~1e8 cells). The previous table read 81/84 and 77/84 with a
+flat `intake_r0` row; the load-bearing conclusions above are unchanged, the magnitudes
+are not, and the `intake_r0` row changed sign of finding.*
 
 * **Proves:** which constants the conclusion depends on, and how far each can be wrong
   before the result changes.
@@ -135,8 +153,18 @@ perfect-information reference (**100% PFS retention vs a policy that can read th
 clonal state; 2.64× MTD PFS on paired seeds**).
 
 The real-geometry campaign (6 BraTS 2021 cases × 3 cohort-derived r0s, 3 replicates
-each, `outputs_real/campaign_log.json`) gives median PFS extension ≈ **+38%** (range
-+9.3% to +51.5%, censored lower bounds) and toxicity reduction **11.7–17.7%**.
+each, `outputs_real/campaign_log.json`) gives median PFS extension ≈ **+38.8%** (range
++9.0% to +51.5%, censored lower bounds) and toxicity reduction **0.9–2.3%**.
+
+The toxicity figure moved from 11.7–17.7% to 0.9–2.3% when the resistance floors
+landed, and the reason matters more than the number: the collateral switch used to take
+drug-B holidays on the strength of a resistant fraction computed for a sub-detectable
+tumour. R/(S+R) reads 1.0 as soon as the sensitive population is extinct, so the policy
+was switching — and banking the drug-B toxicity saving — in response to a number that
+described nothing. It no longer does, so it stays on drug A, and its toxicity advantage
+largely disappears. The PFS advantage does not. Read together: **the survival contrast
+in this model comes from the collateral mechanism, while the previously advertised
+toxicity benefit was substantially an artifact of the degenerate ratio.**
 
 * **Proves:** the policy beats standard dosing in this model, on real patient geometry,
   at equal information.
@@ -159,9 +187,12 @@ more.
 
 > The engine is verified as code (layer 0), the real-data ingestion is validated against
 > published survival (layer 1), the control arm is on the right timescale (layer 2), the
-> conclusion survives a 100× perturbation of every constant except the primary drug's
-> kill rate (layer 3), and it beats the standard of care at equal information in paired
-> runs (layer 4) — and none of that is evidence that a patient benefits.
+> policy is favoured in 80/84 perturbed cells and collapses to parity only when the
+> primary drug's kill rate is perturbed below ~5% (layer 3), and it beats the standard
+> of care at equal information in paired runs (layer 4) — and none of that is evidence
+> that a patient benefits. The contrast demonstrably depends on the ASSUMED pre-existing
+> resistant fraction (layer 3, item 2), so the honest summary is that this model is
+> policy-favourable across a perturbed parameter space, not that the policy works.
 
 `outputs_real/validation_packet.txt` is generated by `danon/reporting.py:validation_packet()`
 from the artifacts themselves, so no number in this document can drift from the code

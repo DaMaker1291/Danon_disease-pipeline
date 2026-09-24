@@ -378,7 +378,10 @@ export default function EvolutionPlayer() {
               <div className="panel-title">Resistant fraction — the divergence IS the resistance story</div>
               <div style={{ color: 'var(--text2)', fontSize: 11.5, margin: '4px 0 10px', lineHeight: 1.5 }}>
                 R/(S+R) per day for both arms on the same tumour and seed. The cursor tracks the timeline;
-                the dashed line is the switch-on threshold (15%).
+                the dashed line is the switch-on threshold (15%). Reported as 0 below the ~1e8-cell detection
+                floor: R/(S+R) hits 100% the moment the sensitive population is extinct, so a sub-detectable
+                tumour is not 'resistant', it is too small for the ratio to mean anything — read the absolute
+                burden figures above for those days.
               </div>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={rChart} margin={{ top: 6, right: 14, bottom: 4, left: 0 }}>

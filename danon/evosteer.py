@@ -77,6 +77,42 @@ results -- reported in full, because a rigged model only ever reports wins:
 Constants are marked CALIBRATED below and are a property of THIS
 implementation -- re-run the calibration when any assumption changes.
 
+CORRECTION (anchor (c) re-opened: the model was wrong, not just unlucky)
+-----------------------------------------------------------------------
+Anchor (c) above was investigated by falsification rather than by sweeping:
+if resistance is a property of the mechanism, then removing the mechanism
+must remove the resistance. It did not. With mutation_rate = 0 AND no seeded
+clone, resistance still reached R/(S+R) = 1.000 -- so mutation was doing no
+work at all, and mu = 0 and mu = 5e-5 produced identical PFS and dominance
+days. Two defects were responsible:
+  (i) NO EXTINCTION. Densities are continuous, so a remnant of 10^-9 of a
+      voxel (~0.000005 of one cell) grew deterministically back to dominance.
+      Every MTD arm failed at every dose because nothing could ever die out.
+      Fixed by MIN_VIABLE_DENSITY: a voxel holding under half a cell is
+      zeroed at end of day, so eradication is exact.
+  (ii) A DEGENERATE RATIO. R/(S+R) reaches 1.0 the moment the sensitive
+      population is driven extinct, regardless of whether anything survives;
+      dominance was declared at a total burden of 0.016 cells, and the
+      collateral-switch policy ACTED on that number. Fixed by
+      DETECTION_BURDEN_DENSITY: below ~1e8 cells (~1 cm^3) the fraction is
+      reported as 0.0 and no policy may switch on it.
+RE-MEASURED after the fix (same geometry, seed 101, 365 days):
+  - Pre-existing resistance (initial fraction 0.005, the calibrated default):
+    MTD PFS ~165-176 d across seeds 0-5 with dominance ~day 25; the
+    collateral switch never reaches progression and ends below the detection
+    floor. The steering advantage in (b) survives -- but see below.
+  - NO pre-existing resistant clone (fraction 0.0, mu = 5e-5): BOTH arms
+    eradicate the tumour (final burden exactly 0). Continuous MTD is
+    sufficient and the adaptive policy buys nothing.
+  - Resistance from mutation alone needs mu ~ 5e-3 (100x the calibrated
+    default) to emerge within 365 days.
+The honest conclusion is therefore NOT 'MTD always fails'. It is that the
+engine's qualitative verdict is set by an ASSUMED input -- whether a
+resistant subclone exists at diagnosis -- which this project does not
+measure (the default comes from a calibrated transcriptome mapping, not a
+measured clonal fraction). A model whose conclusion flips on an unmeasured
+input cannot support a clinical claim, and does not make one.
+
 SCOPE -- deliberately excluded
 ------------------------------
 - No DICOM/MONAI/SegResNet segmentation: the simulator consumes a tumour mask,
@@ -118,6 +154,33 @@ ADAPTIVE_TTP_RATIO_ANCHOR: float = ADAPTIVE_TTP_MONTHS_MCRPC[0] / ADAPTIVE_TTP_M
 
 #: RANO response criteria: progression = >=25% increase in enhancing lesion.
 RANO_PROGRESSION_FRACTION = 0.25
+
+#: Cells per voxel at unit density (N = 1) on the engine's real geometry. A
+#: 3.667 mm engine voxel is 49.3 mm^3 = 0.0493 cm^3, and solid tumour runs at
+#: roughly 1e8 cells/cm^3, so a saturated voxel holds ~4.9e6 cells. This
+#: constant exists to convert the continuum density into a CELL COUNT for two
+#: purposes only -- the extinction floor and the detection floor below. It
+#: never rescales the dynamics, which stay in normalised density units.
+CELLS_PER_VOXEL_AT_UNIT_DENSITY = 4.93e6
+
+#: A population smaller than one cell is not a population. Any voxel holding
+#: less than half a cell is zeroed at end of day. Without this floor a
+#: sub-single-cell remnant (10^-9 of a voxel) grew deterministically back to
+#: dominance, so essentially every MTD arm failed at every dose and at EVERY
+#: mutation rate -- including mutation_rate = 0, which is what exposed the
+#: defect: resistance was pre-seeded and mutation was doing no work at all.
+MIN_VIABLE_CELLS_PER_VOXEL = 0.5
+MIN_VIABLE_DENSITY = MIN_VIABLE_CELLS_PER_VOXEL / CELLS_PER_VOXEL_AT_UNIT_DENSITY
+
+#: Disease below about this burden is not a detectable lesion, so R/(S+R) is
+#: not a clinical quantity. 1e8 cells is ~1 cm^3 of tumour at the density
+#: above. Below the floor the resistant fraction is reported as 0.0 and no
+#: policy may act on it: otherwise a tumour that has been driven to extinction
+#: except for a few resistant cells reports R-fraction 1.00, which reads as
+#: 'resistance took over' when the honest statement is 'the sensitive
+#: population is gone and there is almost nothing left of the tumour'.
+DETECTION_BURDEN_CELLS = 1.0e8
+DETECTION_BURDEN_DENSITY = DETECTION_BURDEN_CELLS / CELLS_PER_VOXEL_AT_UNIT_DENSITY
 
 #: Observed adaptive/MTD PFS-ratio range for THIS implementation across the
 #: calibrated configuration and seed variation (DERIVED from the calibration
@@ -537,11 +600,20 @@ class TumorEvolutionSimulator:
         (no growth, no competitive release where drug kills S). fill is
         CALIBRATED with the rest of the parameter set.
         """
-        if not 0.0 < initial_resistant_fraction < 1.0:
-            raise ValueError("initial_resistant_fraction must be in (0, 1)")
+        if not 0.0 <= initial_resistant_fraction < 1.0:
+            raise ValueError("initial_resistant_fraction must be in [0, 1)")
         rng = np.random.default_rng(seed)
         mask = self.geom.tumor_mask
         N_S = mask.astype(float) * self.clones.carrying_capacity * fill_fraction
+
+        # A fraction of exactly 0 means NO resistant clone at diagnosis: any
+        # resistance in the trial must then be created by mutation. This is the
+        # only configuration in which 'resistance evolves' is a testable
+        # statement rather than an initial condition -- the clustered-seed
+        # path always places R in at least 9 voxels, which at any nonzero
+        # fraction is already a viable population.
+        if initial_resistant_fraction == 0.0:
+            return N_S, np.zeros_like(N_S)
 
         voxels = np.argwhere(mask)
         centre = voxels[rng.integers(len(voxels))].astype(float)
@@ -705,7 +777,14 @@ class TumorEvolutionSimulator:
 
         for day in range(days):
             burden = float(N_S.sum() + N_R.sum())
-            r_frac = float(N_R.sum() / burden) if burden > 0 else 0.0
+            # R/(S+R) is a clinical quantity only above the detection floor.
+            # Below it the ratio is degenerate: kill S to extinction and the
+            # ratio reads 1.00 however few cells remain, so a policy acting on
+            # it would switch drugs because a tumour had been ERADICATED.
+            detectable = burden >= DETECTION_BURDEN_DENSITY
+            r_frac = (
+                float(N_R.sum() / burden) if (burden > 0.0 and detectable) else 0.0
+            )
             st = PolicyState(
                 day=day, burden=burden, burden_initial=b_init, resistant_fraction=r_frac
             )
@@ -716,7 +795,7 @@ class TumorEvolutionSimulator:
 
             if pfs_day is None and burden > pfs_threshold:
                 pfs_day = day
-            if dominance_day is None and r_frac > 0.5:
+            if dominance_day is None and detectable and r_frac > 0.5:
                 dominance_day = day
 
             # Drug transport. With a heterogeneous field the divergence form
@@ -819,6 +898,14 @@ class TumorEvolutionSimulator:
                 N_S = np.clip(N_S + motility * _laplacian(N_S), 0.0, None)
                 N_R = np.clip(N_R + motility * _laplacian(N_R), 0.0, None)
 
+            # Extinction floor, applied to the end-of-day state: a voxel
+            # holding less than half a cell holds no cells. This is what stops
+            # a sub-single-cell remnant from regrowing deterministically --
+            # continuous densities have no extinction, and every nonzero
+            # population grows.
+            np.copyto(N_S, 0.0, where=N_S < MIN_VIABLE_DENSITY)
+            np.copyto(N_R, 0.0, where=N_R < MIN_VIABLE_DENSITY)
+
             # Clinical monitoring hook: end-of-day aggregate burdens.
             if observation_hook is not None:
                 observation_hook(day, float(N_S.sum()), float(N_R.sum()))
@@ -838,8 +925,13 @@ class TumorEvolutionSimulator:
             progressed=pfs_day is not None,
             initial_resistant_fraction=initial_resistant_fraction,
             toxicity=toxicity,
+            # Gated on the same detection floor as the daily readout: at the
+            # horizon the honest statement about a sub-detectable tumour is
+            # carried by the absolute burden arrays, not by this ratio.
             final_resistant_fraction=(
-                float(N_R.sum() / final_burden) if final_burden > 0 else 0.0
+                float(N_R.sum() / final_burden)
+                if final_burden >= DETECTION_BURDEN_DENSITY
+                else 0.0
             ),
             resistant_dominance_day=dominance_day,
         )

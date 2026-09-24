@@ -782,6 +782,55 @@ def check_treatment_restriction_separates_membership_from_signal() -> CheckResul
 # ---------------------------------------------------------------------------
 
 
+def check_resistance_is_emergent() -> CheckResult:
+    """Resistance must come from the mechanism, not from the initial state.
+
+    This is the falsification that exposed two defects in this engine: with
+    no seeded clone the clustered seed still placed ~9 cells (so mutation did
+    no work and mu=0 matched mu=5e-5 exactly), and with no extinction floor a
+    sub-single-cell remnant regrew deterministically while R/(S+R) read 1.00.
+    It is checked live here rather than quoted, so the fix cannot silently
+    regress.
+    """
+    import dataclasses as _dc
+
+    from danon.evosteer import (
+        DEFAULT_CLONES,
+        MTDPolicy,
+        TumorEvolutionSimulator,
+        make_gbm_phantom,
+    )
+
+    geom = make_gbm_phantom()
+    no_mu = _dc.replace(DEFAULT_CLONES, mutation_rate=0.0)
+
+    def run(clones, ifr: float, days: int):
+        return TumorEvolutionSimulator(geom, clones=clones).run(
+            MTDPolicy(), days=days, initial_resistant_fraction=ifr, seed=101
+        )
+
+    sterile = run(no_mu, 0.0, 200)
+    seeded = run(DEFAULT_CLONES, 0.005, 250)
+
+    # (1) no mutation + no seed => no resistant cell may exist at all.
+    no_ghost = float(sterile.burden_R.max()) == 0.0
+    # (2) the floor makes eradication exact rather than asymptotic.
+    eradicated = float(sterile.burden_S[-1]) == 0.0
+    # (3) the verdict must track the ASSUMED pre-existing clone.
+    dependent = seeded.pfs_day is not None and sterile.pfs_day is None
+    return CheckResult(
+        supported=no_ghost and eradicated and dependent,
+        detail=(
+            f"mutation off + no seeded clone -> max resistant burden "
+            f"{float(sterile.burden_R.max()):.3e} (no ghost resistance: {no_ghost}); "
+            f"sensitive population extinguished exactly: {eradicated}; "
+            f"verdict tracks the assumed pre-existing clone "
+            f"(MTD PFS {seeded.pfs_day} d seeded vs {sterile.pfs_day} unseeded): "
+            f"{dependent}"
+        ),
+    )
+
+
 def check_stream_identities_hold() -> CheckResult:
     """Each stream's neutral value must reproduce the engine default exactly."""
     from danon.clinical_twin import KI67_REF, stream2_growth_rate, stream2_clones, build_stream3_clearance, stream1_initial_state
@@ -923,6 +972,7 @@ CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "voxel_scale": check_voxel_scale,
     "runtime_365": check_runtime_365_days,
     "bulk_not_single_cell": check_parameters_are_bulk_not_single_cell,
+    "resistance_is_emergent": check_resistance_is_emergent,
     "stream_identities": check_stream_identities_hold,
     "stream3_cohort_measured": check_stream3_cohort_is_measured,
     "stream_census_refuses": check_stream_census_refuses_honestly,
@@ -957,6 +1007,24 @@ CLAIMS: Tuple[Claim, ...] = (
         "mechanistic_core",
         "The mechanism is mechanistic; the rate constants are declared "
         "assumptions, not measurements from this project.",
+    ),
+    Claim(
+        "resistance_is_not_ghost",
+        "Resistance in this engine is produced by the model, not carried by "
+        "the initial state: with mutation off and no seeded clone the resistant "
+        "burden is exactly zero, and with the extinction floor the sensitive "
+        "population is extinguished exactly rather than lingering as a "
+        "sub-single-cell density. The engine's qualitative verdict (does "
+        "continuous MTD control the tumour?) tracks whether a resistant "
+        "subclone exists at diagnosis, which is an ASSUMED input here, not a "
+        "measured one.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/claims.py::check_resistance_is_emergent",
+        "resistance_is_emergent",
+        "This verifies the mechanism is doing the work; it says nothing about "
+        "whether the assumed constants are right, and the verdict's dependence "
+        "on the pre-existing fraction is a limitation to state, not a result "
+        "to publish.",
     ),
     Claim(
         "not_a_classifier",

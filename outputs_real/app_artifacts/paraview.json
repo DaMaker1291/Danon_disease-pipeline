@@ -1,7 +1,7 @@
 {
  "key": "paraview",
  "title": "ParaView gallery: BraTS-2021 case 01017, 120-day MTD end-state",
- "generated_utc": "2026-09-23T19:35:18Z",
+ "generated_utc": "2026-09-24T18:04:52Z",
  "source": "outputs_real/brats_case01017_mtd_day120.vti (committed artifact; produced by export_fields_vti after sim.run(..., keep_fields=True) on the cached BraTS-2021 case 01017 segmentation)",
  "notes": [
   "simulation output on a real BraTS-2021 segmentation, not patient imaging of a treated tumour and not a clinical prediction",

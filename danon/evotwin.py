@@ -247,6 +247,17 @@ class PatientOutcome:
     immune_used: bool
     tumor_size: int
     initial_resistant_fraction: float
+    #: Clone COMPOSITION at the horizon: R/(S+R) computed from the absolute
+    #: final burdens, WITHOUT the engine's detection floor. This is a
+    #: well-defined arithmetic property of any tumour, including a remnant of
+    #: a few cells, and it is what the failure-mode claim is about -- an MTD
+    #: arm can hold burden down while every surviving cell is resistant.
+    #: It is deliberately NOT `final_resistant_fraction`, which is the gated
+    #: clinical quantity and reads 0.0 for a sub-detectable lesion.
+    final_resistant_composition: float = 0.0
+    #: Absolute final burden, so the composition above is interpretable: 100%
+    #: resistant is a different statement about 2244 units than about 0.02.
+    final_burden: float = 0.0
 
 
 @dataclass
@@ -260,10 +271,13 @@ class ArmSummary:
     median_toxicity: float
     relapse_resistant_frac: Optional[float] = None   # R-dominant at horizon
     relapse_sensitive_frac: Optional[float] = None   # R < 0.5 at horizon
-    median_final_R_controlled: Optional[float] = None  # R fraction among patients
-    # whose burden never crossed the progression threshold. Burden control
-    # is NOT clone control: an MTD+immune patient can be 'controlled' while
-    # sitting on a fully drug-resistant tumour.
+    median_final_R_controlled: Optional[float] = None  # clone COMPOSITION at
+    # the horizon (R/(S+R) from absolute burdens, ungated) among patients whose
+    # burden never crossed the progression threshold. Burden control is NOT
+    # clone control: an MTD+immune patient can be 'controlled' while sitting on
+    # a fully drug-resistant tumour. Read it with `final_burden` on the
+    # outcomes: 100% resistant inside a 2000-unit tumour and 100% resistant
+    # inside a 5-cell remnant are the same number and different situations.
 
 
 @dataclass
@@ -347,6 +361,11 @@ class PatientCohortSimulator:
                     immune_used=patient_immune is not None,
                     tumor_size=size,
                     initial_resistant_fraction=r0,
+                    final_resistant_composition=(
+                        float(traj.burden_R[-1])
+                        / max(float(traj.burden_S[-1]) + float(traj.burden_R[-1]), 1e-30)
+                    ),
+                    final_burden=float(traj.burden_S[-1]) + float(traj.burden_R[-1]),
                 )
             )
         return outcomes
@@ -363,7 +382,10 @@ def _summarize_arm(
     pfs = np.asarray([o.pfs_days for o in outcomes], dtype=float)
     prog = np.asarray([o.progressed for o in outcomes], dtype=bool)
     tox = np.asarray([o.toxicity for o in outcomes], dtype=float)
-    rfrac = np.asarray([o.final_resistant_fraction for o in outcomes], dtype=float)
+    # Clone composition (ungated), not the gated clinical fraction: the
+    # failure-mode question is 'what is left and what is it made of', and a
+    # controlled tumour can be 100% resistant inside a harmless remnant.
+    rfrac = np.asarray([o.final_resistant_composition for o in outcomes], dtype=float)
     ltc = float(np.mean(pfs >= LONG_TERM_CONTROL_DAYS))
 
     km = cohort_km_curve(pfs, prog, horizon=float(sim_days))

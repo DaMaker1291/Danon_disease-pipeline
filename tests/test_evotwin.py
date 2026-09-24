@@ -157,6 +157,11 @@ def test_immune_cohort_failure_mode_asymmetry(cohort_immune):
     # ...but ONLY steering controls the CLONE: MTD+immune 'controlled'
     # patients sit on fully drug-resistant tumours; adaptive+immune
     # patients have the resistant clone essentially eliminated.
+    # These are CLONE COMPOSITIONS (ungated), because the claim is about what
+    # the surviving population is made of -- the gated clinical fraction reads
+    # 0.0 for both arms here, since both are held below the detection floor,
+    # and that gating is exactly what stops 'eradicated' from being read as
+    # 'resistance took over'.
     assert mtd.median_final_R_controlled is not None
     assert mtd.median_final_R_controlled > 0.9
     assert adp.median_final_R_controlled is not None

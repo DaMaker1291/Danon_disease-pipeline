@@ -302,6 +302,31 @@ def write_pvd(
     return pvd_path
 
 
+def resistant_fraction_gated(burden_S: float, burden_R: float) -> float:
+    """R/(S+R), or 0.0 when the tumour is below the detection floor.
+
+    The ratio is only a clinical quantity for a detectable lesion: it reaches
+    1.0 the instant the sensitive population goes extinct, so an eradicated
+    tumour with a five-cell remnant would otherwise be reported as '100%
+    resistant'. Every surface that reports this number routes through here,
+    so the app, the exported frames and the engine cannot disagree about it.
+    """
+    from danon.evosteer import DETECTION_BURDEN_DENSITY
+
+    total = float(burden_S + burden_R)
+    if total < DETECTION_BURDEN_DENSITY:
+        return 0.0
+    return float(burden_R / total)
+
+
+def resistant_fraction_series(burden_S, burden_R) -> List[float]:
+    """Per-day gated resistant fraction for a whole trajectory."""
+    return [
+        resistant_fraction_gated(float(s), float(r))
+        for s, r in zip(burden_S, burden_R)
+    ]
+
+
 def _frame_vti_bytes(
     fs: FrameSet,
     day: int,
@@ -328,7 +353,9 @@ def _frame_vti_bytes(
         progressed=fs.pfs_day is not None and fs.pfs_day <= day,
         initial_resistant_fraction=0.0,
         toxicity=fs.toxicity,
-        final_resistant_fraction=float(R.sum() / max(S.sum() + R.sum(), 1e-30)),
+        final_resistant_fraction=resistant_fraction_gated(
+            float(S.sum()), float(R.sum())
+        ),
         resistant_dominance_day=None,
     )
     traj_like.final_conc_A = cA
@@ -504,12 +531,11 @@ def export_paired_evolution(
 
     if policy_exp.frame_days != mtd_exp.frame_days:
         raise RuntimeError("arms recorded different frame days -- timeline cannot be shared")
-    r_frac_policy = [
-        float(r / max(s + r, 1e-30)) for s, r in zip(policy_exp.burden_S, policy_exp.burden_R)
-    ]
-    r_frac_mtd = [
-        float(r / max(s + r, 1e-30)) for s, r in zip(mtd_exp.burden_S, mtd_exp.burden_R)
-    ]
+    # Gated on the engine's detection floor: ungated, this curve reads 100%
+    # for a tumour driven below ~1e8 cells, because R/(S+R) hits 1.0 as soon as
+    # the sensitive population is extinct regardless of what survives.
+    r_frac_policy = resistant_fraction_series(policy_exp.burden_S, policy_exp.burden_R)
+    r_frac_mtd = resistant_fraction_series(mtd_exp.burden_S, mtd_exp.burden_R)
     payload: Dict[str, Any] = {
         "generated_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "model": "EvoSteer paired spatial evolution: adaptive collateral switch vs MTD",
@@ -531,6 +557,13 @@ def export_paired_evolution(
             "tissue/diffusion maps) -- open any one of them standalone in ParaView",
             "the two arms share geometry and seed (paired design); the only "
             "difference is the dosing policy",
+            "the resistant fraction is reported as 0.0 below the ~1e8-cell "
+            "detection floor: R/(S+R) reaches 1.0 as soon as the sensitive "
+            "population is extinct, so for a sub-detectable lesion the ratio "
+            "describes nothing. Read the absolute burden arrays on those days",
+            "resistance here is SELECTION of the subclone present at diagnosis, "
+            "not newly evolved mutation: at the calibrated mutation rate "
+            "(5e-5) turning mutation off entirely does not change the outcome",
             "simulation on a real segmentation, NOT a patient prediction",
         ],
     }
@@ -573,7 +606,9 @@ def write_pvd_series(
             progressed=False,
             initial_resistant_fraction=r0,
             toxicity=fs.toxicity,
-            final_resistant_fraction=float(R.sum() / max(S.sum() + R.sum(), 1e-30)),
+            final_resistant_fraction=resistant_fraction_gated(
+                float(S.sum()), float(R.sum())
+            ),
             resistant_dominance_day=None,
         )
         traj_like.final_conc_A = cA

@@ -526,10 +526,13 @@ def engine_discrimination_verdict() -> EngineDiscrimination:
        **false and was asserted without checking**. The engine's forecast does
        vary by patient geometry: the three real BraTS geometries in
        `outputs_real/outcome_cards.json` produce MTD-arm day-365 burdens of
-       1386, 2259 and 3677 units and median progression times of 365, 292 and
-       288 days. So the engine *can* produce a patient-varying prediction. What
-       is missing is the cohort to score it against, and the endpoint
-       translation above -- not patient-dependence in the model.
+       1384, 2244 and 3661 units and median progression times of 365, 293 and
+       288 days (re-measured after the extinction/detection floors landed;
+       the previous values were 1386, 2259, 3677 and 365, 292, 288, so the
+       floors move this quantity by under 1%). So the engine *can* produce a
+       patient-varying prediction. What is missing is the cohort to score it
+       against, and the endpoint translation above -- not patient-dependence
+       in the model.
     """
     return EngineDiscrimination(
         estimable=False,

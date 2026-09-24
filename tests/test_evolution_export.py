@@ -27,6 +27,7 @@ from danon.evolution_export import (
     FrameSet,
     capture_frames,
     export_paired_evolution,
+    resistant_fraction_gated,
     snapshot_days,
     static_geometry_maps,
     write_pvd,
@@ -215,7 +216,10 @@ def test_export_paired_evolution_payload(phantom):
         assert len(rf) == 25
         for d in (0, 7, 24):
             s, r = a["burden_S"][d], a["burden_R"][d]
-            assert abs(rf[d] - r / max(s + r, 1e-30)) < 1e-12
+            # GATED against the engine's detection floor, not a raw ratio:
+            # below ~1e8 cells R/(S+R) is 1.0 for a tumour that is gone, and
+            # the chart must not report that as resistance.
+            assert rf[d] == pytest.approx(resistant_fraction_gated(s, r))
 
 
 def test_export_paired_evolution_frames_are_valid_vti(phantom):

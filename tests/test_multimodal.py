@@ -349,7 +349,15 @@ class TestPairedControlAggregation:
         assert s.n_progression_free_policy == 9
         assert s.n_progression_free_mtd == 3
         assert s.median_pfs_extension == pytest.approx(0.267, abs=5e-3)
-        assert s.median_toxicity_reduction == pytest.approx(0.156, abs=5e-3)
+        # Re-measured after the resistance floors landed: the toxicity
+        # reduction fell from 0.156 to 0.0132. The collateral switch used to
+        # toggle on a resistant fraction computed for a sub-detectable tumour
+        # (the degenerate R/(S+R)=1.0 of an eradicated-looking lesion), taking
+        # drug-B holidays on the strength of a number that meant nothing.
+        # With the detection floor in place it stops doing that, so the
+        # adaptive arm's toxicity advantage largely disappears. The PFS
+        # advantage does not.
+        assert s.median_toxicity_reduction == pytest.approx(0.0132, abs=5e-3)
         assert s.n_censored_extensions == 6
 
     def test_report_without_measurements_stays_cheap_and_complete(self):

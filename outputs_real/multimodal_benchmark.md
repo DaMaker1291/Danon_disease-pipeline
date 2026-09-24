@@ -57,7 +57,7 @@ progression: progression: C = 0.534 +/- 0.053 over 5 folds (age alone 0.539) -- 
 ```
 
 ### Test 3 -- paired control on real BraTS-derived geometry
-paired control over 9 card(s): progression-free 9/9 on the policy vs 3/9 on MTD; median PFS extension +0.267 (range +0.000 to +0.342), censored in 6 where the policy never progressed inside the horizon; median toxicity reduction 0.156
+paired control over 9 card(s): progression-free 9/9 on the policy vs 3/9 on MTD; median PFS extension +0.267 (range +0.000 to +0.342), censored in 6 where the policy never progressed inside the horizon; median toxicity reduction 0.013
   - 6 card(s) have the MTD arm progressing while the policy arm does not reach threshold inside the 365-day horizon, so their PFS extension is a lower bound rather than a measured survival gain
   - both arms are the same model, so this is the model's own contrast on real geometry, not a clinical benefit measured in patients
 

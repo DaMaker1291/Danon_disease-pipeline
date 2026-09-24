@@ -16,7 +16,7 @@ MGMT PROMOTER METHYLATION -> RESISTANCE TERM, MEASURED
 -- MGMT call concordance: 109/134 agree (beta-only methylated 0, call-only methylated 25, not callable 0) at cutoff 0.358 -- 81.3% agreement on 134 patient(s) -- the two sources measure the same promoter, so a low agreement would mean the recomputed call is not interchangeable with the published one
 
 MGMT resistance sweep: beta values [0.0105, 0.0147, 0.0513, 0.3708, 0.7278] from cbioportal TCGA-GBM beta quantiles (140 patients, 2 probes), 3 replicate(s), 365 days
-  adaptive_dose                beta=0.0105 scale_R=0.2578 median PFS= 193.0d IQR=[193,197] progressed=100% dominance day=140
+  adaptive_dose                beta=0.0105 scale_R=0.2578 median PFS= 194.0d IQR=[194,198] progressed=100% dominance day=140
   adaptive_dose                beta=0.0147 scale_R=0.2610 median PFS= 194.0d IQR=[194,198] progressed=100% dominance day=140
   adaptive_dose                beta=0.0513 scale_R=0.2885 median PFS= 194.0d IQR=[194,198] progressed=100% dominance day=140
   adaptive_dose                beta=0.3708 scale_R=0.5281 median PFS= 202.0d IQR=[202,206] progressed=100% dominance day=144
@@ -25,13 +25,13 @@ MGMT resistance sweep: beta values [0.0105, 0.0147, 0.0513, 0.3708, 0.7278] from
   mtd                          beta=0.0147 scale_R=0.2610 median PFS= 144.0d IQR=[143,147] progressed=100% dominance day=22
   mtd                          beta=0.0513 scale_R=0.2885 median PFS= 145.0d IQR=[144,148] progressed=100% dominance day=22
   mtd                          beta=0.3708 scale_R=0.5281 median PFS= 155.0d IQR=[154,158] progressed=100% dominance day=23
-  mtd                          beta=0.7278 scale_R=0.7959 median PFS= 167.0d IQR=[166,170] progressed=100% dominance day=23
-  switch(A->B @ R>=15%, back @ R<=5%) beta=0.0105 scale_R=0.2578 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=none
-  switch(A->B @ R>=15%, back @ R<=5%) beta=0.0147 scale_R=0.2610 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=none
-  switch(A->B @ R>=15%, back @ R<=5%) beta=0.0513 scale_R=0.2885 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=none
-  switch(A->B @ R>=15%, back @ R<=5%) beta=0.3708 scale_R=0.5281 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=none
-  switch(A->B @ R>=15%, back @ R<=5%) beta=0.7278 scale_R=0.7959 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=none
-  -- simulated, not clinical: 3 replicate(s) per beta over 365 days on GBM phantom size 20. adaptive_dose: median PFS 193-213d over the beta range; mtd: median PFS 144-167d over the beta range; switch(A->B @ R>=15%, back @ R<=5%): median PFS 365-365d over the beta range
+  mtd                          beta=0.7278 scale_R=0.7959 median PFS= 168.0d IQR=[166,171] progressed=100% dominance day=23
+  switch(A->B @ R>=15%, back @ R<=5%) beta=0.0105 scale_R=0.2578 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=96
+  switch(A->B @ R>=15%, back @ R<=5%) beta=0.0147 scale_R=0.2610 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=96
+  switch(A->B @ R>=15%, back @ R<=5%) beta=0.0513 scale_R=0.2885 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=96
+  switch(A->B @ R>=15%, back @ R<=5%) beta=0.3708 scale_R=0.5281 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=96
+  switch(A->B @ R>=15%, back @ R<=5%) beta=0.7278 scale_R=0.7959 median PFS= 365.0d IQR=[365,365] progressed=0% dominance day=101
+  -- simulated, not clinical: 3 replicate(s) per beta over 365 days on GBM phantom size 20. adaptive_dose: median PFS 194-213d over the beta range; mtd: median PFS 144-168d over the beta range; switch(A->B @ R>=15%, back @ R<=5%): median PFS 365-365d over the beta range
 
 What this cannot show:
   - that MGMT methylation changes any patient's outcome: it is a prognostic marker, and measuring its association in a cohort is not a mechanism
