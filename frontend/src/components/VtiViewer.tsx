@@ -28,7 +28,7 @@ import { OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 
-interface VtiData {
+export interface VtiData {
   dims: [number, number, number]; // array shape (axis0, axis1, axis2)
   fields: Record<string, Float32Array>;
   mask: Uint8Array;
@@ -134,11 +134,16 @@ function fmtTick(v: number): string {
 
 interface Props {
   vtiBase64: string | null;
+  /** Pre-parsed VTI payload (EvolutionPlayer path) — takes precedence over
+   * vtiBase64, so a frame series can reuse this canvas without re-parsing. */
+  parsed?: VtiData | null;
+  /** Override the footer line (the default describes the single-VTI case). */
+  footerNote?: string;
   /** Start with the turntable rotating (gallery default: on). */
   defaultSpin?: boolean;
 }
 
-export default function VtiViewer({ vtiBase64, defaultSpin = false }: Props) {
+export default function VtiViewer({ vtiBase64, parsed = null, footerNote, defaultSpin = false }: Props) {
   const [field, setField] = useState<string>('sensitive');
   const [iso, setIso] = useState(0.0);
   const [cut, setCut] = useState(0);      // 0..1 fraction of axis0 hidden from the front
@@ -149,11 +154,12 @@ export default function VtiViewer({ vtiBase64, defaultSpin = false }: Props) {
   const captureRef = useRef<(() => void) | null>(null);
   const scaleBarRef = useRef<HTMLDivElement | null>(null);
 
-  const data = useMemo(() => {
+  const parsedFromB64 = useMemo(() => {
     if (!vtiBase64) return null;
     try { setError(null); return parseVtiFromBytes(decodeBase64(vtiBase64)); }
     catch (e: any) { setError(e?.message || 'VTI parse failed'); return null; }
   }, [vtiBase64]);
+  const data = parsed ?? parsedFromB64;
 
   const [tumourCount, maxVal, maxR] = useMemo(() => {
     if (!data) return [0, 1, 1];
@@ -188,7 +194,7 @@ export default function VtiViewer({ vtiBase64, defaultSpin = false }: Props) {
     return { css };
   }, [data, field]);
 
-  if (error) {
+  if (error && !parsed) {
     return <div className="seq-empty">3D viewer: {error}</div>;
   }
   if (!data) return <div className="seq-empty">No VTI payload — run a plan first.</div>;
@@ -283,7 +289,7 @@ export default function VtiViewer({ vtiBase64, defaultSpin = false }: Props) {
         </div>
       </div>
       <div className="vti-footer mono">
-        final-day fields on the uploaded grid · same file ParaView opens · legend from the voxel ramp
+        {footerNote ?? 'final-day fields on the uploaded grid · same file ParaView opens · legend from the voxel ramp'}
       </div>
     </div>
   );

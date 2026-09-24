@@ -14,7 +14,8 @@
    - the daily-step spatial simulator (`danon/evosteer.py`) runs a **paired** trial: adaptive steering policy vs standard maximum-tolerated-dose control on identical geometry and seeds,
    - you get: geometry summary measured from your file, the executed dose schedule, daily burden curves, regime-change events, a bound toxicity reduction, the compiled schedule text, and a provenance table (measured vs assumed vs refused).
 2. **3D evolution viewer** — the final simulated fields (sensitive, resistant, drug A, drug B, plus the derived tissue-class and per-voxel diffusion D(x) maps) rendered in-browser as an instanced voxel volume, plus a one-click **ParaView `.vti` export** of the same file. A dedicated **ParaView Gallery** tab renders the committed BraTS-2021 artifact with a color legend, live mm scale bar, PNG capture, and a byte-identical `.vti` download. See [`PARAVIEW.md`](PARAVIEW.md) for the corrected render walkthrough and the artifact in `outputs_real/brats_case01017_mtd_day120.vti`.
-3. **24-phase AAV pipeline, LNP assembly, microfluidics, clinical dashboards** — the earlier Danon-engine views, each rendering precomputed engine artifacts committed in `frontend/public/artifacts/`.
+3. **365-day evolution & resistance player** — the whole paired trial as a movie: the **Evolution Player** tab scrubs/plays the engine's validated per-day spatial frames for both arms (adaptive switch vs MTD) on the same tumour and seed, with the resistant-fraction trajectories synced to the timeline. Frames export as a ParaView **`.pvd` time collection** (`danon.evolution_export.write_pvd_series`) so ParaView's play controls become the day axis.
+4. **24-phase AAV pipeline, LNP assembly, microfluidics, clinical dashboards** — the earlier Danon-engine views, each rendering precomputed engine artifacts committed in `frontend/public/artifacts/`.
 
 ## Running locally (full engine + UI)
 

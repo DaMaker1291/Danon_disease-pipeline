@@ -110,3 +110,36 @@ scale bar on the poster.
 > paired adaptive schedule on the identical geometry and seed, the tumour
 > is eradicated within the horizon (day-120 burden 0.0). Simulation, not
 > patient data; rate constants are declared assumptions.
+
+## The 365-day time series (`.pvd` collection)
+
+The final-state VTI above is one day. The whole evolution — where resistance
+emerges, when the sanctuary pocket becomes visible — is a time series, and
+ParaView opens it natively:
+
+```python
+from danon.imaging import from_nifti_mask
+from danon.evolution_export import write_pvd_series
+
+pg = from_nifti_mask(
+    "data/engine_ready/BraTS2021_01017_mask.nii.gz",
+    proliferative_path="data/engine_ready/BraTS2021_01017_prolif.nii.gz",
+)
+pvd = write_pvd_series(
+    "outputs_real/evolution_mtd", pg.geometry,
+    r0=0.005, seed=101, days=365, arm="mtd",
+)   # -> outputs_real/evolution_mtd/evolution.pvd + frame_XXXX_dayYYYY.vti
+```
+
+Then in ParaView: **File → Open → `evolution.pvd` → Apply**. The play
+controls become the day axis (timestep = day); **Filters → Temporal →
+Temporal Interpolator** smooths between recorded days if you want a fluid
+animation for a video loop. Each frame is a complete `.vti` — the same
+nine arrays as the final-state file — so contour/clip recipes work per
+frame and any single frame can be opened standalone.
+
+In the app, the **Evolution Player** tab renders the same frame series for
+the paired arms (adaptive vs MTD) with the resistance trajectories synced
+to the timeline; every frame it shows is validated against the run's own
+daily curves before export
+(`danon.evolution_export.FrameSet.validate_against_trajectory`).

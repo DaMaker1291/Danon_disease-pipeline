@@ -582,6 +582,7 @@ class TumorEvolutionSimulator:
         observation_hook: Optional[Callable[[int, float, float], None]] = None,
         initial_state: Optional[Tuple[np.ndarray, np.ndarray]] = None,
         clearance_pattern: Optional[np.ndarray] = None,
+        field_hook: Optional[Callable[[int, np.ndarray, np.ndarray, np.ndarray, np.ndarray], None]] = None,
     ) -> SimulationTrajectory:
         """Run one trial.
 
@@ -592,6 +593,17 @@ class TumorEvolutionSimulator:
         dosing). It receives aggregate burdens only and must not mutate
         simulator state; policies never see it, so no hidden-state leakage
         is possible through this channel.
+
+        field_hook, when given, is called IMMEDIATELY AFTER observation_hook
+        on the same day with (day, N_S, N_R, c_A, c_B) -- the full spatial
+        state the aggregates in observation_hook describe. The arrays are
+        internal references: a hook that retains them must copy. Mutating
+        them is forbidden (it would perturb the run the policies act on);
+        a recorder that only reads and copies cannot affect the trajectory.
+        IDENTITY: field_hook=None is a no-op -- the trajectory is bit-identical
+        to the historical path. A recording hook that only copies also
+        leaves the trajectory bit-identical, which the test suite pins by
+        comparing burden arrays with and without a recording hook attached.
 
         initial_state, when given, is an (N_S, N_R) pair that REPLACES the
         clustered seed -- the clinical-twin path where a measured t=0 map
@@ -810,6 +822,9 @@ class TumorEvolutionSimulator:
             # Clinical monitoring hook: end-of-day aggregate burdens.
             if observation_hook is not None:
                 observation_hook(day, float(N_S.sum()), float(N_R.sum()))
+            # Spatial recording hook: the same end-of-day state, full fields.
+            if field_hook is not None:
+                field_hook(day, N_S, N_R, c_A, c_B)
 
         final_burden = float(N_S.sum() + N_R.sum())
         traj = SimulationTrajectory(

@@ -243,6 +243,52 @@ export interface FieldStats {
   mean_in_tumour: number;
 }
 
+/* ------------------------------------------------------------- evolution -- */
+
+/** One arm's frame series + the daily curves the timeline syncs to. */
+export interface EvolutionArmData {
+  arm: 'policy' | 'mtd';
+  seed: number;
+  frame_days: number[];
+  frames_vti_b64: string[];
+  burden_S: number[];
+  burden_R: number[];
+  dose_A: number[];
+  dose_B: number[];
+  pfs_day: number | null;
+  progressed: boolean;
+  toxicity: number;
+  grid: [number, number, number];
+  spacing_mm: number;
+  r0: number;
+  days: number;
+  pfs_note: string;
+}
+
+export interface EvolutionArtifactData {
+  generated_utc: string;
+  model: string;
+  seed: number;
+  r0: number;
+  days: number;
+  grid: [number, number, number];
+  spacing_mm: number;
+  frame_days: number[];
+  arms: { policy: EvolutionArmData; mtd: EvolutionArmData };
+  resistant_fraction: { policy: number[]; mtd: number[] };
+  static_maps?: Record<string, string>;
+  notes: string[];
+  case_id: string;
+  r0_source: string;
+  geometry_note: string;
+  budget: {
+    days: number;
+    dense_until: number;
+    max_frames: number;
+    frames_per_arm: number;
+  };
+}
+
 export interface ParaviewArtifactData {
   vti_base64: string;
   vti_sha256: string;

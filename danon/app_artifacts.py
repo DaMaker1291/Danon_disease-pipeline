@@ -668,6 +668,117 @@ def build_paraview_artifact() -> Dict[str, Any]:
     )
 
 
+# ---------------------------------------------------------------------------
+# evolution (the paired 365-day spatial movie, BraTS case 01017)
+# ---------------------------------------------------------------------------
+
+
+# The geometry the outcome cards and the ParaView gallery already use --
+# the evolution movie must show the SAME tumour the other views report on.
+EVOLUTION_MASK_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "data", "engine_ready", "BraTS2021_01017_mask.nii.gz",
+)
+EVOLUTION_PROLIF_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "data", "engine_ready", "BraTS2021_01017_prolif.nii.gz",
+)
+EVOLUTION_SEED = 101
+
+
+def build_evolution_artifact(
+    days: int = 365, dense_until: int = 45, max_frames: int = 36
+) -> Dict[str, Any]:
+    """Run the paired 365-day evolution and package it for the player.
+
+    Geometry and r0 provenance are taken from the SAME sources as the
+    committed outcome cards (case 01017 mask + prolif; r0 read from the
+    cards and echoed with their transcriptome provenance string), so the
+    movie, the 365-Day Outcome tab, and the schedule text can never tell
+    different stories about the same patient geometry. The frame schedule
+    is density-budgeted (dense through the day-45 switch window, coarsening
+    late) so the payload stays loadable in a browser; the day budget used is
+    recorded in the payload.
+
+    Frame density is a *transport* budget, not a physics one: the player
+    blends adjacent recorded frames during playback
+    (EvolutionPlayer.blendFrames), so halving the frame count changes how
+    often the engine is sampled, never the trajectory or the daily curves
+    (which stay at one point per simulated day).
+    """
+    import json as _json
+
+    from danon.evolution_export import export_paired_evolution
+    from danon.imaging import from_nifti_mask
+
+    if not os.path.exists(EVOLUTION_MASK_PATH):
+        raise FileNotFoundError(
+            f"evolution geometry missing: {EVOLUTION_MASK_PATH}. The artifact "
+            "refuses to fabricate a phantom in its place."
+        )
+
+    # r0 + provenance from the committed outcome cards (same case, same
+    # intake the 365-Day Outcome tab displays).
+    r0 = 0.005
+    r0_source = "engine default 0.5% (outcome cards unavailable)"
+    cards_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "outputs_real", "outcome_cards.json",
+    )
+    case_id = "BraTS2021_01017"
+    if os.path.exists(cards_path):
+        with open(cards_path) as fh:
+            cards = _json.load(fh)
+        match = [c for c in cards.get("cases", []) if c.get("case_id") == case_id]
+        if match:
+            r0 = float(match[0]["intake"]["r0"])
+            r0_source = str(match[0]["intake"]["r0_source"])
+
+    pg = from_nifti_mask(
+        EVOLUTION_MASK_PATH, proliferative_path=EVOLUTION_PROLIF_PATH
+    )
+    payload = export_paired_evolution(
+        pg.geometry, r0=r0, seed=EVOLUTION_SEED, days=days,
+        dense_until=dense_until, max_frames=max_frames,
+    )
+    payload["case_id"] = case_id
+    payload["r0_source"] = r0_source
+    payload["geometry_note"] = (
+        "BraTS-2021 case 01017 expert segmentation (engine-decimated), the same "
+        "geometry as the 365-Day Outcome cards and the ParaView gallery"
+    )
+    payload["budget"] = {
+        "days": int(days),
+        "dense_until": int(dense_until),
+        "max_frames": int(max_frames),
+        "frames_per_arm": len(payload["frame_days"]),
+    }
+
+    return _artifact(
+        key="evolution",
+        title="Paired spatial evolution, 365 days: adaptive switch vs MTD",
+        source=(
+            f"danon.evolution_export.export_paired_evolution(case {case_id}, "
+            f"r0={r0}, seed={EVOLUTION_SEED}, days={days}, dense_until={dense_until})"
+        ),
+        data=payload,
+        notes=[
+            "every frame is the engine's validated end-of-day spatial state; frame "
+            "aggregates are checked against the run's own burden arrays before export",
+            "the resistant-fraction divergence between the arms IS the treatment-"
+            "resistance story: same tumour, same seed, different dosing policy",
+            "artifact carries the frame schedule it was built with; raising the "
+            "density budget re-renders more frames, never different physics",
+        ],
+        provenance={
+            "geometry_real_brats_segmentation": EvidenceStatus.ESTABLISHED,
+            "frames_match_daily_curves": EvidenceStatus.ESTABLISHED,
+            "engine_constants": EvidenceStatus.UNKNOWN,
+            "patient_prediction": EvidenceStatus.PROVEN_FAILED,
+        },
+    )
+
+
 BUILDERS = {
     "pipeline": build_pipeline_artifact,
     "microfluidics": build_microfluidics_artifact,
@@ -676,6 +787,7 @@ BUILDERS = {
     "construct": build_construct_artifact,
     "structure": build_structure_artifact,
     "paraview": build_paraview_artifact,
+    "evolution": build_evolution_artifact,
 }
 
 

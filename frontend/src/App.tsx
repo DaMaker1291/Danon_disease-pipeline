@@ -13,6 +13,7 @@ import TranslationalGateway from './components/TranslationalGateway';
 import StructureViewer from './components/StructureViewer';
 import ErrorBoundary from './components/ErrorBoundary';
 import Day365Outcome from './components/Day365Outcome';
+import EvolutionPlayer from './components/EvolutionPlayer';
 import TwinPlanner from './components/TwinPlanner';
 import VtiViewer from './components/VtiViewer';
 import ParaviewGallery from './components/ParaviewGallery';
@@ -21,13 +22,14 @@ import { useArtifact } from './utils/artifacts';
 import type { FlowTelemetry, ParetoPoint, UploadResult, PipelineResult, PipelineConstraints } from './types';
 import type { MicrofluidicsArtifactData, PipelineArtifactData } from './types/artifacts';
 
-type TabId = 'capsid' | 'phases' | 'lnp' | 'gene' | 'microfluidics' | 'clinical' | 'outcome' | 'upload' | 'twin' | 'paraview';
+type TabId = 'capsid' | 'phases' | 'lnp' | 'gene' | 'microfluidics' | 'clinical' | 'outcome' | 'upload' | 'twin' | 'paraview' | 'evolution';
 interface TabDef { id: TabId; label: string; icon: string; desc: string }
 
 const TABS: TabDef[] = [
   { id: 'twin', label: 'MRI Twin Planner', icon: '🧠', desc: 'Scan in, treatment plan out' },
   { id: 'paraview', label: 'ParaView Gallery', icon: '🧊', desc: 'Real BraTS volumetric artifact' },
   { id: 'outcome', label: '365-Day Outcome', icon: '📅', desc: 'Exact day-365 engine state' },
+  { id: 'evolution', label: 'Evolution Player', icon: '🎞️', desc: '365-day evolution & resistance movie' },
   { id: 'capsid', label: '3D Capsid', icon: '🧬', desc: 'AAV9 structural viewer' },
   { id: 'phases', label: '24 Phases', icon: '🔬', desc: 'Hyper-dimensional matrix' },
   { id: 'lnp', label: 'LNP Simulator', icon: '💊', desc: 'Lipid nanoparticle assembly' },
@@ -231,6 +233,14 @@ export default function App() {
           <div className="content-grid">
             <div style={{ gridColumn: '1 / -1' }}>
               <ErrorBoundary label="Day365Outcome"><Day365Outcome /></ErrorBoundary>
+            </div>
+          </div>
+        );
+      case 'evolution':
+        return (
+          <div className="content-grid">
+            <div style={{ gridColumn: '1 / -1' }}>
+              <ErrorBoundary label="EvolutionPlayer"><EvolutionPlayer /></ErrorBoundary>
             </div>
           </div>
         );

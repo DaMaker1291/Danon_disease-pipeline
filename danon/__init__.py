@@ -671,6 +671,22 @@ from danon.mgmt import (
 
 # Clinical datastream intake: four routine hospital tests -> engine
 # parameters, with identity guarantees and live-count refusals.
+# Per-day spatial evolution: the paired 365-day movie (validated frames +
+# ParaView .pvd time collection), the capture/recording layer, and the
+# static geometry maps carried once per payload.
+from danon.evolution_export import (
+    EvolutionExport,
+    FrameSet,
+    capture_frames,
+    export_evolution_frames,
+    export_paired_evolution,
+    save_payload,
+    snapshot_days,
+    static_geometry_maps,
+    write_pvd,
+    write_pvd_series,
+)
+
 from danon.clinical_twin import (
     CLEARANCE_GAMMA,
     DEFAULT_ALA_R0,
@@ -1224,6 +1240,10 @@ __all__ = [
 
     # Day-365 outcome cards + dashboard (the UI's data contract)
     "ArmRecord", "ReplicateRun", "run_case_outcome", "export_outcome_cards",
+    # evolution_export
+    "EvolutionExport", "FrameSet", "capture_frames", "export_evolution_frames",
+    "export_paired_evolution", "save_payload", "snapshot_days",
+    "static_geometry_maps", "write_pvd", "write_pvd_series",
     "load_cards", "render_dashboard_html", "regenerate_ui_artifacts",
     "outcome_export_provenance",
 
