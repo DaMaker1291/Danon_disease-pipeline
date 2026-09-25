@@ -1566,6 +1566,169 @@ def cohort_feature_provenance() -> Dict[str, EvidenceStatus]:
     }
 
 
+# ---------------------------------------------------------------------------
+# Design calculation: what a cohort of a given size can resolve at all
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ResolvableDelta:
+    """The smallest incremental C-index a cohort of this size can resolve.
+
+    THIS IS A DESIGN CALCULATION, NOT A MEASUREMENT OF ANY STREAM. It answers
+    the question that precedes every covariate proposal: given a cohort of
+    this size drawn from this population, how much does the held-out C move
+    for no reason at all? That movement is the floor a claimed gain has to
+    clear, and it is what turns "we would need more data" into a number.
+
+    Two floors are reported, because they answer two different questions:
+
+    * ``se_across_draws`` -- the spread of the held-out C over independent
+      cohorts of this size. This is the classical standard error, and it is
+      the yardstick for "would a different cohort of the same size reproduce
+      this gain?"
+    * ``mean_fold_sd`` -- the spread across the k folds *within* one cohort,
+      which is the yardstick `covariate_effect.verdict` already uses. At a
+      small n the folds are few and heterogeneous, so this is the more
+      conservative floor.
+
+    Quoting only the conservative floor would overstate the data requirement;
+    quoting only the optimistic one would launder fold noise as signal.
+    """
+
+    n_patients: int
+    n_draws: int
+    n_folds: int
+    mean_c: float
+    se_across_draws: float
+    mean_fold_sd: float
+    age_only_c: float
+    exhaustive_draws: bool = False
+    notes: List[str] = field(default_factory=list)
+
+    @property
+    def floor_optimistic(self) -> float:
+        return self.se_across_draws
+
+    @property
+    def floor_conservative(self) -> float:
+        return self.mean_fold_sd
+
+    @property
+    def estimable(self) -> bool:
+        return self.n_draws > 1 and np.isfinite(self.se_across_draws)
+
+    def resolves(self, delta: float) -> bool:
+        """Whether a claimed gain ``delta`` clears the optimistic floor."""
+        return self.estimable and abs(delta) > self.floor_optimistic
+
+    def verdict(self) -> str:
+        if not self.estimable:
+            return "not estimable: too few draws produced a finite held-out C"
+        return (
+            f"resolves |delta_C| > {self.floor_optimistic:.4f} "
+            f"(1 SE over {self.n_draws} draws); fold yardstick {self.floor_conservative:.4f}"
+        )
+
+    def __str__(self) -> str:
+        return (
+            f"n={self.n_patients} over {self.n_draws} draws ({self.n_folds}-fold): "
+            f"C={self.mean_c:.4f} +/- {self.se_across_draws:.4f} (age alone "
+            f"{self.age_only_c:.4f}), mean fold sd {self.mean_fold_sd:.4f} -- "
+            f"{self.verdict()}"
+        )
+
+
+def resolvable_delta_c_index(
+    rows: Sequence[PatientRow],
+    *,
+    n_patients: int,
+    n_draws: int = 24,
+    n_folds: int = 5,
+    base_seed: int = 7000,
+) -> ResolvableDelta:
+    """Resample cohorts of ``n_patients`` from real rows and measure the floor.
+
+    Each draw is an independent sample of ``n_patients`` WITHOUT replacement
+    from the real cohort, followed by a fresh k-fold split, so patient
+    sampling and split variation are both present -- which is what a real
+    cohort of that size would present.
+
+    When ``n_patients`` equals the row count there is only one distinct draw,
+    so the loop samples permutations and the spread measures split variation
+    alone. That case is flagged in ``exhaustive_draws`` and carries a note,
+    because the two spreads are not interchangeable: an SE measured on the
+    full cohort is not the SE a smaller cohort would have.
+
+    The floor moves with the model, not only with n -- a design with more
+    free parameters has a higher floor at the same n -- so this is measured
+    for the design actually being reported (age, sex, GBM flag), not in the
+    abstract.
+    """
+    if n_patients < n_folds * 5:
+        raise ValueError(
+            f"{n_patients} patients is too few for a {n_folds}-fold split "
+            f"(the existing house rule is {n_folds * 5})"
+        )
+    if n_patients > len(rows):
+        raise ValueError(
+            f"cannot draw {n_patients} patients from a cohort of {len(rows)}"
+        )
+    if n_draws < 2:
+        raise ValueError("n_draws must be at least 2 to have a spread at all")
+
+    means: List[float] = []
+    fold_sds: List[float] = []
+    ages: List[float] = []
+    for draw in range(n_draws):
+        rng = np.random.RandomState(base_seed + draw)
+        idx = rng.choice(len(rows), size=n_patients, replace=False)
+        subset = [rows[i] for i in idx]
+        scores = _cv(subset, None, n_folds=n_folds, seed=draw)
+        if not np.isfinite(scores.mean_c):
+            continue
+        means.append(scores.mean_c)
+        fold_sds.append(scores.sd_c)
+        if np.isfinite(scores.age_only_c):
+            ages.append(scores.age_only_c)
+
+    exhaustive = n_patients == len(rows)
+    notes = [
+        f"{n_draws - len(means)} of {n_draws} draws produced no finite held-out C and "
+        f"were dropped"
+    ] if len(means) < n_draws else []
+    if exhaustive:
+        notes.append(
+            "n_patients equals the cohort size, so every draw is the same patient "
+            "set: the spread measures split variation only, not cohort sampling"
+        )
+    notes.append(
+        "design calculation: this bounds what a cohort of this size could show, "
+        "it does not measure any stream, covariate, or treatment effect"
+    )
+
+    if len(means) < 2:
+        return ResolvableDelta(
+            n_patients=n_patients, n_draws=len(means), n_folds=n_folds,
+            mean_c=float("nan"), se_across_draws=float("nan"),
+            mean_fold_sd=float("nan"), age_only_c=float("nan"),
+            exhaustive_draws=exhaustive, notes=notes,
+        )
+
+    m = np.asarray(means, dtype=float)
+    return ResolvableDelta(
+        n_patients=n_patients,
+        n_draws=len(means),
+        n_folds=n_folds,
+        mean_c=float(m.mean()),
+        se_across_draws=float(m.std(ddof=1)),
+        mean_fold_sd=float(np.mean(fold_sds)),
+        age_only_c=float(np.mean(ages)) if ages else float("nan"),
+        exhaustive_draws=exhaustive,
+        notes=notes,
+    )
+
+
 def what_covariate_intake_cannot_show() -> List[str]:
     """Stated plainly so no section of the report is read as clinical evidence."""
     return [
@@ -1591,6 +1754,7 @@ __all__ = [
     "LeakageContrast",
     "MgmtBetaResult",
     "MgmtReachability",
+    "ResolvableDelta",
     "TimepointCensus",
     "TreatmentExposure",
     "baseline_kps",
@@ -1604,6 +1768,7 @@ __all__ = [
     "parse_kps",
     "post_baseline_kps",
     "probe_mgmt_reachability",
+    "resolvable_delta_c_index",
     "treatment_exposure",
     "what_covariate_intake_cannot_show",
 ]

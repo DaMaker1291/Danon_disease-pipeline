@@ -534,6 +534,50 @@ def stream3_report() -> Dict[str, Any]:
     }
 
 
+#: The committed stream-4 design calculation: whether a cohort of the
+#: manifest's size has the resolution to show anything at all. Built by
+#: `_stream4_resolution.py` from the real cached cohort.
+STREAM4_RESOLUTION_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "outputs_real", "stream4_resolution.json",
+)
+
+
+def stream4_resolution_report() -> Dict[str, Any]:
+    """What a cohort of the manifest's size can resolve -- a DESIGN calculation.
+
+    Stream 4 has no cached images, so nothing about delta-volume can be
+    measured. But the question that comes BEFORE the download is answerable
+    today: a cohort of 168 patients (the manifest's usable-pair count) has a
+    held-out C-index that moves by 0.0219 across independent draws of that
+    size from the real cohort, and its fold yardstick is 0.0610. Any stream
+    whose claimed gain sits under those numbers cannot be shown to contribute
+    at this n, whatever its mechanism is.
+
+    This does not measure velocity, registration error or scanner
+    comparability, and it is not evidence that stream 4 carries a signal. It
+    is the resolution of the measurement, which is what decides whether the
+    download is worth performing.
+    """
+    if not os.path.exists(STREAM4_RESOLUTION_PATH):
+        raise FileNotFoundError(
+            f"stream-4 design calculation missing: {STREAM4_RESOLUTION_PATH}. "
+            "Rebuild with: python _stream4_resolution.py"
+        )
+    import json
+
+    payload = json.load(open(STREAM4_RESOLUTION_PATH))
+    res = payload["resolution"]
+    payload["verdict"] = (
+        f"a cohort of {res['n_patients']} resolves |delta_C| > "
+        f"{res['floor_optimistic']:.4f} (1 SE over {res['n_draws']} draws); its "
+        f"fold yardstick is {res['floor_conservative']:.4f}, and the full cached "
+        f"cohort (n={payload['source_n_patients']}) has a fold sd of "
+        f"{payload['source_base_fold_sd']:.4f} at C={payload['source_base_c']:.4f}"
+    )
+    return payload
+
+
 # ---------------------------------------------------------------------------
 # Live data census -- what the repo can actually activate today
 # ---------------------------------------------------------------------------
@@ -577,6 +621,14 @@ def _archive_availability() -> Dict[str, Any]:
             }
         return {"error": "UPENN-GBM entry absent from the recorded probe"}
     except (FileNotFoundError, ImportError, AttributeError, KeyError) as exc:
+        return {"error": f"{type(exc).__name__}: {exc}"}
+
+
+def _stream4_resolution() -> Dict[str, Any]:
+    """The committed design calculation, or the reason it could not be read."""
+    try:
+        return stream4_resolution_report()
+    except (FileNotFoundError, ImportError, KeyError, ValueError) as exc:
         return {"error": f"{type(exc).__name__}: {exc}"}
 
 
@@ -640,6 +692,15 @@ def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
     n_retrievable = archive.get("n_patients_longitudinal")
     manifest = _availability_manifest()
     n_manifest_pairs = manifest.get("n_patients_with_usable_pair")
+    resolution = _stream4_resolution()
+    _res = resolution.get("resolution") or {}
+    floor_se = _res.get("floor_optimistic")
+    floor_fold = _res.get("floor_conservative")
+    floor_txt = (
+        f"{floor_se:.4f} (1 SE) / {floor_fold:.4f} (fold yardstick)"
+        if isinstance(floor_se, float) and isinstance(floor_fold, float)
+        else "not computed (the design calculation could not be read)"
+    )
 
     return {
         "stream1_5ala": {
@@ -684,6 +745,10 @@ def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
             "archive": archive,
             "manifest": manifest,
             "n_patients_with_usable_pair_in_manifest": n_manifest_pairs,
+            "resolution": resolution,
+            "resolvable_delta_c": resolution.get("resolution", {}).get(
+                "floor_optimistic"
+            ),
             "detail": (
                 "no sequential scan pairs are CACHED (BraTS is a single "
                 "pre-operative timepoint per case). Two independent sources say "
@@ -696,7 +761,12 @@ def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
                 f"{manifest.get('min_interval_weeks')} weeks apart "
                 f"({manifest.get('n_usable_pairs')} pairs). Neither archive is "
                 "downloaded, so the mapping -- implemented and unit-tested as "
-                "an observation -- has nothing to run on yet"
+                "an observation -- has nothing to run on yet. Note that an "
+                "OBSERVATION cannot move a C-index at all: stream 4 would need "
+                "a declared hazard mapping before it could be scored, and at "
+                "the manifest's n such a mapping would have to clear a floor of "
+                f"{floor_txt} "
+                "to be distinguishable from cohort noise"
             ),
         },
     }

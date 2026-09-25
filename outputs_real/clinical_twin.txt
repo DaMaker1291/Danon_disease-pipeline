@@ -2,10 +2,10 @@ EVOTWIN-10X: CLINICAL DATASTREAM STATUS (four routine hospital tests)
 ========================================================================
 
 Per-stream census (live counts from data/):
-  stream1_5ala           REFUSED     no 5-ALA fluorescence captures cached; mapping implemented and unit-tested, acti
-  stream2_histology      REFUSED     no whole-slide images cached; Ki-67 mapping implemented and unit-tested (KI67_RE
-  stream3_perfusion      MEASURABLE  real cached data: BraTS-2021 t1ce contrast volumes + expert segmentations; vascu
-  stream4_sequential     REFUSED     BraTS is a single pre-operative timepoint per case: no sequential scan pairs exi
+  stream1_5ala           REFUSED     no 5-ALA fluorescence captures cached; mapping implemented [...]
+  stream2_histology      REFUSED     no whole-slide images cached; Ki-67 mapping implemented [...]
+  stream3_perfusion      MEASURABLE  real cached data: BraTS-2021 t1ce contrast volumes + [...]
+  stream4_sequential     REFUSED     no sequential scan pairs are CACHED (BraTS is a single [...]
 
 STREAM 3 MEASURED (6 BraTS cases, t1ce -> vasculature, paired same-seed):
   MTD PFS paired delta (real - null), 18 runs: mean -1.17 d (sd 1.01, max 3)
@@ -22,3 +22,13 @@ STREAM 3 MEASURED (6 BraTS cases, t1ce -> vasculature, paired same-seed):
 HONEST READING: at engine scale the vessel-source variation contributes
 ~1 day of PFS; the sanctuary structure lives in D(x) (tissue classes),
 which both geometries share. t1ce is a vascular PROXY, not measured Ktrans.
+
+STREAM 4 RESOLUTION (a DESIGN calculation, not a measurement):
+  manifest cohort: 168 patients with a usable T1-Gd pair (393 pairs)
+  reference cohort: n=595 scored at C=0.6559 +/- 0.0247 (OS)
+  over 24 resampled 168-patient cohorts: C=0.6429 +/- 0.0219, mean fold sd 0.0610
+  => a cohort this size resolves |delta_C| > 0.0219 (1 SE); fold yardstick 0.0610
+  Stream 4 is an OBSERVATION: it calibrates the engine's derived velocity
+  and cannot move a C-index until a hazard mapping is declared. The images
+  are not downloaded, so nothing here measured perfusion, fluorescence,
+  Ki-67 or delta-volume.

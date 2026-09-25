@@ -16,6 +16,7 @@ import pytest
 from danon.clinical_twin import (
     KI67_REF,
     STREAM3_COHORT_PATH,
+    STREAM4_RESOLUTION_PATH,
     assemble_digital_twin_state,
     build_stream3_clearance,
     build_stream3_vessels,
@@ -26,6 +27,7 @@ from danon.clinical_twin import (
     stream2_growth_rate,
     stream4_velocity,
     stream3_report,
+    stream4_resolution_report,
 )
 from danon.evosteer import DEFAULT_CLONES
 
@@ -310,3 +312,50 @@ def test_committed_stream3_cohort_matches_report():
     # the measured headline is negative and small: |mean| < 5 days
     assert -5.0 < report["mtd_pfs_delta_mean_days"] <= 0.0
     assert report["steering_censored_both"] is True
+
+
+# ---------------------------------------------------------------------------
+# Stream-4 resolution: a design calculation, wired into the refusal
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.skipif(
+    not os.path.exists(STREAM4_RESOLUTION_PATH),
+    reason="stream-4 design calculation not committed",
+)
+def test_resolution_report_exposes_both_floors():
+    report = stream4_resolution_report()
+    res = report["resolution"]
+    assert res["n_patients"] == 168
+    assert res["n_draws"] == 24
+    assert 0.0 < res["floor_optimistic"] < res["floor_conservative"]
+    assert "DESIGN calculation" in report["what_this_is"]
+    assert "not a measurement of any datastream" in report["what_this_is"]
+    # the verdict names both floors, so neither can be quoted alone by accident
+    assert f"{res['floor_optimistic']:.4f}" in report["verdict"]
+    assert f"{res['floor_conservative']:.4f}" in report["verdict"]
+
+
+def test_census_carries_the_resolvable_delta_with_formatted_detail():
+    s4 = clinical_stream_census()["stream4_sequential"]
+    assert s4["status"] == "REFUSED"
+    assert s4["resolvable_delta_c"] is not None
+    assert "(1 SE) /" in s4["detail"] and "fold yardstick" in s4["detail"]
+    # an unrounded float in prose is how a derived number looks invented
+    assert "0.021904" not in s4["detail"]
+    assert "an OBSERVATION cannot move a C-index" in s4["detail"]
+
+
+def test_missing_resolution_artifact_refuses_rather_than_guesses(monkeypatch, tmp_path):
+    import danon.clinical_twin as ct
+
+    monkeypatch.setattr(
+        ct, "STREAM4_RESOLUTION_PATH", str(tmp_path / "absent.json")
+    )
+    with pytest.raises(FileNotFoundError):
+        ct.stream4_resolution_report()
+    # and the census reports the failure instead of omitting the field
+    s4 = ct.clinical_stream_census()["stream4_sequential"]
+    assert s4["resolvable_delta_c"] is None
+    assert "error" in s4["resolution"]
+    assert "not computed (the design calculation could not be read)" in s4["detail"]

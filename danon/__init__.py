@@ -447,6 +447,7 @@ from danon.cohort_features import (
     LeakageContrast,
     MgmtBetaResult,
     MgmtReachability,
+    ResolvableDelta,
     TimepointCensus,
     TreatmentExposure,
     baseline_kps,
@@ -461,6 +462,7 @@ from danon.cohort_features import (
     post_baseline_kps,
     probe_mgmt_reachability,
     probe_treatment_records,
+    resolvable_delta_c_index,
     treatment_exposure,
     what_covariate_intake_cannot_show,
 )
@@ -713,6 +715,7 @@ from danon.clinical_twin import (
     DEFAULT_ALA_R0_SOURCE,
     KI67_REF,
     STREAM3_COHORT_PATH,
+    STREAM4_RESOLUTION_PATH,
     TwinStreamState,
     assemble_digital_twin_state,
     build_stream3_clearance,
@@ -723,6 +726,7 @@ from danon.clinical_twin import (
     stream2_clones,
     stream2_growth_rate,
     stream3_report,
+    stream4_resolution_report,
     stream4_velocity,
 )
 
@@ -1129,6 +1133,7 @@ __all__ = [
     "stream1_initial_state", "stream2_clones", "stream2_growth_rate", "stream3_report",
     "stream4_velocity", "clinical_stream_census", "decimate_t1ce_to_engine_grid",
     "KI67_REF", "CLEARANCE_GAMMA", "STREAM3_COHORT_PATH", "TwinStreamState",
+    "STREAM4_RESOLUTION_PATH", "stream4_resolution_report",
     "DEFAULT_ALA_R0", "DEFAULT_ALA_R0_SOURCE",
     "MGMT_BASELINE_RESISTANCE", "BetaArmOutcome", "MgmtBetaPanel", "MgmtResistanceSweep",
     "clone_params_for_mgmt_beta", "load_mgmt_beta_panel", "load_published_mgmt_calls",
@@ -1231,11 +1236,12 @@ __all__ = [
     "COHORT_BASE_COVARIATES", "KPS_BASELINE_TIMEPOINTS", "KPS_POST_BASELINE_TIMEPOINTS",
     "MGMT_METHYLATION_CUTOFF", "MGMT_PROBES", "TREATMENT_RECORDS_PATH",
     "CovariateEffect", "KpsCoverage", "LeakageContrast", "MgmtBetaResult",
-    "MgmtReachability", "TimepointCensus", "TreatmentExposure",
+    "MgmtReachability", "ResolvableDelta", "TimepointCensus", "TreatmentExposure",
     "baseline_kps", "cohort_feature_provenance", "cohort_feature_report",
     "covariate_effect", "extract_mgmt_beta", "kps_coverage",
     "kps_leakage_contrast", "kps_timepoint_census", "parse_kps",
     "post_baseline_kps", "probe_mgmt_reachability", "probe_treatment_records",
+    "resolvable_delta_c_index",
     "treatment_exposure", "what_covariate_intake_cannot_show",
 
     # Claims audit (pitch sentence <-> code, verified live)

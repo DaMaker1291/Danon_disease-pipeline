@@ -992,9 +992,105 @@ def check_availability_census_is_measured() -> CheckResult:
     )
 
 
+def check_stream4_resolution_is_a_design_calculation() -> CheckResult:
+    """The stream-4 floor must be reproducible, and labelled as a design calc.
+
+    Two failure modes are ruled out here. The first is a floor that was never
+    computed: the full-cohort C is re-measured live and must match the committed
+    artifact, so a stale file cannot masquerade as a calculation. The second is
+    the one this project keeps hitting -- a design parameter read as a result.
+    The artifact must say what it is, and must not claim to have measured any
+    stream.
+    """
+    from danon.availability import mri_availability_census
+    from danon.clinical_twin import stream4_resolution_report
+
+    try:
+        payload = stream4_resolution_report()
+    except (FileNotFoundError, KeyError, ValueError) as exc:
+        return CheckResult(
+            supported=False,
+            detail=f"stream-4 design calculation unreadable: {type(exc).__name__}: {exc}",
+        )
+    res = payload["resolution"]
+
+    # Re-measure the quantity the artifact's reference point rests on.
+    from danon.cohort_features import _cv
+    from danon.predictive import load_cohort_rows
+
+    rows, _ = load_cohort_rows()
+    live = _cv(rows, None, n_folds=5, seed=0)
+    live_matches = (
+        abs(live.mean_c - payload["source_base_c"]) < 1e-9
+        and abs(live.sd_c - payload["source_base_fold_sd"]) < 1e-9
+    )
+
+    n_manifest = mri_availability_census().n_patients_with_usable_pair
+    floor_ok = (
+        res["n_patients"] == n_manifest
+        and res["n_draws"] == 24
+        and 0.0 < res["floor_optimistic"] < res["floor_conservative"] < 0.2
+    )
+    labelled = (
+        "DESIGN calculation" in payload["what_this_is"]
+        and "not a measurement of any datastream" in payload["what_this_is"]
+        and len(payload["what_this_cannot_show"]) >= 3
+    )
+
+    return CheckResult(
+        supported=bool(live_matches and floor_ok and labelled),
+        detail=(
+            f"n={res['n_patients']} (manifest's usable pairs), {res['n_draws']} draws: "
+            f"floor {res['floor_optimistic']:.4f} (1 SE) / "
+            f"{res['floor_conservative']:.4f} (fold yardstick); reference cohort "
+            f"re-measured live at C={live.mean_c:.4f} +/- {live.sd_c:.4f} "
+            f"(matches artifact: {live_matches}); labelled as a design "
+            f"calculation: {labelled}"
+        ),
+    )
+
+
+def check_readme_claim_count_matches_the_registry() -> CheckResult:
+    """The README's claim count must be the registry's, not a remembered one.
+
+    This exists because it drifted: the README advertised 31/31 verified while
+    the registry held 33, so a published number had been sitting stale for two
+    commits. A count that nothing re-derives is the same failure mode the rest
+    of this registry exists to prevent, applied to the registry's own headline.
+    """
+    import re
+
+    path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "README.md"
+    )
+    try:
+        text = open(path, encoding="utf-8").read()
+    except OSError as exc:
+        return CheckResult(supported=False, detail=f"README unreadable: {exc}")
+    m = re.search(r"\*\*(\d+)/(\d+) verified\*\*", text)
+    if not m:
+        return CheckResult(
+            supported=False,
+            detail="README carries no '**n/n verified**' claim row to check",
+        )
+    advertised, total = int(m.group(1)), int(m.group(2))
+    live = len(CLAIMS)
+    supported = advertised == live and total == live
+    return CheckResult(
+        supported=supported,
+        detail=(
+            f"README advertises {advertised}/{total} verified; the registry holds "
+            f"{live} claims"
+            + ("" if supported else " -- a published count has gone stale")
+        ),
+    )
+
+
 CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "evidence_status_vocabulary": check_evidence_status_vocabulary,
+    "readme_claim_count_current": check_readme_claim_count_matches_the_registry,
     "availability_census_measured": check_availability_census_is_measured,
+    "stream4_resolution_is_design_only": check_stream4_resolution_is_a_design_calculation,
     "censoring_is_preserved": check_censoring_is_preserved,
     "covariate_gains_are_measured": check_covariate_gains_are_measured,
     "diffusion_units_and_operator": check_diffusion_units_and_operator,
@@ -1453,6 +1549,44 @@ CLAIMS: Tuple[Claim, ...] = (
         "availability_census_measured",
         "Counts are read from the file on every check, so replacing the "
         "manifest with a newer release moves every number at once.",
+    ),
+    Claim(
+        "readme_claim_count_is_derived_not_remembered",
+        "The README's bound-claims row is checked against the registry on every "
+        "audit rather than maintained by hand. It had drifted: the README "
+        "advertised 31/31 verified while the registry held 33, so the project's "
+        "own headline number was stale for two commits -- the exact failure "
+        "mode the registry exists to catch, applied to the registry itself.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/claims.py::check_readme_claim_count_matches_the_registry",
+        "readme_claim_count_current",
+        "It checks that the README agrees with the registry, not that the "
+        "registry is right: claims can be wrong together and still agree.",
+    ),
+    Claim(
+        "stream4_cohort_resolution_is_a_design_calculation",
+        "Whether the manifest's cohort could resolve a gain is computed rather "
+        "than assumed: resampling 168-patient cohorts from the real cached "
+        "cohort (n=595, overall survival) 24 times moves the held-out C by "
+        "0.0219 (1 SE), mean C 0.6429 (age alone 0.6469), with a mean fold sd "
+        "of 0.0610; the full cohort scores 0.6559 +/- 0.0247. Two consequences "
+        "follow. (a) Stream 4 is an OBSERVATION -- it calibrates the engine's "
+        "derived velocity and cannot move a C-index at all until a hazard "
+        "mapping is declared, so no download of CFB-GBM images would by itself "
+        "raise the ceiling. (b) At that n any declared mapping would have to "
+        "clear 0.0219 to be distinguishable from cohort noise, and the "
+        "covariate effects already measured on the larger cohort (KPS +0.0264, "
+        "MGMT -0.0006) sit inside the conservative fold yardstick of 0.0610. "
+        "This measures the resolution of a cohort, not perfusion, "
+        "fluorescence, Ki-67 or delta-volume.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/claims.py::check_stream4_resolution_is_a_design_calculation over "
+        "outputs_real/stream4_resolution.json (rebuildable via "
+        "_stream4_resolution.py)",
+        "stream4_resolution_is_design_only",
+        "A design calculation bounds what a study could show; it is not "
+        "evidence that any stream carries a signal, and the reference cohort "
+        "is scored on overall survival, which the manifest does not carry.",
     ),
     Claim(
         "clinical_stream_census_refuses_with_live_counts",

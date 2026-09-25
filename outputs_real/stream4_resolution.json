@@ -1,0 +1,42 @@
+{
+  "what_this_is": "a DESIGN calculation, not a measurement of any datastream: the spread of the held-out C-index over independent cohorts of the manifest's size, resampled from the cached real cohort",
+  "source_cohort": "cached GDC clinical export (TCGA-GBM), overall survival",
+  "source_n_patients": 595,
+  "source_base_c": 0.6559389476158495,
+  "source_base_fold_sd": 0.024695617547590854,
+  "source_age_only_c": 0.6532630930934141,
+  "manifest_source": "CFB-GBM, The Cancer Imaging Archive (Centre Francois Baclesse), DOI 10.7937/v9pn-2f72 -- Data Citation Required",
+  "manifest_doi": "10.7937/v9pn-2f72",
+  "manifest_path": "data/cfb_gbm\\CFB-GBM_mri_availability_v02_20260129.tsv",
+  "manifest_n_patients_with_usable_pair": 168,
+  "manifest_n_usable_pairs": 393,
+  "resolution": {
+    "n_patients": 168,
+    "n_draws": 24,
+    "n_folds": 5,
+    "mean_c": 0.6428933018067712,
+    "se_across_draws": 0.021904942713486752,
+    "mean_fold_sd": 0.061040328139275145,
+    "age_only_c": 0.646889650776936,
+    "floor_optimistic": 0.021904942713486752,
+    "floor_conservative": 0.061040328139275145,
+    "exhaustive_draws": false,
+    "notes": [
+      "design calculation: this bounds what a cohort of this size could show, it does not measure any stream, covariate, or treatment effect"
+    ]
+  },
+  "load_notes": [
+    "595 patients with a usable os endpoint",
+    "491 events, 104 censored at last contact",
+    "1 patient(s) recorded Dead with no days_to_death: censored at last contact because there is no event time",
+    "21 dropped: no age recorded",
+    "1 dropped: no usable time or endpoint"
+  ],
+  "built_seconds": 17.4,
+  "rebuild_command": "python _stream4_resolution.py",
+  "what_this_cannot_show": [
+    "It does not measure delta-volume, registration error, or scanner comparability: the CFB-GBM images are not downloaded.",
+    "It says nothing about progression-free survival; the cached cohort is scored on overall survival, which is the endpoint the availability manifest does not carry at all.",
+    "A resolved floor is a permission to look, not evidence that any stream carries a signal."
+  ]
+}
