@@ -779,7 +779,84 @@ def build_evolution_artifact(
     )
 
 
+# ---------------------------------------------------------------------------
+# claims (the verification registry, rendered in the app)
+# ---------------------------------------------------------------------------
+
+
+def build_claims_artifact() -> Dict[str, Any]:
+    """Run the bound-claim audit and record it for the app to render.
+
+    This is the only artifact whose subject is the repository rather than a
+    model: every entry is a sentence the project may publish, the check that
+    backs it, and whether that check currently passes. It is recorded at build
+    time so the deployed site shows the same verdicts a reader gets by running
+    the audit -- and a failing check is recorded as failing, never dropped.
+
+    No check in `danon.claims` touches the network, so this rebuilds offline
+    and gives the same answer on any machine with the cached data present.
+    """
+    from danon.claims import (
+        audit_claims,
+        claims_provenance,
+        what_these_claims_cannot_establish,
+    )
+
+    def _detail_text(a) -> str:
+        """One check returns a list of per-endpoint lines; the app renders one.
+
+        Coerced here rather than in the view, so every row in the artifact has
+        the same shape and a reader cannot hit a field that is sometimes a
+        string and sometimes a list.
+        """
+        if isinstance(a.detail, str):
+            return a.detail
+        if isinstance(a.detail, (list, tuple)):
+            return " · ".join(str(x) for x in a.detail)
+        return str(a.detail)
+
+    audits = audit_claims()
+    rows = [
+        {
+            "id": a.claim.id,
+            "sentence": a.claim.sentence,
+            "tier": a.claim.tier.value,
+            "substantiated_by": a.claim.substantiated_by,
+            "check": a.claim.check,
+            "limit": a.claim.limit,
+            "supported": bool(a.supported),
+            "detail": _detail_text(a),
+        }
+        for a in audits
+    ]
+    n_pass = sum(1 for r in rows if r["supported"])
+    return _artifact(
+        key="claims",
+        title="Bound-claim audit (what this project may say)",
+        source="danon.claims.audit_claims()",
+        data={
+            "n_claims": len(rows),
+            "n_passed": n_pass,
+            "n_failed": len(rows) - n_pass,
+            "claims": rows,
+            "provenance": {k: v.value for k, v in claims_provenance().items()},
+            "cannot_establish": list(what_these_claims_cannot_establish()),
+        },
+        notes=[
+            "each row is a sentence plus the check that supports it, re-run at "
+            "build time; a check that failed is recorded as failed",
+            "passing means the code agrees with the sentence, not that the "
+            "biology is right",
+        ],
+        provenance={
+            "claim_matches_code": EvidenceStatus.ESTABLISHED,
+            "clinical_benefit": EvidenceStatus.UNKNOWN,
+        },
+    )
+
+
 BUILDERS = {
+    "claims": build_claims_artifact,
     "pipeline": build_pipeline_artifact,
     "microfluidics": build_microfluidics_artifact,
     "lnp": build_lnp_artifact,

@@ -20,6 +20,29 @@ export interface AppArtifact<T> {
   data: T;
 }
 
+/* --------------------------------------------------------------- claims -- */
+
+/** One published sentence, the check that backs it, and whether it passes. */
+export interface ClaimRow {
+  id: string;
+  sentence: string;
+  tier: string;
+  substantiated_by: string;
+  check: string;
+  limit: string;
+  supported: boolean;
+  detail: string;
+}
+
+export interface ClaimsArtifactData {
+  n_claims: number;
+  n_passed: number;
+  n_failed: number;
+  claims: ClaimRow[];
+  provenance: Record<string, string>;
+  cannot_establish: string[];
+}
+
 /* ------------------------------------------------------------- pipeline -- */
 
 export interface PipelineArtifactData extends PipelineResult {

@@ -1,0 +1,384 @@
+{
+ "key": "claims",
+ "title": "Bound-claim audit (what this project may say)",
+ "generated_utc": "2026-09-25T18:26:07Z",
+ "source": "danon.claims.audit_claims()",
+ "notes": [
+  "each row is a sentence plus the check that supports it, re-run at build time; a check that failed is recorded as failed",
+  "passing means the code agrees with the sentence, not that the biology is right"
+ ],
+ "provenance": {
+  "claim_matches_code": "established",
+  "clinical_benefit": "unknown"
+ },
+ "data": {
+  "n_claims": 35,
+  "n_passed": 35,
+  "n_failed": 0,
+  "claims": [
+   {
+    "id": "mechanistic_scheduler",
+    "sentence": "The dosing scheduler is mechanistic: drugs move by a discretised Fickian diffusion PDE and clones compete by Lotka-Volterra dynamics with saturating (EC50) kill kinetics.",
+    "tier": "established",
+    "substantiated_by": "danon/evosteer.py::TumorEvolutionSimulator",
+    "check": "mechanistic_core",
+    "limit": "The mechanism is mechanistic; the rate constants are declared assumptions, not measurements from this project.",
+    "supported": true,
+    "detail": "PDE transport (diffusion + Laplacian): True; Lotka-Volterra competition with carrying capacity: True; saturating (Hill/EC50) kill kinetics: True -- the scheduler is mechanistic"
+   },
+   {
+    "id": "resistance_is_not_ghost",
+    "sentence": "Resistance in this engine is produced by the model, not carried by the initial state: with mutation off and no seeded clone the resistant burden is exactly zero, and with the extinction floor the sensitive population is extinguished exactly rather than lingering as a sub-single-cell density. The engine's qualitative verdict (does continuous MTD control the tumour?) tracks whether a resistant subclone exists at diagnosis, which is an ASSUMED input here, not a measured one.",
+    "tier": "established",
+    "substantiated_by": "danon/claims.py::check_resistance_is_emergent",
+    "check": "resistance_is_emergent",
+    "limit": "This verifies the mechanism is doing the work; it says nothing about whether the assumed constants are right, and the verdict's dependence on the pre-existing fraction is a limitation to state, not a result to publish.",
+    "supported": true,
+    "detail": "mutation off + no seeded clone -> max resistant burden 0.000e+00 (no ghost resistance: True); sensitive population extinguished exactly: True; verdict tracks the assumed pre-existing clone (MTD PFS 172 d seeded vs None unseeded): True"
+   },
+   {
+    "id": "not_a_classifier",
+    "sentence": "The scheduling core is not a trained classifier: it solves transport and population dynamics rather than learning a mapping from images to labels. A pretrained protein language model contributes capsid-fitness scoring in the separate design arm, and is labelled as such wherever it is used.",
+    "tier": "established",
+    "substantiated_by": "danon/evosteer.py (scheduler) vs danon/ml_scorer.py + danon/esm_inference.py (design arm)",
+    "check": "neural_components_declared",
+    "limit": "A claim of 'no machine learning anywhere' is false: torch modules and an ESM scorer ship in the design arm.",
+    "supported": true,
+    "detail": "torch modules present: PositionalEncoding, AAVTropismTransformer, LNPDeliveryMLP, ImmuneEscapeTransformer; esm_inference.py present: True; /api/esm endpoints wired: True -- a claim of 'no black box anywhere' is false as worded"
+   },
+   {
+    "id": "seeded_reproducibility",
+    "sentence": "Runs are stochastic (mutation timing and growth noise) and fully seeded: identical seeds reproduce a trajectory exactly, and results are reported as distributions over replicates.",
+    "tier": "established",
+    "substantiated_by": "danon/evosteer.py::TumorEvolutionSimulator.run(seed=...)",
+    "check": "seeded_reproducibility",
+    "limit": "Reproducible is not the same as deterministic, and neither is the same as correct.",
+    "supported": true,
+    "detail": "same seed reproduces exactly: True; different seed diverges: True -- the model is stochastic and seeded, not deterministic"
+   },
+   {
+    "id": "deposited_structure",
+    "sentence": "Capsid geometry is the deposited AAV9 structure (PDB 3UX1), assembled with the entry's own REMARK 350 symmetry operators and pinned by SHA-256 verified on every load.",
+    "tier": "established",
+    "substantiated_by": "danon/structure.py::load_aav9_capsid",
+    "check": "structure_is_deposited",
+    "limit": "C-alpha trace only: it is not an atomic surface, and it says nothing about conformational ensembles.",
+    "supported": true,
+    "detail": "PDB file 3UX1.pdb sha256 1a39ed430f8404b9... matches the pin"
+   },
+   {
+    "id": "real_wild_type",
+    "sentence": "The engineered capsid's wild type is VP1 residues 263-736 of that same deposited structure, re-derived from the PDB on every test run.",
+    "tier": "established",
+    "substantiated_by": "danon/aav_generator.py::WILD_TYPE_AAV9_CAPSID",
+    "check": "wild_type_from_deposit",
+    "limit": "One deposited model, not a consensus sequence across AAV9 isolates.",
+    "supported": true,
+    "detail": "474 residues, derived from the deposit: True"
+   },
+   {
+    "id": "provenance_registry",
+    "sentence": "Every output carries a provenance tier from a fixed vocabulary: ESTABLISHED, EMERGING_HUMAN, ANIMAL_ONLY, PROVEN_FAILED, UNKNOWN -- including permanent PROVEN_FAILED entries for claims this project made and withdrew.",
+    "tier": "established",
+    "substantiated_by": "danon/cure.py::EvidenceStatus",
+    "check": "evidence_status_vocabulary",
+    "limit": "A tier is an assertion about evidence; it is only as good as the citation behind the entry using it.",
+    "supported": true,
+    "detail": "EvidenceStatus members: ESTABLISHED, EMERGING_HUMAN, ANIMAL_ONLY, PROVEN_FAILED, UNKNOWN"
+   },
+   {
+    "id": "declared_assumptions",
+    "sentence": "Rate constants are labelled in the source as CALIBRATED or ASSUMED, with the benchmark measurement that would replace each one identified.",
+    "tier": "established",
+    "substantiated_by": "danon/evosteer.py (CALIBRATION section) + danon/validation.py tier 3",
+    "check": "parameters_declared",
+    "limit": "Being labelled is not being measured: every rate is still an assumption until a bench run replaces it.",
+    "supported": true,
+    "detail": "7 parameters marked CALIBRATED, 'ASSUMED' section present: True -- the mechanism is mechanistic, the constants are not measurements"
+   },
+   {
+    "id": "engineering_rigor",
+    "sentence": "The repository carries an automated test suite covering the physics, the statistics and the refusal paths, with the count computed live rather than quoted.",
+    "tier": "established",
+    "substantiated_by": "tests/",
+    "check": "test_suite_counted",
+    "limit": "Tests verify the implementation. They are not evidence about biology.",
+    "supported": true,
+    "detail": "1015 test functions in 138 classes across tests/"
+   },
+   {
+    "id": "heldout_discrimination",
+    "sentence": "A Cox model of clinical covariates reaches C = 0.64 on held-out TCGA-GBM patients, validating the held-out statistical machinery on real data.",
+    "tier": "emerging_human",
+    "substantiated_by": "danon/predictive.py::kfold_holdout_c_index",
+    "check": "engine_c_index_absent",
+    "limit": "That C-index is about age and grade, not about this engine. The engine itself has no estimable patient-level C-index.",
+    "supported": true,
+    "detail": "engine C-index declared not estimable: True"
+   },
+   {
+    "id": "multiscale_coarse_graining",
+    "sentence": "The engine is a coarse-grained continuum--agent hybrid, not a discrete cell-by-cell simulation: clinical voxels hold clone densities and drug concentration, so transport is solved on a mesh rather than per cell.",
+    "tier": "established",
+    "substantiated_by": "danon/evosteer.py::TumorEvolutionSimulator (density fields) + danon/realdata.py::DecimationSpec",
+    "check": "voxel_scale",
+    "limit": "The engine grid is ~4 mm, not the 100 um voxels this pitch originally claimed, and the decimation from a 1 mm scan is a documented lossy step.",
+    "supported": true,
+    "detail": "engine voxel ~3.67 mm from decimation factors (4, 4, 3) (source 1 mm); ~3667 um, not 100 um; decimation is declared as a lossy step in the module: True"
+   },
+   {
+    "id": "runtime_is_measured",
+    "sentence": "A 365-day forecast is a sub-second-to-second computation on the engine's phantom (and ~20 s for a full paired case on real geometry), re-measured whenever this audit runs rather than quoted.",
+    "tier": "established",
+    "substantiated_by": "danon/evosteer.py::TumorEvolutionSimulator.run(days=365)",
+    "check": "runtime_365",
+    "limit": "Runtime is machine-dependent; the audit prints the machine's own number.",
+    "supported": true,
+    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 4.17 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)"
+   },
+   {
+    "id": "inputs_are_bulk",
+    "sentence": "Molecular inputs are real bulk RNA-seq (GDC open STAR counts), and the pipeline states that single-cell clone fractions cannot be recovered from them.",
+    "tier": "established",
+    "substantiated_by": "danon/genomics_intake.py (bulk RNA-seq -> r0, calibrated mapping)",
+    "check": "bulk_not_single_cell",
+    "limit": "A claim of scRNA-seq-derived parameters would describe data this pipeline never reads, and `PROVEN_FAILED` in the same module says so.",
+    "supported": true,
+    "detail": "computational inputs are bulk RNA-seq: True; deriving single-cell clone fractions from bulk is marked PROVEN_FAILED in the module: True -- a pitch claiming scRNA-seq parameters would be describing data this pipeline never reads"
+   },
+   {
+    "id": "no_spatial_agreement_result",
+    "sentence": "No spatial-agreement (Dice) result is claimed: no reachable glioma imaging collection carries both an expert tumour mask and a second timepoint, so a predicted field cannot be scored against an observed recurrence scan. The refusal is computed from recorded probe counts and flips automatically if such a collection appears.",
+    "tier": "proven_failed",
+    "substantiated_by": "danon/multimodal.py::spatial_dice_verdict over data/tcia_probe/multimodal_evidence.json",
+    "check": "spatial_agreement_not_claimed",
+    "limit": "Absence of a test is not a negative result: nothing here is evidence that the engine's spatial predictions are wrong, only that the public data reachable from this environment cannot test them.",
+    "supported": true,
+    "detail": "spatial Dice test REFUSED; 5 imaging collection(s) probed, 0 segmentation series, 632 patient(s) checked for a second timepoint"
+   },
+   {
+    "id": "potency_from_measured_records",
+    "sentence": "Drug potency is taken from real measured activity records (ChEMBL) rather than authored: 31 exact glioma-line IC50s for temozolomide, median 135 uM and most potent 6.4 uM, spanning a 496x between-model range, with 19 right-censored records counted separately and their units preserved.",
+    "tier": "established",
+    "substantiated_by": "danon/pharmacology.py::load_glioma_potency (cache data/pharmacology/)",
+    "check": "potency_is_measured",
+    "limit": "2D monolayer IC50 at a single timepoint is not 3D tumour kill behind a blood-brain barrier, and the records come from heterogeneous assays whose readout and exposure time are largely unrecorded.",
+    "supported": true,
+    "detail": "CHEMBL810 IC50: 31 exact of 50 glioma-line record(s), median 134,970 nM, most potent 6,426 nM, 19 right-censored"
+   },
+   {
+    "id": "engine_potency_scale_not_anchored",
+    "sentence": "The engine's EC50 carries no declared concentration unit, so it is not compared to measured potency: any ratio between them would be unitless. The measured values are reported instead.",
+    "tier": "unknown",
+    "substantiated_by": "danon/pharmacology.py::engine_ec50_unit + compare_engine_ec50 (refusal)",
+    "check": "ec50_unit_undeclared",
+    "limit": "This is a defect, not a feature. Until the engine's concentration scale is declared, its potency constant cannot be anchored to anything measurable, and no calibration claim should be made about it.",
+    "supported": true,
+    "detail": "engine EC50 unit declared: None; comparison REFUSED -- the engine's EC50 has no declared concentration unit (DrugParams documents only 'conc/day at full-dose vessels'), so an EC50-vs-IC50 ratio would be unitless nonsense. Declare a unit on the engine's concentration scale before comparing; measured values are available (median 134,970 nM, most potent 6,426 nM)."
+   },
+   {
+    "id": "censored_endpoint",
+    "sentence": "Held-out discrimination is reported on an endpoint that keeps its censored patients: the progression cohort is 594 patients with 372 events and 222 censored at last contact, and OS is 595 patients with 491 events and 104 censored. An earlier version of the loader searched follow-up records for a field that only exists on the diagnosis node, so no patient was ever censored and the progression C-index read 0.590 instead of 0.534.",
+    "tier": "established",
+    "substantiated_by": "danon/predictive.py::load_cohort_rows",
+    "check": "censoring_is_preserved",
+    "limit": "Censoring makes the number smaller and more honest. It is still not clinical validation.",
+    "supported": true,
+    "detail": "progression endpoint: 594 patients, 372 events, 222 censored at last contact; held-out C = 0.534 +/- 0.053 against 0.539 for age alone -- the multivariable model is beaten by age"
+   },
+   {
+    "id": "covariates_measured_not_estimated",
+    "sentence": "Every covariate proposed for the real cohort is reported with a measured delta-C on the same patients, and Karnofsky status is drawn only from pre-treatment timepoints. A post-treatment KPS is measurably leaky: as a lone predictor it scores C = 0.684 against 0.597 for the pre-treatment value, because it is partly determined by the outcome.",
+    "tier": "established",
+    "substantiated_by": "danon/cohort_features.py::covariate_effect, kps_leakage_contrast",
+    "check": "covariate_gains_are_measured",
+    "limit": "A measured gain of +0.026 inside a fold sd of 0.048 is reported as 'no measurable gain'. MGMT is reachable but caps the cohort at 142 patients, and sub-region segmentation is refused outright.",
+    "supported": true,
+    "detail": "authored gain figures in the module: none; baseline and post-treatment timepoint sets disjoint: True; post-treatment KPS outranks pre-treatment: True (0.684 vs 0.597) -- a covariate gain is a measurement here, not an estimate"
+   },
+   {
+    "id": "transport_units_explicit",
+    "sentence": "Diffusion is measured in voxel^2/day, and the bridge to physical units is explicit. The engine's D = 0.35 is 0.35 mm^2/day on the 1 mm phantom but 4.71 mm^2/day on the real 3.67 mm decimated grid -- 13.44x, with `voxel_mm` documented as bookkeeping only, so nothing raised. The spatially heterogeneous transport term is div(D(x) grad C) with harmonic face conductances, which reduces exactly to the engine's scalar D * laplacian(C) on constant D.",
+    "tier": "established",
+    "substantiated_by": "danon/anisotropy.py::d_to_engine, divergence_d_grad",
+    "check": "diffusion_units_and_operator",
+    "limit": "The heterogeneous operator is slower or redirected relative to a scalar field of the same mean, never faster: no delivery improvement can be claimed from this change alone. Tissue D values are literature constants and no DTI series is present.",
+    "supported": true,
+    "detail": "voxel size 3.667 mm from decimation (4, 4, 3) matches realdata's mean convention: True; div(D grad C) reduces to D*lap(C) on constant D: True; the engine's D=0.35 voxel^2/day is 0.35 mm^2/day on the phantom but 4.706 mm^2/day on real geometry (13.44x inflation); 1 voxel^2/day = 1 mm^2/day at 1 mm"
+   },
+   {
+    "id": "no_inflated_estimand",
+    "sentence": "No proposed high-scoring target is reported as a measurement. The spatial Dice target is refused for want of paired imaging with masks; `best_overall_response` is empty for all 617 cases, so no responder label exists and the nearest flag is 4.3% positive and runs backwards against survival; and the in-vitro R^2 is incommensurable because the engine's EC50 has no concentration unit.",
+    "tier": "proven_failed",
+    "substantiated_by": "danon/eval_targets.py::target_verdicts",
+    "check": "no_inflated_estimand",
+    "limit": "Refusing three estimands does not raise the fourth: overall-survival C stays 0.656 and progression C stays 0.534.",
+    "supported": true,
+    "detail": "`best_overall_response` records: 0 of 617 cases (empty: True); spatial Dice target refused_no_data; in-vitro target refused_incommensurable; no target reports a measured score: True. Reachable response flag: 23 positives in 529 cases, majority-class accuracy 95.65%"
+   },
+   {
+    "id": "gdsc_ic50s_mostly_extrapolated",
+    "sentence": "GDSC2's glioma IC50s are largely extrapolations rather than measurements: 76.0% lie above the highest concentration tested, and for temozolomide every one of the 34 glioma values does. The ChEMBL records already in this repository agree independently, with 19 of 50 glioma temozolomide records right-censored.",
+    "tier": "established",
+    "substantiated_by": "danon/eval_targets.py::load_gdsc_glioma",
+    "check": "gdsc_ic50s_not_all_measured",
+    "limit": "Two independent sources agreeing that this quantity is mostly a lower bound is a reason to refuse the fit, not a caveat on it.",
+    "supported": true,
+    "detail": "8384 glioma rows over 286 drugs and 34 lines: 76.0% of IC50s above the highest concentration tested; temozolomide 34 of 34 extrapolated. An R^2 against these would be a fit to a lower bound"
+   },
+   {
+    "id": "no_rl_agent",
+    "sentence": "No reinforcement-learning agent exists. Every dosing policy is a closed-form rule -- MTDPolicy returns the constant (1.0, 0.0) for every state -- so no policy is learned, trained, or converged, and a claim of '95.4% normalised reward retention over training episodes' describes software that is not here.",
+    "tier": "proven_failed",
+    "substantiated_by": "danon/evosteer.py::MTDPolicy, AdaptiveDosePolicy, CollateralSwitchPolicy",
+    "check": "untestable_tiers_refused",
+    "limit": "The deeper problem is the metric: a self-defined reward and its normalization are both chosen by the author, so the number cannot be contradicted by any measurement. The repo's comparable quantity is anchored externally instead (paired MTD control, RANO threshold, censored lower bound).",
+    "supported": true,
+    "detail": "no RL agent present: True; the metric is self-defined, so it cannot be falsified. EGFRvIII: 1847 structural-variation files of which 1847 are controlled, against 464 open SNV/indel files that cannot carry an exon 2-7 deletion: reachable from open data = False"
+   },
+   {
+    "id": "egfrviii_not_in_open_data",
+    "sentence": "EGFRvIII is an in-frame deletion of exons 2-7 -- a structural variant -- so it cannot appear in the open Masked Somatic Mutation files. All 1,847 structural-variation files for TCGA-GBM are controlled access, so EGFRvIII status is not obtainable from open data and cannot be a feature of a classifier built here.",
+    "tier": "proven_failed",
+    "substantiated_by": "danon/eval_targets.py::probe_egfrviii_reachability",
+    "check": "untestable_tiers_refused",
+    "limit": "Inferring the deletion from RNA-seq junction reads is a legitimate alternative and would be an inference, not a mutation call.",
+    "supported": true,
+    "detail": "no RL agent present: True; the metric is self-defined, so it cannot be falsified. EGFRvIII: 1847 structural-variation files of which 1847 are controlled, against 464 open SNV/indel files that cannot carry an exon 2-7 deletion: reachable from open data = False"
+   },
+   {
+    "id": "no_engine_c_index",
+    "sentence": "This engine is not reported to predict individual patients: no dataset here pairs baseline tumour state, administered schedule and outcome, and one curve per simulation means a C-index would be 0.5 by construction.",
+    "tier": "unknown",
+    "substantiated_by": "danon/predictive.py::engine_discrimination_verdict",
+    "check": "engine_c_index_absent",
+    "limit": "Stating the absence is the honest position; it is not a finding.",
+    "supported": true,
+    "detail": "engine C-index declared not estimable: True"
+   },
+   {
+    "id": "holdout_emulator_090",
+    "sentence": "A physics-feature ridge surrogate predicts the engine's final tumour burden at one-shot holdout R^2 = 0.9211 (95% bootstrap CI 0.8615-0.9536) on 48 configurations never used for feature selection or fitting: the engine's outcome surface is predictable from its inputs to better than 0.90. This is a property of the SIMULATOR, not an accuracy on patients, and is bound to the one-shot re-measurement.",
+    "tier": "established",
+    "substantiated_by": "danon/claims.py::check_holdout_emulator_is_measured",
+    "check": "holdout_emulator_measured",
+    "limit": "Synthetic ground truth (the engine itself). Never present beside patient numbers as if it raised them.",
+    "supported": true,
+    "detail": "one-shot holdout R^2 = 0.9211 (95% bootstrap CI 0.8615-0.9536) on 48 untouched configurations (features locked on the training half, single refit, lambda=1.0); claim band R^2 >= 0.90"
+   },
+   {
+    "id": "mgmt_status_not_predictable_from_open_covariates",
+    "sentence": "Predicting the published MGMT promoter call from age, sex and diagnosis yields out-of-fold AUC 0.5387 (95% CI 0.4850-0.5964) on 396 real TCGA-GBM patients -- indistinguishable from chance. The 0.90 band on this target requires per-patient molecular features the open cache does not carry; the measurement is reported at its real value instead of being dropped or inflated.",
+    "tier": "established",
+    "substantiated_by": "danon/claims.py::check_mgmt_status_is_measured_not_faked",
+    "check": "mgmt_status_measured_not_faked",
+    "limit": "A real miss with a real CI is worth more than a claimed number.",
+    "supported": true,
+    "detail": "real-patient MGMT-status classifier: OOF AUC 0.5387 (CI 0.4850-0.5964) on 396 patients; reported as indistinguishable from chance, NOT as a 0.90+ result"
+   },
+   {
+    "id": "mgmt_beta_moves_the_engine_in_the_methylated_direction",
+    "sentence": "The requested mapping r0 = Baseline_Resistance * (1 - beta), with Baseline_Resistance derived from the calibrated clones (0.75), moves the engine: across the real TCGA-GBM beta range (quantiles of 140 patients, 2 probes), MTD median progression improves 144 -> 167 days and the resistant-clone dominance day moves 22 -> 23, while the steering policy saturates at 365 days at every beta (zero dynamic range under this mapping). Simulated, not clinical.",
+    "tier": "established",
+    "substantiated_by": "danon/mgmt.py::mgmt_resistance_sweep on the cached cBioPortal panel (outputs_real/mgmt_resistance.txt)",
+    "check": "mgmt_resistance_sweep_measured",
+    "limit": "The term reaches only the sensitivity-scale component of resistance; the kill ceiling is untouched. No patient outcome is claimed.",
+    "supported": true,
+    "detail": "live two-beta sweep: MTD median PFS 104d (unmethylated) -> 129d (fully methylated), direction OK; committed quantile artifact present: True"
+   },
+   {
+    "id": "covariate_upgrades_measured_not_estimated",
+    "sentence": "The four covariate upgrades, each measured against a matched baseline on the patients it keeps: KPS beside age/sex HR=0.9810 per point (3.3 SE) with delta_C=+0.0264 vs fold sd 0.0476 (n=247); MGMT binary HR=0.8326 with delta_C=-0.0006 (n=409); continuous beta HR=0.6627 with delta_C=+0.0006 (n=137); RT+temozolomide restriction keeps 356/595 with cohort-membership delta -0.0112 inside fold sd 0.0247. None produces a measurable held-out gain; stacking all of them drops the ceiling below age alone (0.5785 vs 0.6203 at n=68).",
+    "tier": "established",
+    "substantiated_by": "danon/cohort_features.py::covariate_upgrade_report (outputs_real/covariate_upgrades.txt)",
+    "check": "covariate_upgrades_measured",
+    "limit": "Directionally consistent with trial literature; the cohort cannot resolve it. A change in n is never reported as a change in signal.",
+    "supported": true,
+    "detail": "four covariate upgrades measured on the live cache: all-covariates ceiling pooled C 0.5785 (n=68) vs age-alone 0.6203 on the same kept subset -- stacking unavailable-for-most covariates costs discrimination; the artifact records each upgrade with its paired delta: True"
+   },
+   {
+    "id": "clinical_streams_wired_with_identity_guarantees",
+    "sentence": "The four-stream clinical datastream is implemented with identity guarantees: Ki-67 at the declared reference (0.15) returns the calibrated growth rates exactly; uniform rCBV yields uniform clearance; a uniform 5-ALA map preserves the engine's fill burden. Each stream's constants are declared (KI67_REF=0.15, CLEARANCE_GAMMA=1.0), and stream 4 is an observation, not an input.",
+    "tier": "established",
+    "substantiated_by": "danon/claims.py::check_stream_identities_hold",
+    "check": "stream_identities",
+    "limit": "Mappings are re-parameterisations, not rival models; the neutral value is the calibrated default.",
+    "supported": true,
+    "detail": "Ki67=0.15 -> calibrated growth exactly: True; uniform rCBV -> uniform clearance: True; 5-ALA map preserves the engine fill burden (17.5500 == 17.5500): True"
+   },
+   {
+    "id": "stream3_real_vasculature_measured_small_effect",
+    "sentence": "Stream 3 (perfusion) is measured on real cached data: t1ce contrast volumes block-averaged through the segmentations' exact engine transform for 6 BraTS cases (tumour mean enhancement 0.37-0.49), then run PAIRED (same geometry, same seeds) against the null-uniform vasculature: MTD PFS moves by a mean of -1.17 days (sd 1.01, max 3, 18 paired runs; 5/6 cases earlier), steering stays horizon-censored in both geometries (paired delta exactly 0). At engine scale the vessel-source variation contributes ~1 day: the sanctuary structure lives in D(x), which both geometries share.",
+    "tier": "established",
+    "substantiated_by": "danon/clinical_twin.py::stream3_report over outputs_real/stream3_cohort.json (rebuildable via _stream3_cohort.py)",
+    "check": "stream3_cohort_measured",
+    "limit": "A wired-and-measured stream whose measured effect is small is a result, not a failure; t1ce is a vascular proxy, not Ktrans.",
+    "supported": true,
+    "detail": "cohort 6 cases / 18 paired runs: True; live re-run of 01017 seed 101 reproduces the committed PFS: True (paired delta -3 d; committed mean -1.17 d)"
+   },
+   {
+    "id": "longitudinal_availability_is_counted_from_the_manifest",
+    "sentence": "Stream 4's cohort is counted from the committed CFB-GBM availability manifest (TCIA, DOI 10.7937/v9pn-2f72): 264 patients, 170 with more than one timepoint, and 168 with a usable T1-Gd pair at least 4 weeks apart (393 pairs, 37 of them spanning two scanners). The manifest records that a series EXISTS; the images are not downloaded, so no registration, artefact or comparability check has been performed and no velocity field has been measured. The CFB-GBM collection is not served by the NBIA API this repo probes, so activating the stream requires downloading the collection, not querying it.",
+    "tier": "established",
+    "substantiated_by": "danon/claims.py::check_availability_census_is_measured",
+    "check": "availability_census_measured",
+    "limit": "Counts are read from the file on every check, so replacing the manifest with a newer release moves every number at once.",
+    "supported": true,
+    "detail": "CFB-GBM manifest: 264 patients, 170 with >1 timepoint, 168 with a usable t1gd pair (393 pairs, 37 spanning two scanners); images NOT downloaded, so this is availability, not a measurement"
+   },
+   {
+    "id": "readme_claim_count_is_derived_not_remembered",
+    "sentence": "The README's bound-claims row is checked against the registry on every audit rather than maintained by hand. It had drifted: the README advertised 31/31 verified while the registry held 33, so the project's own headline number was stale for two commits -- the exact failure mode the registry exists to catch, applied to the registry itself.",
+    "tier": "established",
+    "substantiated_by": "danon/claims.py::check_readme_claim_count_matches_the_registry",
+    "check": "readme_claim_count_current",
+    "limit": "It checks that the README agrees with the registry, not that the registry is right: claims can be wrong together and still agree.",
+    "supported": true,
+    "detail": "README advertises 35/35 verified; the registry holds 35 claims"
+   },
+   {
+    "id": "stream4_cohort_resolution_is_a_design_calculation",
+    "sentence": "Whether the manifest's cohort could resolve a gain is computed rather than assumed: resampling 168-patient cohorts from the real cached cohort (n=595, overall survival) 24 times moves the held-out C by 0.0219 (1 SE), mean C 0.6429 (age alone 0.6469), with a mean fold sd of 0.0610; the full cohort scores 0.6559 +/- 0.0247. Two consequences follow. (a) Stream 4 is an OBSERVATION -- it calibrates the engine's derived velocity and cannot move a C-index at all until a hazard mapping is declared, so no download of CFB-GBM images would by itself raise the ceiling. (b) At that n any declared mapping would have to clear 0.0219 to be distinguishable from cohort noise, and the covariate effects already measured on the larger cohort (KPS +0.0264, MGMT -0.0006) sit inside the conservative fold yardstick of 0.0610. This measures the resolution of a cohort, not perfusion, fluorescence, Ki-67 or delta-volume.",
+    "tier": "established",
+    "substantiated_by": "danon/claims.py::check_stream4_resolution_is_a_design_calculation over outputs_real/stream4_resolution.json (rebuildable via _stream4_resolution.py)",
+    "check": "stream4_resolution_is_design_only",
+    "limit": "A design calculation bounds what a study could show; it is not evidence that any stream carries a signal, and the reference cohort is scored on overall survival, which the manifest does not carry.",
+    "supported": true,
+    "detail": "n=168 (manifest's usable pairs), 24 draws: floor 0.0219 (1 SE) / 0.0610 (fold yardstick); reference cohort re-measured live at C=0.6559 +/- 0.0247 (matches artifact: True); labelled as a design calculation: True"
+   },
+   {
+    "id": "clinical_stream_census_refuses_with_live_counts",
+    "sentence": "Streams 1 (5-ALA fluorescence), 2 (whole-slide Ki-67) and 4 (sequential MRI) refuse on their CACHED counts -- no fluorescence captures, no WSIs, zero cached sequential pairs -- while their mappings are implemented and unit-tested, activating when real files are supplied. No stream is back-filled. The census also reports what is RETRIEVABLE without new code, so a refusal is not mistaken for absence: 41 of 630 probed UPENN-GBM patients carry a >=28-day follow-up interval, and the archive carries DSC perfusion for 456 patients and CaPTk-processed rCBV/Ktrans maps for 628.",
+    "tier": "established",
+    "substantiated_by": "danon/claims.py::check_stream_census_refuses_honestly",
+    "check": "stream_census_refuses",
+    "limit": "The census is computed live from the data directory and the recorded probe, so acquiring the files flips the refusal to 'available' automatically.",
+    "supported": true,
+    "detail": "census: stream1 REFUSED(0), stream2 REFUSED(0), stream3 MEASURABLE(6 t1ce files; archive carries 456 DSC perfusion patients), stream4 REFUSED(0 cached / 41 retrievable pairs)"
+   },
+   {
+    "id": "restriction_never_mistaken_for_signal",
+    "sentence": "Restricting to patients recording RT plus temozolomide is measured as cohort selection first: kept 356 of 595, membership delta -0.0112 C against the full-cohort fold sd 0.0247, with within-restricted-set covariate deltas (KPS -0.0043, MGMT +0.0046) reported separately and below their own fold sd.",
+    "tier": "established",
+    "substantiated_by": "danon/cohort_features.py::treatment_restriction_effect",
+    "check": "restriction_membership_vs_signal",
+    "limit": "A record is an exposure, not an ordered protocol: first-line cannot be separated from salvage in this export.",
+    "supported": true,
+    "detail": "restriction keeps 356/595 patients; base C 0.6559 (all) -> 0.6447 (restricted); cohort-membership delta -0.0112 inside one fold sd (0.0247) -- selection is reported separately from any covariate signal"
+   }
+  ],
+  "provenance": {
+   "claim_matches_code": "established",
+   "mechanism_is_mechanistic": "established",
+   "parameters_are_measured": "proven_failed",
+   "engine_predicts_patients": "unknown",
+   "clinical_benefit": "unknown"
+  },
+  "cannot_establish": [
+   "that a mechanistic model is more likely to be right than a learned one: mechanism makes a model falsifiable and interpretable, not correct",
+   "that any rate constant in this repository is measured: they are calibrated or assumed, and the tiers say which",
+   "that passing the audit means a judge should believe the biology: the audit checks the code against its own sentences",
+   "that the engine predicts a patient's course, or that any schedule here extends a life -- both require prospective trials"
+  ]
+ }
+}

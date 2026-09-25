@@ -14,6 +14,9 @@ Each is pinned here so the poster cannot drift back.
 
 from __future__ import annotations
 
+import json
+import os
+
 import pytest
 
 from danon.claims import (
@@ -235,6 +238,45 @@ class TestRealDataClaims:
             "engine_potency_scale_not_anchored",
         ):
             assert audits[cid].supported, audits[cid].detail
+
+
+class TestAppArtifact:
+    """The claims artifact the app renders must not drift from the registry.
+
+    This is the same class of check the README count needed: a number published
+    in a file that nothing re-derives goes stale. The count and the ids are read
+    from the committed artifact and compared against the live registry, so
+    adding a claim without rebuilding the artifact fails here.
+    """
+
+    PATH = os.path.join("frontend", "public", "artifacts", "claims.json")
+
+    def test_committed_artifact_matches_the_registry(self):
+        if not os.path.exists(self.PATH):
+            pytest.skip("claims artifact not built")
+        d = json.load(open(self.PATH))["data"]
+        assert d["n_claims"] == len(CLAIMS)
+        assert d["n_passed"] + d["n_failed"] == d["n_claims"]
+        assert {c["id"] for c in d["claims"]} == {c.id for c in CLAIMS}
+
+    def test_failures_are_recorded_not_dropped(self):
+        if not os.path.exists(self.PATH):
+            pytest.skip("claims artifact not built")
+        d = json.load(open(self.PATH))["data"]
+        # every row carries its own verdict and detail, so a failing check is a
+        # visible row rather than an absent one
+        for row in d["claims"]:
+            assert isinstance(row["supported"], bool)
+            assert row["detail"].strip()
+        assert d["n_failed"] == sum(1 for c in d["claims"] if not c["supported"])
+
+    def test_artifact_says_passing_is_not_correctness(self):
+        if not os.path.exists(self.PATH):
+            pytest.skip("claims artifact not built")
+        payload = json.load(open(self.PATH))
+        notes = " ".join(payload["notes"]).lower()
+        assert "not that the biology is right" in notes
+        assert len(payload["data"]["cannot_establish"]) >= 3
 
 
 class TestEnvelope:

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import CapsidViewer from './components/CapsidViewer';
 import SequenceOutputPanel from './components/SequenceOutputPanel';
 import LNPViewer from './components/LNPViewer';
@@ -17,54 +17,29 @@ import EvolutionPlayer from './components/EvolutionPlayer';
 import TwinPlanner from './components/TwinPlanner';
 import VtiViewer from './components/VtiViewer';
 import ParaviewGallery from './components/ParaviewGallery';
+import Overview from './components/Overview';
+import Verification from './components/Verification';
+import PageHeader from './components/PageHeader';
 import { runPipeline } from './utils/api';
 import { useArtifact } from './utils/artifacts';
+import { GROUPS, TABS } from './nav';
+import type { TabId } from './nav';
 import type { FlowTelemetry, ParetoPoint, UploadResult, PipelineResult, PipelineConstraints } from './types';
 import type { MicrofluidicsArtifactData, PipelineArtifactData } from './types/artifacts';
 
-type TabId = 'capsid' | 'phases' | 'lnp' | 'gene' | 'microfluidics' | 'clinical' | 'outcome' | 'upload' | 'twin' | 'paraview' | 'evolution';
-
-interface TabDef {
-  id: TabId;
-  label: string;
-  /** One line of "what you are looking at and where it comes from". */
-  desc: string;
-  /** Which of this project's two subjects the tab belongs to. */
-  group: TabGroup;
-}
-
-type TabGroup =
-  | 'Patient twin (glioblastoma)'
-  | 'Vector design (AAV9-LAMP2B)'
-  | 'Fabrication'
-  | 'Data & provenance';
+/** Tab ids in the order the nav defines them, for URL parsing. */
+const TAB_IDS = TABS.map((t) => t.id);
+const DEFAULT_TAB: TabId = 'overview';
 
 /**
- * Navigation is grouped by subject, because the app contains two studies that
- * share a repository but not a disease: the patient tumour twin (GBM) and the
- * vector-design pipeline (AAV9-LAMP2B for Danon disease). Sorting them into
- * one flat row of eleven tabs made the boundary invisible.
+ * Read the tab from the URL hash, so a view can be linked and the browser's
+ * back/forward buttons work. An unknown hash falls back to the landing page
+ * rather than rendering nothing.
  */
-const GROUPS: TabGroup[] = [
-  'Patient twin (glioblastoma)',
-  'Vector design (AAV9-LAMP2B)',
-  'Fabrication',
-  'Data & provenance',
-];
-
-const TABS: TabDef[] = [
-  { id: 'twin', group: 'Patient twin (glioblastoma)', label: 'MRI → Plan', desc: 'Upload a BraTS scan, get a dosing schedule' },
-  { id: 'evolution', group: 'Patient twin (glioblastoma)', label: '365-Day Evolution', desc: 'Per-day engine frames, steering vs MTD' },
-  { id: 'outcome', group: 'Patient twin (glioblastoma)', label: 'Day-365 State', desc: 'End-of-horizon burdens and outcome cards' },
-  { id: 'upload', group: 'Patient twin (glioblastoma)', label: 'Data Intake', desc: 'NIfTI scans, sequences, availability manifests' },
-  { id: 'capsid', group: 'Vector design (AAV9-LAMP2B)', label: 'Capsid & Sequence', desc: 'PDB 3UX1 structure, masked VP1 design' },
-  { id: 'phases', group: 'Vector design (AAV9-LAMP2B)', label: 'Design Gates', desc: '24 gate scores and their composition' },
-  { id: 'gene', group: 'Vector design (AAV9-LAMP2B)', label: 'Transgene Map', desc: 'LAMP2B construct, promoters, UTRs' },
-  { id: 'clinical', group: 'Vector design (AAV9-LAMP2B)', label: 'Pareto & Readiness', desc: 'Optimizer front, translational gates' },
-  { id: 'lnp', group: 'Fabrication', label: 'LNP Formulation', desc: 'Scored lipid composition and size' },
-  { id: 'microfluidics', group: 'Fabrication', label: 'Microfluidics', desc: 'Y-junction flow telemetry' },
-  { id: 'paraview', group: 'Data & provenance', label: 'ParaView Artifact', desc: 'Committed BraTS volume, downloadable' },
-];
+function tabFromHash(): TabId {
+  const h = window.location.hash.replace(/^#\/?/, '');
+  return (TAB_IDS as string[]).includes(h) ? (h as TabId) : DEFAULT_TAB;
+}
 
 const DEFAULT_CONSTRAINTS: PipelineConstraints = {
   maxHepaticAccumulation: 0.30,
@@ -90,8 +65,19 @@ function Slider({ label, value, min, max, step, unit, onChange }: {
 }
 
 export default function App() {
-  // Default view is the MRI twin planner: the front door of the app.
-  const [tab, setTab] = useState<TabId>('twin');
+  // The landing page is the front door; each tab is addressable by hash.
+  const [tab, setTab] = useState<TabId>(() => tabFromHash());
+
+  useEffect(() => {
+    const onHash = () => setTab(tabFromHash());
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  const navigate = useCallback((id: TabId) => {
+    setTab(id);
+    if (window.location.hash !== `#/${id}`) window.location.hash = `#/${id}`;
+  }, []);
   const [constraints, setConstraints] = useState<PipelineConstraints>(DEFAULT_CONSTRAINTS);
   const [result, setResult] = useState<PipelineResult | null>(null);
   const [selectedSpike, setSelectedSpike] = useState<number | null>(null);
@@ -187,8 +173,14 @@ export default function App() {
         </div>
       )}
     </div>
-  );  const renderContent = () => {
+  );  const meta = TABS.find((t) => t.id === tab) ?? null;
+
+  const renderContent = () => {
     switch (tab) {
+      case 'overview':
+        return <Overview onNavigate={navigate} />;
+      case 'verification':
+        return <Verification />;
       case 'twin':
         return (
           <div className="content-grid" style={{ gridTemplateColumns: '1.05fr 0.95fr' }}>
@@ -342,7 +334,7 @@ export default function App() {
                 <button
                   key={t.id}
                   className={`nav-btn ${tab === t.id ? 'active' : ''}`}
-                  onClick={() => setTab(t.id)}
+                  onClick={() => navigate(t.id)}
                   title={t.desc}
                 >
                   <span className="nav-label">{t.label}</span>
@@ -353,7 +345,25 @@ export default function App() {
         ))}
       </nav>
 
-      <main className="app-main"><ErrorBoundary label="TabContent">{renderContent()}</ErrorBoundary></main>
+      <main className="app-main">
+        <ErrorBoundary label="TabContent">
+          {meta && meta.id !== 'overview' && meta.id !== 'verification' ? (
+            <div className="tab-page">
+              <PageHeader
+                title={meta.label}
+                subject={meta.group}
+                purpose={meta.purpose}
+                source={meta.source}
+                status={meta.status}
+                caveat={meta.caveat}
+              />
+              {renderContent()}
+            </div>
+          ) : (
+            renderContent()
+          )}
+        </ErrorBoundary>
+      </main>
 
       <footer className="app-footer glass">
         <span>
