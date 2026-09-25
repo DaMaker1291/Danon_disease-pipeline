@@ -354,6 +354,24 @@ from danon.multimodal import (
     what_multimodal_benchmark_cannot_show,
 )
 
+# Longitudinal MRI availability manifests: the per-(patient, timepoint)
+# sequence-flag tables that make stream 4 countable at all, with the census the
+# stream record and the intake endpoints are computed from.
+from danon.availability import (
+    CFB_GBM_DOI,
+    CFB_GBM_MANIFEST,
+    CFB_GBM_SOURCE,
+    MIN_PAIR_INTERVAL_WEEKS,
+    REFERENCE_SEQUENCE as AVAILABILITY_REFERENCE_SEQUENCE,
+    SEQUENCE_COLUMNS,
+    AvailabilityCensus,
+    AvailabilityRow,
+    census_from_text,
+    load_mri_availability_manifest,
+    looks_like_availability_manifest,
+    mri_availability_census,
+)
+
 # Anisotropic, heterogeneous transport: the mm^2/day <-> voxel^2/day bridge,
 # the tissue-class diffusion field, and the variable-coefficient operator
 # div(D(x) grad C) that reduces exactly to the engine's scalar Laplacian on
@@ -1168,6 +1186,10 @@ __all__ = [
     "SpatialDiceVerdict", "benchmark_tests",
     "build_evidence", "load_evidence", "load_paired_control_cards",
     "measure_collection_timepoints", "MIN_FOLLOWUP_INTERVAL_DAYS",
+    "CFB_GBM_DOI", "CFB_GBM_MANIFEST", "CFB_GBM_SOURCE", "MIN_PAIR_INTERVAL_WEEKS",
+    "AVAILABILITY_REFERENCE_SEQUENCE", "SEQUENCE_COLUMNS", "AvailabilityCensus",
+    "AvailabilityRow", "census_from_text", "load_mri_availability_manifest",
+    "looks_like_availability_manifest", "mri_availability_census",
     "measured_discrimination", "multimodal_provenance", "probe_collection",
     "probe_local_inventory", "probe_tcia", "render_multimodal_report",
     "save_evidence", "spatial_dice_verdict", "summarize_paired_control",

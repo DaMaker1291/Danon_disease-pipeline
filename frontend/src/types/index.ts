@@ -55,6 +55,40 @@ export interface ClinicalOutcome {
   survivalUpper: number[];
 }
 
+/**
+ * Census of a longitudinal MRI availability manifest (e.g. CFB-GBM's table).
+ *
+ * Every field is a count or a declared parameter. The rules mirror
+ * danon/availability.py, which is the authoritative implementation: a pair
+ * counts when the same patient carries the reference sequence at two
+ * timepoints at least `minIntervalWeeks` apart, and pairs are split by scanner
+ * because a pair spanning two machines is a confound for a delta-volume
+ * measurement.
+ */
+export interface AvailabilityCensus {
+  sourceFormat: 'mri_availability_manifest';
+  columns: string[];
+  nRows: number;
+  nPatients: number;
+  timepoints: Record<string, number>;
+  nPatientsMultiTimepoint: number;
+  referenceSequence: string;
+  minIntervalWeeks: number;
+  nUsablePairs: number;
+  nPatientsWithUsablePair: number;
+  nSameMachinePairs: number;
+  nCrossMachinePairs: number;
+  intervalWeeksMin: number | null;
+  intervalWeeksMedian: number | null;
+  intervalWeeksMax: number | null;
+  scanners: Record<string, number>;
+  patientsPerSequence: Record<string, number>;
+  /** Columns the manifest is missing, if any -- reported, never guessed at. */
+  missingColumns: string[];
+  /** Rows skipped because the week offset was not numeric. */
+  malformedRows: number;
+}
+
 export interface UploadResult {
   sourceFormat: string;
   recordsParsed: number;
@@ -68,6 +102,8 @@ export interface UploadResult {
   templateCoverage: number;
   sequenceValid: boolean;
   warnings: string[];
+  /** Present only for availability manifests. */
+  availabilityCensus?: AvailabilityCensus;
 }
 
 export interface PipelineState {

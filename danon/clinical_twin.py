@@ -580,6 +580,26 @@ def _archive_availability() -> Dict[str, Any]:
         return {"error": f"{type(exc).__name__}: {exc}"}
 
 
+def _availability_manifest() -> Dict[str, Any]:
+    """Counts from a cached availability manifest, if one is present.
+
+    An availability manifest is per-(patient, timepoint) sequence flags: it is
+    what makes stream 4 measurable at all, because it says which patients have
+    two scannable timepoints. Read from the file rather than restated, and
+    reported as an error if absent -- a census that silently omits what it
+    could not read is the failure mode this whole module's honesty section is
+    about.
+    """
+    try:
+        from danon.availability import CFB_GBM_MANIFEST, mri_availability_census
+
+        if not os.path.exists(CFB_GBM_MANIFEST):
+            return {"error": f"no cached manifest at {CFB_GBM_MANIFEST}"}
+        return mri_availability_census().to_json_dict()
+    except (FileNotFoundError, ImportError, ValueError) as exc:
+        return {"error": f"{type(exc).__name__}: {exc}"}
+
+
 def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
     """Live counts per stream: what is cached, what refuses, and why.
 
@@ -612,9 +632,14 @@ def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
         if f.lower().endswith((".svs", ".ndpi", ".tiff"))
     ]
     # Cached pairs: BraTS is one pre-operative timepoint per case, so zero.
+    # A manifest does not change that -- it enumerates what a download WOULD
+    # yield, and the count below is the sequence-level version of the same
+    # question the probe answered from scan dates alone.
     sequential_pairs_cached = 0
     archive = _archive_availability()
     n_retrievable = archive.get("n_patients_longitudinal")
+    manifest = _availability_manifest()
+    n_manifest_pairs = manifest.get("n_patients_with_usable_pair")
 
     return {
         "stream1_5ala": {
@@ -657,14 +682,21 @@ def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
             "n_pairs_retrievable": n_retrievable,
             "status": "REFUSED" if sequential_pairs_cached == 0 else "available",
             "archive": archive,
+            "manifest": manifest,
+            "n_patients_with_usable_pair_in_manifest": n_manifest_pairs,
             "detail": (
                 "no sequential scan pairs are CACHED (BraTS is a single "
-                "pre-operative timepoint per case). Retrievable without new "
-                f"code: {n_retrievable} UPENN-GBM patients carry a "
+                "pre-operative timepoint per case). Two independent sources say "
+                "how many exist: the probed archive supports "
+                f"{n_retrievable} UPENN-GBM patients with a "
                 f">={archive.get('min_interval_days')}-day follow-up interval, "
-                "and all of them carry DSC perfusion series. The mapping is "
-                "implemented and unit-tested as an observation, and activates "
-                "when a longitudinal series is supplied"
+                "and the cached CFB-GBM availability manifest records "
+                f"{n_manifest_pairs} patients with a usable "
+                f"{manifest.get('reference_sequence')} pair at least "
+                f"{manifest.get('min_interval_weeks')} weeks apart "
+                f"({manifest.get('n_usable_pairs')} pairs). Neither archive is "
+                "downloaded, so the mapping -- implemented and unit-tested as "
+                "an observation -- has nothing to run on yet"
             ),
         },
     }

@@ -626,6 +626,29 @@ def clinical():
 @app.post("/api/upload")
 async def upload(file: UploadFile = File(...)):
     raw = (await file.read()).decode("utf-8", errors="ignore")
+    # A longitudinal MRI availability manifest is a different kind of input from
+    # a sequence, and it is routed by CONTENT rather than extension. Left to
+    # fall through, it would reach the sequence path and be reported as a
+    # one-record sequence with an invented coverage figure -- the client-side
+    # portal used to do exactly that for any unrecognised file.
+    from danon.availability import census_from_text, looks_like_availability_manifest
+
+    if looks_like_availability_manifest(raw):
+        try:
+            census = census_from_text(
+                raw, source=f"uploaded manifest {file.filename or 'unnamed'}"
+            )
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=400,
+                detail=f"availability manifest refused unread: {exc}",
+            ) from exc
+        return {
+            "kind": "mri_availability_manifest",
+            "availabilityCensus": census.to_json_dict(),
+            "notes": census.notes,
+        }
+
     engine = DataIngressEngine()
     name = (file.filename or "").lower()
     if name.endswith((".fastq", ".fq")):

@@ -955,8 +955,46 @@ def check_stream_census_refuses_honestly() -> CheckResult:
     )
 
 
+def check_availability_census_is_measured() -> CheckResult:
+    """The longitudinal cohort counts must come from the committed manifest.
+
+    Also checks the one thing a cohort census is most likely to overstate: a
+    count of what a manifest RECORDS is not a count of what has been measured.
+    The images are not downloaded, so the census must say so.
+    """
+    from danon.availability import CFB_GBM_MANIFEST, mri_availability_census
+
+    if not os.path.exists(CFB_GBM_MANIFEST):
+        return CheckResult(
+            supported=False,
+            detail="committed CFB-GBM availability manifest missing",
+        )
+    c = mri_availability_census()
+    ok = (
+        c.n_patients == 264
+        and c.n_patients_multi_timepoint == 170
+        and c.n_usable_pairs == 393
+        and c.n_patients_with_usable_pair == 168
+        and c.n_cross_machine_pairs == 37
+        and "10.7937/v9pn-2f72" in c.source
+        and "not downloaded" in " ".join(c.notes)
+    )
+    return CheckResult(
+        supported=ok,
+        detail=(
+            f"CFB-GBM manifest: {c.n_patients} patients, "
+            f"{c.n_patients_multi_timepoint} with >1 timepoint, "
+            f"{c.n_patients_with_usable_pair} with a usable "
+            f"{c.sequence} pair ({c.n_usable_pairs} pairs, "
+            f"{c.n_cross_machine_pairs} spanning two scanners); images NOT "
+            f"downloaded, so this is availability, not a measurement"
+        ),
+    )
+
+
 CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "evidence_status_vocabulary": check_evidence_status_vocabulary,
+    "availability_census_measured": check_availability_census_is_measured,
     "censoring_is_preserved": check_censoring_is_preserved,
     "covariate_gains_are_measured": check_covariate_gains_are_measured,
     "diffusion_units_and_operator": check_diffusion_units_and_operator,
@@ -1398,6 +1436,23 @@ CLAIMS: Tuple[Claim, ...] = (
         "stream3_cohort_measured",
         "A wired-and-measured stream whose measured effect is small is a "
         "result, not a failure; t1ce is a vascular proxy, not Ktrans.",
+    ),
+    Claim(
+        "longitudinal_availability_is_counted_from_the_manifest",
+        "Stream 4's cohort is counted from the committed CFB-GBM availability "
+        "manifest (TCIA, DOI 10.7937/v9pn-2f72): 264 patients, 170 with more "
+        "than one timepoint, and 168 with a usable T1-Gd pair at least 4 weeks "
+        "apart (393 pairs, 37 of them spanning two scanners). The manifest "
+        "records that a series EXISTS; the images are not downloaded, so no "
+        "registration, artefact or comparability check has been performed and "
+        "no velocity field has been measured. The CFB-GBM collection is not "
+        "served by the NBIA API this repo probes, so activating the stream "
+        "requires downloading the collection, not querying it.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/claims.py::check_availability_census_is_measured",
+        "availability_census_measured",
+        "Counts are read from the file on every check, so replacing the "
+        "manifest with a newer release moves every number at once.",
     ),
     Claim(
         "clinical_stream_census_refuses_with_live_counts",
