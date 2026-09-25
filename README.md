@@ -39,7 +39,7 @@ With the backend up, the Twin Planner runs live planning on your mask (~4 s for 
 python -m pytest tests/ danon/multiagent/ -q    # 1068 tests, ~13 min full suite
 python -m pytest tests/test_recovery.py -q      # Standard 1 recovery suite, 46 tests ~37 s
 python -m pytest tests/test_recovery.py::TestTransportRecovery -q   # ~2 s stencil check
-python -c "from danon.claims import audit_claims; audit_claims()"   # 31/31 bound claims
+python -c "from danon.claims import audit_claims; audit_claims()"   # 36/36 bound claims
 ```
 
 ## Verification matrix (live-measured 2026-09-23; artifacts in `outputs_real/`)
@@ -58,8 +58,9 @@ python -c "from danon.claims import audit_claims; audit_claims()"   # 31/31 boun
 | Covariate upgrades · RT+temozolomide restriction | keeps **356/595**; cohort-membership delta −0.0112 inside fold sd 0.0247 — selection reported separately from signal | same |
 | Covariate upgrades · all covariates stacked | pooled C **0.5785** (n=68) vs age-alone 0.6203 on the same kept subset — stacking unavailable-for-most covariates *costs* discrimination | same |
 | MGMT β → resistance bridge | r0 = 0.75·(1−β); across the real 140-patient beta range MTD median PFS **144 → 168 days**; steering policy saturates at 365 d at every β (zero dynamic range) | `outputs_real/mgmt_resistance.txt` |
-| Bound-claims audit | **35/35 verified** | `danon/claims.py::audit_claims` |
+| Bound-claims audit | **36/36 verified** | `danon/claims.py::audit_claims` |
 | Clinical datastreams (4 tests) | streams wired with identity guarantees; stream 3 measured on real t1ce: MTD PFS paired delta −1.17 d (18 runs); streams 1/2/4 refuse with live zero counts | `danon/clinical_twin.py::stream3_report`, `outputs_real/clinical_twin.txt` |
+| Stream 4 as a comparator | `stream4_velocity_agreement` refuses without a measured pair (cites its own census: 0 cached / 41 retrievable) and scores r=1.0 for identical fields, lower when the growth voxel differs — a validation target, never an engine input | `danon/clinical_twin.py::stream4_velocity_agreement` |
 | Stream-4 cohort resolution (design calc) | the CFB-GBM manifest's **168** usable-pair patients resolve `|ΔC| > 0.0219` (1 SE over 24 draws; fold yardstick 0.0610) versus 0.0247 on the full n=595 cohort — a floor to clear, not a measured gain | `outputs_real/stream4_resolution.json` |
 
 Standard 1 validates the *solver* on synthetic planted ground truth — no patients involved, and it must never be blended with the Standard 2 patient numbers. The dosing "policies" (`MTDPolicy`, `AdaptiveDosePolicy`, `CollateralSwitchPolicy`) are closed-form rules; **no reinforcement-learning agent exists or is claimed** (bound claim `no_rl_agent`). The PDE operators live in `danon/anisotropy.py` and `danon/evosteer.py`; `danon/imaging.py` is NIfTI intake and geometry only.

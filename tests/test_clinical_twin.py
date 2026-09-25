@@ -26,6 +26,7 @@ from danon.clinical_twin import (
     stream2_clones,
     stream2_growth_rate,
     stream4_velocity,
+    stream4_velocity_agreement,
     stream3_report,
     stream4_resolution_report,
 )
@@ -137,6 +138,59 @@ def test_stream4_reports_measured_velocity_without_input_status():
     assert "observation only" in obs["status"]
     with pytest.raises(ValueError):
         stream4_velocity(t1, np.zeros((2, 2, 2)))
+
+
+def test_stream4_agreement_refuses_and_names_the_live_count():
+    """Without a measured pair the comparison is refused, not estimated."""
+    ag = stream4_velocity_agreement()
+    assert ag.status == "REFUSED"
+    assert ag.pearson_r is None and ag.rate_ratio is None
+    assert ag.n_voxels == 0
+    assert "0 cached" in ag.refusal
+    assert "usable-pair patients in the cached CFB-GBM manifest" in ag.refusal
+    # one side alone is still a refusal: the reference is what is missing
+    t1 = np.zeros((3, 3, 3))
+    t2 = t1.copy()
+    t2[1, 1, 1] = 2.0
+    half = stream4_velocity_agreement(measured=(t1, t2))
+    assert half.status == "REFUSED" and "simulated" in half.refusal
+    assert "REFUSED" in ag.describe()
+    assert ag.to_json_dict()["role"].startswith("validation target")
+
+
+def test_stream4_agreement_is_a_comparison_not_a_covariate():
+    """Identical fields agree perfectly; a shifted field does not.
+
+    The second half is the point: this function reports a number that CAN be
+    bad. A comparator that only ever returned agreement would be decoration.
+    """
+    a = np.zeros((5, 5, 5))
+    b = a.copy()
+    b[2, 2, 2] = 1.0
+    b[1, 1, 1] = 0.5
+    same = stream4_velocity_agreement(measured=(a, b), simulated=(a, b))
+    assert same.status == "MEASURED"
+    assert same.pearson_r == pytest.approx(1.0)
+    assert same.sign_agreement == 1.0
+    assert same.rate_ratio == pytest.approx(1.0)
+    assert same.measured_peak_voxel == same.simulated_peak_voxel
+
+    # the engine grows a different voxel, and shrinks one the measurement
+    # called growth: r must fall and the sign agreement must not be 1.
+    c = a.copy()
+    c[3, 3, 3] = 1.0
+    c[1, 1, 1] = -0.5
+    worse = stream4_velocity_agreement(measured=(a, b), simulated=(a, c))
+    assert worse.pearson_r < 1.0
+    assert worse.sign_agreement < 1.0
+    assert worse.measured_peak_voxel != worse.simulated_peak_voxel
+
+    # a flat pair is refused rather than reported as perfect agreement
+    with pytest.raises(ValueError):
+        stream4_velocity_agreement(measured=(a, a), simulated=(a, a))
+    # different grids must be registered first, not silently broadcast
+    with pytest.raises(ValueError):
+        stream4_velocity_agreement(measured=(a, b), simulated=(a, np.zeros((2, 2, 2))))
 
 
 # ---------------------------------------------------------------------------

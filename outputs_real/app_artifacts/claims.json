@@ -1,7 +1,7 @@
 {
  "key": "claims",
  "title": "Bound-claim audit (what this project may say)",
- "generated_utc": "2026-09-25T21:27:18Z",
+ "generated_utc": "2026-09-25T22:05:16Z",
  "source": "danon.claims.audit_claims()",
  "notes": [
   "each row is a sentence plus the check that supports it, re-run at build time; a check that failed is recorded as failed",
@@ -12,8 +12,8 @@
   "clinical_benefit": "unknown"
  },
  "data": {
-  "n_claims": 35,
-  "n_passed": 35,
+  "n_claims": 36,
+  "n_passed": 36,
   "n_failed": 0,
   "claims": [
    {
@@ -112,7 +112,7 @@
     "check": "test_suite_counted",
     "limit": "Tests verify the implementation. They are not evidence about biology.",
     "supported": true,
-    "detail": "1016 test functions in 138 classes across tests/",
+    "detail": "1018 test functions in 138 classes across tests/",
     "study": "tumour_twin"
    },
    {
@@ -145,7 +145,7 @@
     "check": "runtime_365",
     "limit": "Runtime is machine-dependent; the audit prints the machine's own number.",
     "supported": true,
-    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 3.69 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)",
+    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 3.41 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)",
     "study": "tumour_twin"
    },
    {
@@ -365,7 +365,7 @@
     "check": "readme_claim_count_current",
     "limit": "It checks that the README agrees with the registry, not that the registry is right: claims can be wrong together and still agree.",
     "supported": true,
-    "detail": "README advertises 35/35 verified; the registry holds 35 claims",
+    "detail": "README advertises 36/36 verified; the registry holds 36 claims",
     "study": "tumour_twin"
    },
    {
@@ -377,6 +377,17 @@
     "limit": "A design calculation bounds what a study could show; it is not evidence that any stream carries a signal, and the reference cohort is scored on overall survival, which the manifest does not carry.",
     "supported": true,
     "detail": "n=168 (manifest's usable pairs), 24 draws: floor 0.0219 (1 SE) / 0.0610 (fold yardstick); reference cohort re-measured live at C=0.6559 +/- 0.0247 (matches artifact: True); labelled as a design calculation: True",
+    "study": "tumour_twin"
+   },
+   {
+    "id": "stream4_agreement_is_a_validation_target",
+    "sentence": "Stream 4 is implemented as a COMPARISON, not an input: stream4_velocity_agreement reports a measured delta-volume field against the engine's simulated one (rate ratio, Pearson r, sign agreement, peak-growth voxel) and refuses with the census's live counts when either side is absent. Identical fields score r=1.0; a field whose growth sits in a different voxel scores lower, so the statistic can be bad. No measured velocity is ever fed to the engine -- injecting a dR/dt into a model that derives its own would double-count the rate -- and no agreement, however good, can move a discrimination metric.",
+    "tier": "established",
+    "substantiated_by": "danon/clinical_twin.py::stream4_velocity_agreement",
+    "check": "stream4_agreement_is_a_validation_target",
+    "limit": "The comparison has never been run on a real measured pair: 0 are cached, so what a real agreement would score is unknown. This binds what the function IS, not what it would find.",
+    "supported": true,
+    "detail": "refusal cites the census live (0 cached / 41 retrievable): True; identical fields r=0.9999999999999999, misaligned r=-0.6546536707079771 -> discriminates: True; role labelled a validation target: True",
     "study": "tumour_twin"
    },
    {

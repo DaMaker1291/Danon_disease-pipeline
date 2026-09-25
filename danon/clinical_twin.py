@@ -355,6 +355,161 @@ def stream4_velocity(
     }
 
 
+@dataclass(frozen=True)
+class VelocityAgreement:
+    """A MEASURED delta-volume field compared with the engine's own.
+
+    This is the only lawful use of stream 4 in this repository, and it is why
+    the field is called ``agreement`` and not ``resistance_drift``. A measured
+    velocity is a VALIDATION TARGET for the dynamics the engine derives; it is
+    never an input to them, because injecting a measured dR/dt into a model that
+    already derives a dR/dt double-counts the same rate twice. Nothing here is a
+    covariate: a comparison between two fields cannot move a discrimination
+    metric, however good the agreement turns out to be.
+
+    ``status`` is MEASURED only when both sides were supplied. Otherwise the
+    object carries the live count that refuses it, and no comparison statistics
+    at all -- a correlation against an absent reference is a fabricated number,
+    which is the failure mode this module exists to avoid.
+    """
+
+    status: str
+    interval_days: float
+    n_voxels: int
+    measured_abs_rate_per_day: Optional[float] = None
+    simulated_abs_rate_per_day: Optional[float] = None
+    rate_ratio: Optional[float] = None
+    pearson_r: Optional[float] = None
+    sign_agreement: Optional[float] = None
+    measured_peak_voxel: Optional[int] = None
+    simulated_peak_voxel: Optional[int] = None
+    refusal: Optional[str] = None
+
+    def describe(self) -> str:
+        if self.status != "MEASURED":
+            return f"REFUSED: {self.refusal}"
+        r = "n/a (no variance)" if self.pearson_r is None else f"{self.pearson_r:+.4f}"
+        return (
+            f"MEASURED over {self.n_voxels:,} voxels: measured "
+            f"{self.measured_abs_rate_per_day:.4g}/day vs simulated "
+            f"{self.simulated_abs_rate_per_day:.4g}/day (ratio "
+            f"{self.rate_ratio:.3f}), Pearson r = {r}, sign agreement "
+            f"{self.sign_agreement:.3f}. Validation target: it cannot move a "
+            "discrimination metric."
+        )
+
+    def to_json_dict(self) -> Dict[str, Any]:
+        return {
+            "status": self.status,
+            "interval_days": self.interval_days,
+            "n_voxels": self.n_voxels,
+            "measured_abs_rate_per_day": self.measured_abs_rate_per_day,
+            "simulated_abs_rate_per_day": self.simulated_abs_rate_per_day,
+            "rate_ratio": self.rate_ratio,
+            "pearson_r": self.pearson_r,
+            "sign_agreement": self.sign_agreement,
+            "measured_peak_voxel": self.measured_peak_voxel,
+            "simulated_peak_voxel": self.simulated_peak_voxel,
+            "refusal": self.refusal,
+            "role": (
+                "validation target for the engine's derived velocity -- never an "
+                "input and never a covariate"
+            ),
+        }
+
+
+def stream4_velocity_agreement(
+    measured: Optional[Tuple[np.ndarray, np.ndarray]] = None,
+    simulated: Optional[Tuple[np.ndarray, np.ndarray]] = None,
+    *,
+    interval_days: float = DEFAULT_SCAN_INTERVAL_DAYS,
+) -> VelocityAgreement:
+    """Compare a measured delta-volume field with the engine's simulated one.
+
+    Both sides are two same-grid volumes separated by ``interval_days``. The
+    statistics are computed over the voxels where EITHER field is non-zero: a
+    correlation over a mostly-empty grid is dominated by the shared zeros and
+    would report agreement that neither field earned.
+
+    Call it with neither pair and it refuses, naming the live count that
+    refuses it -- so the refusal is reproducible rather than asserted.
+    """
+    if measured is None or simulated is None:
+        missing = [
+            name
+            for name, value in (("measured", measured), ("simulated", simulated))
+            if value is None
+        ]
+        # The counts in a refusal must BE the census's counts, so this reads the
+        # census rather than restating them: a second copy of a live number is
+        # the drift this repository keeps finding.
+        stream4 = clinical_stream_census().get("stream4_sequential", {})
+        cached = stream4.get("n_pairs_cached")
+        retrievable = stream4.get("n_pairs_retrievable")
+        archive = stream4.get("archive") or {}
+        manifest = stream4.get("manifest") or {}
+        in_manifest = manifest.get("n_patients_with_usable_pair")
+        return VelocityAgreement(
+            status="REFUSED",
+            interval_days=float(interval_days),
+            n_voxels=0,
+            refusal=(
+                f"no {', '.join(missing)} sequential-scan pair: "
+                f"{cached} cached, {retrievable} retrievable from the probed "
+                f"{archive.get('collection', 'archive')}, {in_manifest} usable-pair "
+                f"patients in the cached CFB-GBM manifest. A correlation against "
+                "an absent reference is not reported."
+            ),
+        )
+
+    m1, m2 = measured
+    s1, s2 = simulated
+    if np.asarray(m1).shape != np.asarray(s1).shape:
+        raise ValueError(
+            f"measured grid {np.asarray(m1).shape} and simulated grid "
+            f"{np.asarray(s1).shape} differ; register both to one grid first"
+        )
+
+    m_stats = stream4_velocity(m1, m2, interval_days=interval_days)
+    s_stats = stream4_velocity(s1, s2, interval_days=interval_days)
+
+    dm = np.asarray(m2, dtype=float) - np.asarray(m1, dtype=float)
+    ds = np.asarray(s2, dtype=float) - np.asarray(s1, dtype=float)
+    both_zero = (dm == 0.0) & (ds == 0.0)
+    active = ~both_zero
+    n_active = int(active.sum())
+    if n_active == 0:
+        raise ValueError(
+            "both fields are flat: there is no change to compare, and the "
+            "apparent perfect agreement would be an artefact of an empty grid"
+        )
+
+    x = dm[active]
+    y = ds[active]
+    sign_agreement = float((np.sign(x) == np.sign(y)).mean())
+    pearson: Optional[float]
+    if x.std() == 0.0 or y.std() == 0.0:
+        pearson = None
+    else:
+        pearson = float(np.corrcoef(x, y)[0, 1])
+
+    sim_rate = float(s_stats["abs_rate_per_day"])
+    return VelocityAgreement(
+        status="MEASURED",
+        interval_days=float(interval_days),
+        n_voxels=n_active,
+        measured_abs_rate_per_day=float(m_stats["abs_rate_per_day"]),
+        simulated_abs_rate_per_day=sim_rate,
+        rate_ratio=(
+            float(m_stats["abs_rate_per_day"]) / sim_rate if sim_rate else None
+        ),
+        pearson_r=pearson,
+        sign_agreement=sign_agreement,
+        measured_peak_voxel=int(np.argmax(dm)),
+        simulated_peak_voxel=int(np.argmax(ds)),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Assemble: the one function the request specifies
 # ---------------------------------------------------------------------------

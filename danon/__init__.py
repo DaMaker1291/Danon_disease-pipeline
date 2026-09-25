@@ -717,6 +717,7 @@ from danon.clinical_twin import (
     STREAM3_COHORT_PATH,
     STREAM4_RESOLUTION_PATH,
     TwinStreamState,
+    VelocityAgreement,
     assemble_digital_twin_state,
     build_stream3_clearance,
     build_stream3_vessels,
@@ -728,6 +729,7 @@ from danon.clinical_twin import (
     stream3_report,
     stream4_resolution_report,
     stream4_velocity,
+    stream4_velocity_agreement,
 )
 
 # Verification campaign: millions of elementary property checks (per-voxel
@@ -1077,7 +1079,8 @@ __all__ = [
     "TwinPlanResult", "DEFAULT_R0", "DEFAULT_R0_SOURCE", "downsample_mask_to_budget", "plan_from_mask",
     "assemble_digital_twin_state", "build_stream3_vessels", "build_stream3_clearance",
     "stream1_initial_state", "stream2_clones", "stream2_growth_rate", "stream3_report",
-    "stream4_velocity", "clinical_stream_census", "decimate_t1ce_to_engine_grid",
+    "stream4_velocity", "stream4_velocity_agreement", "VelocityAgreement",
+    "clinical_stream_census", "decimate_t1ce_to_engine_grid",
     "KI67_REF", "CLEARANCE_GAMMA", "STREAM3_COHORT_PATH", "TwinStreamState",
     "STREAM4_RESOLUTION_PATH", "stream4_resolution_report",
     "DEFAULT_ALA_R0", "DEFAULT_ALA_R0_SOURCE",

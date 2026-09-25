@@ -1086,6 +1086,77 @@ def check_readme_claim_count_matches_the_registry() -> CheckResult:
     )
 
 
+def check_stream4_agreement_is_a_validation_target() -> CheckResult:
+    """Stream 4 must be a comparison, and must refuse without a reference.
+
+    Three things are ruled out. A comparator that reports agreement it did not
+    earn: the identical-field case must be exactly 1.0 and the misaligned case
+    must be measurably worse. A refusal that hard-codes its own count: the
+    refusal's numbers are read back against the census, so the two cannot
+    drift apart. And any drift of language into "input": the returned record
+    must carry its role, because calling a validation target a covariate is how
+    this stream came to be described as raising a C-index in the first place.
+    """
+    import numpy as np
+
+    from danon.clinical_twin import clinical_stream_census, stream4_velocity_agreement
+
+    empty = stream4_velocity_agreement()
+    if empty.status != "REFUSED" or empty.pearson_r is not None:
+        return CheckResult(
+            supported=False,
+            detail=(
+                f"stream-4 agreement returned status {empty.status!r} with "
+                f"pearson {empty.pearson_r!r}; an unmeasured comparison must "
+                "refuse and carry no statistic"
+            ),
+        )
+    stream4 = clinical_stream_census().get("stream4_sequential", {})
+    cached = stream4.get("n_pairs_cached")
+    retrievable = stream4.get("n_pairs_retrievable")
+    counts_live = (
+        cached is not None
+        and retrievable is not None
+        and f"{cached} cached" in empty.refusal
+        and f"{retrievable} retrievable" in empty.refusal
+    )
+
+    # Two active voxels, not one: a correlation over a single point has no
+    # variance, and the function correctly reports no r rather than a 1.0 it
+    # did not earn. Asserting r==1.0 on a one-voxel field would be testing the
+    # test.
+    base = np.zeros((5, 5, 5))
+    grown = base.copy()
+    grown[2, 2, 2] = 1.0
+    grown[1, 1, 1] = 0.5
+    same = stream4_velocity_agreement(measured=(base, grown), simulated=(base, grown))
+    shifted = base.copy()
+    shifted[3, 3, 3] = 1.0
+    shifted[1, 1, 1] = -0.5
+    other = stream4_velocity_agreement(measured=(base, grown), simulated=(base, shifted))
+    # numpy's corrcoef returns 0.9999999999999999 for a field against itself,
+    # so this compares within floating-point slack rather than by equality.
+    identical_r = same.pearson_r is not None and abs(same.pearson_r - 1.0) < 1e-12
+    discriminates = (
+        same.status == "MEASURED"
+        and identical_r
+        and same.sign_agreement == 1.0
+        and other.pearson_r is not None
+        and other.pearson_r < 1.0
+    )
+    role_labelled = same.to_json_dict().get("role", "").startswith("validation target")
+    supported = bool(counts_live and discriminates and role_labelled)
+    return CheckResult(
+        supported=supported,
+        detail=(
+            f"refusal cites the census live ({cached} cached / {retrievable} "
+            f"retrievable): {counts_live}; identical fields r={same.pearson_r}, "
+            f"misaligned r={other.pearson_r} -> discriminates: {discriminates}; "
+            f"role labelled a validation target: {role_labelled}"
+        ),
+    )
+
+
 CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "evidence_status_vocabulary": check_evidence_status_vocabulary,
     "readme_claim_count_current": check_readme_claim_count_matches_the_registry,
@@ -1121,6 +1192,7 @@ CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "stream_identities": check_stream_identities_hold,
     "stream3_cohort_measured": check_stream3_cohort_is_measured,
     "stream_census_refuses": check_stream_census_refuses_honestly,
+    "stream4_agreement_is_a_validation_target": check_stream4_agreement_is_a_validation_target,
 }
 
 
@@ -1593,6 +1665,25 @@ CLAIMS: Tuple[Claim, ...] = (
         "A design calculation bounds what a study could show; it is not "
         "evidence that any stream carries a signal, and the reference cohort "
         "is scored on overall survival, which the manifest does not carry.",
+    ),
+    Claim(
+        "stream4_agreement_is_a_validation_target",
+        "Stream 4 is implemented as a COMPARISON, not an input: "
+        "stream4_velocity_agreement reports a measured delta-volume field "
+        "against the engine's simulated one (rate ratio, Pearson r, sign "
+        "agreement, peak-growth voxel) and refuses with the census's live "
+        "counts when either side is absent. Identical fields score r=1.0; a "
+        "field whose growth sits in a different voxel scores lower, so the "
+        "statistic can be bad. No measured velocity is ever fed to the engine "
+        "-- injecting a dR/dt into a model that derives its own would "
+        "double-count the rate -- and no agreement, however good, can move a "
+        "discrimination metric.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/clinical_twin.py::stream4_velocity_agreement",
+        "stream4_agreement_is_a_validation_target",
+        "The comparison has never been run on a real measured pair: 0 are "
+        "cached, so what a real agreement would score is unknown. This binds "
+        "what the function IS, not what it would find.",
     ),
     Claim(
         "clinical_stream_census_refuses_with_live_counts",
