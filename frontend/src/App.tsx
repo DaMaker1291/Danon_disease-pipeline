@@ -346,7 +346,7 @@ export default function App() {
       </nav>
 
       <main className="app-main">
-        <ErrorBoundary label="TabContent">
+        <ErrorBoundary label="TabContent" resetKey={tab}>
           {meta && meta.id !== 'overview' && meta.id !== 'verification' ? (
             <div className="tab-page">
               <PageHeader
