@@ -3,7 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, Line, ContactShadows } from '@react-three/drei';
 import { EffectComposer, Bloom, N8AO, ToneMapping, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
-import ErrorBoundary from './ErrorBoundary';
+import ErrorBoundary from '../components/ErrorBoundary';
 import { useArtifact, artifactStamp } from '../utils/artifacts';
 import type { LNPArtifactData } from '../types/artifacts';
 
@@ -157,7 +157,7 @@ function Scene({ n2p, bands, radius }: { n2p: number; bands: LipidBand[]; radius
 
 export default function LNPViewer() {
   const [n2p, setN2p] = useState(6);
-  const { artifact, loading, error } = useArtifact<LNPArtifactData>('lnp');
+  const { artifact, loading, error } = useArtifact<LNPArtifactData>('lnp', 'vector_design');
 
   const bands: LipidBand[] = (artifact?.data.composition ?? []).map(c => ({
     name: c.name, color: c.color, frac: c.frac,

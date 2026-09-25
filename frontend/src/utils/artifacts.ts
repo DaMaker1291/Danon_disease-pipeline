@@ -2,15 +2,27 @@ import { useEffect, useState } from 'react';
 import type { AppArtifact } from '../types/artifacts';
 
 /**
+ * Which public folder an artifact key is served from.
+ *
+ * The tumour-twin artifacts sit in `public/artifacts/`; the vector-design
+ * study's sit in `public/vector_design/`, mirroring the split of its code into
+ * `src/vector_design/`. Both are written by `danon/app_artifacts.py`.
+ */
+export type ArtifactDir = 'artifacts' | 'vector_design';
+
+/**
  * Load a generated artifact from the app's own base path.
  *
- * Artifacts live in `public/artifacts/` (written by `danon/app_artifacts.py`),
- * so every view in this app renders recorded engine output with no backend
- * running. A missing artifact throws: a view that invents a plausible number
- * when its data is absent is worse than one that says it has no data.
+ * Artifacts are written by `danon/app_artifacts.py`, so every view in this app
+ * renders recorded engine output with no backend running. A missing artifact
+ * throws: a view that invents a plausible number when its data is absent is
+ * worse than one that says it has no data.
  */
-export async function loadArtifact<T>(key: string): Promise<AppArtifact<T>> {
-  const url = `${import.meta.env.BASE_URL}artifacts/${key}.json`;
+export async function loadArtifact<T>(
+  key: string,
+  dir: ArtifactDir = 'artifacts',
+): Promise<AppArtifact<T>> {
+  const url = `${import.meta.env.BASE_URL}${dir}/${key}.json`;
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) {
     throw new Error(
@@ -30,7 +42,7 @@ export interface ArtifactState<T> {
 }
 
 /** React hook for an artifact: loading, error, and the payload itself. */
-export function useArtifact<T>(key: string): ArtifactState<T> {
+export function useArtifact<T>(key: string, dir: ArtifactDir = 'artifacts'): ArtifactState<T> {
   const [artifact, setArtifact] = useState<AppArtifact<T> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,12 +50,12 @@ export function useArtifact<T>(key: string): ArtifactState<T> {
   useEffect(() => {
     let live = true;
     setLoading(true);
-    loadArtifact<T>(key)
+    loadArtifact<T>(key, dir)
       .then((a) => { if (live) { setArtifact(a); setError(null); } })
       .catch((e: Error) => { if (live) { setArtifact(null); setError(e.message); } })
       .finally(() => { if (live) setLoading(false); });
     return () => { live = false; };
-  }, [key]);
+  }, [key, dir]);
 
   return { artifact, loading, error };
 }

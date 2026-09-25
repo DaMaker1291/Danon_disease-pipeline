@@ -21,12 +21,12 @@ which made every ranking it produced meaningless.
 import numpy as np
 import pytest
 
-from danon.biology import WILD_TYPE_AAV9, biological_provenance
-from danon.cell_simulator import DanonCellSimulator
-from danon.dual_vector_moi_optimizer import DualVectorMOIOptimizer
-from danon.immunosuppression_protocol import ImmunosuppressionProtocol
-from danon.nab_assay_simulator import NAbAssaySimulator
-from danon.stoichiometric_calc import StoichiometricCalculator
+from danon.vector_design.biology import WILD_TYPE_AAV9, biological_provenance
+from danon.vector_design.cell_simulator import DanonCellSimulator
+from danon.vector_design.dual_vector_moi_optimizer import DualVectorMOIOptimizer
+from danon.vector_design.immunosuppression_protocol import ImmunosuppressionProtocol
+from danon.vector_design.nab_assay_simulator import NAbAssaySimulator
+from danon.vector_design.stoichiometric_calc import StoichiometricCalculator
 
 
 class TestBaselinesAreDerivedNotAsserted:
@@ -122,7 +122,7 @@ class TestDualVectorMetricIsNotSaturated:
 class TestInverseFoldBaselines:
     def test_global_numpy_rng_is_not_polluted(self):
         """``np.random.seed`` inside a design call corrupted callers' streams."""
-        from danon.inverse_fold import InverseFoldingEngine
+        from danon.vector_design.inverse_fold import InverseFoldingEngine
 
         wt = ("MVCFRLFVPLLLLLLVTSGDGNTTLTPQNSTTAAPSTSTASSSKAPSTAAPSTSGSVTGLKNGSTC"
               "IMNVTFSPSGNITLNFTNMSSTTIIFKNSTSATSTFTTKTIHNSTTIYAPTKSSTAALQTTATPT"
@@ -136,7 +136,7 @@ class TestInverseFoldBaselines:
         assert np.random.random() == expected
 
     def test_design_is_reproducible_for_a_candidate_id(self):
-        from danon.inverse_fold import InverseFoldingEngine
+        from danon.vector_design.inverse_fold import InverseFoldingEngine
 
         wt = ("MVCFRLFVPLLLLLLVTSGDGNTTLTPQNSTTAAPSTSTASSSKAPSTAAPSTSGSVTGLKNGSTC"
               "IMNVTFSPSGNITLNFTNMSSTTIIFKNSTSATSTFTTKTIHNSTTIYAPTKSSTAALQTTATPT"
@@ -148,7 +148,7 @@ class TestInverseFoldBaselines:
         assert a.mutated_sequence == b.mutated_sequence
 
     def test_edits_are_confined_to_the_target_region_and_change_the_residue(self):
-        from danon.inverse_fold import InverseFoldingEngine
+        from danon.vector_design.inverse_fold import InverseFoldingEngine
 
         wt = ("MVCFRLFVPLLLLLLVTSGDGNTTLTPQNSTTAAPSTSTASSSKAPSTAAPSTSGSVTGLKNGSTC"
               "IMNVTFSPSGNITLNFTNMSSTTIIFKNSTSATSTFTTKTIHNSTTIYAPTKSSTAALQTTATPT"
@@ -161,7 +161,7 @@ class TestInverseFoldBaselines:
                 assert original != new
 
     def test_panel_is_diverse_not_one_design_repeated(self):
-        from danon.inverse_fold import InverseFoldingEngine
+        from danon.vector_design.inverse_fold import InverseFoldingEngine
 
         wt = ("MVCFRLFVPLLLLLLVTSGDGNTTLTPQNSTTAAPSTSTASSSKAPSTAAPSTSGSVTGLKNGSTC"
               "IMNVTFSPSGNITLNFTNMSSTTIIFKNSTSATSTFTTKTIHNSTTIYAPTKSSTAALQTTATPT"
@@ -172,7 +172,7 @@ class TestInverseFoldBaselines:
         assert len({d.mutated_sequence for d in panel}) > 20
 
     def test_baseline_requires_a_real_sequence(self):
-        from danon.inverse_fold import InverseFoldingEngine
+        from danon.vector_design.inverse_fold import InverseFoldingEngine
 
         with pytest.raises(ValueError):
             InverseFoldingEngine().stream_designs("", 5)
@@ -181,8 +181,8 @@ class TestInverseFoldBaselines:
 class TestCodonResultModelIsStrict:
     def test_codon_result_exposes_every_field_it_documents(self):
         """pydantic's default ``extra='ignore'`` silently dropped 7 fields."""
-        from danon.codon_elongation import CodonElongationEngine
-        from danon.codon_elongation import DEFAULT_LAMP2B_PEPTIDE
+        from danon.vector_design.codon_elongation import CodonElongationEngine
+        from danon.vector_design.codon_elongation import DEFAULT_LAMP2B_PEPTIDE
 
         result = CodonElongationEngine(min_tai=0.88).evaluate(protein=DEFAULT_LAMP2B_PEPTIDE)
         for field in ("tai", "tai_before", "tai_after", "min_window_tai",
@@ -191,7 +191,7 @@ class TestCodonResultModelIsStrict:
             assert hasattr(result, field), f"{field} missing from CodonHarmonizationResult"
 
     def test_codon_result_rejects_unknown_fields(self):
-        from danon.codon_elongation import CodonHarmonizationResult
+        from danon.vector_design.codon_elongation import CodonHarmonizationResult
 
         kwargs = dict(
             cds_length_nt=3, n_codons=1, tai=0.9, tai_before=0.9, tai_after=0.9,

@@ -21,13 +21,13 @@ import numpy as np
 
 sys.path.insert(0, ".")
 
-from danon.cardiac_promoters import CardiacPromoterEngine
-from danon.mirna_detarget import miRNADetargetEngine
-from danon.pareto_optimizer import ParetoOptimizer
-from danon.dual_vector import DualVectorEngine
+from danon.vector_design.cardiac_promoters import CardiacPromoterEngine
+from danon.vector_design.mirna_detarget import miRNADetargetEngine
+from danon.vector_design.pareto_optimizer import ParetoOptimizer
+from danon.vector_design.dual_vector import DualVectorEngine
 from danon.dosing_optimizer import DosingOptimizer
-from danon.immune_stealth import ImmuneStealthEngine
-from danon.inverse_fold import InverseFoldingEngine
+from danon.vector_design.immune_stealth import ImmuneStealthEngine
+from danon.vector_design.inverse_fold import InverseFoldingEngine
 
 UCL_SCORES = {
     "Cardiac Promoter (CMV)": {"ours": None, "ucl": 0.35},

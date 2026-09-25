@@ -38,10 +38,10 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from danon.stoichiometric_calc import StoichiometricCalculator, DecoyOptimizationResult
-from danon.hla_decoupler import HLADecoupler, HLADecouplerResult
-from danon.nab_assay_simulator import NAbAssaySimulator, NAbAssayWell
-from danon.dual_vector_moi_optimizer import DualVectorMOIOptimizer
+from danon.vector_design.stoichiometric_calc import StoichiometricCalculator, DecoyOptimizationResult
+from danon.vector_design.hla_decoupler import HLADecoupler, HLADecouplerResult
+from danon.vector_design.nab_assay_simulator import NAbAssaySimulator, NAbAssayWell
+from danon.vector_design.dual_vector_moi_optimizer import DualVectorMOIOptimizer
 
 logger = logging.getLogger(__name__)
 

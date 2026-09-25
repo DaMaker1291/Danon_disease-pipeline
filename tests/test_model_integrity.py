@@ -11,8 +11,8 @@ from __future__ import annotations
 
 import pytest
 
-from danon.stoichiometric_calc import StoichiometricCalculator
-from danon.hla_decoupler import HLADecoupler, resolve_allele
+from danon.vector_design.stoichiometric_calc import StoichiometricCalculator
+from danon.vector_design.hla_decoupler import HLADecoupler, resolve_allele
 
 
 @pytest.fixture

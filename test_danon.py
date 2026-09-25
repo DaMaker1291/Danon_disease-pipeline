@@ -3,10 +3,10 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from danon.config import DanonConfig
-from danon.aav_generator import DanonAAVGenerator, DanonAAVCandidate
-from danon.lnp_generator import DanonLNPGenerator, DanonLNPCandidate
-from danon.tropism_filter import DanonTropismFilter
-from danon.safety_engine import DanonSafetyEngine
+from danon.vector_design.aav_generator import DanonAAVGenerator, DanonAAVCandidate
+from danon.vector_design.lnp_generator import DanonLNPGenerator, DanonLNPCandidate
+from danon.vector_design.tropism_filter import DanonTropismFilter
+from danon.vector_design.safety_engine import DanonSafetyEngine
 
 
 def test_config():

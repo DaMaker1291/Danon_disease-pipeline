@@ -11,7 +11,7 @@ import math
 
 import pytest
 
-from danon.biology import (
+from danon.vector_design.biology import (
     BOND_FORCE_SCALE_PN,
     COHESION_STRENGTH_INTACT_KPA,
     ENZYMES_PER_PARTICLE,

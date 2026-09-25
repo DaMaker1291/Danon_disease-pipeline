@@ -54,7 +54,7 @@ class DanonConfig(BaseModel):
     backend_server_port: int = 8000
     # AAV9 reference structure. 3J1S was wrong twice over (it is AAV2 + the A20
     # antibody, and the "coordinates" previously carried under its name were
-    # hand-written); see danon/structure.py for the correction record.
+    # hand-written); see danon/vector_design/structure.py for the correction record.
     primary_pdb_template: str = "3UX1"
 
     aav_total_candidates: int = 1_000_000_000

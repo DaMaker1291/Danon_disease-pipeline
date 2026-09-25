@@ -1,6 +1,6 @@
 import logging, numpy as np
 
-from danon.biology import WILD_TYPE_AAV9
+from danon.vector_design.biology import WILD_TYPE_AAV9
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Tuple
 
@@ -223,9 +223,9 @@ class MouseStudySimulator:
         This used to return the constant ``0.25``. The control arm now runs the
         identical biodistribution and cardiac-function pipeline, differing only in
         the tropism and hepatic uptake of an unmodified vector
-        (:data:`danon.biology.WILD_TYPE_AAV9`). Those two values are explicit,
+        (:data:`danon.vector_design.biology.WILD_TYPE_AAV9`). Those two values are explicit,
         registered assumptions rather than a hidden number:
-        :func:`danon.biology.biological_provenance` tags them ``assumed``.
+        :func:`danon.vector_design.biology.biological_provenance` tags them ``assumed``.
         """
         result = self.run_study(
             0,

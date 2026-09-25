@@ -51,7 +51,7 @@ logger = logging.getLogger(__name__)
 
 #: Provenance tag for the rubric itself. The scores below are ASSUMED: they are
 #: an authored weighting scheme, not a published regulatory instrument. See
-#: :func:`danon.biology.biological_provenance` for the vocabulary this mirrors.
+#: :func:`danon.vector_design.biology.biological_provenance` for the vocabulary this mirrors.
 RUBRIC_PROVENANCE = "ASSUMED"
 
 #: Plain-language statement of what a result from this module does and does not

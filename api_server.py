@@ -21,30 +21,30 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from danon.config import DanonConfig
-from danon.aav_generator import DanonAAVGenerator, WILD_TYPE_AAV9_CAPSID
-from danon.epitope_masker import (
+from danon.vector_design.aav_generator import DanonAAVGenerator, WILD_TYPE_AAV9_CAPSID
+from danon.vector_design.epitope_masker import (
     EpitopeMasker,
     AA_CHARGE,
     KNOWN_NAB_EPITOPE_RESIDUES,
     CARDIAC_DOCKING_RESIDUES,
     AAV9_VR_COORDINATES,
 )
-from danon.pareto_optimizer import ParetoOptimizer, ParetoPoint
-from danon.microfluidics_core import MicrofluidicsCore, MicrofluidicConfig
-from danon.data_ingress import DataIngressEngine
-from danon.promoter_spec import PromoterSpecEngine
-from danon.safety_engine import DanonSafetyEngine, DanonSafetyProfile, print_global_regulatory_disclaimer
-from danon.dms_fitness import DMSFitnessLayer
-from danon.solvation_energy import SolvationEnergyEngine
-from danon.smar_insulator import SMARInsulatorEngine, CpGOptimizationEngine, calculate_cpg_density
-from danon.codon_elongation import CodonElongationEngine, DEFAULT_LAMP2B_PEPTIDE
-from danon.hla_decoupler import HLADecoupler
-from danon.synthesis_guard import SynthesisGuard
-from danon.mirna_detarget import miRNADetargetEngine
-from danon.translational_readiness import TranslationalReadinessEngine
-from danon.stoichiometric_calc import StoichiometricCalculator
-from danon.platform_validator import PlatformValidator, CLINICAL_ASSUMED_INPUTS
-from danon.tropism_filter import DanonTropismFilter, CARDIAC_RECEPTORS, HEPATIC_RECEPTORS, CHARGE_PROFILE
+from danon.vector_design.pareto_optimizer import ParetoOptimizer, ParetoPoint
+from danon.vector_design.microfluidics_core import MicrofluidicsCore, MicrofluidicConfig
+from danon.vector_design.data_ingress import DataIngressEngine
+from danon.vector_design.promoter_spec import PromoterSpecEngine
+from danon.vector_design.safety_engine import DanonSafetyEngine, DanonSafetyProfile, print_global_regulatory_disclaimer
+from danon.vector_design.dms_fitness import DMSFitnessLayer
+from danon.vector_design.solvation_energy import SolvationEnergyEngine
+from danon.vector_design.smar_insulator import SMARInsulatorEngine, CpGOptimizationEngine, calculate_cpg_density
+from danon.vector_design.codon_elongation import CodonElongationEngine, DEFAULT_LAMP2B_PEPTIDE
+from danon.vector_design.hla_decoupler import HLADecoupler
+from danon.vector_design.synthesis_guard import SynthesisGuard
+from danon.vector_design.mirna_detarget import miRNADetargetEngine
+from danon.vector_design.translational_readiness import TranslationalReadinessEngine
+from danon.vector_design.stoichiometric_calc import StoichiometricCalculator
+from danon.vector_design.platform_validator import PlatformValidator, CLINICAL_ASSUMED_INPUTS
+from danon.vector_design.tropism_filter import DanonTropismFilter, CARDIAC_RECEPTORS, HEPATIC_RECEPTORS, CHARGE_PROFILE
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("danon.api")
@@ -279,7 +279,7 @@ def run_full_pipeline(c: PipelineConstraints) -> Dict:
     improvement = float(best["immune"] / max(ucl_immune, 1e-6))
 
     # ----- Accurate LAMP2B cargo estimate for the single-vs-dual vector gate -----
-    from danon.dual_vector import evaluate_vector_capacity
+    from danon.vector_design.dual_vector import evaluate_vector_capacity
     lamp2b_cargo_bp = int(round(len(DEFAULT_LAMP2B_PEPTIDE) * 3 + 600 + 1000))
     vector_capacity = evaluate_vector_capacity(lamp2b_cargo_bp)
 
@@ -708,7 +708,7 @@ class EsmFitnessRequest(BaseModel):
 def esm_fitness(req: EsmFitnessRequest):
     """ESM-2 per-residue fitness scoring for a protein sequence."""
     try:
-        from danon.esm_inference import compute_per_residue_fitness, score_mutations_with_esm
+        from danon.vector_design.esm_inference import compute_per_residue_fitness, score_mutations_with_esm
         fitness = compute_per_residue_fitness(req.sequence)
         result = {
             "sequenceLength": fitness.sequence_length,
@@ -741,7 +741,7 @@ class EsmStructureRequest(BaseModel):
 def esm_structure(req: EsmStructureRequest):
     """ESM-2 derived structural features: secondary structure, accessibility, contacts."""
     try:
-        from danon.esm_inference import compute_structural_features
+        from danon.vector_design.esm_inference import compute_structural_features
         result = compute_structural_features(req.sequence)
         return _snake_to_camel(result)
     except Exception as e:

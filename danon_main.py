@@ -12,35 +12,35 @@ from typing import List, Dict, Any
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from danon.config import DanonConfig, danon_config
-from danon.aav_generator import DanonAAVGenerator, WILD_TYPE_AAV9_CAPSID
-from danon.biology import WILD_TYPE_AAV9
-from danon.lnp_generator import DanonLNPGenerator
-from danon.tropism_filter import DanonTropismFilter
-from danon.safety_engine import DanonSafetyEngine
-from danon.cardiac_promoters import CardiacPromoterEngine
-from danon.mirna_detarget import miRNADetargetEngine
-from danon.pareto_optimizer import ParetoOptimizer, ParetoPoint
-from danon.dual_vector import DualVectorEngine
+from danon.vector_design.aav_generator import DanonAAVGenerator, WILD_TYPE_AAV9_CAPSID
+from danon.vector_design.biology import WILD_TYPE_AAV9
+from danon.vector_design.lnp_generator import DanonLNPGenerator
+from danon.vector_design.tropism_filter import DanonTropismFilter
+from danon.vector_design.safety_engine import DanonSafetyEngine
+from danon.vector_design.cardiac_promoters import CardiacPromoterEngine
+from danon.vector_design.mirna_detarget import miRNADetargetEngine
+from danon.vector_design.pareto_optimizer import ParetoOptimizer, ParetoPoint
+from danon.vector_design.dual_vector import DualVectorEngine
 from danon.dosing_optimizer import DosingOptimizer
-from danon.immune_stealth import ImmuneStealthEngine
-from danon.inverse_fold import InverseFoldingEngine
-from danon.ml_scorer import MLScorer
-from danon.construct_builder import ConstructBuilder
+from danon.vector_design.immune_stealth import ImmuneStealthEngine
+from danon.vector_design.inverse_fold import InverseFoldingEngine
+from danon.vector_design.ml_scorer import MLScorer
+from danon.vector_design.construct_builder import ConstructBuilder
 from danon.clinical_simulator import ClinicalSimulator
 from danon.active_learner import ActiveLearner, ExperimentalResult
-from danon.epitope_masker import EpitopeMasker, ChargeMaskDesign
-from danon.stoichiometric_calc import StoichiometricCalculator
-from danon.promoter_spec import PromoterSpecEngine
-from danon.platform_validator import (
+from danon.vector_design.epitope_masker import EpitopeMasker, ChargeMaskDesign
+from danon.vector_design.stoichiometric_calc import StoichiometricCalculator
+from danon.vector_design.promoter_spec import PromoterSpecEngine
+from danon.vector_design.platform_validator import (
     PlatformValidator, MHRA_ILAP_DIMENSIONS, CLINICAL_ASSUMED_INPUTS,
 )
-from danon.wetlab_lims_tracker import WetlabLIMSTracker, ASSAY_TEMPLATES
-from danon.mouse_study_simulator import MouseStudySimulator
-from danon.dual_vector_moi_optimizer import DualVectorMOIOptimizer
-from danon.nab_assay_simulator import NAbAssaySimulator
-from danon.immunosuppression_protocol import ImmunosuppressionProtocol
-from danon.cell_simulator import DanonCellSimulator
-from danon.plasmid_builder import PlasmidAssembler, PlasmidAssemblyReport
+from danon.vector_design.wetlab_lims_tracker import WetlabLIMSTracker, ASSAY_TEMPLATES
+from danon.vector_design.mouse_study_simulator import MouseStudySimulator
+from danon.vector_design.dual_vector_moi_optimizer import DualVectorMOIOptimizer
+from danon.vector_design.nab_assay_simulator import NAbAssaySimulator
+from danon.vector_design.immunosuppression_protocol import ImmunosuppressionProtocol
+from danon.vector_design.cell_simulator import DanonCellSimulator
+from danon.vector_design.plasmid_builder import PlasmidAssembler, PlasmidAssemblyReport
 
 logging.basicConfig(
     level=logging.INFO,
@@ -62,7 +62,7 @@ logger = logging.getLogger(__name__)
 #: that should be substituted here, one key at a time, before any superiority
 #: claim is published. Keys whose value has been superseded are marked below.
 #:
-#: Provenance: ASSUMED  (see :func:`danon.biology.biological_provenance`)
+#: Provenance: ASSUMED  (see :func:`danon.vector_design.biology.biological_provenance`)
 UCL_BASELINE_SCORES = {
     "promoter": 0.35,
     "mirna": 0.10,
@@ -93,7 +93,7 @@ UCL_BASELINE_SCORES = {
 
 
 #: Local alias for the shared assumed-input block; see
-#: :data:`danon.platform_validator.CLINICAL_ASSUMED_INPUTS` for what it is and
+#: :data:`danon.vector_design.platform_validator.CLINICAL_ASSUMED_INPUTS` for what it is and
 #: why it is passed explicitly rather than hidden inside the scorer.
 REGULATORY_ASSUMED_INPUTS = CLINICAL_ASSUMED_INPUTS
 
@@ -207,7 +207,7 @@ class DanonPipeline:
         for region in ["VR_IV", "VR_VIII", "VR_IX", "VR_V"]:
             designs = self.inverse_fold.stream_designs(wt_seq, 500, target_region=region)
             for d in designs[:200]:
-                from danon.aav_generator import DanonAAVCandidate
+                from danon.vector_design.aav_generator import DanonAAVCandidate
                 c = DanonAAVCandidate(
                     candidate_id=d.candidate_id + 1000000,
                     sequence=d.mutated_sequence,
@@ -1064,7 +1064,7 @@ class DanonPipeline:
         logger.info("PHASE 25/25: Synthesis-Ready Plasmid Assembly (Dual-Vector)")
 
         # Get harmonized CDS from codon harmonization (Phase 22 in codon_elongation.py)
-        from danon.codon_elongation import CodonElongationEngine
+        from danon.vector_design.codon_elongation import CodonElongationEngine
         codon_engine = CodonElongationEngine()
         harmonized_result = codon_engine.evaluate()
         harmonized_cds = harmonized_result.harmonized_cds or harmonized_result.optimized_cds

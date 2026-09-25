@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from danon.personalization import (
+from danon.vector_design.personalization import (
     IschemicIndication,
     Modality,
     NAB_EXCLUSION_TITER,

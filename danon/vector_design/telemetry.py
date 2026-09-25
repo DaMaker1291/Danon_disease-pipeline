@@ -124,7 +124,7 @@ ARDUINO_FIRMWARE: str = r"""
  * Flow-rig DAQ firmware. Emits one checksummed ASCII line per sample:
  *   #<seq>,<t_ms>,<p1_counts>,<p2_counts>,<temp_counts>,<flow_counts>*<XX>
  * XX = uppercase hex XOR of the bytes between '#' and '*'.
- * Serial: 115200 baud. Wiring map lives in danon/telemetry.py.
+ * Serial: 115200 baud. Wiring map lives in danon/vector_design/telemetry.py.
  */
 #include <Wire.h>
 #include <Adafruit_ADS1115.h>

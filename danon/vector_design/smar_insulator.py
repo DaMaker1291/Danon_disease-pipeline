@@ -29,7 +29,7 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 # Reuse the codon optimiser for tAI-aware, GC-balanced, CpG-depleted back-translation
-from danon.codon_elongation import CodonElongationEngine, DEFAULT_LAMP2B_PEPTIDE, CODON_TABLE
+from danon.vector_design.codon_elongation import CodonElongationEngine, DEFAULT_LAMP2B_PEPTIDE, CODON_TABLE
 
 # Default S/MAR flanks (optional, secondary shielding only)
 DEFAULT_UPSTREAM_SMAR = (

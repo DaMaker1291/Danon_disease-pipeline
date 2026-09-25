@@ -32,6 +32,8 @@ export interface ClaimRow {
   limit: string;
   supported: boolean;
   detail: string;
+  /** Which study of this repository the claim is about. See danon/claims.py. */
+  study: string;
 }
 
 export interface ClaimsArtifactData {

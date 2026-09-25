@@ -2,7 +2,7 @@
 Epitope Masker: Structural charge-masking algorithm for AAV9 capsid.
 
 Coordinates come from RCSB PDB **3UX1** (AAV9), loaded through
-`danon.structure`, which reads the deposited C-alpha coordinates and generates
+`danon.vector_design.structure`, which reads the deposited C-alpha coordinates and generates
 the 60-subunit T=1 assembly from the entry's own `REMARK 350 BIOMT` operators.
 
 CORRECTION (carried in the record on purpose): this module previously claimed
@@ -229,10 +229,10 @@ AA_HYDRO = {"A": 1.8, "C": 2.5, "D": -3.5, "E": -3.5, "F": 2.8,
             "S": -0.8, "T": -0.7, "V": 4.2, "W": -0.9, "Y": -1.3}
 
 # Structural coordinates are NOT written here. They are read from the deposited
-# model at data/pdb/3UX1.pdb by `danon.structure`, so that the numbers this
+# model at data/pdb/3UX1.pdb by `danon.vector_design.structure`, so that the numbers this
 # module scores against are the ones RCSB holds -- and so that a reader can
 # check them with a text editor.
-from danon.structure import (
+from danon.vector_design.structure import (
     AAV9_STRUCTURE_ID,
     AAV9_STRUCTURE_REFERENCE,
     DEFAULT_STRUCTURE_DIR,
@@ -348,7 +348,7 @@ class EpitopeMasker:
     def load_pdb_structure(self, pdb_path: Optional[str] = None) -> bool:
         """
         Load the AAV9 capsid C-alpha coordinates via BioPython for the structural
-        distance matrix. Defaults to the deposited file that `danon.structure`
+        distance matrix. Defaults to the deposited file that `danon.vector_design.structure`
         caches (PDB 3UX1), so the scoring path and the geometry path read the
         same coordinates. Returns True if BioPython-based coords were loaded.
         """

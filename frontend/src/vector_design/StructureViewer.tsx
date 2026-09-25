@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { fetchEsmFitness, fetchEsmStructure } from '../utils/api';
-import ErrorBoundary from './ErrorBoundary';
+import { fetchEsmFitness, fetchEsmStructure } from './api';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 interface Props {
   sequence: string | null;

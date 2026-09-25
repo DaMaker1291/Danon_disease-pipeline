@@ -459,7 +459,7 @@ class MLScorer:
 
     def score_with_esm(self, seq: str, mutations: list = None) -> dict:
         try:
-            from danon.esm_inference import compute_per_residue_fitness, score_mutations_with_esm
+            from danon.vector_design.esm_inference import compute_per_residue_fitness, score_mutations_with_esm
             fitness = compute_per_residue_fitness(seq)
             result = {
                 "esm_fitness_mean": fitness.mean_fitness,
@@ -477,7 +477,7 @@ class MLScorer:
 
     def predict_structure(self, seq: str) -> dict:
         try:
-            from danon.esm_inference import compute_structural_features
+            from danon.vector_design.esm_inference import compute_structural_features
             return compute_structural_features(seq)
         except Exception as e:
             logger.warning("ESM structural prediction failed: %s", e)

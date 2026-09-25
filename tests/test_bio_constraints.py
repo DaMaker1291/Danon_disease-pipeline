@@ -17,17 +17,17 @@ import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from danon.promoter_spec import PromoterSpecEngine
-from danon.epitope_masker import EpitopeMasker
-from danon.stoichiometric_calc import StoichiometricCalculator
-from danon.platform_validator import (
+from danon.vector_design.promoter_spec import PromoterSpecEngine
+from danon.vector_design.epitope_masker import EpitopeMasker
+from danon.vector_design.stoichiometric_calc import StoichiometricCalculator
+from danon.vector_design.platform_validator import (
     PlatformValidator,
     CLINICAL_ASSUMED_INPUTS,
     REQUIRED_INPUTS,
 )
-from danon.microfluidics_core import MicrofluidicsCore, MicrofluidicConfig
-from danon.dual_vector import DualVectorEngine
-from danon.data_ingress import DataIngressEngine
+from danon.vector_design.microfluidics_core import MicrofluidicsCore, MicrofluidicConfig
+from danon.vector_design.dual_vector import DualVectorEngine
+from danon.vector_design.data_ingress import DataIngressEngine
 from danon.config import danon_config
 
 WILD_TYPE_AAV9_CAPSID = (
@@ -328,14 +328,14 @@ class TestBioConstraints:
         assert telemetry.shear_stress_safe, "Shear stress safety flag False"
 
 
-from danon.dms_fitness import DMSFitnessLayer
-from danon.solvation_energy import SolvationEnergyEngine
-from danon.smar_insulator import SMARInsulatorEngine
-from danon.codon_elongation import CodonElongationEngine, DEFAULT_LAMP2B_PEPTIDE, CODON_TABLE
-from danon.hla_decoupler import HLADecoupler
-from danon.synthesis_guard import SynthesisGuard, revcomp
-from danon.translational_readiness import TranslationalReadinessEngine, PreclinicalValidationMilestones
-from danon.epitope_masker import AAV9_VR_COORDINATES
+from danon.vector_design.dms_fitness import DMSFitnessLayer
+from danon.vector_design.solvation_energy import SolvationEnergyEngine
+from danon.vector_design.smar_insulator import SMARInsulatorEngine
+from danon.vector_design.codon_elongation import CodonElongationEngine, DEFAULT_LAMP2B_PEPTIDE, CODON_TABLE
+from danon.vector_design.hla_decoupler import HLADecoupler
+from danon.vector_design.synthesis_guard import SynthesisGuard, revcomp
+from danon.vector_design.translational_readiness import TranslationalReadinessEngine, PreclinicalValidationMilestones
+from danon.vector_design.epitope_masker import AAV9_VR_COORDINATES
 
 
 class TestHorizon2Phases:
@@ -371,7 +371,7 @@ class TestHorizon2Phases:
 
     # ---- PHASE 21: CpG depletion / anti-silencing ----
     def test_cpg_depletion_reduces_density(self):
-        from danon.smar_insulator import CpGOptimizationEngine, calculate_cpg_density
+        from danon.vector_design.smar_insulator import CpGOptimizationEngine, calculate_cpg_density
         engine = CpGOptimizationEngine(cpg_density_threshold=1.0)
         report = engine.optimize(protein=DEFAULT_LAMP2B_PEPTIDE)
         assert report.depleted_cpg_density <= report.raw_cpg_density, (
@@ -386,7 +386,7 @@ class TestHorizon2Phases:
         assert translated == DEFAULT_LAMP2B_PEPTIDE
 
     def test_cpg_density_function_counts_per_100bp(self):
-        from danon.smar_insulator import calculate_cpg_density
+        from danon.vector_design.smar_insulator import calculate_cpg_density
         # 8 bp with 4 CG dinucleotides -> 4 / (8/2) = 1.0
         assert calculate_cpg_density("CGCGCGCG") == 1.0
         assert calculate_cpg_density("ATGC" * 25) == 0.0
@@ -471,7 +471,7 @@ class TestHorizon2Phases:
 
     # ---- Cross-module integration ----
     def test_lamp2b_uses_single_vector_not_dual(self):
-        from danon.dual_vector import evaluate_vector_capacity
+        from danon.vector_design.dual_vector import evaluate_vector_capacity
         # LAMP2B CDS (1.2 kb) + promoter + UTRs/polyA ~ 2.8 kb < 4.7 kb
         cargo = int(round(len(DEFAULT_LAMP2B_PEPTIDE) * 3 + 600 + 1000))
         decision = evaluate_vector_capacity(cargo)
@@ -481,7 +481,7 @@ class TestHorizon2Phases:
         assert decision["toxicity_risk_multiplier"] == 1.0
 
     def test_oversized_cargo_triggers_dual_vector(self):
-        from danon.dual_vector import evaluate_vector_capacity
+        from danon.vector_design.dual_vector import evaluate_vector_capacity
         decision = evaluate_vector_capacity(8000)
         assert decision["strategy"].startswith("Dual")
         assert decision["toxicity_risk_multiplier"] > 1.0

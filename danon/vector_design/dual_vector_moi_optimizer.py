@@ -1,6 +1,6 @@
 import logging, numpy as np
 
-from danon.biology import WILD_TYPE_AAV9
+from danon.vector_design.biology import WILD_TYPE_AAV9
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Tuple
 
@@ -241,7 +241,7 @@ class DualVectorMOIOptimizer:
         Previously this returned the constant ``0.25``, which made every
         "dual-vector split beats single-vector" claim unverifiable. The baseline
         now runs the same dose-range optimizer with the wild-type parameters from
-        :data:`danon.biology.WILD_TYPE_AAV9`.
+        :data:`danon.vector_design.biology.WILD_TYPE_AAV9`.
 
         The returned quantity is reconstituted gene copies per cell, **not** the
         dual-hit fraction: the fraction saturates at 1.0 throughout the

@@ -1,6 +1,6 @@
 import logging, numpy as np
 
-from danon.biology import WILD_TYPE_AAV9
+from danon.vector_design.biology import WILD_TYPE_AAV9
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Tuple, Callable
 from scipy.integrate import solve_ivp
@@ -432,7 +432,7 @@ class DanonCellSimulator:
 
         This used to be the constant ``0.10``. It now runs the identical ODE
         simulation as :meth:`our_best_score`, differing only in the tropism and
-        dose of an unmodified vector (:data:`danon.biology.WILD_TYPE_AAV9`),
+        dose of an unmodified vector (:data:`danon.vector_design.biology.WILD_TYPE_AAV9`),
         which are explicit assumptions rather than a hidden number.
         """
         return self._paired_cell(WILD_TYPE_AAV9["cardiac_tropism"],

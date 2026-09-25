@@ -3,7 +3,7 @@ import { Canvas, useFrame, ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, Environment, Sparkles, Html, ContactShadows } from '@react-three/drei';
 import { EffectComposer, Bloom, N8AO, ToneMapping, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
-import ErrorBoundary from './ErrorBoundary';
+import ErrorBoundary from '../components/ErrorBoundary';
 import {
   buildBackbone,
   buildProtrusionGeometry,
@@ -12,7 +12,7 @@ import {
   MUTATION_COLOR,
   type DecodedStructure,
   type ProtrusionPlacement,
-} from '../utils/capsidGeometry';
+} from './capsidGeometry';
 import { useArtifact } from '../utils/artifacts';
 import type { PipelineResult } from '../types';
 import type { StructureArtifactData } from '../types/artifacts';
@@ -220,7 +220,7 @@ function MissingStructure() {
 }
 
 export default function CapsidViewer(props: Props) {
-  const { artifact, error, loading } = useArtifact<StructureArtifactData>('structure');
+  const { artifact, error, loading } = useArtifact<StructureArtifactData>('structure', 'vector_design');
   const [decoded, setDecoded] = useState<DecodedStructure | null>(null);
 
   useEffect(() => {

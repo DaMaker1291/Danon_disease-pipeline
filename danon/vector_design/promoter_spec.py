@@ -130,7 +130,7 @@ class PromoterSpecEngine:
         elif promoter_name == "CMV":
             parts.append(self.cmv)
         elif promoter_name == "cTnT":
-            from danon.cardiac_promoters import CARDIAC_CIS_ELEMENTS
+            from danon.vector_design.cardiac_promoters import CARDIAC_CIS_ELEMENTS
             parts.append(CARDIAC_CIS_ELEMENTS["cTnT_promoter"]["sequence"])
         else:
             parts.append(self.mhc_core)

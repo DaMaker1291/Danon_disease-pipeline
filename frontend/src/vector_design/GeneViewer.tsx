@@ -3,7 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, Float } from '@react-three/drei';
 import { EffectComposer, Bloom, ToneMapping } from '@react-three/postprocessing';
 import * as THREE from 'three';
-import ErrorBoundary from './ErrorBoundary';
+import ErrorBoundary from '../components/ErrorBoundary';
 import { useArtifact, artifactStamp } from '../utils/artifacts';
 import type { ConstructArtifactData, ConstructSegment } from '../types/artifacts';
 
@@ -142,7 +142,7 @@ function Scene({ segments }: { segments: GeneSegment[] }) {
 
 export default function GeneViewer() {
   const [hovered, setHovered] = useState<string | null>(null);
-  const { artifact, loading, error } = useArtifact<ConstructArtifactData>('construct');
+  const { artifact, loading, error } = useArtifact<ConstructArtifactData>('construct', 'vector_design');
   const segments = useMemo(() => (artifact ? toGeneSegments(artifact.data.segments) : []), [artifact]);
 
   if (loading) {

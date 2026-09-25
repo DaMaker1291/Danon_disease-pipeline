@@ -16,8 +16,8 @@ import tempfile
 import numpy as np
 import pytest
 
-from danon.aav_generator import WILD_TYPE_AAV9_CAPSID, VP1_FRAME_OFFSET, CAPSID_STRUCTURAL_INTERFACES
-from danon.structure import (
+from danon.vector_design.aav_generator import WILD_TYPE_AAV9_CAPSID, VP1_FRAME_OFFSET, CAPSID_STRUCTURAL_INTERFACES
+from danon.vector_design.structure import (
     AAV9_STRUCTURE_ID,
     EXPECTED_SHA256,
     MISLABELED_STRUCTURE_ACTUAL,

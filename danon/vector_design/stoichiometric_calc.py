@@ -24,7 +24,7 @@ AVOGADRO = 6.022e23
 #:
 #: AAV capsids activate complement directly, so even a fully decoyed dose is not
 #: at zero. This is an **ASSUMED** order-of-magnitude estimate, not a measured
-#: value, and it is registered as such in :func:`danon.biology.biological_provenance`.
+#: value, and it is registered as such in :func:`danon.vector_design.biology.biological_provenance`.
 #: It is the first quantity to replace with a CH50 / C3a assay on the real
 #: construct. It is named here rather than inlined so the assumption is visible
 #: at the call site and cannot be mistaken for a fitted parameter.

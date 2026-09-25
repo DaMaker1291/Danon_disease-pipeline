@@ -1,7 +1,7 @@
 {
  "key": "claims",
  "title": "Bound-claim audit (what this project may say)",
- "generated_utc": "2026-09-25T18:26:07Z",
+ "generated_utc": "2026-09-25T21:27:18Z",
  "source": "danon.claims.audit_claims()",
  "notes": [
   "each row is a sentence plus the check that supports it, re-run at build time; a check that failed is recorded as failed",
@@ -24,7 +24,8 @@
     "check": "mechanistic_core",
     "limit": "The mechanism is mechanistic; the rate constants are declared assumptions, not measurements from this project.",
     "supported": true,
-    "detail": "PDE transport (diffusion + Laplacian): True; Lotka-Volterra competition with carrying capacity: True; saturating (Hill/EC50) kill kinetics: True -- the scheduler is mechanistic"
+    "detail": "PDE transport (diffusion + Laplacian): True; Lotka-Volterra competition with carrying capacity: True; saturating (Hill/EC50) kill kinetics: True -- the scheduler is mechanistic",
+    "study": "tumour_twin"
    },
    {
     "id": "resistance_is_not_ghost",
@@ -34,17 +35,19 @@
     "check": "resistance_is_emergent",
     "limit": "This verifies the mechanism is doing the work; it says nothing about whether the assumed constants are right, and the verdict's dependence on the pre-existing fraction is a limitation to state, not a result to publish.",
     "supported": true,
-    "detail": "mutation off + no seeded clone -> max resistant burden 0.000e+00 (no ghost resistance: True); sensitive population extinguished exactly: True; verdict tracks the assumed pre-existing clone (MTD PFS 172 d seeded vs None unseeded): True"
+    "detail": "mutation off + no seeded clone -> max resistant burden 0.000e+00 (no ghost resistance: True); sensitive population extinguished exactly: True; verdict tracks the assumed pre-existing clone (MTD PFS 172 d seeded vs None unseeded): True",
+    "study": "tumour_twin"
    },
    {
     "id": "not_a_classifier",
     "sentence": "The scheduling core is not a trained classifier: it solves transport and population dynamics rather than learning a mapping from images to labels. A pretrained protein language model contributes capsid-fitness scoring in the separate design arm, and is labelled as such wherever it is used.",
     "tier": "established",
-    "substantiated_by": "danon/evosteer.py (scheduler) vs danon/ml_scorer.py + danon/esm_inference.py (design arm)",
+    "substantiated_by": "danon/evosteer.py (scheduler) vs danon/vector_design/ml_scorer.py + danon/vector_design/esm_inference.py (design arm)",
     "check": "neural_components_declared",
     "limit": "A claim of 'no machine learning anywhere' is false: torch modules and an ESM scorer ship in the design arm.",
     "supported": true,
-    "detail": "torch modules present: PositionalEncoding, AAVTropismTransformer, LNPDeliveryMLP, ImmuneEscapeTransformer; esm_inference.py present: True; /api/esm endpoints wired: True -- a claim of 'no black box anywhere' is false as worded"
+    "detail": "torch modules present: PositionalEncoding, AAVTropismTransformer, LNPDeliveryMLP, ImmuneEscapeTransformer; esm_inference.py present: False; /api/esm endpoints wired: True -- a claim of 'no black box anywhere' is false as worded",
+    "study": "tumour_twin"
    },
    {
     "id": "seeded_reproducibility",
@@ -54,27 +57,30 @@
     "check": "seeded_reproducibility",
     "limit": "Reproducible is not the same as deterministic, and neither is the same as correct.",
     "supported": true,
-    "detail": "same seed reproduces exactly: True; different seed diverges: True -- the model is stochastic and seeded, not deterministic"
+    "detail": "same seed reproduces exactly: True; different seed diverges: True -- the model is stochastic and seeded, not deterministic",
+    "study": "tumour_twin"
    },
    {
     "id": "deposited_structure",
     "sentence": "Capsid geometry is the deposited AAV9 structure (PDB 3UX1), assembled with the entry's own REMARK 350 symmetry operators and pinned by SHA-256 verified on every load.",
     "tier": "established",
-    "substantiated_by": "danon/structure.py::load_aav9_capsid",
+    "substantiated_by": "danon/vector_design/structure.py::load_aav9_capsid",
     "check": "structure_is_deposited",
     "limit": "C-alpha trace only: it is not an atomic surface, and it says nothing about conformational ensembles.",
     "supported": true,
-    "detail": "PDB file 3UX1.pdb sha256 1a39ed430f8404b9... matches the pin"
+    "detail": "PDB file 3UX1.pdb sha256 1a39ed430f8404b9... matches the pin",
+    "study": "vector_design"
    },
    {
     "id": "real_wild_type",
     "sentence": "The engineered capsid's wild type is VP1 residues 263-736 of that same deposited structure, re-derived from the PDB on every test run.",
     "tier": "established",
-    "substantiated_by": "danon/aav_generator.py::WILD_TYPE_AAV9_CAPSID",
+    "substantiated_by": "danon/vector_design/aav_generator.py::WILD_TYPE_AAV9_CAPSID",
     "check": "wild_type_from_deposit",
     "limit": "One deposited model, not a consensus sequence across AAV9 isolates.",
     "supported": true,
-    "detail": "474 residues, derived from the deposit: True"
+    "detail": "474 residues, derived from the deposit: True",
+    "study": "vector_design"
    },
    {
     "id": "provenance_registry",
@@ -84,7 +90,8 @@
     "check": "evidence_status_vocabulary",
     "limit": "A tier is an assertion about evidence; it is only as good as the citation behind the entry using it.",
     "supported": true,
-    "detail": "EvidenceStatus members: ESTABLISHED, EMERGING_HUMAN, ANIMAL_ONLY, PROVEN_FAILED, UNKNOWN"
+    "detail": "EvidenceStatus members: ESTABLISHED, EMERGING_HUMAN, ANIMAL_ONLY, PROVEN_FAILED, UNKNOWN",
+    "study": "tumour_twin"
    },
    {
     "id": "declared_assumptions",
@@ -94,7 +101,8 @@
     "check": "parameters_declared",
     "limit": "Being labelled is not being measured: every rate is still an assumption until a bench run replaces it.",
     "supported": true,
-    "detail": "7 parameters marked CALIBRATED, 'ASSUMED' section present: True -- the mechanism is mechanistic, the constants are not measurements"
+    "detail": "7 parameters marked CALIBRATED, 'ASSUMED' section present: True -- the mechanism is mechanistic, the constants are not measurements",
+    "study": "tumour_twin"
    },
    {
     "id": "engineering_rigor",
@@ -104,7 +112,8 @@
     "check": "test_suite_counted",
     "limit": "Tests verify the implementation. They are not evidence about biology.",
     "supported": true,
-    "detail": "1015 test functions in 138 classes across tests/"
+    "detail": "1016 test functions in 138 classes across tests/",
+    "study": "tumour_twin"
    },
    {
     "id": "heldout_discrimination",
@@ -114,7 +123,8 @@
     "check": "engine_c_index_absent",
     "limit": "That C-index is about age and grade, not about this engine. The engine itself has no estimable patient-level C-index.",
     "supported": true,
-    "detail": "engine C-index declared not estimable: True"
+    "detail": "engine C-index declared not estimable: True",
+    "study": "tumour_twin"
    },
    {
     "id": "multiscale_coarse_graining",
@@ -124,7 +134,8 @@
     "check": "voxel_scale",
     "limit": "The engine grid is ~4 mm, not the 100 um voxels this pitch originally claimed, and the decimation from a 1 mm scan is a documented lossy step.",
     "supported": true,
-    "detail": "engine voxel ~3.67 mm from decimation factors (4, 4, 3) (source 1 mm); ~3667 um, not 100 um; decimation is declared as a lossy step in the module: True"
+    "detail": "engine voxel ~3.67 mm from decimation factors (4, 4, 3) (source 1 mm); ~3667 um, not 100 um; decimation is declared as a lossy step in the module: True",
+    "study": "tumour_twin"
    },
    {
     "id": "runtime_is_measured",
@@ -134,7 +145,8 @@
     "check": "runtime_365",
     "limit": "Runtime is machine-dependent; the audit prints the machine's own number.",
     "supported": true,
-    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 4.17 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)"
+    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 3.69 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)",
+    "study": "tumour_twin"
    },
    {
     "id": "inputs_are_bulk",
@@ -144,7 +156,8 @@
     "check": "bulk_not_single_cell",
     "limit": "A claim of scRNA-seq-derived parameters would describe data this pipeline never reads, and `PROVEN_FAILED` in the same module says so.",
     "supported": true,
-    "detail": "computational inputs are bulk RNA-seq: True; deriving single-cell clone fractions from bulk is marked PROVEN_FAILED in the module: True -- a pitch claiming scRNA-seq parameters would be describing data this pipeline never reads"
+    "detail": "computational inputs are bulk RNA-seq: True; deriving single-cell clone fractions from bulk is marked PROVEN_FAILED in the module: True -- a pitch claiming scRNA-seq parameters would be describing data this pipeline never reads",
+    "study": "tumour_twin"
    },
    {
     "id": "no_spatial_agreement_result",
@@ -154,7 +167,8 @@
     "check": "spatial_agreement_not_claimed",
     "limit": "Absence of a test is not a negative result: nothing here is evidence that the engine's spatial predictions are wrong, only that the public data reachable from this environment cannot test them.",
     "supported": true,
-    "detail": "spatial Dice test REFUSED; 5 imaging collection(s) probed, 0 segmentation series, 632 patient(s) checked for a second timepoint"
+    "detail": "spatial Dice test REFUSED; 5 imaging collection(s) probed, 0 segmentation series, 632 patient(s) checked for a second timepoint",
+    "study": "tumour_twin"
    },
    {
     "id": "potency_from_measured_records",
@@ -164,7 +178,8 @@
     "check": "potency_is_measured",
     "limit": "2D monolayer IC50 at a single timepoint is not 3D tumour kill behind a blood-brain barrier, and the records come from heterogeneous assays whose readout and exposure time are largely unrecorded.",
     "supported": true,
-    "detail": "CHEMBL810 IC50: 31 exact of 50 glioma-line record(s), median 134,970 nM, most potent 6,426 nM, 19 right-censored"
+    "detail": "CHEMBL810 IC50: 31 exact of 50 glioma-line record(s), median 134,970 nM, most potent 6,426 nM, 19 right-censored",
+    "study": "tumour_twin"
    },
    {
     "id": "engine_potency_scale_not_anchored",
@@ -174,7 +189,8 @@
     "check": "ec50_unit_undeclared",
     "limit": "This is a defect, not a feature. Until the engine's concentration scale is declared, its potency constant cannot be anchored to anything measurable, and no calibration claim should be made about it.",
     "supported": true,
-    "detail": "engine EC50 unit declared: None; comparison REFUSED -- the engine's EC50 has no declared concentration unit (DrugParams documents only 'conc/day at full-dose vessels'), so an EC50-vs-IC50 ratio would be unitless nonsense. Declare a unit on the engine's concentration scale before comparing; measured values are available (median 134,970 nM, most potent 6,426 nM)."
+    "detail": "engine EC50 unit declared: None; comparison REFUSED -- the engine's EC50 has no declared concentration unit (DrugParams documents only 'conc/day at full-dose vessels'), so an EC50-vs-IC50 ratio would be unitless nonsense. Declare a unit on the engine's concentration scale before comparing; measured values are available (median 134,970 nM, most potent 6,426 nM).",
+    "study": "tumour_twin"
    },
    {
     "id": "censored_endpoint",
@@ -184,7 +200,8 @@
     "check": "censoring_is_preserved",
     "limit": "Censoring makes the number smaller and more honest. It is still not clinical validation.",
     "supported": true,
-    "detail": "progression endpoint: 594 patients, 372 events, 222 censored at last contact; held-out C = 0.534 +/- 0.053 against 0.539 for age alone -- the multivariable model is beaten by age"
+    "detail": "progression endpoint: 594 patients, 372 events, 222 censored at last contact; held-out C = 0.534 +/- 0.053 against 0.539 for age alone -- the multivariable model is beaten by age",
+    "study": "tumour_twin"
    },
    {
     "id": "covariates_measured_not_estimated",
@@ -194,7 +211,8 @@
     "check": "covariate_gains_are_measured",
     "limit": "A measured gain of +0.026 inside a fold sd of 0.048 is reported as 'no measurable gain'. MGMT is reachable but caps the cohort at 142 patients, and sub-region segmentation is refused outright.",
     "supported": true,
-    "detail": "authored gain figures in the module: none; baseline and post-treatment timepoint sets disjoint: True; post-treatment KPS outranks pre-treatment: True (0.684 vs 0.597) -- a covariate gain is a measurement here, not an estimate"
+    "detail": "authored gain figures in the module: none; baseline and post-treatment timepoint sets disjoint: True; post-treatment KPS outranks pre-treatment: True (0.684 vs 0.597) -- a covariate gain is a measurement here, not an estimate",
+    "study": "tumour_twin"
    },
    {
     "id": "transport_units_explicit",
@@ -204,7 +222,8 @@
     "check": "diffusion_units_and_operator",
     "limit": "The heterogeneous operator is slower or redirected relative to a scalar field of the same mean, never faster: no delivery improvement can be claimed from this change alone. Tissue D values are literature constants and no DTI series is present.",
     "supported": true,
-    "detail": "voxel size 3.667 mm from decimation (4, 4, 3) matches realdata's mean convention: True; div(D grad C) reduces to D*lap(C) on constant D: True; the engine's D=0.35 voxel^2/day is 0.35 mm^2/day on the phantom but 4.706 mm^2/day on real geometry (13.44x inflation); 1 voxel^2/day = 1 mm^2/day at 1 mm"
+    "detail": "voxel size 3.667 mm from decimation (4, 4, 3) matches realdata's mean convention: True; div(D grad C) reduces to D*lap(C) on constant D: True; the engine's D=0.35 voxel^2/day is 0.35 mm^2/day on the phantom but 4.706 mm^2/day on real geometry (13.44x inflation); 1 voxel^2/day = 1 mm^2/day at 1 mm",
+    "study": "tumour_twin"
    },
    {
     "id": "no_inflated_estimand",
@@ -214,7 +233,8 @@
     "check": "no_inflated_estimand",
     "limit": "Refusing three estimands does not raise the fourth: overall-survival C stays 0.656 and progression C stays 0.534.",
     "supported": true,
-    "detail": "`best_overall_response` records: 0 of 617 cases (empty: True); spatial Dice target refused_no_data; in-vitro target refused_incommensurable; no target reports a measured score: True. Reachable response flag: 23 positives in 529 cases, majority-class accuracy 95.65%"
+    "detail": "`best_overall_response` records: 0 of 617 cases (empty: True); spatial Dice target refused_no_data; in-vitro target refused_incommensurable; no target reports a measured score: True. Reachable response flag: 23 positives in 529 cases, majority-class accuracy 95.65%",
+    "study": "tumour_twin"
    },
    {
     "id": "gdsc_ic50s_mostly_extrapolated",
@@ -224,7 +244,8 @@
     "check": "gdsc_ic50s_not_all_measured",
     "limit": "Two independent sources agreeing that this quantity is mostly a lower bound is a reason to refuse the fit, not a caveat on it.",
     "supported": true,
-    "detail": "8384 glioma rows over 286 drugs and 34 lines: 76.0% of IC50s above the highest concentration tested; temozolomide 34 of 34 extrapolated. An R^2 against these would be a fit to a lower bound"
+    "detail": "8384 glioma rows over 286 drugs and 34 lines: 76.0% of IC50s above the highest concentration tested; temozolomide 34 of 34 extrapolated. An R^2 against these would be a fit to a lower bound",
+    "study": "tumour_twin"
    },
    {
     "id": "no_rl_agent",
@@ -234,7 +255,8 @@
     "check": "untestable_tiers_refused",
     "limit": "The deeper problem is the metric: a self-defined reward and its normalization are both chosen by the author, so the number cannot be contradicted by any measurement. The repo's comparable quantity is anchored externally instead (paired MTD control, RANO threshold, censored lower bound).",
     "supported": true,
-    "detail": "no RL agent present: True; the metric is self-defined, so it cannot be falsified. EGFRvIII: 1847 structural-variation files of which 1847 are controlled, against 464 open SNV/indel files that cannot carry an exon 2-7 deletion: reachable from open data = False"
+    "detail": "no RL agent present: True; the metric is self-defined, so it cannot be falsified. EGFRvIII: 1847 structural-variation files of which 1847 are controlled, against 464 open SNV/indel files that cannot carry an exon 2-7 deletion: reachable from open data = False",
+    "study": "tumour_twin"
    },
    {
     "id": "egfrviii_not_in_open_data",
@@ -244,7 +266,8 @@
     "check": "untestable_tiers_refused",
     "limit": "Inferring the deletion from RNA-seq junction reads is a legitimate alternative and would be an inference, not a mutation call.",
     "supported": true,
-    "detail": "no RL agent present: True; the metric is self-defined, so it cannot be falsified. EGFRvIII: 1847 structural-variation files of which 1847 are controlled, against 464 open SNV/indel files that cannot carry an exon 2-7 deletion: reachable from open data = False"
+    "detail": "no RL agent present: True; the metric is self-defined, so it cannot be falsified. EGFRvIII: 1847 structural-variation files of which 1847 are controlled, against 464 open SNV/indel files that cannot carry an exon 2-7 deletion: reachable from open data = False",
+    "study": "tumour_twin"
    },
    {
     "id": "no_engine_c_index",
@@ -254,7 +277,8 @@
     "check": "engine_c_index_absent",
     "limit": "Stating the absence is the honest position; it is not a finding.",
     "supported": true,
-    "detail": "engine C-index declared not estimable: True"
+    "detail": "engine C-index declared not estimable: True",
+    "study": "tumour_twin"
    },
    {
     "id": "holdout_emulator_090",
@@ -264,7 +288,8 @@
     "check": "holdout_emulator_measured",
     "limit": "Synthetic ground truth (the engine itself). Never present beside patient numbers as if it raised them.",
     "supported": true,
-    "detail": "one-shot holdout R^2 = 0.9211 (95% bootstrap CI 0.8615-0.9536) on 48 untouched configurations (features locked on the training half, single refit, lambda=1.0); claim band R^2 >= 0.90"
+    "detail": "one-shot holdout R^2 = 0.9211 (95% bootstrap CI 0.8615-0.9536) on 48 untouched configurations (features locked on the training half, single refit, lambda=1.0); claim band R^2 >= 0.90",
+    "study": "tumour_twin"
    },
    {
     "id": "mgmt_status_not_predictable_from_open_covariates",
@@ -274,7 +299,8 @@
     "check": "mgmt_status_measured_not_faked",
     "limit": "A real miss with a real CI is worth more than a claimed number.",
     "supported": true,
-    "detail": "real-patient MGMT-status classifier: OOF AUC 0.5387 (CI 0.4850-0.5964) on 396 patients; reported as indistinguishable from chance, NOT as a 0.90+ result"
+    "detail": "real-patient MGMT-status classifier: OOF AUC 0.5387 (CI 0.4850-0.5964) on 396 patients; reported as indistinguishable from chance, NOT as a 0.90+ result",
+    "study": "tumour_twin"
    },
    {
     "id": "mgmt_beta_moves_the_engine_in_the_methylated_direction",
@@ -284,7 +310,8 @@
     "check": "mgmt_resistance_sweep_measured",
     "limit": "The term reaches only the sensitivity-scale component of resistance; the kill ceiling is untouched. No patient outcome is claimed.",
     "supported": true,
-    "detail": "live two-beta sweep: MTD median PFS 104d (unmethylated) -> 129d (fully methylated), direction OK; committed quantile artifact present: True"
+    "detail": "live two-beta sweep: MTD median PFS 104d (unmethylated) -> 129d (fully methylated), direction OK; committed quantile artifact present: True",
+    "study": "tumour_twin"
    },
    {
     "id": "covariate_upgrades_measured_not_estimated",
@@ -294,7 +321,8 @@
     "check": "covariate_upgrades_measured",
     "limit": "Directionally consistent with trial literature; the cohort cannot resolve it. A change in n is never reported as a change in signal.",
     "supported": true,
-    "detail": "four covariate upgrades measured on the live cache: all-covariates ceiling pooled C 0.5785 (n=68) vs age-alone 0.6203 on the same kept subset -- stacking unavailable-for-most covariates costs discrimination; the artifact records each upgrade with its paired delta: True"
+    "detail": "four covariate upgrades measured on the live cache: all-covariates ceiling pooled C 0.5785 (n=68) vs age-alone 0.6203 on the same kept subset -- stacking unavailable-for-most covariates costs discrimination; the artifact records each upgrade with its paired delta: True",
+    "study": "tumour_twin"
    },
    {
     "id": "clinical_streams_wired_with_identity_guarantees",
@@ -304,7 +332,8 @@
     "check": "stream_identities",
     "limit": "Mappings are re-parameterisations, not rival models; the neutral value is the calibrated default.",
     "supported": true,
-    "detail": "Ki67=0.15 -> calibrated growth exactly: True; uniform rCBV -> uniform clearance: True; 5-ALA map preserves the engine fill burden (17.5500 == 17.5500): True"
+    "detail": "Ki67=0.15 -> calibrated growth exactly: True; uniform rCBV -> uniform clearance: True; 5-ALA map preserves the engine fill burden (17.5500 == 17.5500): True",
+    "study": "tumour_twin"
    },
    {
     "id": "stream3_real_vasculature_measured_small_effect",
@@ -314,7 +343,8 @@
     "check": "stream3_cohort_measured",
     "limit": "A wired-and-measured stream whose measured effect is small is a result, not a failure; t1ce is a vascular proxy, not Ktrans.",
     "supported": true,
-    "detail": "cohort 6 cases / 18 paired runs: True; live re-run of 01017 seed 101 reproduces the committed PFS: True (paired delta -3 d; committed mean -1.17 d)"
+    "detail": "cohort 6 cases / 18 paired runs: True; live re-run of 01017 seed 101 reproduces the committed PFS: True (paired delta -3 d; committed mean -1.17 d)",
+    "study": "tumour_twin"
    },
    {
     "id": "longitudinal_availability_is_counted_from_the_manifest",
@@ -324,7 +354,8 @@
     "check": "availability_census_measured",
     "limit": "Counts are read from the file on every check, so replacing the manifest with a newer release moves every number at once.",
     "supported": true,
-    "detail": "CFB-GBM manifest: 264 patients, 170 with >1 timepoint, 168 with a usable t1gd pair (393 pairs, 37 spanning two scanners); images NOT downloaded, so this is availability, not a measurement"
+    "detail": "CFB-GBM manifest: 264 patients, 170 with >1 timepoint, 168 with a usable t1gd pair (393 pairs, 37 spanning two scanners); images NOT downloaded, so this is availability, not a measurement",
+    "study": "tumour_twin"
    },
    {
     "id": "readme_claim_count_is_derived_not_remembered",
@@ -334,7 +365,8 @@
     "check": "readme_claim_count_current",
     "limit": "It checks that the README agrees with the registry, not that the registry is right: claims can be wrong together and still agree.",
     "supported": true,
-    "detail": "README advertises 35/35 verified; the registry holds 35 claims"
+    "detail": "README advertises 35/35 verified; the registry holds 35 claims",
+    "study": "tumour_twin"
    },
    {
     "id": "stream4_cohort_resolution_is_a_design_calculation",
@@ -344,7 +376,8 @@
     "check": "stream4_resolution_is_design_only",
     "limit": "A design calculation bounds what a study could show; it is not evidence that any stream carries a signal, and the reference cohort is scored on overall survival, which the manifest does not carry.",
     "supported": true,
-    "detail": "n=168 (manifest's usable pairs), 24 draws: floor 0.0219 (1 SE) / 0.0610 (fold yardstick); reference cohort re-measured live at C=0.6559 +/- 0.0247 (matches artifact: True); labelled as a design calculation: True"
+    "detail": "n=168 (manifest's usable pairs), 24 draws: floor 0.0219 (1 SE) / 0.0610 (fold yardstick); reference cohort re-measured live at C=0.6559 +/- 0.0247 (matches artifact: True); labelled as a design calculation: True",
+    "study": "tumour_twin"
    },
    {
     "id": "clinical_stream_census_refuses_with_live_counts",
@@ -354,7 +387,8 @@
     "check": "stream_census_refuses",
     "limit": "The census is computed live from the data directory and the recorded probe, so acquiring the files flips the refusal to 'available' automatically.",
     "supported": true,
-    "detail": "census: stream1 REFUSED(0), stream2 REFUSED(0), stream3 MEASURABLE(6 t1ce files; archive carries 456 DSC perfusion patients), stream4 REFUSED(0 cached / 41 retrievable pairs)"
+    "detail": "census: stream1 REFUSED(0), stream2 REFUSED(0), stream3 MEASURABLE(6 t1ce files; archive carries 456 DSC perfusion patients), stream4 REFUSED(0 cached / 41 retrievable pairs)",
+    "study": "tumour_twin"
    },
    {
     "id": "restriction_never_mistaken_for_signal",
@@ -364,7 +398,8 @@
     "check": "restriction_membership_vs_signal",
     "limit": "A record is an exposure, not an ordered protocol: first-line cannot be separated from salvage in this export.",
     "supported": true,
-    "detail": "restriction keeps 356/595 patients; base C 0.6559 (all) -> 0.6447 (restricted); cohort-membership delta -0.0112 inside one fold sd (0.0247) -- selection is reported separately from any covariate signal"
+    "detail": "restriction keeps 356/595 patients; base C 0.6559 (all) -> 0.6447 (restricted); cohort-membership delta -0.0112 inside one fold sd (0.0247) -- selection is reported separately from any covariate signal",
+    "study": "tumour_twin"
    }
   ],
   "provenance": {

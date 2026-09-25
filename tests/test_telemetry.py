@@ -12,7 +12,7 @@ import math
 import numpy as np
 import pytest
 
-from danon.telemetry import (
+from danon.vector_design.telemetry import (
     ARDUINO_FIRMWARE,
     CHANNEL_UNITS,
     DEFAULT_CHANNELS,
@@ -177,10 +177,10 @@ class TestRigConfig:
     def test_combined_dp_uncertainty_is_quadrature_sum(self):
         cfg = RigConfig(channels=[
             # two transducers with known residual scatter
-            __import__("danon.telemetry", fromlist=["RigChannel"]).RigChannel(
+            __import__("danon.vector_design.telemetry", fromlist=["RigChannel"]).RigChannel(
                 "p_proximal", "kPa",
                 SensorCalibration(slope=1.0, intercept=0.0, residual_std=0.03)),
-            __import__("danon.telemetry", fromlist=["RigChannel"]).RigChannel(
+            __import__("danon.vector_design.telemetry", fromlist=["RigChannel"]).RigChannel(
                 "p_distal", "kPa",
                 SensorCalibration(slope=1.0, intercept=0.0, residual_std=0.04)),
         ])

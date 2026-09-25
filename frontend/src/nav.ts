@@ -2,12 +2,15 @@
  * Navigation config, in one place so the header, the nav, and the landing
  * page cannot disagree about what a tab is.
  *
- * This repository holds two studies that share a codebase but not a disease:
- * a patient tumour twin (glioblastoma) and a vector-design pipeline
- * (AAV9-LAMP2B for Danon disease). `group` carries that boundary, and
+ * This app shows ONE study: the glioblastoma patient tumour twin. The
+ * AAV9-LAMP2B vector-design pipeline that used to be routed here lives in
+ * `src/vector_design/` and `danon/vector_design/` — preserved and runnable,
+ * but not part of this product's navigation, because mixing a cardiac
+ * gene-therapy design pipeline into an oncology tool made both harder to read.
+ *
  * `status` says, per screen, what class of number the visitor is about to
- * read -- because "recorded engine output" and "measured in real patients"
- * are different claims and the UI must not blur them.
+ * read, because "recorded engine output" and "measured in real patients" are
+ * different claims and the UI must not blur them.
  */
 
 export type TabId =
@@ -16,27 +19,17 @@ export type TabId =
   | 'evolution'
   | 'outcome'
   | 'upload'
-  | 'capsid'
-  | 'phases'
-  | 'gene'
-  | 'clinical'
-  | 'lnp'
-  | 'microfluidics'
   | 'paraview'
   | 'verification';
 
 export type TabGroup =
   | 'Start here'
   | 'Patient twin (glioblastoma)'
-  | 'Vector design (AAV9-LAMP2B)'
-  | 'Fabrication'
   | 'Data & provenance';
 
 export const GROUPS: TabGroup[] = [
   'Start here',
   'Patient twin (glioblastoma)',
-  'Vector design (AAV9-LAMP2B)',
-  'Fabrication',
   'Data & provenance',
 ];
 
@@ -44,7 +37,6 @@ export const GROUPS: TabGroup[] = [
 export type ScreenStatus =
   | 'recorded engine output'
   | 'measured real data'
-  | 'design-engine scores'
   | 'live (needs local API)'
   | 'runs in your browser'
   | 'audit of this repository';
@@ -65,7 +57,7 @@ export interface TabDef {
 }
 
 const SOURCE_TWIN =
-  'braTS-2021 segmentation + the engine, planned locally through api_server.py (uvicorn). '
+  'BraTS-2021 segmentation + the engine, planned locally through api_server.py (uvicorn). '
   + 'On the deployed site the same fields render from the recorded evolution artifact.';
 
 export const TABS: TabDef[] = [
@@ -75,7 +67,7 @@ export const TABS: TabDef[] = [
     label: 'Overview',
     desc: 'What this is, what is measured, and what it refuses to claim',
     purpose:
-      'Two studies live in this repository: a patient tumour twin (glioblastoma) and an AAV9-LAMP2B vector-design pipeline (Danon disease). This page states what each screen shows and which numbers are measurements.',
+      'A 3D spatial tumour-evolution engine for glioblastoma: drug transport, clonal competition, and the dosing schedule it derives. This page states which numbers on screen are measurements.',
     source: 'danon/claims.py — the bound-claim registry, re-run and recorded as artifacts/claims.json',
     status: 'audit of this repository',
   },
@@ -121,66 +113,6 @@ export const TABS: TabDef[] = [
     status: 'runs in your browser',
   },
   {
-    id: 'capsid',
-    group: 'Vector design (AAV9-LAMP2B)',
-    label: 'Capsid & Sequence',
-    desc: 'PDB 3UX1 structure, masked VP1 design',
-    purpose:
-      'The deposited AAV9 capsid assembled from its own symmetry operators, and the VP1 design the optimizer selected with its substitutions.',
-    source:
-      'danon/structure.py (PDB 3UX1) + api_server.run_full_pipeline, recorded as artifacts/structure.json and artifacts/pipeline.json',
-    status: 'design-engine scores',
-  },
-  {
-    id: 'phases',
-    group: 'Vector design (AAV9-LAMP2B)',
-    label: 'Design Gates',
-    desc: '24 gate scores and their composition',
-    purpose:
-      'The 24 screening gates over the selected design, their pass/warn/fail composition, and the Horizon-2 module detail.',
-    source: 'api_server.run_full_pipeline, recorded as artifacts/pipeline.json',
-    status: 'design-engine scores',
-  },
-  {
-    id: 'gene',
-    group: 'Vector design (AAV9-LAMP2B)',
-    label: 'Transgene Map',
-    desc: 'LAMP2B construct, promoters, UTRs',
-    purpose: 'The single-vector LAMP2B construct: promoters, UTRs, miRNA detargeting sites, polyA.',
-    source: 'danon.construct_builder, recorded as artifacts/construct.json',
-    status: 'design-engine scores',
-  },
-  {
-    id: 'clinical',
-    group: 'Vector design (AAV9-LAMP2B)',
-    label: 'Pareto & Readiness',
-    desc: 'Optimizer front, translational gates',
-    purpose:
-      'The NSGA-II Pareto front over six competing objectives, the modelled cardiomyocyte rescue, and the translational gates that are still unmet.',
-    source: 'artifacts/pipeline.json (front) + danon.cell_simulator 8-ODE model (artifacts/clinical.json)',
-    status: 'recorded engine output',
-  },
-  {
-    id: 'lnp',
-    group: 'Fabrication',
-    label: 'LNP Formulation',
-    desc: 'Scored lipid composition and size',
-    purpose:
-      'The best-scoring lipid nanoparticle formulation out of the scored candidates: composition, predicted size, and which parts are drawn rather than computed.',
-    source: 'danon.lnp_generator, recorded as artifacts/lnp.json',
-    status: 'design-engine scores',
-  },
-  {
-    id: 'microfluidics',
-    group: 'Fabrication',
-    label: 'Microfluidics',
-    desc: 'Y-junction flow telemetry',
-    purpose:
-      'Y-junction mixing hydraulics: Reynolds, Peclet, shear against the structural-integrity limit, and the TypeScript port checked against the Python engine.',
-    source: 'danon.microfluidics_core, recorded as artifacts/microfluidics.json',
-    status: 'recorded engine output',
-  },
-  {
     id: 'paraview',
     group: 'Data & provenance',
     label: 'ParaView Artifact',
@@ -216,5 +148,4 @@ export const OVERVIEW_RESULTS = [
   'stream4_cohort_resolution_is_a_design_calculation',
   'stream3_real_vasculature_measured_small_effect',
   'covariate_upgrades_measured_not_estimated',
-  'deposited_structure',
 ];

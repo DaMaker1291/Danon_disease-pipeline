@@ -3,7 +3,7 @@ import { useArtifact, artifactStamp } from '../utils/artifacts';
 import {
   checkPort, computeTelemetry, ETHANOL_DENSITY_KG_M3, ETHANOL_VISCOSITY_PA_S,
   WATER_DENSITY_KG_M3, WATER_VISCOSITY_PA_S,
-} from '../utils/fluidics';
+} from './fluidics';
 import type { MicrofluidicConfigData, MicrofluidicsArtifactData } from '../types/artifacts';
 
 const CANVAS_W = 640;
@@ -31,7 +31,7 @@ interface Particle {
  * cross-checked against the Python output and the agreement is shown.
  */
 export default function MicrofluidicViewer() {
-  const { artifact, loading, error } = useArtifact<MicrofluidicsArtifactData>('microfluidics');
+  const { artifact, loading, error } = useArtifact<MicrofluidicsArtifactData>('microfluidics', 'vector_design');
   const canvasRef = useRef<HTMLCanvasElement>(null!);
   const particlesRef = useRef<Particle[]>([]);
 

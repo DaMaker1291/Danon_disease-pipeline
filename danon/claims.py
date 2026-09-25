@@ -78,7 +78,7 @@ def check_evidence_status_vocabulary() -> CheckResult:
 
 def check_neural_components_are_declared() -> CheckResult:
     """The repo does contain learned components; a claim of 'no black box' fails."""
-    text = _read("danon/ml_scorer.py")
+    text = _read("danon/vector_design/ml_scorer.py")
     modules = re.findall(r"^class (\w+)\(nn\.Module\)", text, flags=re.M)
     esm = os.path.exists(os.path.join(ROOT, "danon", "esm_inference.py"))
     api = "esm" in _read("api_server.py")
@@ -114,7 +114,7 @@ def check_seeded_reproducibility() -> CheckResult:
 
 def check_structure_is_deposited() -> CheckResult:
     """The capsid geometry must be the deposited structure, digest-verified."""
-    from danon.structure import EXPECTED_SHA256, ensure_structure_file, file_sha256
+    from danon.vector_design.structure import EXPECTED_SHA256, ensure_structure_file, file_sha256
 
     path, _ = ensure_structure_file(allow_download=False)
     digest = file_sha256(path)
@@ -126,8 +126,8 @@ def check_structure_is_deposited() -> CheckResult:
 
 def check_wild_type_from_deposit() -> CheckResult:
     """The wild-type capsid must equal VP1 263-736 of that structure."""
-    from danon.aav_generator import VP1_FRAME_OFFSET, WILD_TYPE_AAV9_CAPSID
-    from danon.structure import load_aav9_capsid
+    from danon.vector_design.aav_generator import VP1_FRAME_OFFSET, WILD_TYPE_AAV9_CAPSID
+    from danon.vector_design.structure import load_aav9_capsid
 
     three_to_one = {
         "ALA": "A", "ARG": "R", "ASN": "N", "ASP": "D", "CYS": "C", "GLN": "Q",
@@ -1139,6 +1139,10 @@ class Claim:
     substantiated_by: str
     check: str
     limit: str
+    # Which study of this repository the claim belongs to. The app routes only
+    # the tumour twin, so the vector-design claims are marked and hidden from
+    # its default view rather than silently presented inside an oncology tool.
+    study: str = "tumour_twin"
 
 
 CLAIMS: Tuple[Claim, ...] = (
@@ -1179,7 +1183,7 @@ CLAIMS: Tuple[Claim, ...] = (
         "scoring in the separate design arm, and is labelled as such wherever it "
         "is used.",
         EvidenceStatus.ESTABLISHED,
-        "danon/evosteer.py (scheduler) vs danon/ml_scorer.py + danon/esm_inference.py (design arm)",
+        "danon/evosteer.py (scheduler) vs danon/vector_design/ml_scorer.py + danon/vector_design/esm_inference.py (design arm)",
         "neural_components_declared",
         "A claim of 'no machine learning anywhere' is false: torch modules and "
         "an ESM scorer ship in the design arm.",
@@ -1201,19 +1205,21 @@ CLAIMS: Tuple[Claim, ...] = (
         "with the entry's own REMARK 350 symmetry operators and pinned by "
         "SHA-256 verified on every load.",
         EvidenceStatus.ESTABLISHED,
-        "danon/structure.py::load_aav9_capsid",
+        "danon/vector_design/structure.py::load_aav9_capsid",
         "structure_is_deposited",
         "C-alpha trace only: it is not an atomic surface, and it says nothing "
         "about conformational ensembles.",
+        study="vector_design",
     ),
     Claim(
         "real_wild_type",
         "The engineered capsid's wild type is VP1 residues 263-736 of that same "
         "deposited structure, re-derived from the PDB on every test run.",
         EvidenceStatus.ESTABLISHED,
-        "danon/aav_generator.py::WILD_TYPE_AAV9_CAPSID",
+        "danon/vector_design/aav_generator.py::WILD_TYPE_AAV9_CAPSID",
         "wild_type_from_deposit",
         "One deposited model, not a consensus sequence across AAV9 isolates.",
+        study="vector_design",
     ),
     Claim(
         "provenance_registry",

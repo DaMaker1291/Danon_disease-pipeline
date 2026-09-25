@@ -16,14 +16,14 @@ per view, so every figure on screen is a recorded engine output:
   pipeline      api_server.run_full_pipeline(constraints)  -> 24 phases,
                 Pareto front, sequence, mutations, Horizon-2 metrics,
                 translational gates
-  microfluidics danon.microfluidics_core.MicrofluidicsCore -> Reynolds,
+  microfluidics danon.vector_design.microfluidics_core.MicrofluidicsCore -> Reynolds,
                 shear, Péclet, pressure drop, velocity + concentration
                 profiles, and the channel geometry that produced them
-  lnp           danon.lnp_generator.DanonLNPGenerator     -> scored
+  lnp           danon.vector_design.lnp_generator.DanonLNPGenerator     -> scored
                 candidates with real lipid identities and fractions
-  clinical      danon.cell_simulator.DanonCellSimulator    -> dose-response
+  clinical      danon.vector_design.cell_simulator.DanonCellSimulator    -> dose-response
                 panel, per-mutation rescue, and the UCL-comparison scores
-  construct     danon.construct_builder.ConstructBuilder   -> the real
+  construct     danon.vector_design.construct_builder.ConstructBuilder   -> the real
                 plasmid segment map, in base pairs
 
 HONESTY RULES HELD HERE
@@ -152,14 +152,14 @@ def build_pipeline_artifact(
 
 def build_microfluidics_artifact() -> Dict[str, Any]:
     """Real flow physics from the microfluidics core at its default geometry."""
-    from danon.microfluidics_core import MicrofluidicsCore
+    from danon.vector_design.microfluidics_core import MicrofluidicsCore
 
     core = MicrofluidicsCore()
     telemetry = core.simulate()
     return _artifact(
         key="microfluidics",
         title="Microfluidic Y-junction: computed flow telemetry",
-        source="danon.microfluidics_core.MicrofluidicsCore().simulate() + profile accessors",
+        source="danon.vector_design.microfluidics_core.MicrofluidicsCore().simulate() + profile accessors",
         data={
             "config": _plain(core.config.model_dump()),
             "telemetry": _plain(telemetry),
@@ -192,7 +192,7 @@ def build_microfluidics_artifact() -> Dict[str, Any]:
 def build_lnp_artifact(batch_size: int = 48, top_n: int = 8) -> Dict[str, Any]:
     """Score real LNP candidates and record the best formulation + spread."""
     from danon.config import DanonConfig
-    from danon.lnp_generator import DanonLNPGenerator
+    from danon.vector_design.lnp_generator import DanonLNPGenerator
 
     config = DanonConfig()
     generator = DanonLNPGenerator(config)
@@ -217,7 +217,7 @@ def build_lnp_artifact(batch_size: int = 48, top_n: int = 8) -> Dict[str, Any]:
         key="lnp",
         title="LNP formulation search",
         source=(
-            "danon.lnp_generator.DanonLNPGenerator(DanonConfig())"
+            "danon.vector_design.lnp_generator.DanonLNPGenerator(DanonConfig())"
             f".generate_candidates(0, {batch_size}) + score_candidates"
         ),
         data={
@@ -259,7 +259,7 @@ def build_lnp_artifact(batch_size: int = 48, top_n: int = 8) -> Dict[str, Any]:
 
 def build_clinical_artifact(vector_copy_number: float = 10.0) -> Dict[str, Any]:
     """Real cell-simulator outputs: dose response, mutation classes, anchors."""
-    from danon.cell_simulator import DanonCellSimulator
+    from danon.vector_design.cell_simulator import DanonCellSimulator
 
     sim = DanonCellSimulator()
     dose_response = _plain(sim.dose_response_panel(candidate_id=0))
@@ -276,7 +276,7 @@ def build_clinical_artifact(vector_copy_number: float = 10.0) -> Dict[str, Any]:
         key="clinical",
         title="Modelled cardiomyocyte rescue (8-ODE cell simulator)",
         source=(
-            "danon.cell_simulator.DanonCellSimulator.dose_response_panel + "
+            "danon.vector_design.cell_simulator.DanonCellSimulator.dose_response_panel + "
             f"compare_mutation_types(vcn={vector_copy_number}) + benchmark scores"
         ),
         data={
@@ -308,7 +308,7 @@ def build_clinical_artifact(vector_copy_number: float = 10.0) -> Dict[str, Any]:
 
 def build_construct_artifact() -> Dict[str, Any]:
     """The engine's own construct: real segments, in base pairs."""
-    from danon.construct_builder import ConstructBuilder
+    from danon.vector_design.construct_builder import ConstructBuilder
 
     builder = ConstructBuilder()
     construct = builder.build_construct()
@@ -350,7 +350,7 @@ def build_construct_artifact() -> Dict[str, Any]:
     return _artifact(
         key="construct",
         title="Synthesis-ready AAV9-LAMP2B plasmid",
-        source="danon.construct_builder.ConstructBuilder().build_construct()",
+        source="danon.vector_design.construct_builder.ConstructBuilder().build_construct()",
         data={
             "name": construct.name,
             "promoter_name": construct.promoter_name,
@@ -396,7 +396,7 @@ def build_structure_artifact() -> Dict[str, Any]:
     to the wrong serotype; this artifact replaces all of that with the
     deposited geometry.
     """
-    from danon.structure import (
+    from danon.vector_design.structure import (
         AAV9_STRUCTURE_ID,
         AAV9_STRUCTURE_METHOD,
         AAV9_STRUCTURE_REFERENCE,
@@ -454,7 +454,7 @@ def build_structure_artifact() -> Dict[str, Any]:
         key="structure",
         title=f"AAV9 capsid structure ({AAV9_STRUCTURE_ID}) -- deposited coordinates, deposited symmetry",
         source=(
-            f"danon.structure.load_aav9_capsid() over PDB {AAV9_STRUCTURE_ID}; "
+            f"danon.vector_design.structure.load_aav9_capsid() over PDB {AAV9_STRUCTURE_ID}; "
             f"coordinates and REMARK 350 BIOMT operators read from "
             f"data/pdb/{AAV9_STRUCTURE_ID}.pdb"
         ),
@@ -826,6 +826,11 @@ def build_claims_artifact() -> Dict[str, Any]:
             "limit": a.claim.limit,
             "supported": bool(a.supported),
             "detail": _detail_text(a),
+            # Which of the repository's studies the claim is about. The app
+            # routes only the tumour twin; the vector-design claims are still
+            # checked here (they back code that still exists) but are marked
+            # so a reader is not shown a capsid claim inside an oncology tool.
+            "study": a.claim.study,
         }
         for a in audits
     ]
@@ -867,6 +872,22 @@ BUILDERS = {
     "evolution": build_evolution_artifact,
 }
 
+# Which public folder each artifact mirrors into. The tumour twin's files stay
+# in ``artifacts/``; the vector-design study's move to ``vector_design/``, for
+# the same reason its code lives in danon/vector_design: the two studies share
+# a build, not a disease.
+MIRROR_SUBDIR = {
+    "claims": "artifacts",
+    "paraview": "artifacts",
+    "evolution": "artifacts",
+    "pipeline": "vector_design",
+    "microfluidics": "vector_design",
+    "lnp": "vector_design",
+    "clinical": "vector_design",
+    "construct": "vector_design",
+    "structure": "vector_design",
+}
+
 
 def build_app_artifacts(
     keys: Optional[List[str]] = None,
@@ -891,11 +912,13 @@ def build_app_artifacts(
 
 def write_app_artifacts(
     out_dir: str = "outputs_real/app_artifacts",
-    mirror_dir: Optional[str] = "frontend/public/artifacts",
+    mirror_root: Optional[str] = "frontend/public",
     keys: Optional[List[str]] = None,
     log: Optional[callable] = None,
 ) -> Dict[str, List[str]]:
-    """Write each artifact to disk (and to the frontend's public folder).
+    """Write each artifact to disk and to its folder under the frontend's public
+    root (see ``MIRROR_SUBDIR``: tumour-twin keys to ``artifacts/``, vector-design
+    keys to ``vector_design/``).
 
     Returns {key: [paths written]}. The frontend copy is byte-identical to the
     canonical one, so the UI cannot be showing a stale or different artifact
@@ -905,8 +928,14 @@ def write_app_artifacts(
     written: Dict[str, List[str]] = {}
     for key, payload in artifacts.items():
         blob = json.dumps(payload, indent=1)
+        subdir = MIRROR_SUBDIR.get(key)
+        if subdir is None:
+            raise ValueError(
+                f"artifact {key!r} has no MIRROR_SUBDIR entry; add one so its "
+                "frontend folder is an explicit decision"
+            )
         paths = []
-        for directory in (out_dir, mirror_dir):
+        for directory in (out_dir, mirror_root and os.path.join(mirror_root, subdir)):
             if not directory:
                 continue
             os.makedirs(directory, exist_ok=True)

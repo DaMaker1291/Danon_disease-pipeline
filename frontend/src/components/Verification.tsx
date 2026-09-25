@@ -14,11 +14,19 @@ export default function Verification() {
   const { artifact, loading, error } = useArtifact<ClaimsArtifactData>('claims');
   const [tier, setTier] = useState<string>('all');
   const [only, setOnly] = useState<'all' | 'pass' | 'fail'>('all');
+  // The registry covers the whole repository, which also holds a vector-design
+  // study this app does not route. Default to this app's study and say how
+  // many rows that hides, rather than quietly dropping or showing them.
+  const [showAll, setShowAll] = useState(false);
+
+  const all = artifact?.data.claims ?? [];
+  const scoped = showAll ? all : all.filter((c) => c.study !== 'vector_design');
+  const hidden = all.length - scoped.length;
 
   const tiers = useMemo(() => {
-    const t = new Set((artifact?.data.claims ?? []).map((c) => c.tier));
+    const t = new Set(scoped.map((c) => c.tier));
     return ['all', ...Array.from(t).sort()];
-  }, [artifact]);
+  }, [scoped]);
 
   if (loading) return <div className="panel glass seq-empty">Loading the claim audit…</div>;
   if (error || !artifact) {
@@ -37,7 +45,8 @@ export default function Verification() {
   }
 
   const d = artifact.data;
-  const shown = d.claims.filter(
+  const nPassed = scoped.filter((c) => c.supported).length;
+  const shown = scoped.filter(
     (c) =>
       (tier === 'all' || c.tier === tier) &&
       (only === 'all' || (only === 'pass' ? c.supported : !c.supported)),
@@ -49,13 +58,26 @@ export default function Verification() {
         <div className="panel-title">
           Bound-claim audit
           <span className="overview-counter">
-            {d.n_passed}/{d.n_claims} verified · {d.n_failed} failing
+            {nPassed}/{scoped.length} verified · {scoped.length - nPassed} failing
           </span>
         </div>
         <p className="page-header-source">
           Each row is a sentence this project may publish, the check that backs it, and the check's
           result at build time. Passing means the code agrees with the sentence. It does not mean the
           biology is right, and a failed check is listed rather than dropped.
+          {hidden > 0 && (
+            <>
+              {' '}The registry checks {all.length} sentences in total; {hidden} belong to a
+              vector-design study this app does not route.{' '}
+              <button className="chip chip-btn" onClick={() => setShowAll(true)}>show them</button>
+            </>
+          )}
+          {showAll && all.length > scoped.length && (
+            <>
+              {' '}
+              <button className="chip chip-btn" onClick={() => setShowAll(false)}>hide them</button>
+            </>
+          )}
         </p>
 
         <div className="verify-filters">
@@ -94,7 +116,9 @@ export default function Verification() {
               <div style={{ minWidth: 0 }}>
                 <div className="claim-sentence">{c.sentence}</div>
                 <div className="claim-meta">
-                  {c.id} · tier {c.tier} · backed by {c.substantiated_by}
+                  {c.id} · tier {c.tier}
+                  {c.study !== 'tumour_twin' && ` · study ${c.study}`}
+                  {' · backed by '}{c.substantiated_by}
                 </div>
                 <div className="claim-detail">{c.detail}</div>
                 <div className="claim-limit">limit: {c.limit}</div>

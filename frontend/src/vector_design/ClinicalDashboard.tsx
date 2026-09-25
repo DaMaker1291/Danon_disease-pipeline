@@ -15,7 +15,7 @@ import type { ClinicalArtifactData } from '../types/artifacts';
  * in the footer exactly what a model of one cardiomyocyte is not.
  */
 export default function ClinicalDashboard() {
-  const { artifact, loading, error } = useArtifact<ClinicalArtifactData>('clinical');
+  const { artifact, loading, error } = useArtifact<ClinicalArtifactData>('clinical', 'vector_design');
 
   if (loading) return <div className="panel"><div className="panel-title">Modelled cardiomyocyte rescue</div><div className="seq-empty">Loading cell-simulator artifact…</div></div>;
   if (error || !artifact) return <div className="panel"><div className="panel-title">Modelled cardiomyocyte rescue</div><div className="seq-empty">⚠ {error}</div></div>;

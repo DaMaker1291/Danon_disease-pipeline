@@ -12,7 +12,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from danon.pipeline import (
+from danon.vector_design.pipeline import (
     BloodPanel,
     BloodProfiler,
     BloodToCurePipeline,

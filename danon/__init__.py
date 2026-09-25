@@ -1,31 +1,102 @@
 from danon.config import DanonConfig, danon_config
-from danon.aav_generator import DanonAAVGenerator, DanonAAVCandidate
-from danon.lnp_generator import DanonLNPGenerator, DanonLNPCandidate
-from danon.tropism_filter import DanonTropismFilter
-from danon.safety_engine import DanonSafetyEngine, DanonSafetyProfile, print_global_regulatory_disclaimer
-from danon.translational_readiness import (
-    TranslationalReadinessEngine, TranslationalReadinessResult, PreclinicalValidationMilestones,
-)
-from danon.wetlab_lims_tracker import WetlabLIMSTracker, ConstructOrder, AssayResult
-from danon.mouse_study_simulator import MouseStudySimulator, MouseStudyResult
-from danon.dual_vector_moi_optimizer import DualVectorMOIOptimizer, DualVectorMoiDesign
-from danon.nab_assay_simulator import NAbAssaySimulator, NAbAssayResult
-from danon.immunosuppression_protocol import ImmunosuppressionProtocol, ImmunosuppressionAssessment
-from danon.cell_simulator import DanonCellSimulator, CellSimulationResult
-from danon.epitope_masker import EpitopeMasker, ChargeMaskDesign
-from danon.stoichiometric_calc import StoichiometricCalculator, DecoyOptimizationResult
-from danon.promoter_spec import PromoterSpecEngine, PromoterSpec
-from danon.platform_validator import PlatformValidator, RegulatoryAssessment
-from danon.data_ingress import DataIngressEngine, IngressResult
-from danon.microfluidics_core import MicrofluidicsCore, FlowTelemetry, MicrofluidicConfig
-from danon.opentrons_compiler import OpentronsCompiler, OpentronsProtocol, RobotType
-from danon.dms_fitness import DMSFitnessLayer, DMSFitnessResult
-from danon.solvation_energy import SolvationEnergyEngine, SolvationResult
-from danon.smar_insulator import SMARInsulatorEngine, CpGOptimizationEngine, CpGDepletionReport, calculate_cpg_density
-from danon.codon_elongation import CodonElongationEngine, CodonElongationResult
-from danon.hla_decoupler import HLADecoupler, HLADecouplerResult
-from danon.synthesis_guard import SynthesisGuard, SynthesisResult
-from danon.plasmid_builder import PlasmidAssembler, PlasmidAssemblyReport, AssembledVector
+
+# ---------------------------------------------------------------------------
+# The non-oncology studies (AAV9-LAMP2B vector design, the lipid-nanoparticle
+# delivery layer, and the benchtop microfluidics rig) live in
+# ``danon.vector_design``. They are loaded LAZILY: importing ``danon`` must not
+# drag the capsid, LNP and microfluidics engines into a process that only ever
+# runs the tumour twin, which is why the names below are served by module
+# ``__getattr__`` (PEP 562) instead of by import statements. Prefer the
+# explicit path in new code: ``from danon.vector_design import X``.
+# ---------------------------------------------------------------------------
+
+_VECTOR_DESIGN_NAMES = {
+    # name -> module inside danon.vector_design
+    "PatientBloodPanel": "personalization",
+    "PatientAssessment": "personalization",
+    "PatientPersonalizationEngine": "personalization",
+    "PersonalizedRegimen": "personalization",
+    "PersonalizationTier": "personalization",
+    "IschemicIndication": "personalization",
+    "Transgene": "personalization",
+    "TransgeneSpec": "personalization",
+    "Modality": "personalization",
+    "TRANSGENE_CATALOG": "personalization",
+    "print_personalization_disclaimer": "personalization",
+    "DerivedAdhesion": "biology",
+    "StenosisGeometry": "biology",
+    "biological_provenance": "biology",
+    "bell_off_rate": "biology",
+    "cohesion_strength_kpa": "biology",
+    "damkohler_number": "biology",
+    "derive_adhesion": "biology",
+    "embolization_risk": "biology",
+    "enzyme_mass_removal_rate_kg_s": "biology",
+    "hydrodynamic_drag_force_n": "biology",
+    "injected_dose_required": "biology",
+    "noyes_whitney_rate_kg_s": "biology",
+    "particles_required_for_fraction": "biology",
+    "receptor_concentration": "biology",
+    "single_pass_adhesion_fraction": "biology",
+    "time_to_clear_fraction": "biology",
+    "BloodPanel": "pipeline",
+    "BloodProfileResult": "pipeline",
+    "BloodProfiler": "pipeline",
+    "TargetingResult": "pipeline",
+    "MolecularTargeting": "pipeline",
+    "BloodToCurePipeline": "pipeline",
+    "PipelineReport": "pipeline",
+    "AcquisitionSession": "telemetry",
+    "BenchMetrics": "telemetry",
+    "LineProtocol": "telemetry",
+    "ProtocolError": "telemetry",
+    "ReplayBackend": "telemetry",
+    "RigBackend": "telemetry",
+    "RigChannel": "telemetry",
+    "RigConfig": "telemetry",
+    "RigTrace": "telemetry",
+    "SensorCalibration": "telemetry",
+    "SerialBackend": "telemetry",
+    "SimulatedRigBackend": "telemetry",
+    "ValidationReport": "telemetry",
+    "clearance_for_reduction": "telemetry",
+    "default_rig_config": "telemetry",
+    "detect_pulse_peaks": "telemetry",
+    "nominal_reduction_pct": "telemetry",
+    "run_validation": "telemetry",
+    "validate_against_prediction": "telemetry",
+    "waveform_stats": "telemetry",
+    "AAV9_STRUCTURE_ID": "structure",
+    "AAV9_STRUCTURE_REFERENCE": "structure",
+    "AAV9_STRUCTURE_TITLE": "structure",
+    "CaResidue": "structure",
+    "CapsidAssembly": "structure",
+    "MISLABELED_STRUCTURE_ACTUAL": "structure",
+    "MISLABELED_STRUCTURE_ID": "structure",
+    "SymmetryOperator": "structure",
+    "VP1_OFFSET": "structure",
+    "VR_REGION_WINDOWS": "structure",
+    "axis_lines": "structure",
+    "classify_symmetry_operators": "structure",
+    "ensure_structure_file": "structure",
+    "load_aav9_capsid": "structure",
+    "parse_ca_residues": "structure",
+    "parse_symmetry_operators": "structure",
+    "structure_path": "structure",
+    "structure_provenance": "structure",
+    "vr_coordinate_map": "structure",
+    "what_this_structure_cannot_tell_you": "structure",
+}
+
+
+def __getattr__(name: str):
+    """Serve the non-oncology names on first use (PEP 562)."""
+    module = _VECTOR_DESIGN_NAMES.get(name)
+    if module is None:
+        raise AttributeError(f"module 'danon' has no attribute {name!r}")
+    from importlib import import_module
+
+    return getattr(import_module(f"danon.vector_design.{module}"), name)
 
 # Multi-agent CVD / ischemic heart disease deployment layer.
 # These are new abstractions that reuse the existing Danon discovery primitives
@@ -62,22 +133,6 @@ from danon.multiagent.aggregator import (
     normalize_candidate_score,
 )
 
-# Patient personalization layer: turns a blood panel into a patient-specific
-# regimen by wiring the decoy / HLA / dose primitives per patient.
-from danon.personalization import (
-    PatientBloodPanel,
-    PatientAssessment,
-    PatientPersonalizationEngine,
-    PersonalizedRegimen,
-    PersonalizationTier,
-    IschemicIndication,
-    Transgene,
-    TransgeneSpec,
-    Modality,
-    TRANSGENE_CATALOG,
-    print_personalization_disclaimer,
-)
-
 # First-principles hemodynamics: derived constants, similarity, rig design.
 from danon.physics import (
     BenchRigSolver,
@@ -93,61 +148,6 @@ from danon.physics import (
     coronary_presets,
     provenance_summary,
     stokes_einstein_diffusion,
-)
-
-# Derived molecular / cell biology: transport theory, bond mechanics, kinetics.
-from danon.biology import (
-    DerivedAdhesion,
-    StenosisGeometry,
-    biological_provenance,
-    bell_off_rate,
-    cohesion_strength_kpa,
-    damkohler_number,
-    derive_adhesion,
-    embolization_risk,
-    enzyme_mass_removal_rate_kg_s,
-    hydrodynamic_drag_force_n,
-    injected_dose_required,
-    noyes_whitney_rate_kg_s,
-    particles_required_for_fraction,
-    receptor_concentration,
-    single_pass_adhesion_fraction,
-    time_to_clear_fraction,
-)
-
-# Master controller: blood profiling -> molecular targeting -> swarm regression.
-from danon.pipeline import (
-    BloodPanel,
-    BloodProfileResult,
-    BloodProfiler,
-    TargetingResult,
-    MolecularTargeting,
-    BloodToCurePipeline,
-    PipelineReport,
-)
-
-# Benchtop rig telemetry: real acquisition, calibration, sim-vs-bench agreement.
-from danon.telemetry import (
-    AcquisitionSession,
-    BenchMetrics,
-    LineProtocol,
-    ProtocolError,
-    ReplayBackend,
-    RigBackend,
-    RigChannel,
-    RigConfig,
-    RigTrace,
-    SensorCalibration,
-    SerialBackend,
-    SimulatedRigBackend,
-    ValidationReport,
-    clearance_for_reduction,
-    default_rig_config,
-    detect_pulse_peaks,
-    nominal_reduction_pct,
-    run_validation,
-    validate_against_prediction,
-    waveform_stats,
 )
 
 # Vectorised swarm ABM: stenotic coronary flow, plaque regression, embolism.
@@ -776,32 +776,6 @@ from danon.outcome_export import (
     run_case_outcome,
 )
 
-# The real AAV9 capsid structure (PDB 3UX1): deposited C-alpha coordinates and
-# the deposit's own symmetry operators, replacing a fabricated coordinate table
-# that had been attributed to the wrong serotype.
-from danon.structure import (
-    AAV9_STRUCTURE_ID,
-    AAV9_STRUCTURE_REFERENCE,
-    AAV9_STRUCTURE_TITLE,
-    CaResidue,
-    CapsidAssembly,
-    MISLABELED_STRUCTURE_ACTUAL,
-    MISLABELED_STRUCTURE_ID,
-    SymmetryOperator,
-    VP1_OFFSET,
-    VR_REGION_WINDOWS,
-    axis_lines,
-    classify_symmetry_operators,
-    ensure_structure_file,
-    load_aav9_capsid,
-    parse_ca_residues,
-    parse_symmetry_operators,
-    structure_path,
-    structure_provenance,
-    vr_coordinate_map,
-    what_this_structure_cannot_tell_you,
-)
-
 # Every artifact the UI renders, generated by running the real modules.
 from danon.app_artifacts import (
     app_artifacts_provenance,
@@ -855,30 +829,6 @@ from danon.evotwin import (
 )
 
 __all__ = [
-    # Original Danon pipeline
-    "DanonConfig", "danon_config",
-    "DanonAAVGenerator", "DanonAAVCandidate",
-    "DanonLNPGenerator", "DanonLNPCandidate",
-    "DanonTropismFilter",
-    "DanonSafetyEngine", "DanonSafetyProfile",
-    "EpitopeMasker", "ChargeMaskDesign",
-    "StoichiometricCalculator", "DecoyOptimizationResult",
-    "PromoterSpecEngine", "PromoterSpec",
-    "PlatformValidator", "RegulatoryAssessment",
-    "DataIngressEngine", "IngressResult",
-    "MicrofluidicsCore", "FlowTelemetry", "MicrofluidicConfig",
-    "OpentronsCompiler", "OpentronsProtocol", "RobotType",
-    "DMSFitnessLayer", "DMSFitnessResult",
-    "SolvationEnergyEngine", "SolvationResult",
-    "SMARInsulatorEngine", "CpGOptimizationEngine", "CpGDepletionReport",
-    "CodonElongationEngine", "CodonElongationResult",
-    "HLADecoupler", "HLADecouplerResult",
-    "SynthesisGuard", "SynthesisResult",
-    "print_global_regulatory_disclaimer",
-    "TranslationalReadinessEngine", "TranslationalReadinessResult", "PreclinicalValidationMilestones",
-    "WetlabLIMSTracker", "ConstructOrder", "AssayResult",
-    "MouseStudySimulator", "MouseStudyResult",
-    "DualVectorMOIOptimizer", "DualVectorMoiDesign",
 
     # Cure-roadmap evidence map: the four biological requirements for REVERSING
     # IHD, each anchored to the human trial record (GLAGOV/ASTEROID for plaque
@@ -900,10 +850,6 @@ __all__ = [
     "delivery_feasibility",
     "cure_provenance",
     "print_cure_disclaimer",
-    "NAbAssaySimulator", "NAbAssayResult",
-    "ImmunosuppressionProtocol", "ImmunosuppressionAssessment",
-    "DanonCellSimulator", "CellSimulationResult",
-    "PlasmidAssembler", "PlasmidAssemblyReport", "AssembledVector",
 
     # Multi-agent deployment layer
     "MultiAgentConfig",

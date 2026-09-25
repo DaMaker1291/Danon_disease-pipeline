@@ -1,80 +1,80 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
+/*
+ * A restrained instrument palette, not a landing page. One accent, neutral
+ * greys, flat surfaces. The theme this replaced animated two radial glow
+ * blobs behind the content, blurred every panel, and gradient-filled the
+ * title -- decoration that made a data tool look like a product mock, and that
+ * cost a compositing layer on every screen. Numbers use tabular figures
+ * because they are compared down a column.
+ */
 :root {
-  --bg: #060b18;
-  --surface: rgba(17, 24, 39, 0.75);
-  --surface2: rgba(31, 41, 55, 0.6);
-  --accent: #3b82f6;
-  --accent2: #06b6d4;
-  --accent3: #8b5cf6;
-  --success: #22c55e;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --text: #e2e8f0;
-  --text2: #94a3b8;
-  --text3: #64748b;
-  --border: rgba(51, 65, 85, 0.5);
-  --radius: 14px;
-  --radius-sm: 8px;
-  --shadow: 0 8px 32px rgba(0,0,0,0.4);
-  --glow: 0 0 40px rgba(59,130,246,0.15);
+  --bg: #0b1015;
+  --surface: #11161d;
+  --surface2: #171e27;
+  --accent: #4c8ddb;
+  --accent2: #4c8ddb;
+  --accent3: #8a8f98;
+  --success: #4ea672;
+  --danger: #cc5f57;
+  --warning: #c99a45;
+  --text: #dfe4ea;
+  --text2: #9aa4b0;
+  --text3: #6b7683;
+  --border: #232c36;
+  --border-strong: #33404e;
+  --radius: 6px;
+  --radius-sm: 4px;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3);
+  --glow: none;
+  --page-max: 1560px;
 }
 
 html, body, #root { height: 100%; }
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
   line-height: 1.5;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection { background: var(--accent); color: #fff; }
 
+/* Flat surfaces. The backdrop blur was removed rather than reduced: a
+   translucent panel over a moving background makes small text harder to read,
+   which is the opposite of what a readout needs. */
 .glass {
   background: var(--surface);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
 }
 
-.app { display: flex; flex-direction: column; min-height: 100vh; position: relative; }
-.bg-canvas {
-  position: fixed; inset: 0; z-index: 0;
-  pointer-events: none;
+.app {
+  display: flex; flex-direction: column; min-height: 100vh; position: relative;
+  max-width: var(--page-max); margin: 0 auto;
 }
-.bg-glow {
-  position: fixed; z-index: 0; border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
-  animation: glowFloat 20s ease-in-out infinite;
-}
-@keyframes glowFloat {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -20px) scale(1.05); }
-  66% { transform: translate(-20px, 15px) scale(0.95); }
-}
-
 .app-header {
   position: relative; z-index: 10;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 28px; margin: 12px 16px 0; border-radius: var(--radius);
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 0;
 }
 .h-left { display: flex; align-items: center; gap: 20px; }
 .logo-wrap { display: flex; align-items: center; gap: 12px; }
-.logo-icon { font-size: 32px; }
-h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #e2e8f0 0%, #60a5fa 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.h-sub { font-size: 11px; color: var(--text3); display: block; margin-top: -2px;
-  -webkit-text-fill-color: var(--text3); }
+.logo-icon { font-size: 28px; }
+h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
+.h-sub { font-size: 11px; color: var(--text3); display: block; margin-top: 1px; }
 .h-badges { display: flex; gap: 8px; }
-.badge-status { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 700; letter-spacing: 0.05em; }
-.badge-status.live { background: rgba(34,197,94,0.15); color: var(--success); }
-.badge-accent { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 700;
-  background: rgba(59,130,246,0.15); color: var(--accent); }
-.badge-accent.cyan { background: rgba(6,182,212,0.15); color: var(--accent2); }
+.badge-status { font-size: 10px; padding: 2px 8px; border-radius: var(--radius-sm); font-weight: 600;
+  letter-spacing: 0.04em; border: 1px solid var(--border-strong); color: var(--text2); }
+.badge-status.live { border-color: rgba(78,166,114,0.5); color: var(--success); }
+.badge-accent { font-size: 10px; padding: 2px 8px; border-radius: var(--radius-sm); font-weight: 600;
+  background: transparent; border: 1px solid var(--border-strong); color: var(--text2); }
+.badge-accent.cyan { border-color: var(--border-strong); color: var(--text2); }
 .h-right { display: flex; align-items: center; }
 .status-indicator { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
 .status-idle { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); opacity: 0.6; }
@@ -89,8 +89,9 @@ h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.03em;
    not a disease, so the groups carry that boundary instead of one flat row. */
 .app-nav {
   position: relative; z-index: 10;
-  display: flex; flex-wrap: wrap; gap: 18px; padding: 10px 16px; margin: 8px 16px 0;
-  border-radius: var(--radius); align-items: flex-start;
+  display: flex; flex-wrap: wrap; gap: 24px; padding: 8px 20px 0;
+  margin: 0; border: 0; border-bottom: 1px solid var(--border);
+  border-radius: 0; background: var(--surface); align-items: flex-start;
 }
 .nav-group { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .nav-group-label {
@@ -98,26 +99,28 @@ h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.03em;
   color: var(--text3); padding-left: 2px;
 }
 .nav-group-items { display: flex; flex-wrap: wrap; gap: 6px; }
+/* Tabs read as a toolbar with an active rule, not as pill buttons: the
+   underline is the conventional signal for "this is the open view". */
 .nav-btn {
-  display: flex; align-items: center; gap: 8px;
-  padding: 7px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
-  background: transparent; color: var(--text3); font-size: 12px; cursor: pointer;
-  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  display: flex; align-items: center;
+  padding: 8px 2px 7px; border: 0; border-bottom: 2px solid transparent;
+  background: transparent; color: var(--text2); font-size: 13px; cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
   white-space: nowrap;
 }
-.nav-btn:hover { background: var(--surface2); color: var(--text2); }
-.nav-btn.active { background: rgba(59,130,246,0.12); color: var(--accent); border-color: rgba(59,130,246,0.35); }
-.nav-label { font-weight: 600; }
+.nav-btn:hover { color: var(--text); }
+.nav-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+.nav-label { font-weight: 500; }
 
 .app-main {
   position: relative; z-index: 10;
-  flex: 1; padding: 16px; overflow-y: auto;
+  flex: 1; padding: 20px; overflow-y: auto;
 }
 .app-footer {
   position: relative; z-index: 10;
-  display: flex; justify-content: space-between;
-  padding: 10px 24px; margin: 0 16px 12px; border-radius: var(--radius);
-  font-size: 11px; color: var(--text3);
+  display: flex; justify-content: space-between; gap: 24px;
+  padding: 12px 20px; border-top: 1px solid var(--border); border-radius: 0;
+  font-size: 11px; color: var(--text3); background: var(--surface);
 }
 
 .content-grid { display: grid; gap: 16px; height: 100%; }
@@ -133,7 +136,7 @@ h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.03em;
 
 .telemetry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .telemetry-item { padding: 12px; background: var(--surface2); border-radius: var(--radius-sm);
-  backdrop-filter: blur(10px); border: 1px solid var(--border); }
+  border: 1px solid var(--border); }
 .telemetry-label { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
 .telemetry-value { font-size: 18px; font-weight: 800; margin-top: 2px; letter-spacing: -0.02em; }
 .telemetry-safe { color: var(--success); }
@@ -143,18 +146,37 @@ h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.03em;
 .chart-container { width: 100%; height: 320px; flex: 1; }
 
 .upload-zone {
-  border: 2px dashed var(--border); border-radius: var(--radius);
-  padding: 60px 48px; text-align: center; cursor: pointer;
-  transition: all 0.3s; display: flex; flex-direction: column;
-  align-items: center; gap: 16px; background: var(--surface2);
+  border: 1px dashed var(--border-strong); border-radius: var(--radius);
+  padding: 40px 32px; text-align: center; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s; display: flex; flex-direction: column;
+  align-items: center; gap: 10px; background: var(--surface2);
 }
-.upload-zone:hover { border-color: var(--accent); background: rgba(59,130,246,0.06); }
-.upload-zone-icon { font-size: 56px; opacity: 0.4; }
-.upload-zone-text { font-size: 14px; color: var(--text2); }
+.upload-zone:hover { border-color: var(--accent); }
+.upload-zone-text { font-size: 13px; color: var(--text2); }
 .upload-zone-hint { font-size: 11px; color: var(--text3); }
-.upload-result { margin-top: 16px; padding: 16px; background: var(--surface2); border-radius: var(--radius-sm); }
-.upload-result h3 { font-size: 13px; margin-bottom: 8px; }
-.upload-result pre { font-size: 10px; color: var(--text2); overflow-x: auto; white-space: pre-wrap; }
+
+/* ------------------------------ data intake ------------------------------ */
+.intake-result { margin-top: 16px; padding: 16px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.intake-result h3 { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+.intake-result pre { font-size: 12px; color: var(--text2); overflow-x: auto;
+  white-space: pre-wrap; line-height: 1.55; }
+.intake-refused { border-left: 3px solid var(--danger); }
+.intake-refused h3 { color: var(--danger); }
+.intake-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px; margin-bottom: 12px; }
+.intake-metric { background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 10px; }
+.intake-metric-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text3); }
+.intake-metric-value { font-size: 19px; font-weight: 600; margin-top: 2px; }
+.intake-metric-sub { font-size: 10px; color: var(--text3); }
+.intake-facts { display: grid; gap: 6px; font-size: 12px; }
+.intake-facts > div { display: grid; grid-template-columns: 150px 1fr; gap: 10px; }
+.intake-facts dt { color: var(--text3); }
+.intake-facts dd { color: var(--text2); }
+.intake-note { font-size: 11px; color: var(--text3); }
+.intake-warning { font-size: 12px; color: var(--warning); margin-top: 6px; }
 
 .input-group { margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; }
 .input-group label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -281,13 +303,14 @@ h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.03em;
 .flag { font-size: 8px; padding: 1px 6px; border-radius: 8px; margin-right: 4px; }
 .flag.reversal { background: rgba(139,92,246,0.15); color: #a78bfa; }
 .flag.epitope { background: rgba(239,68,68,0.15); color: #f87171; }
-.badge-accent.violet { background: rgba(139,92,246,0.15); color: #a78bfa; }
-.badge { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 700; letter-spacing: 0.03em;
-  background: rgba(148,163,184,0.12); color: var(--text2); display: inline-flex; align-items: center; gap: 4px; }
-.badge-mhra { background: rgba(245,158,11,0.15); color: var(--warning); }
+.badge-accent.violet { border-color: var(--border-strong); color: var(--text2); }
+.badge { font-size: 10px; padding: 2px 8px; border-radius: var(--radius-sm); font-weight: 600; letter-spacing: 0.03em;
+  background: transparent; border: 1px solid var(--border-strong); color: var(--text2);
+  display: inline-flex; align-items: center; gap: 4px; }
+.badge-fail { border-color: rgba(204,95,87,0.5); color: var(--danger); }
 .f-right { margin-left: auto; }
-.badge-warn { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 700;
-  background: rgba(245,158,11,0.18); color: var(--warning); letter-spacing: 0.03em; }
+.badge-warn { font-size: 10px; padding: 2px 8px; border-radius: var(--radius-sm); font-weight: 600;
+  background: transparent; border: 1px solid rgba(201,154,69,0.5); color: var(--warning); letter-spacing: 0.03em; }
 
 /* ===== 24-Phase matrix ===== */
 .phase-matrix { display: flex; flex-direction: column; gap: 6px; }
@@ -402,9 +425,9 @@ h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.03em;
 /* ---------------- VTI 3D viewer ---------------- */
 .vti-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 8px 4px; }
 .vti-ctrl-group { display: flex; gap: 6px; }
-.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(148,163,184,0.25); background: transparent; color: #94a3b8; font-size: 12px; cursor: pointer; transition: all 0.15s; }
-.chip:hover { border-color: var(--accent2); color: #e2e8f0; }
-.chip.active { border-color: var(--accent2); background: rgba(6,182,212,0.12); color: #e2e8f0; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: transparent; color: var(--text2); font-size: 11px; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
+.chip:hover { border-color: var(--accent); color: var(--text); }
+.chip.active { border-color: var(--accent); color: var(--accent); }
 .chip-dot { width: 8px; height: 8px; border-radius: 50%; }
 .vti-slider { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #94a3b8; }
 .vti-slider b { color: #e2e8f0; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
