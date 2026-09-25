@@ -57,7 +57,7 @@ export default function ParaviewGallery() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
         <div className="panel glass" style={{ minHeight: 620, display: 'flex', flexDirection: 'column' }}>
           <div className="panel-title">
-            🧊 3D volume — MTD day-120 end-state
+            3D volume — MTD day-120 end-state
             <span className="readonly-badge">REAL ENGINE ARTIFACT</span>
           </div>
           <ErrorBoundaryish>

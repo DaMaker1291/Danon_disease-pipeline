@@ -179,9 +179,9 @@ export default function MicrofluidicViewer() {
     return () => cancelAnimationFrame(raf);
   }, [telemetry]);
 
-  if (loading) return <div className="panel-title">💧 Y-Junction Microfluidic Mixing — loading artifact…</div>;
+  if (loading) return <div className="panel-title">Y-Junction Microfluidic Mixing — loading artifact…</div>;
   if (error || !artifact || !config || !telemetry) {
-    return <div className="panel-title" style={{ color: 'var(--warning)' }}>💧 Microfluidics artifact unavailable: {error}</div>;
+    return <div className="panel-title" style={{ color: 'var(--warning)' }}>Microfluidics artifact unavailable: {error}</div>;
   }
 
   const setField = (k: keyof MicrofluidicConfigData, v: number) => setConfig({ ...config, [k]: v });
@@ -189,7 +189,7 @@ export default function MicrofluidicViewer() {
   return (
     <>
       <div className="panel-title" style={{ marginBottom: 6 }}>
-        💧 Y-Junction Microfluidic Mixing — channel hydraulics from the engine's own correlations
+        Y-Junction Microfluidic Mixing — channel hydraulics from the engine's own correlations
       </div>
       <div className="canvas-container" style={{ minHeight: CANVAS_H }}>
         <canvas ref={canvasRef} width={CANVAS_W} height={CANVAS_H} style={{ width: '100%', height: '100%', display: 'block' }} />

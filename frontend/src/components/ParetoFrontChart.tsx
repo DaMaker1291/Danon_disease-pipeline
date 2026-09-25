@@ -20,7 +20,7 @@ export default function ParetoFrontChart({ candidates }: Props) {
 
   return (
     <div className="panel">
-      <div className="panel-title">📊 NSGA-II Pareto Front — 6 Competing Objectives</div>
+      <div className="panel-title">NSGA-II Pareto Front — 6 Competing Objectives</div>
       <div className="chart-container">
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart margin={{ top: 10, right: 20, bottom: 20, left: 10 }}>

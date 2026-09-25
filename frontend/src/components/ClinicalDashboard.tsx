@@ -17,8 +17,8 @@ import type { ClinicalArtifactData } from '../types/artifacts';
 export default function ClinicalDashboard() {
   const { artifact, loading, error } = useArtifact<ClinicalArtifactData>('clinical');
 
-  if (loading) return <div className="panel"><div className="panel-title">🏥 Modelled cardiomyocyte rescue</div><div className="seq-empty">Loading cell-simulator artifact…</div></div>;
-  if (error || !artifact) return <div className="panel"><div className="panel-title">🏥 Modelled cardiomyocyte rescue</div><div className="seq-empty">⚠ {error}</div></div>;
+  if (loading) return <div className="panel"><div className="panel-title">Modelled cardiomyocyte rescue</div><div className="seq-empty">Loading cell-simulator artifact…</div></div>;
+  if (error || !artifact) return <div className="panel"><div className="panel-title">Modelled cardiomyocyte rescue</div><div className="seq-empty">⚠ {error}</div></div>;
 
   const { dose_response, mutation_comparison, benchmark, vector_copy_number } = artifact.data;
 
@@ -27,7 +27,7 @@ export default function ClinicalDashboard() {
 
   return (
     <div className="panel">
-      <div className="panel-title">🏥 Modelled cardiomyocyte rescue — 8-ODE cell simulator</div>
+      <div className="panel-title">Modelled cardiomyocyte rescue — 8-ODE cell simulator</div>
       <div style={{ color: 'var(--text2)', fontSize: 11.5, margin: '4px 0 12px', lineHeight: 1.5 }}>
         Dose-response sweep and per-mutation comparison at VCN = {vector_copy_number}. Every point is a solved
         ODE system for one modelled cardiomyocyte — not a measurement.

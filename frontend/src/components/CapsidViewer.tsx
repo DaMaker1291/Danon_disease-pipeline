@@ -207,7 +207,7 @@ function MissingStructure() {
   return (
     <div className="canvas-overlay">
       <div className="overlay-card">
-        <span className="overlay-icon">🧬</span>
+        
         <strong>No structure artifact</strong>
         <p>
           This view renders the deposited AAV9 capsid (PDB&nbsp;3UX1). It has no
@@ -237,7 +237,7 @@ export default function CapsidViewer(props: Props) {
   return (
     <>
       <div className="panel-title" style={{ marginBottom: 6 }}>
-        🧬 AAV9 Capsid — {g ? `${g.subunits}-subunit T=1 assembly` : 'T=1 assembly'} ·{' '}
+        AAV9 Capsid — {g ? `${g.subunits}-subunit T=1 assembly` : 'T=1 assembly'} ·{' '}
         PDB&nbsp;{artifact?.data.structure_id ?? '3UX1'} deposited coordinates ·{' '}
         {g ? `${g.protrusions} three-fold protrusions on ${g.three_fold_axis_lines} axis lines` : 'symmetry from REMARK 350'}
       </div>

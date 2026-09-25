@@ -146,17 +146,17 @@ export default function GeneViewer() {
   const segments = useMemo(() => (artifact ? toGeneSegments(artifact.data.segments) : []), [artifact]);
 
   if (loading) {
-    return <div className="panel-title">🧪 LAMP2B Transgene — loading construct artifact…</div>;
+    return <div className="panel-title">LAMP2B Transgene — loading construct artifact…</div>;
   }
   if (error || !artifact) {
-    return <div className="panel-title" style={{ color: 'var(--warning)' }}>🧪 Construct artifact unavailable: {error}</div>;
+    return <div className="panel-title" style={{ color: 'var(--warning)' }}>Construct artifact unavailable: {error}</div>;
   }
   const construct = artifact.data;
 
   return (
     <>
       <div className="panel-title" style={{ marginBottom: 6 }}>
-        🧪 LAMP2B Transgene — the engine's own single-vector construct ({construct.total_length_bp} bp)
+        LAMP2B Transgene — the engine's own single-vector construct ({construct.total_length_bp} bp)
       </div>
       <div className="canvas-container" style={{ minHeight: 300 }}>
         <ErrorBoundary label="GeneViewer">

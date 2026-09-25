@@ -165,9 +165,9 @@ export default function LNPViewer() {
   const best = artifact?.data.best;
   const summary = artifact?.data.summary;
 
-  if (loading) return <div className="panel-title">💊 Lipid Nanoparticle — loading formulation artifact…</div>;
+  if (loading) return <div className="panel-title">Lipid Nanoparticle — loading formulation artifact…</div>;
   if (error || !artifact || !best || !summary) {
-    return <div className="panel-title" style={{ color: 'var(--warning)' }}>💊 LNP artifact unavailable: {error}</div>;
+    return <div className="panel-title" style={{ color: 'var(--warning)' }}>LNP artifact unavailable: {error}</div>;
   }
 
   // The sphere scales with the PREDICTED particle size from the artifact, so the
@@ -177,7 +177,7 @@ export default function LNPViewer() {
   return (
     <>
       <div className="panel-title" style={{ marginBottom: 6 }}>
-        💊 Lipid Nanoparticle — best of {summary.n_candidates} scored candidates ({best.particle_size_nm.toFixed(1)} nm predicted)
+        Lipid Nanoparticle — best of {summary.n_candidates} scored candidates ({best.particle_size_nm.toFixed(1)} nm predicted)
       </div>
       <div className="canvas-container" style={{ minHeight: 400 }}>
         <ErrorBoundary label="LNPViewer">

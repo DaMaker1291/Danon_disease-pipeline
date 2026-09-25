@@ -145,7 +145,7 @@ export default function TwinPlanner({ onVti }: Props) {
             </>
           ) : (
             <>
-              <div className="upload-zone-icon">🧠</div>
+              
               <div className="upload-zone-text">Drop a tumour segmentation mask (.nii / .nii.gz)</div>
               <div className="upload-zone-text" style={{ fontSize: 11 }}>
                 any binary or label mask; nonzero = tumour · ≤4,000,000 voxels · auto-downsampled if larger

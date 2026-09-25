@@ -496,16 +496,37 @@ class TestHorizon2Phases:
         p9 = [p for p in r["phases"] if p["name"].startswith("Vector Topology")][0]
         assert "Single" in p9["metric"]
 
-    def test_full_24_phase_pipeline_compiles_and_compounds(self):
+    def test_full_24_phase_pipeline_compiles(self):
         from api_server import run_full_pipeline, PipelineConstraints
         result = run_full_pipeline(PipelineConstraints(candidate_pool=150, random_seed=7))
         assert result["totalPhases"] == 24
         assert len(result["phases"]) == 24
-        assert result["combinatorialAdvantage"] > 1e9, "Combinatorial advantage collapsed"
-        # every phase must carry a real selectivity factor in the valid band
         for p in result["phases"]:
-            assert 1.5 <= p["selectivityFactor"] <= 4.0
             assert p["status"] in ("pass", "warn", "fail")
+
+    def test_no_compounded_design_space_advantage_is_reported(self):
+        """The removed metric must not come back, in any key spelling.
+
+        This replaces a test that *required* the product to exceed 1e9 -- i.e. a
+        test that failed if a meaningless number stopped being impressive. The
+        gates it multiplied are neither orthogonal nor independent, and the
+        multipliers were an arbitrary affine map of the scores already reported.
+        """
+        from api_server import run_full_pipeline, PipelineConstraints
+
+        result = run_full_pipeline(PipelineConstraints(candidate_pool=150, random_seed=7))
+        assert "combinatorialAdvantage" not in result
+        assert "combinatorial_advantage" not in result
+        for p in result["phases"]:
+            assert "selectivityFactor" not in p
+            assert "selectivity_factor" not in p
+        # what replaced it must actually be there, and must add up
+        s = result["phaseSummary"]
+        assert s["nPhases"] == 24
+        assert s["nPass"] + s["nWarn"] + s["nFail"] == 24
+        assert s["nPass"] == result["phasesPassed"]
+        assert s["nPass"] == sum(1 for p in result["phases"] if p["status"] == "pass")
+        assert "not independent" in s["basis"]
 
 
 if __name__ == "__main__":

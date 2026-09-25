@@ -182,8 +182,19 @@ export interface Phase {
   score: number;
   status: 'pass' | 'warn' | 'fail';
   metric: string;
-  selectivityFactor: number;
   horizon: number;
+}
+
+/**
+ * Composition of the 24 gates. Replaces the removed `combinatorialAdvantage`,
+ * which was a product of arbitrary per-gate multipliers (see api_server.py).
+ */
+export interface PhaseSummary {
+  nPhases: number;
+  nPass: number;
+  nWarn: number;
+  nFail: number;
+  basis: string;
 }
 
 export interface AdvancedMetrics {
@@ -300,7 +311,7 @@ export interface PipelineResult {
   poolEvaluated: number;
   phases: Phase[];
   advancedMetrics: AdvancedMetrics;
-  combinatorialAdvantage: number;
+  phaseSummary: PhaseSummary;
   phasesPassed: number;
   totalPhases: number;
   translationalReadiness: TranslationalReadiness;

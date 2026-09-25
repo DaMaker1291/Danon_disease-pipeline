@@ -22,7 +22,7 @@ export default function TelemetryPanel({ telemetry, title = 'System Telemetry' }
 
   return (
     <>
-      <div className="panel-title">{title === 'System Telemetry' ? '📡 ' : '📊 '}{title}</div>
+      <div className="panel-title">{title}</div>
       <div className="telemetry-grid">
         {items.map(item => (
           <div key={item.label} className="telemetry-item">

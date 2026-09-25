@@ -59,7 +59,7 @@ export default function StructureViewer({ sequence }: Props) {
     return (
       <div>
         <div className="panel-title" style={{ marginBottom: 6 }}>
-          🧬 ESM-2 Structural Biology — AI-Powered Protein Analysis
+          ESM-2 Structural Biology — AI-Powered Protein Analysis
         </div>
         <div className="seq-empty">
           Run the pipeline to generate an engineered capsid sequence. ESM-2 will predict
@@ -85,7 +85,7 @@ export default function StructureViewer({ sequence }: Props) {
   return (
     <div>
       <div className="panel-title" style={{ marginBottom: 6 }}>
-        🧬 ESM-2 Structural Biology — Per-Residue AI Predictions
+        ESM-2 Structural Biology — Per-Residue AI Predictions
       </div>
 
       {loading && (

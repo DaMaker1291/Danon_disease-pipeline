@@ -1,7 +1,7 @@
 {
  "key": "pipeline",
  "title": "AAV9-LAMP2B design pipeline (24 phases)",
- "generated_utc": "2026-09-24T18:04:47Z",
+ "generated_utc": "2026-09-25T17:56:54Z",
  "source": "api_server.run_full_pipeline(PipelineConstraints(candidate_pool=240, random_seed=42))",
  "notes": [
   "engine output, not an experiment: sequences and scores come from the design pipeline's own scorers (NSGA-II Pareto selection, Poisson-Boltzmann charge masking, Horizon-2 phase gates)",
@@ -1091,7 +1091,6 @@
     "score": 1.0,
     "status": "pass",
     "metric": "240 variants ingested \u00b7 template mapped",
-    "selectivityFactor": 4.0,
     "horizon": 1
    },
    {
@@ -1101,7 +1100,6 @@
     "score": 1.0,
     "status": "pass",
     "metric": "240 VP1 variants sampled from pool of 240",
-    "selectivityFactor": 4.0,
     "horizon": 1
    },
    {
@@ -1111,7 +1109,6 @@
     "score": 0.7627,
     "status": "pass",
     "metric": "cardiomyocyte affinity 76%",
-    "selectivityFactor": 3.407,
     "horizon": 1
    },
    {
@@ -1121,7 +1118,6 @@
     "score": 0.5,
     "status": "warn",
     "metric": "myofiber affinity 50%",
-    "selectivityFactor": 2.75,
     "horizon": 1
    },
    {
@@ -1131,7 +1127,6 @@
     "score": 0.8609,
     "status": "pass",
     "metric": "liver avoidance 86%",
-    "selectivityFactor": 3.652,
     "horizon": 1
    },
    {
@@ -1141,7 +1136,6 @@
     "score": 0.6867,
     "status": "pass",
     "metric": "mask score 0.69 \u00b7 7 subs",
-    "selectivityFactor": 3.217,
     "horizon": 1
    },
    {
@@ -1151,7 +1145,6 @@
     "score": 0.7294,
     "status": "pass",
     "metric": "mask score 0.73 \u00b7 10 subs",
-    "selectivityFactor": 3.324,
     "horizon": 1
    },
    {
@@ -1161,7 +1154,6 @@
     "score": 1.0,
     "status": "pass",
     "metric": "charge-flip ratio 1.00",
-    "selectivityFactor": 4.0,
     "horizon": 1
    },
    {
@@ -1171,7 +1163,6 @@
     "score": 1.0,
     "status": "pass",
     "metric": "receptor footprint preserved",
-    "selectivityFactor": 4.0,
     "horizon": 1
    },
    {
@@ -1181,7 +1172,6 @@
     "score": 0.7602,
     "status": "pass",
     "metric": "integrity 0.76",
-    "selectivityFactor": 3.401,
     "horizon": 1
    },
    {
@@ -1191,7 +1181,6 @@
     "score": 0.8933,
     "status": "pass",
     "metric": "compatibility 0.89",
-    "selectivityFactor": 3.733,
     "horizon": 1
    },
    {
@@ -1201,7 +1190,6 @@
     "score": 0.7081,
     "status": "pass",
     "metric": "NAb escape 71%",
-    "selectivityFactor": 3.27,
     "horizon": 1
    },
    {
@@ -1211,7 +1199,6 @@
     "score": 0.9,
     "status": "pass",
     "metric": "cardiac specificity 0.90",
-    "selectivityFactor": 3.75,
     "horizon": 1
    },
    {
@@ -1221,7 +1208,6 @@
     "score": 1.0,
     "status": "pass",
     "metric": "miR-122/miR-1/miR-142/miR-208 score 1.00",
-    "selectivityFactor": 4.0,
     "horizon": 1
    },
    {
@@ -1231,7 +1217,6 @@
     "score": 1.0,
     "status": "pass",
     "metric": "Single-Vector (Monotropic) \u00b7 2188 bp \u00b7 tox x1.0",
-    "selectivityFactor": 4.0,
     "horizon": 1
    },
    {
@@ -1241,7 +1226,6 @@
     "score": 0.8325,
     "status": "pass",
     "metric": "empty:full capsid ratio optimized for NAb decoy",
-    "selectivityFactor": 3.581,
     "horizon": 1
    },
    {
@@ -1251,7 +1235,6 @@
     "score": 0.6531,
     "status": "pass",
     "metric": "mixing efficiency 0.65",
-    "selectivityFactor": 3.133,
     "horizon": 1
    },
    {
@@ -1261,7 +1244,6 @@
     "score": 0.6373,
     "status": "pass",
     "metric": "rubric verdict UNKNOWN \u00b7 7/8 dimensions scored \u00b7 not an MHRA determination",
-    "selectivityFactor": 3.093,
     "horizon": 1
    },
    {
@@ -1271,7 +1253,6 @@
     "score": 0.723,
     "status": "pass",
     "metric": "min fitness -0.05 \u00b7 0 lethal \u00b7 0 pocket hits",
-    "selectivityFactor": 3.308,
     "horizon": 2
    },
    {
@@ -1281,7 +1262,6 @@
     "score": 1.0,
     "status": "pass",
     "metric": "\u0394\u0394G_solv -654.79 kcal/mol \u00b7 soluble",
-    "selectivityFactor": 4.0,
     "horizon": 2
    },
    {
@@ -1291,7 +1271,6 @@
     "score": 0.8482,
     "status": "pass",
     "metric": "CpG 0.10\u21920.00/100bp \u00b7 -100% \u00b7 depleted",
-    "selectivityFactor": 3.621,
     "horizon": 2
    },
    {
@@ -1301,7 +1280,6 @@
     "score": 0.9603,
     "status": "pass",
     "metric": "tAI 0.960 \u00b7 min-window 0.87 \u00b7 0 stalls",
-    "selectivityFactor": 3.901,
     "horizon": 2
    },
    {
@@ -1311,7 +1289,6 @@
     "score": 1.0,
     "status": "pass",
     "metric": "split@200 \u00b7 strongest IC50 50000 nM \u00b7 0 hits",
-    "selectivityFactor": 4.0,
     "horizon": 2
    },
    {
@@ -1321,7 +1298,6 @@
     "score": 1.0,
     "status": "pass",
     "metric": "GC 64% \u00b7 0 hairpins \u00b7 synthesizable",
-    "selectivityFactor": 4.0,
     "horizon": 2
    }
   ],
@@ -1614,7 +1590,13 @@
     ]
    }
   },
-  "combinatorialAdvantage": 24212846477669.246,
+  "phaseSummary": {
+   "nPhases": 24,
+   "nPass": 23,
+   "nWarn": 1,
+   "nFail": 0,
+   "basis": "gate pass/warn/fail on the pipeline's own scores at fixed thresholds (pass >= 0.6, warn >= 0.4); the scores are model outputs, and the gates are not independent of one another"
+  },
   "phasesPassed": 23,
   "totalPhases": 24,
   "translationalReadiness": {

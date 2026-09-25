@@ -3,13 +3,6 @@ import type { PipelineResult, Phase } from '../types';
 
 interface Props { result: PipelineResult | null }
 
-function fmtAdvantage(x: number): string {
-  if (x >= 1e12) return `${(x / 1e12).toFixed(2)} trillion×`;
-  if (x >= 1e9) return `${(x / 1e9).toFixed(2)} billion×`;
-  if (x >= 1e6) return `${(x / 1e6).toFixed(2)} million×`;
-  return `${x.toFixed(0)}×`;
-}
-
 function PhaseCard({ p }: { p: Phase }) {
   return (
     <div className={`phase-card ${p.status} ${p.horizon === 2 ? 'h2' : ''}`}>
@@ -23,7 +16,7 @@ function PhaseCard({ p }: { p: Phase }) {
       <div className="phase-metric">{p.metric}</div>
       <div className="phase-foot">
         <span>score {p.score.toFixed(2)}</span>
-        <span className="sel">×{p.selectivityFactor.toFixed(2)}</span>
+        <span className="sel">gate ≥{p.status === 'fail' ? '0.40' : '0.60'}</span>
       </div>
     </div>
   );
@@ -42,7 +35,7 @@ export default function PhaseMatrix({ result }: Props) {
     return (
       <div className="seq-empty">
         {!result
-          ? 'Run the pipeline (3D Capsid tab) to execute all 24 phases. This matrix renders the live per-phase scores, the six Horizon-2 modules, and the compounded combinatorial design-space advantage.'
+          ? 'No pipeline result loaded. Run the pipeline on the Capsid & Sequence tab, or use the precomputed artifact this page ships with. The matrix renders the 24 gate scores, their pass/warn/fail composition, and the six Horizon-2 module details.'
           : 'Pipeline returned without advanced metrics. Re-run to populate Horizon-2 data.'}
       </div>
     );
@@ -52,14 +45,22 @@ export default function PhaseMatrix({ result }: Props) {
 
 function PhaseMatrixInner({ result }: { result: PipelineResult }) {
   const am = result.advancedMetrics;
+  const summary = result.phaseSummary;
 
   return (
     <div className="phase-matrix">
       <div className="pm-header">
         <div className="pm-hero glass">
-          <span className="pm-hero-label">Combinatorial design-space advantage</span>
-          <span className="pm-hero-value">{fmtAdvantage(result.combinatorialAdvantage)}</span>
-          <span className="pm-hero-sub">∏ selectivity factors across 24 orthogonal phases · {result.phasesPassed}/24 passed</span>
+          <span className="pm-hero-label">Gate composition</span>
+          <span className="pm-hero-value">
+            {summary ? `${summary.nPass}` : '—'}
+            <em>{summary ? ` / ${summary.nPhases}` : ''}</em>
+          </span>
+          <span className="pm-hero-sub">
+            {summary
+              ? `${summary.nWarn} warn · ${summary.nFail} fail — ${summary.basis}`
+              : 'gate summary absent: this artifact predates the removal of the compounded factor. Rebuild it (python -m danon.app_artifacts).'}
+          </span>
         </div>
         <div className="pm-hero-stats">
           <StatChip label="Capsid viable (DMS)" value={am.dms.capsidViable ? 'yes' : 'no'} ok={am.dms.capsidViable} />

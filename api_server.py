@@ -348,19 +348,42 @@ def run_full_pipeline(c: PipelineConstraints) -> Dict:
         ("Microfluidic LNP Formulation", "Formulation", float(np.clip(mixing_eff, 0, 1)), f"mixing efficiency {mixing_eff:.2f}"),
         reg_phase,
     ]
+    # ------------------------------------------------------------------ #
+    # NOTE -- a compounded "combinatorial design-space advantage" used to be
+    # computed here as prod(1.5 + 2.5 * score) over the 24 phases and shown in
+    # the UI as, e.g., "24.2 trillion x". It was removed: the gates are neither
+    # orthogonal nor independent (phases 3-12 all score the same selected
+    # capsid, phases 21-24 all score the same sequence), the multipliers were an
+    # arbitrary affine map of the already-reported scores, and a product of 24
+    # dimensionless gate scores has no units and no interpretation. Nothing
+    # measured changes when it is removed; only the headline changes.
+    # The registry now reports the composition of the gates instead.
+    # ------------------------------------------------------------------ #
     all_specs = phases_18 + horizon2["_new_phases"]
     phases = []
-    advantage = 1.0
     for i, (name, cat, score, metric) in enumerate(all_specs, start=1):
         score = float(np.clip(score, 0, 1))
-        selectivity = round(1.5 + 2.5 * score, 3)  # per-phase orthogonal factor (1.5-4.0)
-        advantage *= selectivity
         phases.append({
             "id": i, "name": name, "category": cat,
             "score": round(score, 4), "status": _status(score),
-            "metric": metric, "selectivityFactor": selectivity,
+            "metric": metric,
             "horizon": 2 if i >= 19 else 1,
         })
+    by_status = {
+        status: sum(1 for p in phases if p["status"] == status)
+        for status in ("pass", "warn", "fail")
+    }
+    phase_summary = {
+        "nPhases": len(phases),
+        "nPass": by_status["pass"],
+        "nWarn": by_status["warn"],
+        "nFail": by_status["fail"],
+        "basis": (
+            "gate pass/warn/fail on the pipeline's own scores at fixed "
+            "thresholds (pass >= 0.6, warn >= 0.4); the scores are model "
+            "outputs, and the gates are not independent of one another"
+        ),
+    }
 
     return {
         "sequence": masked_seq,
@@ -394,8 +417,8 @@ def run_full_pipeline(c: PipelineConstraints) -> Dict:
         "poolEvaluated": len(scored),
         "phases": phases,
         "advancedMetrics": horizon2["advancedMetrics"],
-        "combinatorialAdvantage": advantage,
-        "phasesPassed": sum(1 for p in phases if p["status"] == "pass"),
+        "phaseSummary": phase_summary,
+        "phasesPassed": phase_summary["nPass"],
         "totalPhases": 24,
         "translationalReadiness": _snake_to_camel(TranslationalReadinessEngine().evaluate_translational_gate().model_dump()),
     }
@@ -551,7 +574,6 @@ def run_horizon2(c: PipelineConstraints, wt_seq: str, masked_seq: str,
         "advancedMetrics": advanced,
         "_new_phases": new_phases,
         "phases": [],  # filled by build_phase_registry
-        "combinatorialAdvantage": 0.0,
     }
 
 

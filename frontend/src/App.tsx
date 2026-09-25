@@ -23,20 +23,47 @@ import type { FlowTelemetry, ParetoPoint, UploadResult, PipelineResult, Pipeline
 import type { MicrofluidicsArtifactData, PipelineArtifactData } from './types/artifacts';
 
 type TabId = 'capsid' | 'phases' | 'lnp' | 'gene' | 'microfluidics' | 'clinical' | 'outcome' | 'upload' | 'twin' | 'paraview' | 'evolution';
-interface TabDef { id: TabId; label: string; icon: string; desc: string }
+
+interface TabDef {
+  id: TabId;
+  label: string;
+  /** One line of "what you are looking at and where it comes from". */
+  desc: string;
+  /** Which of this project's two subjects the tab belongs to. */
+  group: TabGroup;
+}
+
+type TabGroup =
+  | 'Patient twin (glioblastoma)'
+  | 'Vector design (AAV9-LAMP2B)'
+  | 'Fabrication'
+  | 'Data & provenance';
+
+/**
+ * Navigation is grouped by subject, because the app contains two studies that
+ * share a repository but not a disease: the patient tumour twin (GBM) and the
+ * vector-design pipeline (AAV9-LAMP2B for Danon disease). Sorting them into
+ * one flat row of eleven tabs made the boundary invisible.
+ */
+const GROUPS: TabGroup[] = [
+  'Patient twin (glioblastoma)',
+  'Vector design (AAV9-LAMP2B)',
+  'Fabrication',
+  'Data & provenance',
+];
 
 const TABS: TabDef[] = [
-  { id: 'twin', label: 'MRI Twin Planner', icon: '🧠', desc: 'Scan in, treatment plan out' },
-  { id: 'paraview', label: 'ParaView Gallery', icon: '🧊', desc: 'Real BraTS volumetric artifact' },
-  { id: 'outcome', label: '365-Day Outcome', icon: '📅', desc: 'Exact day-365 engine state' },
-  { id: 'evolution', label: 'Evolution Player', icon: '🎞️', desc: '365-day evolution & resistance movie' },
-  { id: 'capsid', label: '3D Capsid', icon: '🧬', desc: 'AAV9 structural viewer' },
-  { id: 'phases', label: '24 Phases', icon: '🔬', desc: 'Hyper-dimensional matrix' },
-  { id: 'lnp', label: 'LNP Simulator', icon: '💊', desc: 'Lipid nanoparticle assembly' },
-  { id: 'gene', label: 'Gene Construct', icon: '🧪', desc: 'LAMP2B transgene map' },
-  { id: 'microfluidics', label: 'Microfluidics', icon: '💧', desc: 'Y-junction flow simulation' },
-  { id: 'clinical', label: 'Clinical', icon: '📊', desc: 'Pareto fronts & outcomes' },
-  { id: 'upload', label: 'Upload', icon: '📤', desc: 'Sequence data ingress' },
+  { id: 'twin', group: 'Patient twin (glioblastoma)', label: 'MRI → Plan', desc: 'Upload a BraTS scan, get a dosing schedule' },
+  { id: 'evolution', group: 'Patient twin (glioblastoma)', label: '365-Day Evolution', desc: 'Per-day engine frames, steering vs MTD' },
+  { id: 'outcome', group: 'Patient twin (glioblastoma)', label: 'Day-365 State', desc: 'End-of-horizon burdens and outcome cards' },
+  { id: 'upload', group: 'Patient twin (glioblastoma)', label: 'Data Intake', desc: 'NIfTI scans, sequences, availability manifests' },
+  { id: 'capsid', group: 'Vector design (AAV9-LAMP2B)', label: 'Capsid & Sequence', desc: 'PDB 3UX1 structure, masked VP1 design' },
+  { id: 'phases', group: 'Vector design (AAV9-LAMP2B)', label: 'Design Gates', desc: '24 gate scores and their composition' },
+  { id: 'gene', group: 'Vector design (AAV9-LAMP2B)', label: 'Transgene Map', desc: 'LAMP2B construct, promoters, UTRs' },
+  { id: 'clinical', group: 'Vector design (AAV9-LAMP2B)', label: 'Pareto & Readiness', desc: 'Optimizer front, translational gates' },
+  { id: 'lnp', group: 'Fabrication', label: 'LNP Formulation', desc: 'Scored lipid composition and size' },
+  { id: 'microfluidics', group: 'Fabrication', label: 'Microfluidics', desc: 'Y-junction flow telemetry' },
+  { id: 'paraview', group: 'Data & provenance', label: 'ParaView Artifact', desc: 'Committed BraTS volume, downloadable' },
 ];
 
 const DEFAULT_CONSTRAINTS: PipelineConstraints = {
@@ -121,7 +148,7 @@ export default function App() {
   const renderCapsidTab = () => (
     <div className="capsid-layout">
       <aside className="run-panel glass">
-        <div className="panel-title">⚙️ Target Constraints</div>
+        <div className="panel-title">Target constraints</div>
         <p className="run-sub">The pipeline generates the capsid — you set the design targets.</p>
         <Slider label="Max hepatic accumulation" value={constraints.maxHepaticAccumulation} min={0.05} max={0.6} step={0.01} unit="%" onChange={v => setC('maxHepaticAccumulation', v)} />
         <Slider label="Min cardiac tropism" value={constraints.minCardiacTropism} min={0.3} max={0.95} step={0.01} unit="%" onChange={v => setC('minCardiacTropism', v)} />
@@ -137,7 +164,7 @@ export default function App() {
           {running ? <><span className="spinner" /> Optimizing…</> : '▶ Run Pipeline'}
         </button>
         {error && <div className="run-error">⚠ {error}</div>}
-        <div className="run-note">NSGA-II Pareto · PDB 3J1S Poisson-Boltzmann · dual-region VR masking</div>
+        <div className="run-note">NSGA-II Pareto · PDB 3UX1 (AAV9) Poisson-Boltzmann · dual-region VR masking</div>
       </aside>
 
       <div className="panel glass capsid-canvas-panel">
@@ -261,36 +288,68 @@ export default function App() {
       <header className="app-header glass">
         <div className="h-left">
           <div className="logo-wrap">
-            <span className="logo-icon">🧬</span>
             <div><h1>EvoTwin-10X</h1><span className="h-sub">Digital-Twin Oncology · MRI → Adaptive Treatment Plan</span></div>
           </div>
+          {/*
+            Badges state where the numbers on screen came from, and nothing
+            else. Three that used to sit here were removed: a compounded
+            "T× design space" (an arbitrary product -- see api_server.py), and
+            an "MHRA ILAP" badge, which asserted a regulatory standing this
+            project does not have (its own regulatory gate reports UNKNOWN and
+            says it is not an MHRA determination).
+          */}
           <div className="h-badges">
-            <span className="badge-status live">● LIVE</span>
-            {artifactMode && <span className="badge-accent cyan">PRECOMPUTED ENGINE RUN</span>}
-            {effectiveResult && <span className="badge-accent">{effectiveResult.phasesPassed}/24 phases</span>}
-            {effectiveResult && effectiveResult.combinatorialAdvantage >= 1e12 && (
-              <span className="badge-accent violet">{(effectiveResult.combinatorialAdvantage / 1e12).toFixed(1)}T× space</span>
+            {artifactMode
+              ? <span className="badge-accent cyan">PRECOMPUTED ENGINE RUN</span>
+              : running
+                ? <span className="badge-warn">COMPUTING</span>
+                : <span className="badge-status live">LIVE BACKEND RESULT</span>}
+            {effectiveResult && effectiveResult.phaseSummary && (
+              <span className="badge-accent">
+                {effectiveResult.phaseSummary.nPass}/{effectiveResult.phaseSummary.nPhases} gates passed
+              </span>
             )}
             {effectiveResult && (
               effectiveResult.translationalReadiness?.clinicalTrialEligibility
-                ? <span className="badge-accent">CLINIC ELIGIBLE</span>
-                : <span className="badge-warn">PRECLINICAL STEP 0.5</span>
+                ? <span className="badge-accent">READINESS GATES MET</span>
+                : <span className="badge-warn">PRECLINICAL · GATES UNMET</span>
             )}
-            <span className="badge-accent cyan">MHRA ILAP</span>
           </div>
         </div>
         <div className="h-right">
-          <div className="status-indicator"><div className="status-pulse" /><span>{running ? 'Optimizing' : 'Pipeline Operational'}</span></div>
+          {/* States where the numbers come from, not a vague "operational". */}
+          <div className="status-indicator">
+            <div className={running || result ? 'status-pulse' : 'status-idle'} />
+            <span>
+              {running
+                ? 'Optimizing…'
+                : result
+                  ? 'Live backend result'
+                  : artifactMode
+                    ? 'Precomputed run (no backend)'
+                    : 'No result loaded'}
+            </span>
+          </div>
         </div>
       </header>
 
       <nav className="app-nav glass">
-        {TABS.map(t => (
-          <button key={t.id} className={`nav-btn ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}>
-            <span className="nav-icon">{t.icon}</span>
-            <span className="nav-label">{t.label}</span>
-            <span className="nav-desc">{t.desc}</span>
-          </button>
+        {GROUPS.map(g => (
+          <div key={g} className="nav-group">
+            <span className="nav-group-label">{g}</span>
+            <div className="nav-group-items">
+              {TABS.filter(t => t.group === g).map(t => (
+                <button
+                  key={t.id}
+                  className={`nav-btn ${tab === t.id ? 'active' : ''}`}
+                  onClick={() => setTab(t.id)}
+                  title={t.desc}
+                >
+                  <span className="nav-label">{t.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         ))}
       </nav>
 
@@ -298,8 +357,12 @@ export default function App() {
 
       <footer className="app-footer glass">
         <span>
-          EvoTwin-10X · spatial tumour-evolution twin engine · every number on this page is a recorded engine output or clearly labelled as refused
-        </span>          <span className="f-right">paired steering-vs-MTD trials · ParaView VTI export · 975-test audit suite</span>
+          EvoTwin-10X · spatial tumour-evolution twin engine · every number on this page is a recorded engine output or labelled as refused
+        </span>
+        {/* No test count here: a number in a footer is not re-derived by anything,
+            and the one that used to sit here had drifted. The live count is the
+            claim registry (danon/claims.py), which the audit checks. */}
+        <span className="f-right">paired steering-vs-MTD trials · ParaView VTI export · claims verified in danon/claims.py</span>
       </footer>
     </div>
   );

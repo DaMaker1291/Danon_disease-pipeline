@@ -240,7 +240,7 @@ export default function Day365Outcome() {
   return (
     <div>
       <Panel
-        title="🧠 365-Day Predicted Outcome — exact engine state"
+        title="365-Day Predicted Outcome — exact engine state"
         sub={`Adaptive collateral switch vs paired MTD control on the same real geometry and seeds. ${payload.model}. Generated ${payload.generated_utc}.`}
       >
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: 12 }}>

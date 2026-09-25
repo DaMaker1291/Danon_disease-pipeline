@@ -136,7 +136,7 @@ export default function UploadPortal({ onResult }: Props) {
 
   return (
     <div className="panel" style={{ gridColumn: '1 / -1' }}>
-      <div className="panel-title">📤 Upload Portal — Clinical Sequencing & Cohort Availability</div>
+      <div className="panel-title">Upload Portal — Clinical Sequencing & Cohort Availability</div>
 
       <div
         className="upload-zone"
@@ -146,7 +146,7 @@ export default function UploadPortal({ onResult }: Props) {
         onClick={() => fileRef.current?.click()}
         style={{ borderColor: dragOver ? '#3b82f6' : undefined, background: dragOver ? '#1f2937' : undefined }}
       >
-        <div className="upload-zone-icon">📂</div>
+        
         <div className="upload-zone-text">
           {loading ? 'Processing...' : 'Drop an MRI availability manifest (.tsv), FASTQ, or GenBank (.gb)'}
         </div>

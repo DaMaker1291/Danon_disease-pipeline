@@ -245,11 +245,11 @@ export default function EvolutionPlayer() {
   }, [data]);
 
   if (loading) {
-    return <Panel title="🎞️ 365-Day Evolution & Resistance"><div style={{ color: 'var(--text2)' }}>Loading the 365-day artifact (validated engine frames; the file is fetched once, then frames decode on demand)…</div></Panel>;
+    return <Panel title="365-Day Evolution & Resistance"><div style={{ color: 'var(--text2)' }}>Loading the 365-day artifact (validated engine frames; the file is fetched once, then frames decode on demand)…</div></Panel>;
   }
   if (error || !data || !armData) {
     return (
-      <Panel title="🎞️ 365-Day Evolution & Resistance">
+      <Panel title="365-Day Evolution & Resistance">
         <div style={{ color: 'var(--warning)', fontSize: 13, lineHeight: 1.6 }}>⚠ {error ?? 'artifact missing'}</div>
       </Panel>
     );
@@ -285,7 +285,7 @@ export default function EvolutionPlayer() {
   return (
     <div>
       <Panel
-        title="🎞️ 365-Day Evolution & Treatment Resistance — every frame a validated engine state"
+        title="365-Day Evolution & Treatment Resistance — every frame a validated engine state"
         sub={`${data.model}. ${data.geometry_note} Frame aggregates are cross-checked against the run's own daily curves before export (evolution_export.FrameSet.validate_against_trajectory).`}
       >
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 10 }}>
