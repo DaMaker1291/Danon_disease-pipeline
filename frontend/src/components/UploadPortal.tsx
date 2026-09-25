@@ -41,17 +41,28 @@ export default function UploadPortal({ onResult }: Props) {
 
       if (looksLikeAvailabilityManifest(text)) {
         const census = censusAvailabilityManifest(text);
+        // danon/availability.py refuses these three cases outright, and this
+        // portal must not report a census it computed from the rows that
+        // happened to parse: a number derived from a subset reads as the
+        // file's number. Same bytes, same verdict, both intake paths.
+        const refusal = census.nRows === 0
+          ? 'the manifest has no usable rows (header only, or every row was blank)'
+          : census.missingColumns.length > 0
+            ? `required column(s) missing: ${census.missingColumns.join(', ')} ` +
+              `(found: ${census.columns.join(', ')})`
+            : census.malformedRows > 0
+              ? `${census.malformedRows} row(s) have a non-numeric time_diff_t0 (weeks)`
+              : null;
+        if (refusal) {
+          setError(
+            `Refused: ${refusal}.\n\n` +
+              'The reference intake (danon/availability.py) refuses the same file, so no census ' +
+              'is reported here rather than one computed from the rows that happened to parse.\n\n' +
+              'Nothing was processed.',
+          );
+          return;
+        }
         const warnings: string[] = [];
-        if (census.missingColumns.length > 0) {
-          warnings.push(
-            `Missing required column(s): ${census.missingColumns.join(', ')} — the census below is incomplete`,
-          );
-        }
-        if (census.malformedRows > 0) {
-          warnings.push(
-            `${census.malformedRows} row(s) skipped: time_diff_t0 (weeks) was not numeric`,
-          );
-        }
         warnings.push(
           'These are counts of what the manifest records, not a measurement: the images themselves are not downloaded, so no registration or artefact check has been performed',
         );
@@ -201,7 +212,7 @@ export default function UploadPortal({ onResult }: Props) {
             <div><b>Timepoints:</b> {Object.entries(census.timepoints).map(([k, v]) => `${k} ${v}`).join(' · ')}</div>
             <div><b>Scanners:</b> {Object.entries(census.scanners).map(([k, v]) => `${k} ${v}`).join(' · ')}</div>
             <div>
-              <b>Per sequence (patients with 2+ timepoints):</b>{' '}
+              <b>Per sequence (patients with a pair at 2+ timepoints):</b>{' '}
               {Object.entries(census.patientsPerSequence).map(([k, v]) => `${k} ${v}`).join(' · ')}
             </div>
           </div>

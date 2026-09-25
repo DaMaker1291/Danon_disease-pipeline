@@ -27,9 +27,18 @@ export const SEQUENCE_COLUMNS = [
 const REQUIRED_COLUMNS = ['id_patient', 'temporality'];
 const MACHINE_COLUMN = 'mri_machine';
 
+/**
+ * A spreadsheet export may carry a UTF-8 BOM, which the Python file loader
+ * drops (``utf-8-sig``). Left in place it becomes part of the first column's
+ * name and the manifest is refused as "missing id_patient".
+ */
+function stripBom(text: string): string {
+  return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+}
+
 /** True when the header carries the manifest's own columns. */
 export function looksLikeAvailabilityManifest(text: string): boolean {
-  const first = text.split(/\r?\n/, 1)[0] ?? '';
+  const first = stripBom(text).split(/\r?\n/, 1)[0] ?? '';
   if (!first.includes('\t')) return false;
   const cols = first.split('\t').map(c => c.trim().toLowerCase());
   return (
@@ -54,7 +63,7 @@ interface Row {
 }
 
 export function censusAvailabilityManifest(text: string): AvailabilityCensus {
-  const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+  const lines = stripBom(text).split(/\r?\n/).filter(l => l.trim().length > 0);
   const header = (lines[0] ?? '').split('\t').map(c => c.trim());
   const lower = header.map(c => c.toLowerCase());
   const at = (name: string) => lower.indexOf(name);
@@ -112,8 +121,8 @@ export function censusAvailabilityManifest(text: string): AvailabilityCensus {
   const patientsWithPair = new Set<string>();
   const patientsOnlySame = new Set<string>();
   const patientsCross = new Set<string>();
-  const patientsPerSequence: Record<string, number> = {};
-  for (const col of SEQUENCE_COLUMNS) patientsPerSequence[col] = 0;
+  const patientsPerSequence: Record<string, Set<string>> = {};
+  for (const col of SEQUENCE_COLUMNS) patientsPerSequence[col] = new Set<string>();
 
   for (const [patient, list] of byPatient) {
     if (list.length > 1) nPatientsMultiTimepoint += 1;
@@ -126,7 +135,10 @@ export function censusAvailabilityManifest(text: string): AvailabilityCensus {
         if (gap < MIN_INTERVAL_WEEKS) continue;
         for (const col of SEQUENCE_COLUMNS) {
           if (ordered[i].sequences[col] && ordered[j].sequences[col]) {
-            patientsPerSequence[col] += 1;
+            // A set, not a counter: the field is named for patients and shown
+            // as patients, so a patient with three qualifying timepoints
+            // counts once rather than once per pair.
+            patientsPerSequence[col].add(patient);
           }
         }
         if (!(ordered[i].sequences[REFERENCE_SEQUENCE] && ordered[j].sequences[REFERENCE_SEQUENCE])) {
@@ -168,7 +180,9 @@ export function censusAvailabilityManifest(text: string): AvailabilityCensus {
     intervalWeeksMedian: median(intervals),
     intervalWeeksMax: intervals.length ? Math.max(...intervals) : null,
     scanners,
-    patientsPerSequence,
+    patientsPerSequence: Object.fromEntries(
+      SEQUENCE_COLUMNS.map(c => [c, patientsPerSequence[c].size]),
+    ),
     missingColumns,
     malformedRows: malformed,
   };

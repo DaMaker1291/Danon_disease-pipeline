@@ -154,7 +154,9 @@ export default function App() {
       </aside>
 
       <div className="panel glass capsid-canvas-panel">
-        <CapsidViewer result={effectiveResult} selectedSpike={selectedSpike} onSelectSpike={setSelectedSpike} />
+        <ErrorBoundary label="CapsidViewer" resetKey={tab}>
+          <CapsidViewer result={effectiveResult} selectedSpike={selectedSpike} onSelectSpike={setSelectedSpike} />
+        </ErrorBoundary>
       </div>
 
       <div className="panel glass seq-out-panel">
@@ -167,7 +169,7 @@ export default function App() {
 
       {effectiveResult?.sequence && (
         <div className="panel glass" style={{ gridColumn: '1 / -1' }}>
-          <ErrorBoundary label="StructureViewer">
+          <ErrorBoundary label="StructureViewer" resetKey={tab}>
             <StructureViewer sequence={effectiveResult.sequence} />
           </ErrorBoundary>
         </div>
@@ -185,11 +187,11 @@ export default function App() {
         return (
           <div className="content-grid" style={{ gridTemplateColumns: '1.05fr 0.95fr' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
-              <ErrorBoundary label="TwinPlanner"><TwinPlanner onVti={setTwinVtiCb} /></ErrorBoundary>
+              <ErrorBoundary label="TwinPlanner" resetKey={tab}><TwinPlanner onVti={setTwinVtiCb} /></ErrorBoundary>
             </div>
             <div className="panel glass" style={{ minHeight: 640, display: 'flex', flexDirection: 'column' }}>
               <div className="panel-title">3D evolution viewer — same fields ParaView opens</div>
-              <ErrorBoundary label="VtiViewer"><VtiViewer vtiBase64={twinVti} /></ErrorBoundary>
+              <ErrorBoundary label="VtiViewer" resetKey={tab}><VtiViewer vtiBase64={twinVti} /></ErrorBoundary>
             </div>
           </div>
         );
@@ -197,7 +199,7 @@ export default function App() {
         return (
           <div className="content-grid">
             <div style={{ gridColumn: '1 / -1' }}>
-              <ErrorBoundary label="ParaviewGallery"><ParaviewGallery /></ErrorBoundary>
+              <ErrorBoundary label="ParaviewGallery" resetKey={tab}><ParaviewGallery /></ErrorBoundary>
             </div>
           </div>
         );
@@ -216,13 +218,21 @@ export default function App() {
         // artifact; the flow-telemetry panel belongs on the microfluidics tab.
         return (
           <div className="content-grid">
-            <div className="panel glass" style={{ gridColumn: '1 / -1', height: 620 }}><LNPViewer /></div>
+            <div className="panel glass" style={{ gridColumn: '1 / -1', height: 620 }}>
+              {/* Every panel that owns a WebGL context gets its own boundary:
+                  a renderer disposed during unmount can throw, and unwrapped
+                  that fault reached the TabContent boundary and blanked the
+                  tab the visitor had just opened. */}
+              <ErrorBoundary label="LNPViewer" resetKey={tab}><LNPViewer /></ErrorBoundary>
+            </div>
           </div>
         );
       case 'gene':
         return (
           <div className="content-grid">
-            <div className="panel glass" style={{ gridColumn: '1 / -1', height: 560 }}><GeneViewer /></div>
+            <div className="panel glass" style={{ gridColumn: '1 / -1', height: 560 }}>
+              <ErrorBoundary label="GeneViewer" resetKey={tab}><GeneViewer /></ErrorBoundary>
+            </div>
           </div>
         );
       case 'microfluidics':
@@ -251,7 +261,7 @@ export default function App() {
         return (
           <div className="content-grid">
             <div style={{ gridColumn: '1 / -1' }}>
-              <ErrorBoundary label="Day365Outcome"><Day365Outcome /></ErrorBoundary>
+              <ErrorBoundary label="Day365Outcome" resetKey={tab}><Day365Outcome /></ErrorBoundary>
             </div>
           </div>
         );
@@ -259,7 +269,7 @@ export default function App() {
         return (
           <div className="content-grid">
             <div style={{ gridColumn: '1 / -1' }}>
-              <ErrorBoundary label="EvolutionPlayer"><EvolutionPlayer /></ErrorBoundary>
+              <ErrorBoundary label="EvolutionPlayer" resetKey={tab}><EvolutionPlayer /></ErrorBoundary>
             </div>
           </div>
         );

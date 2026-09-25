@@ -31,6 +31,7 @@ from danon.availability import (
 )
 
 TS_MIRROR = "frontend/src/utils/availability.ts"
+UPLOAD_PORTAL = "frontend/src/components/UploadPortal.tsx"
 
 pytestmark = pytest.mark.skipif(
     not os.path.exists(CFB_GBM_MANIFEST),
@@ -71,11 +72,28 @@ class TestCommittedCensus:
         assert census.interval_weeks_max == 55
         assert census.n_machines == {"AERA (1.5T)": 510, "VIDA (3T)": 44}
 
-    def test_per_sequence_coverage(self, census):
+    def test_per_sequence_coverage_counts_patients_not_pairs(self, census):
+        """Named for patients, read as patients, so it must count patients.
+
+        Measured, not assumed: this count used to sit inside the pair loop and
+        report pairs under a patient's name -- 393 for t1gd against 168
+        patients, a 2.3x overstatement that the browser showed as "patients".
+
+        The identity below is the check that catches it, and it is exact: the
+        reference column and ``n_patients_with_usable_pair`` are defined by the
+        same predicate, so they cannot legitimately differ.
+        """
         assert census.n_patients_per_sequence == {
-            "t1gd": 393, "t1eg": 220, "t1tse": 4, "t2star": 287,
-            "t2tse": 3, "flair": 386, "adc": 173,
+            "t1gd": 168, "t1eg": 139, "t1tse": 4, "t2star": 146,
+            "t2tse": 3, "flair": 165, "adc": 109,
         }
+        assert census.n_patients_per_sequence["t1gd"] == census.n_patients_with_usable_pair
+        # a sequence cannot be carried by more patients than have a 2nd scan
+        assert all(
+            n <= census.n_patients_multi_timepoint
+            for n in census.n_patients_per_sequence.values()
+        )
+        assert census.n_usable_pairs == 393  # pairs are still reported as pairs
 
     def test_provenance_names_the_doi(self, census):
         assert "10.7937/v9pn-2f72" in census.source
@@ -173,6 +191,18 @@ class TestRefusals:
         with pytest.raises(ValueError, match="no usable rows"):
             census_from_text("id_patient\ttemporality\ttime_diff_t0 (weeks)\tt1gd\n")
 
+    def test_a_bom_is_not_part_of_the_first_column_name(self):
+        """A spreadsheet export's BOM must not become a column name.
+
+        The file loader opens with ``utf-8-sig`` and dropped it; the text
+        path -- which is what the API and the browser use -- did not, so the
+        same bytes were refused here as "missing required column(s)
+        ['id_patient']" while listing id_patient in the header.
+        """
+        text = "\ufeffid_patient\ttemporality\ttime_diff_t0 (weeks)\tt1gd\n1\tt0\t0\t1\n"
+        assert looks_like_availability_manifest(text)
+        assert census_from_text(text).n_rows == 1
+
 
 class TestCensusEdges:
     """Counting rules on hand-built rows, where the answer is knowable."""
@@ -230,9 +260,12 @@ class TestCensusEdges:
 def test_browser_mirror_declares_the_same_rules():
     """The static app cannot call the Python census, so the rules must match.
 
-    Reads the TypeScript source for its declared constants and compares them
-    with this module's. Cheap, and it catches the failure that matters: the two
-    implementations quietly disagreeing about what counts as a pair.
+    This is a SOURCE check, not a behavioural one: it pins the mirror's
+    declared constants and the portal's refusal gate. It cannot prove the two
+    counters agree number-for-number -- only a shared fixture run through both
+    runtimes could, and there is no JS runtime in this suite. Stated because a
+    test that reads like a proof of parity while checking constants invites
+    exactly the drift it was written to prevent.
     """
     with open(TS_MIRROR, encoding="utf-8") as fh:
         src = fh.read()
@@ -244,3 +277,9 @@ def test_browser_mirror_declares_the_same_rules():
     # every sequence column the Python census scores must appear in the mirror
     for col in SEQUENCE_COLUMNS:
         assert f"'{col}'" in src, f"mirror omits sequence column {col}"
+    # ...and the portal must REFUSE what census_from_text refuses, rather than
+    # reporting a census computed from the rows that happened to parse
+    with open(UPLOAD_PORTAL, encoding="utf-8") as fh:
+        portal = fh.read()
+    for condition in ("missingColumns.length", "malformedRows", "nRows === 0"):
+        assert condition in portal, f"portal no longer refuses on {condition}"

@@ -139,6 +139,9 @@ class AvailabilityCensus:
     interval_weeks_max: Optional[int]
     n_machines: Dict[str, int]
     n_patients_per_sequence: Dict[str, int]
+    """Distinct patients carrying the sequence at both ends of a qualifying
+    interval. Equal to ``n_patients_with_usable_pair`` for the reference
+    sequence, since that predicate defines both."""
     notes: List[str] = field(default_factory=list)
 
     def describe(self) -> str:
@@ -198,6 +201,7 @@ def looks_like_availability_manifest(text: str) -> bool:
     decision. Content-based, not extension-based: the CFB-GBM table has arrived
     with ``.tsv`` and could arrive as ``.txt``.
     """
+    text = text.lstrip("\ufeff")  # a BOM is not a column name
     first = text.splitlines()[0] if text.splitlines() else ""
     if "\t" not in first:
         return False
@@ -209,8 +213,13 @@ def looks_like_availability_manifest(text: str) -> bool:
 
 def census_from_text(text: str, *, source: str = "uploaded manifest") -> AvailabilityCensus:
     """Census a manifest supplied as text, validating the same way as the file
-    loader. Raises ``ValueError`` on a schema mismatch."""
-    lines = [l for l in text.splitlines() if l.strip()]
+    loader. Raises ``ValueError`` on a schema mismatch.
+
+    The BOM is stripped because the file loader opens with ``utf-8-sig``: a
+    spreadsheet export that carries one must not be refused here as "missing
+    column id_patient" while the same bytes load fine from disk.
+    """
+    lines = [l for l in text.lstrip("\ufeff").splitlines() if l.strip()]
     if not lines:
         raise ValueError("manifest is empty")
     header = tuple(c.strip() for c in lines[0].split("\t"))
@@ -373,7 +382,10 @@ def mri_availability_census(
     patients_with_pair: set = set()
     patients_only_same: set = set()
     patients_cross: set = set()
-    per_sequence: Dict[str, int] = {c: 0 for c in SEQUENCE_COLUMNS}
+    # A SET of patient ids per sequence, not a running total: the field is
+    # named for patients and read as patients, so a patient with three
+    # qualifying timepoints must count once, not three times (its pairs).
+    per_sequence: Dict[str, set] = {c: set() for c in SEQUENCE_COLUMNS}
     for pid, prows in by_patient.items():
         if len(prows) > 1:
             n_patients_multi += 1
@@ -389,7 +401,7 @@ def mri_availability_census(
                 # both ends of some qualifying interval?
                 for col in SEQUENCE_COLUMNS:
                     if ordered[i].has(col) and ordered[j].has(col):
-                        per_sequence[col] += 1
+                        per_sequence[col].add(pid)
                 if ordered[i].has(sequence) and ordered[j].has(sequence):
                     patient_had_pair = True
                     n_usable += 1
@@ -434,7 +446,7 @@ def mri_availability_census(
         interval_weeks_median=_median(intervals),
         interval_weeks_max=max(intervals) if intervals else None,
         n_machines=machines,
-        n_patients_per_sequence=per_sequence,
+        n_patients_per_sequence={c: len(s) for c, s in per_sequence.items()},
         notes=notes,
     )
 
