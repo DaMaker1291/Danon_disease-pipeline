@@ -731,6 +731,15 @@ from danon.perfusion import (
     relative_cbv,
 )
 
+from danon.histology import (
+    HistologyError,
+    SlideMeta,
+    classify_stain,
+    ki67_fraction,
+    measure_nuclei_density,
+    read_slide_metadata,
+)
+
 from danon.clinical_twin import (
     CLEARANCE_GAMMA,
     DEFAULT_ALA_R0,

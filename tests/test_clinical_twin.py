@@ -325,6 +325,26 @@ def test_census_refuses_empty_streams_and_reports_stream3():
         assert census["stream3_perfusion"]["n_t1ce_files"] >= 1
 
 
+def test_census_refuses_stream2_as_input_while_reporting_the_sample():
+    """A downloaded haematoxylin-only slide is a SAMPLE, not a Ki-67 input.
+
+    The census counts slides in the intake directories as inputs and the probe's
+    downloaded slide separately, so a refusal cannot be flipped to "available"
+    by a file that could not feed the mapping anyway.
+    """
+    s2 = clinical_stream_census()["stream2_histology"]
+    assert s2["n_files"] == 0
+    assert "Ki-67" in s2["refused_for"]
+    assert "CELLULARITY" in s2["measurable"]
+    wsi = s2.get("wsi") or {}
+    if "error" in wsi:
+        pytest.skip("histology probe record unavailable")
+    assert wsi["n_named_ki67"] == 0
+    assert wsi["stain"] != "dab-positive"
+    assert wsi["nuclei_per_mm2"] > 0 and wsi["crops_used"] >= 2
+    assert wsi["n_slides_cached"] >= 1
+
+
 def test_census_separates_cached_from_retrievable():
     """A refusal must say what is missing, not imply the data does not exist.
 

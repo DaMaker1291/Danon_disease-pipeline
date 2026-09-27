@@ -1110,6 +1110,131 @@ def check_stream3_cohort_is_measured() -> CheckResult:
     )
 
 
+def check_stream2_histology_measured_and_ki67_refused() -> CheckResult:
+    """Stream 2: what the biopsy archive yields, and the ratio it cannot give.
+
+    Four things are verified live. (a) The probe record is readable and its
+    slide is still on disk -- a nuclei density with no slide behind it is a
+    number with nothing under it. (b) The stain really is non-DAB: the
+    committed brown fraction is ~0 and the called stain is not 'dab-positive',
+    so the Ki-67 numerator is absent rather than merely uncomputed. (c) The
+    refusal is exercised, not described -- `ki67_fraction` is called on the
+    record's own stain and must raise. (d) The census agrees with the record
+    and still refuses stream 2 as an INPUT: the downloaded slide is a sample,
+    and a haematoxylin-only sample must not flip the stream to 'available'.
+    """
+    import json
+
+    from danon.histology import HistologyError, ki67_fraction
+
+    path = os.path.join(ROOT, "outputs_real", "histology_probe.json")
+    try:
+        record = json.load(open(path))
+    except (OSError, ValueError) as exc:
+        return CheckResult(supported=False, detail=f"histology probe unreadable: {exc}")
+
+    census = record.get("census") or {}
+    slide = record.get("slide_measured") or {}
+    density = slide.get("density") or {}
+    stain = slide.get("stain") or {}
+    problems: List[str] = []
+
+    if not density.get("nuclei_per_mm2") or not density.get("nuclei"):
+        problems.append("the record carries no measured nuclei density")
+    if int(density.get("crops_used", 0)) < 2:
+        problems.append("the density rests on a single crop")
+    if not (density.get("slide") or {}).get("mpp_um"):
+        problems.append("the record reports a density without an MPP")
+    # The slide lives under data/tcia/, which is gitignored: the committed record
+    # is the evidence and the slide is a re-downloadable cache. So a cache miss is
+    # reported, not failed -- but a present slide must match the recorded size, so
+    # a truncated or swapped file cannot sit behind a density it does not contain.
+    if not slide.get("file"):
+        problems.append("the record names no slide")
+    else:
+        sample = os.path.join(ROOT, "data", "tcia", "wsiprode", str(slide["file"]))
+        if os.path.exists(sample):
+            if os.path.getsize(sample) != int(slide.get("bytes") or 0):
+                problems.append(
+                    f"the cached slide's size ({os.path.getsize(sample)} B) does not "
+                    f"match the recorded {slide.get('bytes')} B"
+                )
+            slide_note = "cached slide size matches the record"
+        else:
+            slide_note = "slide not cached (re-download via _histology_probe.py)"
+
+    if stain.get("stain") == "dab-positive":
+        problems.append(
+            "the slide is called dab-positive, so the Ki-67 numerator may exist "
+            "and the refusal's premise would be wrong"
+        )
+    if float(stain.get("brown_fraction", 1.0)) > 0.15:
+        problems.append("the committed brown fraction is not negligible")
+
+    # Exercise the refusal on the record's own stain rather than trusting prose.
+    refusal_ok = False
+    refusal_excerpt = ""
+    try:
+        ki67_fraction(stain)
+    except HistologyError as exc:
+        refusal_excerpt = str(exc)
+        refusal_ok = "Ki-67" in refusal_excerpt
+    if not refusal_ok:
+        problems.append("ki67_fraction did not refuse the archive's own stain")
+    if "Ki-67" not in str(slide.get("ki67_refusal") or ""):
+        problems.append("the recorded refusal does not name the missing numerator")
+
+    # The retrieval claim must be a live count, not a remembered one.
+    if int(census.get("n_slide_images") or 0) <= 0:
+        problems.append("the probe recorded no retrievable slide images")
+    if int(census.get("n_named_ki67") or 0) != 0:
+        problems.append(
+            "the index now names Ki-67 slides; the archive should be re-probed "
+            "rather than keeping this refusal"
+        )
+
+    live = _histology_stream2_census()
+    if live is None:
+        problems.append("the census carries no whole-slide evidence block")
+    else:
+        if live.get("status") != "REFUSED" or int(live.get("n_files", -1)) != 0:
+            problems.append(
+                "the census no longer refuses stream 2 as an input; a sample "
+                "slide must not count as a Ki-67 input"
+            )
+        recorded = (live.get("wsi") or {})
+        if recorded.get("n_named_ki67") != census.get("n_named_ki67"):
+            problems.append("the census and the probe disagree on the Ki-67 count")
+        if recorded.get("nuclei_per_mm2") != density.get("nuclei_per_mm2"):
+            problems.append("the census and the probe disagree on the density")
+        if "Ki-67" not in str(live.get("refused_for") or ""):
+            problems.append("the census does not name what stream 2 refuses")
+
+    supported = not problems
+    return CheckResult(
+        supported=supported,
+        detail=(
+            f"{census.get('n_slide_images')} TCGA-GBM slide images retrievable, "
+            f"{census.get('n_named_ki67')} named Ki-67; the downloaded slide is "
+            f"{stain.get('stain')} (brown {stain.get('brown_fraction')}) at MPP "
+            f"{(slide.get('slide') or {}).get('mpp_um')}, giving "
+            f"{density.get('nuclei_per_mm2')} nuclei/mm^2 over "
+            f"{density.get('crops_used')} crops; {slide_note}; Ki-67 refusal "
+            f"exercised and stream 2 still refused as an input"
+            + ("; " + "; ".join(problems) if problems else "")
+        ),
+    )
+
+
+def _histology_stream2_census() -> Optional[dict]:
+    try:
+        from danon.clinical_twin import clinical_stream_census
+
+        return clinical_stream_census()["stream2_histology"]
+    except Exception:  # pragma: no cover - census failure is reported by its own check
+        return None
+
+
 def check_stream_census_refuses_honestly() -> CheckResult:
     """Streams 1/2/4 must refuse with live counts, and stream 4 must state how
     much is retrievable rather than implying the data does not exist."""
@@ -1386,6 +1511,7 @@ CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "stream3_diffusion_measured": check_stream3_diffusion_is_measured,
     "stream3_dsc_perfusion_measured": check_stream3_dsc_perfusion_is_measured,
     "stream_census_refuses": check_stream_census_refuses_honestly,
+    "stream2_histology_measured": check_stream2_histology_measured_and_ki67_refused,
     "stream4_agreement_is_a_validation_target": check_stream4_agreement_is_a_validation_target,
 }
 
@@ -1976,6 +2102,40 @@ CLAIMS: Tuple[Claim, ...] = (
         "restriction_membership_vs_signal",
         "A record is an exposure, not an ordered protocol: first-line cannot "
         "be separated from salvage in this export.",
+    ),
+    Claim(
+        "stream2_biopsy_measures_cellularity_and_refuses_ki67",
+        "The biopsy stream measures what the archive actually holds and refuses "
+        "what it does not. TCGA-GBM carries 2,053 whole-slide images at the live "
+        "GDC count, none of them named as Ki-67 or IHC; the smallest by listed "
+        "file size (6.01 MB) was downloaded and read -- an Aperio SVS, "
+        "9352x4666, MPP 2.0037 um/px, AppMag 5, haematoxylin-only with a brown "
+        "fraction of 0.0 over the sampled crop. From it danon/histology.py "
+        "reports 636 nuclei per mm^2 over 4 crops (3,588 nuclei, per-crop "
+        "spread 460-1579, median nucleus area 76.3 um^2). That is CELLULARITY. "
+        "Stream 2's mapping needs the Ki-67 labelling index, whose numerator "
+        "does not exist in this source, so ki67_fraction raises and no r0 is "
+        "derived: the growth mapping stays unit-tested at KI67_REF=0.15 until "
+        "a real Ki-67 slide is supplied. Substituting a nuclei density for the "
+        "labelling index would fabricate the growth rate it feeds.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/claims.py::check_stream2_histology_measured_and_ki67_refused "
+        "over outputs_real/histology_probe.json (rebuildable via "
+        "_histology_probe.py)",
+        "stream2_histology_measured",
+        "The 636 nuclei/mm^2 is ONE slide, the smallest by listed size -- not a "
+        "cohort statistic. The zero-Ki-67 finding generalises only as far as the "
+        "file index plus this one slide's pixels: the index carries barcodes, "
+        "not markers, so none being named is a lower bound on identifiability, "
+        "and the remaining 2,052 slides were not downloaded or read. The slide "
+        "itself is a gitignored cache under data/tcia/ (re-downloadable via "
+        "_histology_probe.py); the committed record is the evidence, and when "
+        "the cache is present its size is checked against the record. The stain "
+        "call is a hue-fraction heuristic, not a validated assay, and the nuclei "
+        "count comes from connected components in a hue band with an area filter "
+        "-- clumped nuclei are dropped rather than split, which is part of why "
+        "crops spread 3.4x. No pathologist count anchors any of it, and nothing "
+        "here is a grade, a WHO criterion, or a statement about a patient.",
     ),
 )
 

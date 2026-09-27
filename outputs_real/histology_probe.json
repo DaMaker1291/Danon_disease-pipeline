@@ -1,0 +1,121 @@
+{
+ "census": {
+  "project": "TCGA-GBM",
+  "endpoint": "https://api.gdc.cancer.gov/files",
+  "n_slide_images": 2053,
+  "n_tabulated": 2053,
+  "by_strategy": {
+   "Tissue Slide": 1193,
+   "Diagnostic Slide": 860
+  },
+  "n_named_ki67": 0,
+  "n_named_ihc": 0,
+  "note": "TCGA file names carry a barcode, not a marker, so 'named' is a lower bound on what is identifiable from the index alone; the stain is settled from pixels below",
+  "sizes_mb": {
+   "smallest": 6.01,
+   "largest_tabulated": 3590.94
+  }
+ },
+ "slide_measured": {
+  "file": "TCGA-06-5418-01A-01-TS1.6600b787-bac7-4ad1-8711-f27bae721e7a.svs",
+  "bytes": 6007209,
+  "slide": {
+   "path": "data/tcia/wsiprode\\TCGA-06-5418-01A-01-TS1.6600b787-bac7-4ad1-8711-f27bae721e7a.svs",
+   "pixels": [
+    9352,
+    4666
+   ],
+   "mpp_um": 2.0037,
+   "app_mag": 5.0,
+   "pyramid_levels": 3,
+   "format": "TIFF",
+   "mm2_per_pixel": 4.014813689999999e-06
+  },
+  "stain": {
+   "stain": "haematoxylin-only",
+   "brown_fraction": 0.0,
+   "haematoxylin_fraction": 1.0,
+   "tissue_pixels_sampled": 105688,
+   "rule": "stain is called from hue fractions over tissue pixels: >15% DAB brown is dab-positive; >60% haematoxylin with almost no brown is haematoxylin-only"
+  },
+  "density": {
+   "path": "data/tcia/wsiprode\\TCGA-06-5418-01A-01-TS1.6600b787-bac7-4ad1-8711-f27bae721e7a.svs",
+   "slide": {
+    "path": "data/tcia/wsiprode\\TCGA-06-5418-01A-01-TS1.6600b787-bac7-4ad1-8711-f27bae721e7a.svs",
+    "pixels": [
+     9352,
+     4666
+    ],
+    "mpp_um": 2.0037,
+    "app_mag": 5.0,
+    "pyramid_levels": 3,
+    "format": "TIFF",
+    "mm2_per_pixel": 4.014813689999999e-06
+   },
+   "nuclei": 3588,
+   "tissue_mm2": 5.6425,
+   "nuclei_per_mm2": 636,
+   "crops_used": 4,
+   "per_crop": [
+    {
+     "origin_xy": [
+      500,
+      500
+     ],
+     "nuclei": 1038,
+     "tissue_mm2": 1.4626,
+     "nuclei_per_mm2": 710,
+     "tissue_fraction": 0.3474
+    },
+    {
+     "origin_xy": [
+      3000,
+      1500
+     ],
+     "nuclei": 670,
+     "tissue_mm2": 0.4243,
+     "nuclei_per_mm2": 1579,
+     "tissue_fraction": 0.1008
+    },
+    {
+     "origin_xy": [
+      7000,
+      3000
+     ],
+     "nuclei": 663,
+     "tissue_mm2": 1.4407,
+     "nuclei_per_mm2": 460,
+     "tissue_fraction": 0.3422
+    },
+    {
+     "origin_xy": [
+      1200,
+      1800
+     ],
+     "nuclei": 1217,
+     "tissue_mm2": 2.3149,
+     "nuclei_per_mm2": 526,
+     "tissue_fraction": 0.5499
+    }
+   ],
+   "per_crop_spread": {
+    "min": 460,
+    "max": 1579,
+    "ratio": 3.43
+   },
+   "median_nucleus_area_px": 19.0,
+   "median_nucleus_area_um2": 76.3,
+   "measures": "nuclei density in haematoxylin-stained tissue -- CELLULARITY, not a proliferation index",
+   "not_measured": [
+    "Ki-67 fraction (needs a Ki-67 IHC slide; see ki67_fraction)",
+    "a mitosis count, a grade, or any WHO criterion",
+    "anything about the patient the slide came from"
+   ]
+  },
+  "ki67_fraction": null,
+  "ki67_refusal": "Ki-67 fraction is not measurable from a 'haematoxylin-only' slide: the numerator (Ki-67 positive nuclei) requires a Ki-67 immunohistochemistry slide, and TCGA-GBM's slide images are not that (0 of 2,053 file names identify Ki-67 or IHC; a downloaded one is AppMag 5, MPP 2.0037, haematoxylin-only). No r0 is derived"
+ },
+ "selection": "the smallest TCGA-GBM slide image by reported file size",
+ "stream2_status": "MEASURED for cellularity; REFUSED for the Ki-67 ratio",
+ "regenerate": "python _histology_probe.py"
+}

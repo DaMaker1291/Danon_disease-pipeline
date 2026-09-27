@@ -1137,6 +1137,60 @@ def _availability_manifest() -> Dict[str, Any]:
         return {"error": f"{type(exc).__name__}: {exc}"}
 
 
+def _histology_evidence(data_dir: str = "data") -> Optional[Dict[str, Any]]:
+    """The committed whole-slide probe, plus the slides cached on disk.
+
+    Read from the record rather than restated, and paired with a live count of
+    cached slide files: a probe whose slide has been deleted is a number with
+    nothing behind it. Returns None when the record is absent or unreadable, so
+    the census can say that instead of implying a measurement.
+    """
+    import json
+
+    path = os.path.join("outputs_real", "histology_probe.json")
+    cached = 0
+    root = os.path.join(data_dir, "tcia", "wsiprode")
+    if os.path.isdir(root):
+        cached = sum(
+            1 for n in os.listdir(root) if n.lower().endswith((".svs", ".tif", ".tiff"))
+        )
+    try:
+        with open(path) as fh:
+            record = json.load(fh)
+    except (OSError, ValueError):
+        return None
+    slide = record.get("slide_measured") or {}
+    census = record.get("census") or {}
+    density = slide.get("density") or {}
+    stain = slide.get("stain") or {}
+    if not density or not stain:
+        return None
+    return {
+        "record": path,
+        "n_slides_cached": cached,
+        "n_slide_images_retrievable": census.get("n_slide_images"),
+        "n_named_ki67": census.get("n_named_ki67"),
+        "n_named_ihc": census.get("n_named_ihc"),
+        "slide": {
+            "file": slide.get("file"),
+            "bytes": slide.get("bytes"),
+            "pixels": (slide.get("slide") or {}).get("pixels"),
+            "mpp_um": (slide.get("slide") or {}).get("mpp_um"),
+            "app_mag": (slide.get("slide") or {}).get("app_mag"),
+        },
+        "stain": stain.get("stain"),
+        "brown_fraction": stain.get("brown_fraction"),
+        "nuclei_per_mm2": density.get("nuclei_per_mm2"),
+        "nuclei": density.get("nuclei"),
+        "crops_used": density.get("crops_used"),
+        "per_crop_spread": density.get("per_crop_spread"),
+        "median_nucleus_area_um2": density.get("median_nucleus_area_um2"),
+        "measured": density.get("measures"),
+        "ki67_refusal": (slide.get("ki67_refusal") or "").split(":")[0] or None,
+        "selection": record.get("selection"),
+    }
+
+
 def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
     """Live counts per stream: what is cached, what refuses, and why.
 
@@ -1161,6 +1215,11 @@ def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
         if os.path.isdir(root)
         for f in os.listdir(root)
     ]
+    # Slides sitting in the intake directories -- what the mapping could consume
+    # today. The probe's downloaded slide lives under data/tcia/wsiprode and is
+    # counted separately as a SAMPLE (see _histology_evidence): it is
+    # haematoxylin-only, so it is not a Ki-67 input and must not flip stream 2
+    # to 'available'.
     wsi_files = [
         f
         for root in (os.path.join(data_dir, "pathology"), data_dir)
@@ -1175,6 +1234,7 @@ def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
     sequential_pairs_cached = 0
     archive = _archive_availability()
     perfusion_evidence = _perfusion_cohort_evidence(data_dir)
+    histology_evidence = _histology_evidence(data_dir)
     n_retrievable = archive.get("n_patients_longitudinal")
     manifest = _availability_manifest()
     n_manifest_pairs = manifest.get("n_patients_with_usable_pair")
@@ -1200,9 +1260,36 @@ def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
         "stream2_histology": {
             "n_files": len(wsi_files),
             "status": "REFUSED" if not wsi_files else "available",
+            "refused_for": "the Ki-67 ratio (r0 = baseline * Ki67/KI67_REF)",
+            "counts": (
+                "n_files is slides in the intake directories (inputs); "
+                "wsi.n_slides_cached is the probe's downloaded sample, which is "
+                "not a Ki-67 input"
+            ),
+            "measurable": (
+                "nuclei density per mm^2 -- CELLULARITY, which is not a "
+                "proliferation index and does not enter r0"
+            ),
+            "wsi": histology_evidence if histology_evidence is not None else {
+                "error": "histology probe record unreadable (run _histology_probe.py)"
+            },
             "detail": (
-                "no whole-slide images cached; Ki-67 mapping implemented and "
-                "unit-tested (KI67_REF=0.15), activates when a WSI is supplied"
+                "the Ki-67 numerator does not exist in this source, so r0 is "
+                "refused and the mapping stays unit-tested (KI67_REF=0.15) "
+                "until a real Ki-67 slide is supplied. What the archive DOES "
+                "hold is whole-slide images: "
+                f"{(histology_evidence or {}).get('n_slide_images_retrievable')} "
+                "TCGA-GBM slide images at the live GDC count, "
+                f"{(histology_evidence or {}).get('n_named_ki67')} of them named "
+                "as Ki-67. The smallest was downloaded and read: "
+                f"AppMag {(histology_evidence or {}).get('slide', {}).get('app_mag')}, "
+                f"MPP {(histology_evidence or {}).get('slide', {}).get('mpp_um')} "
+                f"um/px, {(histology_evidence or {}).get('stain')} (brown fraction "
+                f"{(histology_evidence or {}).get('brown_fraction')}), "
+                f"{(histology_evidence or {}).get('nuclei_per_mm2')} nuclei/mm^2 "
+                f"over {(histology_evidence or {}).get('crops_used')} crops. "
+                "A density is not a labelling index: substituting it for the "
+                "Ki-67 fraction would fabricate the growth rate it feeds."
             ),
         },
         "stream3_perfusion": {

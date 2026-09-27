@@ -1,7 +1,7 @@
 {
  "key": "claims",
  "title": "Bound-claim audit (what this project may say)",
- "generated_utc": "2026-09-27T16:04:15Z",
+ "generated_utc": "2026-09-27T16:21:19Z",
  "source": "danon.claims.audit_claims()",
  "notes": [
   "each row is a sentence plus the check that supports it, re-run at build time; a check that failed is recorded as failed",
@@ -12,8 +12,8 @@
   "clinical_benefit": "unknown"
  },
  "data": {
-  "n_claims": 38,
-  "n_passed": 38,
+  "n_claims": 39,
+  "n_passed": 39,
   "n_failed": 0,
   "claims": [
    {
@@ -112,7 +112,7 @@
     "check": "test_suite_counted",
     "limit": "Tests verify the implementation. They are not evidence about biology.",
     "supported": true,
-    "detail": "1081 test functions in 152 classes across tests/ and danon/multiagent/ (pytest collects more than this wherever a test is parametrised); README defers to this check rather than quoting a count",
+    "detail": "1093 test functions in 156 classes across tests/ and danon/multiagent/ (pytest collects more than this wherever a test is parametrised); README defers to this check rather than quoting a count",
     "study": "tumour_twin"
    },
    {
@@ -145,7 +145,7 @@
     "check": "runtime_365",
     "limit": "Runtime is machine-dependent; the audit prints the machine's own number.",
     "supported": true,
-    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 0.80 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)",
+    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 0.84 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)",
     "study": "tumour_twin"
    },
    {
@@ -387,7 +387,7 @@
     "check": "readme_claim_count_current",
     "limit": "It checks that the README agrees with the registry, not that the registry is right: claims can be wrong together and still agree.",
     "supported": true,
-    "detail": "README advertises 38/38 verified; the registry holds 38 claims",
+    "detail": "README advertises 39/39 verified; the registry holds 39 claims",
     "study": "tumour_twin"
    },
    {
@@ -432,6 +432,17 @@
     "limit": "A record is an exposure, not an ordered protocol: first-line cannot be separated from salvage in this export.",
     "supported": true,
     "detail": "restriction keeps 356/595 patients; base C 0.6559 (all) -> 0.6447 (restricted); cohort-membership delta -0.0112 inside one fold sd (0.0247) -- selection is reported separately from any covariate signal",
+    "study": "tumour_twin"
+   },
+   {
+    "id": "stream2_biopsy_measures_cellularity_and_refuses_ki67",
+    "sentence": "The biopsy stream measures what the archive actually holds and refuses what it does not. TCGA-GBM carries 2,053 whole-slide images at the live GDC count, none of them named as Ki-67 or IHC; the smallest by listed file size (6.01 MB) was downloaded and read -- an Aperio SVS, 9352x4666, MPP 2.0037 um/px, AppMag 5, haematoxylin-only with a brown fraction of 0.0 over the sampled crop. From it danon/histology.py reports 636 nuclei per mm^2 over 4 crops (3,588 nuclei, per-crop spread 460-1579, median nucleus area 76.3 um^2). That is CELLULARITY. Stream 2's mapping needs the Ki-67 labelling index, whose numerator does not exist in this source, so ki67_fraction raises and no r0 is derived: the growth mapping stays unit-tested at KI67_REF=0.15 until a real Ki-67 slide is supplied. Substituting a nuclei density for the labelling index would fabricate the growth rate it feeds.",
+    "tier": "established",
+    "substantiated_by": "danon/claims.py::check_stream2_histology_measured_and_ki67_refused over outputs_real/histology_probe.json (rebuildable via _histology_probe.py)",
+    "check": "stream2_histology_measured",
+    "limit": "The 636 nuclei/mm^2 is ONE slide, the smallest by listed size -- not a cohort statistic. The zero-Ki-67 finding generalises only as far as the file index plus this one slide's pixels: the index carries barcodes, not markers, so none being named is a lower bound on identifiability, and the remaining 2,052 slides were not downloaded or read. The stain call is a hue-fraction heuristic, not a validated assay, and the nuclei count comes from connected components in a hue band with an area filter -- clumped nuclei are dropped rather than split, which is part of why crops spread 3.4x. No pathologist count anchors any of it, and nothing here is a grade, a WHO criterion, or a statement about a patient.",
+    "supported": true,
+    "detail": "2053 TCGA-GBM slide images retrievable, 0 named Ki-67; the downloaded slide is haematoxylin-only (brown 0.0) at MPP 2.0037, giving 636 nuclei/mm^2 over 4 crops; Ki-67 refusal exercised and stream 2 still refused as an input",
     "study": "tumour_twin"
    }
   ],
