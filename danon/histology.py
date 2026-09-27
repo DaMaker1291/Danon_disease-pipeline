@@ -112,6 +112,53 @@ def _require_cv2():
     return cv2
 
 
+def _as_rgb_uint8(rgb: np.ndarray) -> Tuple[np.ndarray, str]:
+    """The image as 8-bit RGB, or a refusal naming the input this is not.
+
+    OpenCV's RGB->HSV reads a float array as 0-1, so a float array holding
+    0-255 values is not "close enough": it would be clamped, and the hue
+    statistics would then describe a different image than the one passed in --
+    which is worse than a crash, because the caller would read a confident
+    refusal about tissue that is plainly on the slide. Each accepted convention
+    is therefore applied explicitly and every other input is refused by name,
+    including the dtype OpenCV answers with a raw `cv2.error` instead of a
+    sentence.
+    """
+    a = np.asarray(rgb)
+    if a.ndim != 3:
+        raise HistologyError(f"expected an RGB image, got shape {a.shape}")
+    notes: List[str] = []
+    if a.shape[2] == 4:
+        # An alpha channel is opacity, not colour. The hue statistics use only
+        # the colour channels, so dropping it loses nothing they read; a
+        # screenshot of a slide is the common case.
+        a = a[..., :3]
+        notes.append("alpha channel dropped")
+    elif a.shape[2] != 3:
+        raise HistologyError(
+            f"expected 3 colour channels (RGB or RGBA), got {a.shape[2]} in "
+            f"shape {a.shape}"
+        )
+    if a.dtype == np.uint8:
+        return a, "; ".join(notes)
+    if np.issubdtype(a.dtype, np.floating):
+        if not np.all(np.isfinite(a)):
+            raise HistologyError(f"{a.dtype} image holds non-finite values")
+        lo, hi = float(a.min()), float(a.max())
+        if 0.0 <= lo and hi <= 1.0:
+            notes.append("float 0-1 scaled to 8-bit")
+            return (a * 255.0).round().astype(np.uint8), "; ".join(notes)
+        raise HistologyError(
+            f"a {a.dtype} image with values {lo:g}-{hi:g} is ambiguous: OpenCV "
+            f"reads float images as 0-1, so these values would be clamped and "
+            f"measured as a different image. Pass 8-bit values, or scale to 0-1"
+        )
+    raise HistologyError(
+        f"unsupported image dtype {a.dtype}: expected 8-bit values, or floats "
+        f"already scaled to 0-1"
+    )
+
+
 def _open_slide(path: str):
     try:
         from PIL import Image
@@ -191,9 +238,7 @@ def classify_stain(rgb: np.ndarray, *, sample_px: int = 2_000_000) -> Dict[str, 
     """
     cv2 = _require_cv2()
 
-    a = np.asarray(rgb)
-    if a.ndim != 3 or a.shape[2] < 3:
-        raise HistologyError(f"expected an RGB image, got shape {a.shape}")
+    a, note = _as_rgb_uint8(rgb)
     flat = a.reshape(-1, 3)
     if flat.shape[0] > sample_px:
         step = flat.shape[0] // sample_px + 1
@@ -212,16 +257,17 @@ def classify_stain(rgb: np.ndarray, *, sample_px: int = 2_000_000) -> Dict[str, 
         stain = "haematoxylin-only"
     else:
         stain = "unclassified"
+    rule = (
+        "stain is called from hue fractions over tissue pixels: >15% DAB brown "
+        "is dab-positive; >60% haematoxylin with almost no brown is "
+        "haematoxylin-only"
+    )
     return {
         "stain": stain,
         "brown_fraction": brown,
         "haematoxylin_fraction": haematoxylin,
         "tissue_pixels_sampled": int(tissue.sum()),
-        "rule": (
-            "stain is called from hue fractions over tissue pixels: >15% DAB brown "
-            "is dab-positive; >60% haematoxylin with almost no brown is "
-            "haematoxylin-only"
-        ),
+        "rule": f"{rule}; input: {note}" if note else rule,
     }
 
 
@@ -265,6 +311,17 @@ def measure_nuclei_density(
     tissue_pixels = 0
     nucleus_areas: List[int] = []
     for (x, y) in crops:
+        x, y = int(x), int(y)
+        if x < 0 or y < 0:
+            # Pillow pads a negative origin with black, so the measurement would
+            # silently cover this crop's intersection with the slide instead of
+            # the region asked for, and report a tissue area short by the
+            # padding -- a different measurement wearing the caller's coordinates.
+            raise HistologyError(
+                f"{path}: crop origin ({x}, {y}) lies off the slide; a negative "
+                f"origin is padded, not clipped, so the region measured would not "
+                f"be the region requested"
+            )
         if x + crop_px > meta.width or y + crop_px > meta.height:
             continue
         rgb = np.asarray(

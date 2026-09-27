@@ -416,6 +416,50 @@ class TestStream2Capacity:
         with pytest.raises(ValueError):
             stream2_carrying_capacity(junk, 636.0)
 
+    def test_the_departure_from_pure_scale_grows_as_the_seed_approaches_the_floor(
+        self,
+    ):
+        """The claim's mechanism, demonstrated on the engine's own phantom.
+
+        The claim says measured packing matters only where an ABSOLUTE floor gates
+        a decision. This walks the ceiling toward `MIN_VIABLE_DENSITY` and requires
+        the departure from pure scale-covariance to grow -- so if the floor moved
+        or stopped biting, the claim's reading would fail here rather than quietly
+        becoming false.
+        """
+        from danon.evosteer import (
+            MIN_VIABLE_DENSITY,
+            MTDPolicy,
+            TumorEvolutionSimulator,
+            make_gbm_phantom,
+        )
+
+        geom = make_gbm_phantom()
+        scaled = []
+        for ratio in (1.0, 1e-3, 1e-5):
+            clones = stream2_capacity_clones(636.0 * ratio, 636.0)
+            traj = TumorEvolutionSimulator(geom, clones=clones).run(
+                MTDPolicy(), days=365, initial_resistant_fraction=0.005, seed=101
+            )
+            # Pure scale-covariance leaves final/K identical across ratios, so the
+            # reference is the baseline arm itself rather than a remembered number.
+            scaled.append(
+                float(traj.burden_S[-1] + traj.burden_R[-1])
+                / clones.carrying_capacity
+            )
+        departures = [abs(s - scaled[0]) / scaled[0] for s in scaled]
+        assert departures[0] == 0.0
+        assert departures[1] > 0.0
+        assert departures[2] > departures[1]
+        # And the floor really is what does it: the tiniest ceiling empties.
+        tiny = stream2_capacity_clones(636.0 * 1e-7, 636.0)
+        assert 0.65 * tiny.carrying_capacity < MIN_VIABLE_DENSITY
+        empty = TumorEvolutionSimulator(geom, clones=tiny).run(
+            MTDPolicy(), days=365, initial_resistant_fraction=0.005, seed=101
+        )
+        assert float(empty.burden_S[-1] + empty.burden_R[-1]) == 0.0
+        assert empty.pfs_day is None
+
     def test_the_contrast_refuses_an_empty_cohort(self):
         """No seeds is no measurement, not a null result."""
         with pytest.raises(ValueError) as err:

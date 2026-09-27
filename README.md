@@ -39,7 +39,7 @@ With the backend up, the Twin Planner runs live planning on your mask (~4 s for 
 python -m pytest tests/ danon/multiagent/ -q    # full suite ~13 min; the count is derived, never quoted here
 python -m pytest tests/test_recovery.py -q      # Standard 1 recovery suite, 46 tests ~37 s
 python -m pytest tests/test_recovery.py::TestTransportRecovery -q   # ~2 s stencil check
-python -c "from danon.claims import audit_claims; audit_claims()"   # 38/38 bound claims
+python -c "from danon.claims import audit_claims; audit_claims()"   # 40/40 bound claims
 ```
 
 ## Verification matrix (live-measured 2026-09-23; artifacts in `outputs_real/`)

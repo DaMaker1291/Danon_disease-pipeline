@@ -1537,21 +1537,27 @@ def check_readme_claim_count_matches_the_registry() -> CheckResult:
         text = open(path, encoding="utf-8").read()
     except OSError as exc:
         return CheckResult(supported=False, detail=f"README unreadable: {exc}")
-    m = re.search(r"\*\*(\d+)/(\d+) verified\*\*", text)
-    if not m:
+    # EVERY place the README states this count, not just the bold matrix row.
+    # The first version of this check matched only `**n/n verified**`, and the
+    # same number written as a plain comment (`# 38/38 bound claims`, above the
+    # audit command) escaped it entirely and sat stale while the registry held
+    # 40 -- a duplicate of the counted fact that the guard was blind to purely
+    # because of its formatting.
+    pairs = re.findall(r"(\d+)/(\d+)\s*(?:verified|bound claims)", text)
+    if not pairs:
         return CheckResult(
             supported=False,
-            detail="README carries no '**n/n verified**' claim row to check",
+            detail="README states no 'n/n verified' claim count to check",
         )
-    advertised, total = int(m.group(1)), int(m.group(2))
     live = len(CLAIMS)
-    supported = advertised == live and total == live
+    stale = [f"{a}/{b}" for a, b in pairs if int(a) != live or int(b) != live]
     return CheckResult(
-        supported=supported,
+        supported=not stale,
         detail=(
-            f"README advertises {advertised}/{total} verified; the registry holds "
+            f"README states the claim count {len(pairs)}x "
+            f"({', '.join(f'{a}/{b}' for a, b in pairs)}); the registry holds "
             f"{live} claims"
-            + ("" if supported else " -- a published count has gone stale")
+            + ("" if not stale else f" -- stale: {', '.join(stale)}")
         ),
     )
 

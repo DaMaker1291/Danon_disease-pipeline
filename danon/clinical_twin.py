@@ -753,7 +753,13 @@ def stream4_velocity_agreement(
 
 @dataclass
 class TwinStreamState:
-    """The four-stream assembled state, with per-stream provenance."""
+    """The four-stream assembled state, with per-stream provenance.
+
+    `initial_state` is a PAIR with `clones_override`: a measured density scales
+    the ceiling and the seed together (the fill fraction is calibrated against
+    K), so running the seed against the default clones over-saturates the tumour
+    by K. Pass `clones=state.clones_override` to the simulator, or neither.
+    """
 
     initial_state: Optional[Tuple[np.ndarray, np.ndarray]]
     clones_override: Optional[CloneParams]
@@ -1003,11 +1009,11 @@ def stream2_capacity_contrast(
             "no seeds: an empty cohort is not a null result, it is no measurement"
         )
     # A perfectly uniform slide yields ratio 1.0 for its min AND its max crop, so
-    # the distinct ratios a caller passes can repeat. Keep the first of each: the
-    # arms are keyed by ratio, and a duplicate key would leave an arm and the
-    # control lists different lengths -- which the pairing check would (rightly)
-    # flag as a broken cohort rather than as the uniform slide it is.
-    ratios = list(dict.fromkeys(float(r) for r in ratios))
+    # the distinct ratios a caller passes can repeat. Dedupe on the SAME key the
+    # arms are keyed by, so the ratio list and `clones_by_ratio` cannot disagree:
+    # deduping on exact floats while keying at six decimals would leave an arm
+    # short one key and run the same arm twice.
+    ratios = list({_key(ratio): float(ratio) for ratio in ratios}.values())
 
     mask_file = os.path.join(engineered_dir, f"BraTS2021_{case_id}_mask.nii.gz")
     prolif_file = os.path.join(engineered_dir, f"BraTS2021_{case_id}_prolif.nii.gz")

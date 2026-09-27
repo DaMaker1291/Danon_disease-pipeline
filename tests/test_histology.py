@@ -134,6 +134,36 @@ class TestRefusals:
             measure_nuclei_density(path, crops=[(0, 0)], crop_px=256)
         assert "nothing to count" in str(err.value)
 
+    def test_a_negative_crop_origin_is_refused_rather_than_padded(self, tmp_path):
+        """Pillow pads a negative origin instead of clipping it.
+
+        So the region measured would be the crop's intersection with the slide
+        while the caller's coordinates said otherwise, and a caller sampling a
+        grid could read the same off-slide region twice without knowing. The
+        failure this replaces was silent.
+        """
+        path = str(tmp_path / "padded.tif")
+        _write_slide(path, _nuclei_slide(n=100), mpp="2.0")
+        with pytest.raises(HistologyError) as err:
+            measure_nuclei_density(
+                path, crops=[(-512, -512)], crop_px=1024, min_tissue_fraction=0.001
+            )
+        message = str(err.value)
+        assert "-512" in message and "padded" in message
+
+    def test_a_crop_running_off_the_far_edge_is_still_skipped(self, tmp_path):
+        """The far edge is a crop that does not fit, not a lie: it is dropped and
+        `crops_used` reports it, so a caller can see how many crops survived."""
+        path = str(tmp_path / "edge.tif")
+        _write_slide(path, _nuclei_slide(n=100), mpp="2.0")
+        out = measure_nuclei_density(
+            path,
+            crops=[(0, 0), (900, 900)],
+            crop_px=1024,
+            min_tissue_fraction=0.001,
+        )
+        assert out["crops_used"] == 1
+
 
 class TestStainAndKi67:
     def test_haematoxylin_only_is_called(self):
@@ -164,6 +194,67 @@ class TestStainAndKi67:
         with pytest.raises(HistologyError) as err:
             ki67_fraction(classify_stain(img))
         assert "pathologist" in str(err.value)
+
+
+class TestImageInputConventions:
+    """The pixel-acceptance surface: what it converts, and what it refuses by name.
+
+    Every case here was a real failure mode. An RGBA array raised a bare
+    `ValueError` out of a reshape. A float array holding 0-255 values was
+    silently clamped by OpenCV to 0-1 and then reported as "no tissue pixels
+    found" -- a confident sentence about tissue plainly on the slide, which is
+    worse than a crash because it reads as a measurement result. And float64
+    reached OpenCV, which answered `cv2.error` instead of a reason.
+    """
+
+    def _rgb(self) -> np.ndarray:
+        img = np.full((64, 64, 3), 255, dtype=np.uint8)
+        img[8:56, 8:56] = HAEMATOXYLIN_RGB
+        return img
+
+    def test_rgba_is_measured_with_only_its_alpha_dropped(self):
+        rgb = self._rgb()
+        rgba = np.dstack([rgb, np.full(rgb.shape[:2], 255, dtype=np.uint8)])
+        plain, with_alpha = classify_stain(rgb), classify_stain(rgba)
+        assert with_alpha["stain"] == plain["stain"] == "haematoxylin-only"
+        # Alpha is opacity, not colour, so the hue statistics must be identical.
+        for key in ("brown_fraction", "haematoxylin_fraction", "tissue_pixels_sampled"):
+            assert with_alpha[key] == plain[key]
+        assert "alpha channel dropped" in with_alpha["rule"]
+
+    def test_floats_in_zero_to_one_agree_with_the_eight_bit_image(self):
+        rgb = self._rgb()
+        eight_bit = classify_stain(rgb)
+        for dtype in (np.float32, np.float64):
+            scaled = classify_stain((rgb / 255.0).astype(dtype))
+            assert scaled["stain"] == eight_bit["stain"]
+            assert scaled["tissue_pixels_sampled"] == eight_bit["tissue_pixels_sampled"]
+            assert scaled["brown_fraction"] == eight_bit["brown_fraction"]
+
+    def test_float_values_above_one_are_refused_not_clamped(self):
+        rgb = self._rgb()
+        with pytest.raises(HistologyError) as err:
+            classify_stain(rgb.astype(np.float32))
+        message = str(err.value)
+        assert "ambiguous" in message and "0-1" in message
+        # The defect was that this read as a measured absence of tissue.
+        assert "no tissue pixels" not in message
+
+    def test_a_float64_array_is_refused_by_name_not_by_opencv(self):
+        with pytest.raises(HistologyError) as err:
+            classify_stain((self._rgb().astype(np.float64) * 4.0))
+        assert "float64" in str(err.value)
+
+    def test_odd_shapes_dtypes_and_non_finite_values_are_refused(self):
+        with pytest.raises(HistologyError) as err:
+            classify_stain(np.zeros((8, 8, 2), dtype=np.uint8))
+        assert "colour channels" in str(err.value)
+        with pytest.raises(HistologyError) as err:
+            classify_stain(np.zeros((8, 8, 3), dtype=np.int16))
+        assert "dtype" in str(err.value)
+        with pytest.raises(HistologyError) as err:
+            classify_stain(np.full((8, 8, 3), np.nan, dtype=np.float32))
+        assert "non-finite" in str(err.value)
 
 
 @pytest.mark.skipif(
