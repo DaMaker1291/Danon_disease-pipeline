@@ -105,10 +105,16 @@ CANDIDATE_GLIOMA_COLLECTIONS: Tuple[str, ...] = (
 #: number it produces.
 MIN_FOLLOWUP_INTERVAL_DAYS = 28
 
-#: Series-label tokens identifying raw DSC perfusion acquisition and
-#: CaPTk-processed perfusion maps (rCBV/Ktrans) in a collection listing.
+#: Series-label tokens identifying raw DSC perfusion acquisition in a listing.
 DSC_PERFUSION_TOKENS: Tuple[str, ...] = ("perf", "bolus")
-PROCESSED_PERFUSION_TOKENS: Tuple[str, ...] = ("captk",)
+
+#: Series-label tokens identifying CaPTk-PROCESSED series. These are co-registered
+#: STRUCTURAL volumes, not perfusion maps: the smallest one in the listing is
+#: 'AX T1 PRE : Processed_CaPTk' (TR 777 ms, TE 17 ms, one frame per file,
+#: implicit VR), downloaded and read in this session to check the label. An
+#: earlier version of this module called them 'perfusion maps (rCBV/Ktrans)' and
+#: a claim repeated that, which is why the name is spelled out here.
+PROCESSED_CAPTK_TOKENS: Tuple[str, ...] = ("captk",)
 
 
 class ModalityStatus(str, Enum):
@@ -374,8 +380,9 @@ def measure_collection_timepoints(
         bucket = dates_by_patient.setdefault(pid, set())
         if raw_date:
             bucket.add(str(raw_date)[:10])
-        # UPENN-GBM records the acquisition in ProtocolName ('ep2d_perf BOLUS')
-        # and the processed map in SeriesDescription ('Processed_CaPTk').
+        # UPENN-GBM records the raw acquisition in ProtocolName ('ep2d_perf
+        # BOLUS') and the CaPTk output in SeriesDescription ('Processed_CaPTk'),
+        # which is a co-registered structural volume.
         label = (
             f"{row.get('ProtocolName') or ''} "
             f"{row.get('SeriesDescription') or ''}"
@@ -383,7 +390,7 @@ def measure_collection_timepoints(
         if any(tok in label for tok in DSC_PERFUSION_TOKENS):
             n_dsc_series += 1
             dsc_patients.add(pid)
-        if any(tok in label for tok in PROCESSED_PERFUSION_TOKENS):
+        if any(tok in label for tok in PROCESSED_CAPTK_TOKENS):
             n_processed_series += 1
             processed_patients.add(pid)
 

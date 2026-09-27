@@ -1,0 +1,602 @@
+[
+ {
+  "patient_id": "UPENN-GBM-00576",
+  "series_uid": "1.3.6.1.4.1.14519.5.2.1.288966082182720135055225805042736998020",
+  "series_description": "PERFUSION GRE_TERA",
+  "bytes_listed": 12130672,
+  "listing_url": "https://services.cancerimagingarchive.net/nbia-api/services/v1/getSeries?Collection=UPENN-GBM",
+  "n_files": 700,
+  "dsc": {
+   "source": "data/tcia/perfusion\\UPENN-GBM-00576",
+   "n_files": 700,
+   "shape_tzyx": [
+    50,
+    14,
+    128,
+    128
+   ],
+   "tr_s": 1.83,
+   "te_s": 0.0514,
+   "pixel_mm": [
+    1.796875,
+    1.796875
+   ],
+   "slice_mm": 6.5,
+   "signal_units": "DICOM stored values (arbitrary, not rescaled to HU)",
+   "warnings": []
+  },
+  "cbv": {
+   "peak_frame": 26,
+   "arrival_frame": 20,
+   "end_frame": 37,
+   "window_frames": 18,
+   "drift_peak_ratio": 0.5065859636120363,
+   "reference_voxels": 61707,
+   "voxels": 229376,
+   "voxels_positive": 145219,
+   "median": 1.4342432311479532,
+   "p95": 5.472435114255785,
+   "max": 77.25361395649972,
+   "contrast_p95_over_median": 3.815555824429937,
+   "fraction_above_1_5x": 0.48302219406551483
+  },
+  "engine": {
+   "decimation_xyz": [
+    4,
+    4,
+    2
+   ],
+   "grid_shape_zyx": [
+    7,
+    32,
+    32
+   ],
+   "roi_rcbv_multiple": 1.5,
+   "roi_threshold_rcbv": 1.6214986696112248,
+   "roi_voxels": 1289,
+   "total_voxels": 7168,
+   "mask_path": "data/tcia/engine_ready/UPENN_GBM_00576_roi.nii.gz",
+   "perfusion_path": "data/tcia/engine_ready/UPENN_GBM_00576_rcbv.nii.gz",
+   "geometry_source": "from_nifti_mask(mask, vessels_path=measured rCBV)",
+   "arms": {
+    "mtd": {
+     "pfs_uniform": [
+      365,
+      365,
+      365
+     ],
+     "pfs_measured": [
+      365,
+      365,
+      365
+     ],
+     "progressed_uniform": [
+      false,
+      false,
+      false
+     ],
+     "progressed_measured": [
+      false,
+      false,
+      false
+     ],
+     "final_burden_uniform": [
+      119.99648845237999,
+      148.1837320859038,
+      44.621677537271175
+     ],
+     "final_burden_measured": [
+      120.04014072388262,
+      148.67289273828564,
+      44.81497249516742
+     ],
+     "final_r_fraction_uniform": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "final_r_fraction_measured": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "toxicity_uniform": [
+      365.0,
+      365.0,
+      365.0
+     ],
+     "toxicity_measured": [
+      365.0,
+      365.0,
+      365.0
+     ],
+     "pfs_informed_pairs": 0,
+     "n_pairs_in_disagreement": 0,
+     "max_abs_relative_burden_difference": 0.004331862192648149,
+     "max_abs_r_fraction_difference": 0.0,
+     "field_min_mm2_per_day": 0.4002067110257914,
+     "field_max_mm2_per_day": 8.658150198283677,
+     "field_contrast_ratio": 21.634195428886,
+     "seeds": [
+      101,
+      102,
+      103
+     ]
+    },
+    "steering": {
+     "pfs_uniform": [
+      365,
+      365,
+      365
+     ],
+     "pfs_measured": [
+      365,
+      365,
+      365
+     ],
+     "progressed_uniform": [
+      false,
+      false,
+      false
+     ],
+     "progressed_measured": [
+      false,
+      false,
+      false
+     ],
+     "final_burden_uniform": [
+      7.196999874761207,
+      8.17968398752783,
+      6.482333441902912
+     ],
+     "final_burden_measured": [
+      7.34998263185746,
+      7.844222663873915,
+      6.341849243817229
+     ],
+     "final_r_fraction_uniform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "final_r_fraction_measured": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "toxicity_uniform": [
+      364.09999999999997,
+      363.79999999999995,
+      364.4
+     ],
+     "toxicity_measured": [
+      364.09999999999997,
+      363.79999999999995,
+      364.4
+     ],
+     "pfs_informed_pairs": 0,
+     "n_pairs_in_disagreement": 0,
+     "max_abs_relative_burden_difference": 0.04101152613785794,
+     "max_abs_r_fraction_difference": 0.0,
+     "field_min_mm2_per_day": 0.4002067110257914,
+     "field_max_mm2_per_day": 8.658150198283677,
+     "field_contrast_ratio": 21.634195428886,
+     "seeds": [
+      101,
+      102,
+      103
+     ]
+    }
+   }
+  },
+  "honesty": {
+   "roi_is_not_a_segmentation": "the ROI is rCBV >= 1.5x median on the decimated DSC grid; no expert segmentation is co-registered to this grid, so this is a perfusion-defined region, not a tumour",
+   "not_claimed": [
+    "absolute CBV or Ktrans",
+    "a voxel-wise link between this map and any BraTS case",
+    "survival of any patient"
+   ]
+  },
+  "seconds": 85.4
+ },
+ {
+  "patient_id": "UPENN-GBM-00559",
+  "series_uid": "1.3.6.1.4.1.14519.5.2.1.27323866643948510256237247628501048654",
+  "series_description": "ep2d_perf BOLUS_TERA",
+  "bytes_listed": 14242166,
+  "listing_url": "https://services.cancerimagingarchive.net/nbia-api/services/v1/getSeries?Collection=UPENN-GBM",
+  "n_files": 900,
+  "dsc": {
+   "source": "data/tcia/perfusion\\UPENN-GBM-00559",
+   "n_files": 900,
+   "shape_tzyx": [
+    45,
+    20,
+    128,
+    128
+   ],
+   "tr_s": 2.0,
+   "te_s": 0.045,
+   "pixel_mm": [
+    1.71875,
+    1.71875
+   ],
+   "slice_mm": 3.0,
+   "signal_units": "DICOM stored values (arbitrary, not rescaled to HU)",
+   "warnings": []
+  },
+  "cbv": {
+   "peak_frame": 17,
+   "arrival_frame": 14,
+   "end_frame": 22,
+   "window_frames": 9,
+   "drift_peak_ratio": 0.2993726822246237,
+   "reference_voxels": 89892,
+   "voxels": 327680,
+   "voxels_positive": 204379,
+   "median": 1.3612890367931394,
+   "p95": 10.134264184770378,
+   "max": 43.563743366477496,
+   "contrast_p95_over_median": 7.44460868401923,
+   "fraction_above_1_5x": 0.4650820289755797
+  },
+  "engine": {
+   "decimation_xyz": [
+    4,
+    4,
+    2
+   ],
+   "grid_shape_zyx": [
+    10,
+    32,
+    32
+   ],
+   "roi_rcbv_multiple": 1.5,
+   "roi_threshold_rcbv": 2.5058256801495227,
+   "roi_voxels": 1946,
+   "total_voxels": 10240,
+   "mask_path": "data/tcia/engine_ready/UPENN_GBM_00559_roi.nii.gz",
+   "perfusion_path": "data/tcia/engine_ready/UPENN_GBM_00559_rcbv.nii.gz",
+   "geometry_source": "from_nifti_mask(mask, vessels_path=measured rCBV)",
+   "arms": {
+    "mtd": {
+     "pfs_uniform": [
+      365,
+      365,
+      365
+     ],
+     "pfs_measured": [
+      365,
+      365,
+      365
+     ],
+     "progressed_uniform": [
+      false,
+      false,
+      false
+     ],
+     "progressed_measured": [
+      false,
+      false,
+      false
+     ],
+     "final_burden_uniform": [
+      263.79079012072197,
+      8.029320841378546,
+      255.62035074837817
+     ],
+     "final_burden_measured": [
+      263.82445483529625,
+      8.014273553285928,
+      255.5980215682186
+     ],
+     "final_r_fraction_uniform": [
+      1.0,
+      0.0,
+      1.0
+     ],
+     "final_r_fraction_measured": [
+      1.0,
+      0.0,
+      1.0
+     ],
+     "toxicity_uniform": [
+      365.0,
+      365.0,
+      365.0
+     ],
+     "toxicity_measured": [
+      365.0,
+      365.0,
+      365.0
+     ],
+     "pfs_informed_pairs": 0,
+     "n_pairs_in_disagreement": 0,
+     "max_abs_relative_burden_difference": 0.0018740424489045449,
+     "max_abs_r_fraction_difference": 0.0,
+     "field_min_mm2_per_day": 0.39036739935241543,
+     "field_max_mm2_per_day": 6.58539827600075,
+     "field_contrast_ratio": 16.869744468737235,
+     "seeds": [
+      101,
+      102,
+      103
+     ]
+    },
+    "steering": {
+     "pfs_uniform": [
+      365,
+      365,
+      365
+     ],
+     "pfs_measured": [
+      365,
+      365,
+      365
+     ],
+     "progressed_uniform": [
+      false,
+      false,
+      false
+     ],
+     "progressed_measured": [
+      false,
+      false,
+      false
+     ],
+     "final_burden_uniform": [
+      4.533275762748535,
+      0.047237314092245464,
+      6.3423597838459
+     ],
+     "final_burden_measured": [
+      4.746774861889215,
+      0.04579696288207538,
+      5.783620523146656
+     ],
+     "final_r_fraction_uniform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "final_r_fraction_measured": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "toxicity_uniform": [
+      363.49999999999994,
+      364.1,
+      363.5
+     ],
+     "toxicity_measured": [
+      363.49999999999994,
+      364.1,
+      363.5
+     ],
+     "pfs_informed_pairs": 0,
+     "n_pairs_in_disagreement": 0,
+     "max_abs_relative_burden_difference": 0.08809643094079321,
+     "max_abs_r_fraction_difference": 0.0,
+     "field_min_mm2_per_day": 0.39036739935241543,
+     "field_max_mm2_per_day": 6.58539827600075,
+     "field_contrast_ratio": 16.869744468737235,
+     "seeds": [
+      101,
+      102,
+      103
+     ]
+    }
+   }
+  },
+  "honesty": {
+   "roi_is_not_a_segmentation": "the ROI is rCBV >= 1.5x median on the decimated DSC grid; no expert segmentation is co-registered to this grid, so this is a perfusion-defined region, not a tumour",
+   "not_claimed": [
+    "absolute CBV or Ktrans",
+    "a voxel-wise link between this map and any BraTS case",
+    "survival of any patient"
+   ]
+  },
+  "seconds": 95.1
+ },
+ {
+  "patient_id": "UPENN-GBM-00592",
+  "series_uid": "1.3.6.1.4.1.14519.5.2.1.53410643861558994134829970937914737745",
+  "series_description": "ep2d_perf BOLUS",
+  "bytes_listed": 14399444,
+  "listing_url": "https://services.cancerimagingarchive.net/nbia-api/services/v1/getSeries?Collection=UPENN-GBM",
+  "n_files": 900,
+  "dsc": {
+   "source": "data/tcia/perfusion\\UPENN-GBM-00592",
+   "n_files": 900,
+   "shape_tzyx": [
+    45,
+    20,
+    128,
+    128
+   ],
+   "tr_s": 2.0,
+   "te_s": 0.045,
+   "pixel_mm": [
+    1.71875,
+    1.71875
+   ],
+   "slice_mm": 3.0,
+   "signal_units": "DICOM stored values (arbitrary, not rescaled to HU)",
+   "warnings": []
+  },
+  "cbv": {
+   "peak_frame": 16,
+   "arrival_frame": 13,
+   "end_frame": 18,
+   "window_frames": 6,
+   "drift_peak_ratio": 0.29955027904756043,
+   "reference_voxels": 90117,
+   "voxels": 327680,
+   "voxels_positive": 197153,
+   "median": 1.209746652746794,
+   "p95": 10.452679509942623,
+   "max": 39.87536268453243,
+   "contrast_p95_over_median": 8.640387213479169,
+   "fraction_above_1_5x": 0.4141047815655861
+  },
+  "engine": {
+   "decimation_xyz": [
+    4,
+    4,
+    2
+   ],
+   "grid_shape_zyx": [
+    10,
+    32,
+    32
+   ],
+   "roi_rcbv_multiple": 1.5,
+   "roi_threshold_rcbv": 2.0773291576820694,
+   "roi_voxels": 2170,
+   "total_voxels": 10240,
+   "mask_path": "data/tcia/engine_ready/UPENN_GBM_00592_roi.nii.gz",
+   "perfusion_path": "data/tcia/engine_ready/UPENN_GBM_00592_rcbv.nii.gz",
+   "geometry_source": "from_nifti_mask(mask, vessels_path=measured rCBV)",
+   "arms": {
+    "mtd": {
+     "pfs_uniform": [
+      365,
+      365,
+      365
+     ],
+     "pfs_measured": [
+      365,
+      365,
+      365
+     ],
+     "progressed_uniform": [
+      false,
+      false,
+      false
+     ],
+     "progressed_measured": [
+      false,
+      false,
+      false
+     ],
+     "final_burden_uniform": [
+      186.95558442851922,
+      156.2712566559553,
+      50.684619202524004
+     ],
+     "final_burden_measured": [
+      187.09023366589722,
+      156.3702632879335,
+      50.77395388148144
+     ],
+     "final_r_fraction_uniform": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "final_r_fraction_measured": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "toxicity_uniform": [
+      365.0,
+      365.0,
+      365.0
+     ],
+     "toxicity_measured": [
+      365.0,
+      365.0,
+      365.0
+     ],
+     "pfs_informed_pairs": 0,
+     "n_pairs_in_disagreement": 0,
+     "max_abs_relative_burden_difference": 0.0017625599316525293,
+     "max_abs_r_fraction_difference": 0.0,
+     "field_min_mm2_per_day": 0.3719894343838033,
+     "field_max_mm2_per_day": 5.675518462329198,
+     "field_contrast_ratio": 15.257203398076715,
+     "seeds": [
+      101,
+      102,
+      103
+     ]
+    },
+    "steering": {
+     "pfs_uniform": [
+      365,
+      365,
+      365
+     ],
+     "pfs_measured": [
+      365,
+      365,
+      365
+     ],
+     "progressed_uniform": [
+      false,
+      false,
+      false
+     ],
+     "progressed_measured": [
+      false,
+      false,
+      false
+     ],
+     "final_burden_uniform": [
+      2.075869181056846,
+      1.5105153832068483,
+      0.42974922179811786
+     ],
+     "final_burden_measured": [
+      2.160486840993414,
+      1.4582164097966828,
+      0.42830987289522693
+     ],
+     "final_r_fraction_uniform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "final_r_fraction_measured": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "toxicity_uniform": [
+      364.1,
+      364.1,
+      364.1
+     ],
+     "toxicity_measured": [
+      364.1,
+      364.1,
+      364.1
+     ],
+     "pfs_informed_pairs": 0,
+     "n_pairs_in_disagreement": 0,
+     "max_abs_relative_burden_difference": 0.04076252044624918,
+     "max_abs_r_fraction_difference": 0.0,
+     "field_min_mm2_per_day": 0.3719894343838033,
+     "field_max_mm2_per_day": 5.675518462329198,
+     "field_contrast_ratio": 15.257203398076715,
+     "seeds": [
+      101,
+      102,
+      103
+     ]
+    }
+   }
+  },
+  "honesty": {
+   "roi_is_not_a_segmentation": "the ROI is rCBV >= 1.5x median on the decimated DSC grid; no expert segmentation is co-registered to this grid, so this is a perfusion-defined region, not a tumour",
+   "not_claimed": [
+    "absolute CBV or Ktrans",
+    "a voxel-wise link between this map and any BraTS case",
+    "survival of any patient"
+   ]
+  },
+  "seconds": 150.8
+ }
+]

@@ -1,7 +1,7 @@
 {
  "key": "claims",
  "title": "Bound-claim audit (what this project may say)",
- "generated_utc": "2026-09-27T15:18:06Z",
+ "generated_utc": "2026-09-27T16:04:15Z",
  "source": "danon.claims.audit_claims()",
  "notes": [
   "each row is a sentence plus the check that supports it, re-run at build time; a check that failed is recorded as failed",
@@ -12,8 +12,8 @@
   "clinical_benefit": "unknown"
  },
  "data": {
-  "n_claims": 37,
-  "n_passed": 37,
+  "n_claims": 38,
+  "n_passed": 38,
   "n_failed": 0,
   "claims": [
    {
@@ -112,7 +112,7 @@
     "check": "test_suite_counted",
     "limit": "Tests verify the implementation. They are not evidence about biology.",
     "supported": true,
-    "detail": "1060 test functions in 147 classes across tests/ and danon/multiagent/ (pytest collects more than this wherever a test is parametrised); README defers to this check rather than quoting a count",
+    "detail": "1081 test functions in 152 classes across tests/ and danon/multiagent/ (pytest collects more than this wherever a test is parametrised); README defers to this check rather than quoting a count",
     "study": "tumour_twin"
    },
    {
@@ -145,7 +145,7 @@
     "check": "runtime_365",
     "limit": "Runtime is machine-dependent; the audit prints the machine's own number.",
     "supported": true,
-    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 0.81 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)",
+    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 0.80 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)",
     "study": "tumour_twin"
    },
    {
@@ -358,6 +358,17 @@
     "study": "tumour_twin"
    },
    {
+    "id": "stream3_dsc_perfusion_measured",
+    "sentence": "Stream 3 consumes MEASURED perfusion, not only a contrast proxy: raw DSC series download from TCIA (UPENN-GBM), `danon.dicomio` reads their JPEG-2000-encapsulated pixels, and `danon.perfusion` integrates the first pass into a relative-CBV map. 3 series are downloaded and measured -- selected as the three smallest by listed FileSize, a rule fixed before any outcome was seen -- across three different acquisitions (TR 1.83-2.0 s, TE 45-51 ms, 700-900 files each). A head-to-tail drift line is subtracted before integration because 30-51% of the raw volume-mean peak on these series is drift, not bolus; without it the first real series called frame 0 the arrival and integrated 45 of 50 frames. The pipeline recovers a planted 3:1 CBV ratio to 0.9% under 0.2% signal noise; on the real maps the transport field spans 15.3-21.6x, and the only endpoint with resolution is the final burden, which differs between transport arms by at most 0.18-8.81% (steering the more sensitive of the two policies). PFS is censored in every arm of this cohort and is reported as censored.",
+    "tier": "established",
+    "substantiated_by": "danon/claims.py::check_stream3_dsc_perfusion_is_measured over outputs_real/perfusion_cohort.json (rebuildable via _perfusion_cohort.py)",
+    "check": "stream3_dsc_perfusion_measured",
+    "limit": "The maps are relative CBV by first-pass integration: no arterial input function is fitted, so this is NOT absolute CBV and NOT Ktrans. The region the engine runs on is rCBV >= 1.5x the map median -- a perfusion-defined ROI, NOT a tumour segmentation, since no segmentation is co-registered to the DSC grid. No result here is about a patient's tumour, and nothing links a series to a survival outcome.",
+    "supported": true,
+    "detail": "planted 3:1 CBV recovered to 3.009 (0.3% error, 7-frame window); 3 downloaded series: field contrast 15.3-21.6x, final-burden effect up to 8.8%, 6 arm-sets with a censored PFS endpoint",
+    "study": "tumour_twin"
+   },
+   {
     "id": "longitudinal_availability_is_counted_from_the_manifest",
     "sentence": "Stream 4's cohort is counted from the committed CFB-GBM availability manifest (TCIA, DOI 10.7937/v9pn-2f72): 264 patients, 170 with more than one timepoint, and 168 with a usable T1-Gd pair at least 4 weeks apart (393 pairs, 37 of them spanning two scanners). The manifest records that a series EXISTS; the images are not downloaded, so no registration, artefact or comparability check has been performed and no velocity field has been measured. The CFB-GBM collection is not served by the NBIA API this repo probes, so activating the stream requires downloading the collection, not querying it.",
     "tier": "established",
@@ -376,7 +387,7 @@
     "check": "readme_claim_count_current",
     "limit": "It checks that the README agrees with the registry, not that the registry is right: claims can be wrong together and still agree.",
     "supported": true,
-    "detail": "README advertises 37/37 verified; the registry holds 37 claims",
+    "detail": "README advertises 38/38 verified; the registry holds 38 claims",
     "study": "tumour_twin"
    },
    {
@@ -403,7 +414,7 @@
    },
    {
     "id": "clinical_stream_census_refuses_with_live_counts",
-    "sentence": "Streams 1 (5-ALA fluorescence), 2 (whole-slide Ki-67) and 4 (sequential MRI) refuse on their CACHED counts -- no fluorescence captures, no WSIs, zero cached sequential pairs -- while their mappings are implemented and unit-tested, activating when real files are supplied. No stream is back-filled. The census also reports what is RETRIEVABLE without new code, so a refusal is not mistaken for absence: 41 of 630 probed UPENN-GBM patients carry a >=28-day follow-up interval, and the archive carries DSC perfusion for 456 patients and CaPTk-processed rCBV/Ktrans maps for 628.",
+    "sentence": "Streams 1 (5-ALA fluorescence), 2 (whole-slide Ki-67) and 4 (sequential MRI) refuse on their CACHED counts -- no fluorescence captures, no WSIs, zero cached sequential pairs -- while their mappings are implemented and unit-tested, activating when real files are supplied. No stream is back-filled. The census also reports what is RETRIEVABLE without new code, so a refusal is not mistaken for absence: 41 of 630 probed UPENN-GBM patients carry a >=28-day follow-up interval, and the archive carries raw DSC perfusion for 456 patients. (Its 628 patients' worth of CaPTk-processed series are co-registered STRUCTURAL volumes, not rCBV/Ktrans maps: an earlier version of this sentence said perfusion maps, and a downloaded file settled it -- 'AX T1 PRE : Processed_CaPTk', TR 777 ms, one frame per file.)",
     "tier": "established",
     "substantiated_by": "danon/claims.py::check_stream_census_refuses_honestly",
     "check": "stream_census_refuses",

@@ -895,6 +895,83 @@ def check_stream_identities_hold() -> CheckResult:
     )
 
 
+def check_stream3_dsc_perfusion_is_measured() -> CheckResult:
+    """Stream 3's measured form: a real DSC series read into a relative-CBV map.
+
+    Four things are verified live, not restated. The pipeline recovers a
+    planted 3:1 CBV ratio under signal noise (a chain that cannot recover a
+    known ratio has no business reporting an unknown one). Every committed case
+    has a bolus window inside the acquisition, a drift fraction strictly between
+    0 and 1 (the head-to-tail line was subtracted, not added), and a transport
+    field with more than one value. The endpoint is labelled for what it is: PFS
+    is censored in this cohort, so the burden readout is the one with resolution
+    and the claim may not rest on PFS. And the archive label stays corrected --
+    the CaPTk series are structural, not perfusion maps.
+    """
+    from danon.perfusion import planted_cbv_recovery
+
+    recovery = planted_cbv_recovery(true_ratio=3.0, noise=0.002, seed=1)
+    recovery_ok = (
+        recovery["relative_error"] < 0.05
+        and 3 <= recovery["window_frames"] <= 20
+        and recovery["peak_is_after_baseline"] == 1.0
+    )
+
+    path = os.path.join(ROOT, "outputs_real", "perfusion_cohort.json")
+    try:
+        rows = json.load(open(path))
+    except (OSError, ValueError) as exc:
+        return CheckResult(supported=False, detail=f"perfusion cohort unreadable: {exc}")
+    if not isinstance(rows, list) or not rows:
+        return CheckResult(supported=False, detail="perfusion cohort holds no cases")
+
+    problems: List[str] = []
+    contrasts: List[float] = []
+    burdens: List[float] = []
+    censored = 0
+    for row in rows:
+        cbv, engine = row.get("cbv", {}), row.get("engine", {})
+        if not (cbv.get("arrival_frame", 99) < cbv.get("peak_frame", -1) < cbv.get("end_frame", -1)):
+            problems.append(f"{row.get('patient_id')}: bolus window out of order")
+        if not 0.0 < float(cbv.get("drift_peak_ratio", 0.0)) < 1.0:
+            problems.append(f"{row.get('patient_id')}: drift fraction not in (0, 1)")
+        for policy, arm in (engine.get("arms") or {}).items():
+            contrasts.append(float(arm.get("field_contrast_ratio", 0.0)))
+            burdens.append(float(arm.get("max_abs_relative_burden_difference", 0.0)))
+            if int(arm.get("pfs_informed_pairs", 0)) == 0:
+                censored += 1
+            if not np.isfinite(arm.get("max_abs_relative_burden_difference", float("nan"))):
+                problems.append(f"{row.get('patient_id')}/{policy}: burden difference missing")
+
+    if not contrasts or min(contrasts) <= 1.0:
+        problems.append("no arm reports a transport contrast above 1x")
+    if censored == 0:
+        problems.append(
+            "no arm reports a censored PFS endpoint; the claim's endpoint "
+            "labelling would then be wrong"
+        )
+
+    entry = _read("danon/multimodal.py")
+    if "PROCESSED_CAPTK_TOKENS" not in entry or "CaPTk-processed perfusion maps" in entry:
+        problems.append(
+            "danon/multimodal.py still calls the CaPTk-processed structural "
+            "series perfusion maps"
+        )
+
+    supported = recovery_ok and not problems
+    return CheckResult(
+        supported=supported,
+        detail=(
+            f"planted 3:1 CBV recovered to {recovery['recovered_ratio']:.3f} "
+            f"({recovery['relative_error']:.1%} error, {recovery['window_frames']:.0f}-frame "
+            f"window); {len(rows)} downloaded series: field contrast "
+            f"{min(contrasts):.1f}-{max(contrasts):.1f}x, final-burden effect up to "
+            f"{max(burdens):.1%}, {censored} arm-sets with a censored PFS endpoint"
+            + ("; " + "; ".join(problems) if problems else "")
+        ),
+    )
+
+
 def check_stream3_diffusion_is_measured() -> CheckResult:
     """The rCBV -> D(x) arm: field stats re-derived live, engine arms consistent.
 
@@ -1307,6 +1384,7 @@ CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "stream_identities": check_stream_identities_hold,
     "stream3_cohort_measured": check_stream3_cohort_is_measured,
     "stream3_diffusion_measured": check_stream3_diffusion_is_measured,
+    "stream3_dsc_perfusion_measured": check_stream3_dsc_perfusion_is_measured,
     "stream_census_refuses": check_stream_census_refuses_honestly,
     "stream4_agreement_is_a_validation_target": check_stream4_agreement_is_a_validation_target,
 }
@@ -1761,6 +1839,36 @@ CLAIMS: Tuple[Claim, ...] = (
         "diffusion tensor, and no anisotropy is fabricated from perfusion.",
     ),
     Claim(
+        "stream3_dsc_perfusion_measured",
+        "Stream 3 consumes MEASURED perfusion, not only a contrast proxy: raw DSC "
+        "series download from TCIA (UPENN-GBM), `danon.dicomio` reads their "
+        "JPEG-2000-encapsulated pixels, and `danon.perfusion` integrates the "
+        "first pass into a relative-CBV map. 3 series are downloaded and "
+        "measured -- selected as the three smallest by listed FileSize, a rule "
+        "fixed before any outcome was seen -- across three different "
+        "acquisitions (TR 1.83-2.0 s, TE 45-51 ms, 700-900 files each). A "
+        "head-to-tail drift line is subtracted before integration because 30-51% "
+        "of the raw volume-mean peak on these series is drift, not bolus; "
+        "without it the first real series called frame 0 the arrival and "
+        "integrated 45 of 50 frames. The pipeline recovers a planted 3:1 CBV "
+        "ratio to 0.9% under 0.2% signal noise; on the real maps the transport "
+        "field spans 15.3-21.6x, and the only endpoint with resolution is the "
+        "final burden, which differs between transport arms by at most "
+        "0.18-8.81% (steering the more sensitive of the two policies). PFS is "
+        "censored in every arm of this cohort and is reported as censored.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/claims.py::check_stream3_dsc_perfusion_is_measured over "
+        "outputs_real/perfusion_cohort.json (rebuildable via "
+        "_perfusion_cohort.py)",
+        "stream3_dsc_perfusion_measured",
+        "The maps are relative CBV by first-pass integration: no arterial input "
+        "function is fitted, so this is NOT absolute CBV and NOT Ktrans. The "
+        "region the engine runs on is rCBV >= 1.5x the map median -- a "
+        "perfusion-defined ROI, NOT a tumour segmentation, since no "
+        "segmentation is co-registered to the DSC grid. No result here is about "
+        "a patient's tumour, and nothing links a series to a survival outcome.",
+    ),
+    Claim(
         "longitudinal_availability_is_counted_from_the_manifest",
         "Stream 4's cohort is counted from the committed CFB-GBM availability "
         "manifest (TCIA, DOI 10.7937/v9pn-2f72): 264 patients, 170 with more "
@@ -1843,8 +1951,12 @@ CLAIMS: Tuple[Claim, ...] = (
         "are supplied. No stream is back-filled. The census also reports what "
         "is RETRIEVABLE without new code, so a refusal is not mistaken for "
         "absence: 41 of 630 probed UPENN-GBM patients carry a >=28-day "
-        "follow-up interval, and the archive carries DSC perfusion for 456 "
-        "patients and CaPTk-processed rCBV/Ktrans maps for 628.",
+        "follow-up interval, and the archive carries raw DSC perfusion for 456 "
+        "patients. (Its 628 patients' worth of CaPTk-processed series are "
+        "co-registered STRUCTURAL volumes, not rCBV/Ktrans maps: an earlier "
+        "version of this sentence said perfusion maps, and a downloaded file "
+        "settled it -- 'AX T1 PRE : Processed_CaPTk', TR 777 ms, one frame "
+        "per file.)",
         EvidenceStatus.ESTABLISHED,
         "danon/claims.py::check_stream_census_refuses_honestly",
         "stream_census_refuses",

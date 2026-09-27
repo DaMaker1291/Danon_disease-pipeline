@@ -348,7 +348,17 @@ def test_census_separates_cached_from_retrievable():
     # only the t1ce proxy
     s3 = census["stream3_perfusion"]
     assert s3["n_archive_dsc_patients"] == 456
-    assert s3["n_archive_processed_perfusion_patients"] == 628
+    assert s3["n_archive_processed_captk_patients"] == 628
+    # ...but those 628 are co-registered STRUCTURAL series, not perfusion maps:
+    # a downloaded file is 'AX T1 PRE : Processed_CaPTk'. The census must say so
+    # rather than let the number read as an rCBV/Ktrans archive.
+    assert "STRUCTURAL" in s3["archive_processed_series_are"]
+    # Stream 3's own measured arm: the downloaded DSC cohort, read live.
+    dsc = s3["dsc"]
+    assert dsc["n_cases"] >= 1
+    assert dsc["n_series_cached"] >= 1
+    assert dsc["max_field_contrast"] > 1.0
+    assert "censored" in dsc["endpoint_note"]
     assert archive["n_seg_series"] == 0
 
 

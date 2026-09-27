@@ -26,9 +26,16 @@ refuses them. Supplying real files activates them -- no code changes.
 
 CACHED IS NOT THE SAME AS EXISTING, and the census now reports both. The cached
 BraTS path is one pre-operative timepoint per case, but the TCIA collection the
-repo probed (UPENN-GBM) carries a second timepoint for 41 of 630 patients, DSC
-perfusion for 456, and CaPTk-processed perfusion maps for 628. Streams 3 and 4
-are therefore blocked by a DOWNLOAD, not by the absence of data. An earlier
+repo probed (UPENN-GBM) carries a second timepoint for 41 of 630 patients and
+raw DSC perfusion for 456. (It also carries 628 patients' worth of
+CaPTk-PROCESSED series -- but those are co-registered STRUCTURAL volumes, not
+rCBV/Ktrans maps: the smallest was downloaded and read in this session and is
+'AX T1 PRE : Processed_CaPTk', TR 777 ms, one frame per file. An earlier
+version of this docstring called them perfusion maps.) Streams 3 and 4 were
+therefore blocked by a DOWNLOAD, not by the absence of data -- and stream 3 is
+no longer blocked: `danon/perfusion.py` reads a DSC series into a relative-CBV
+map, and the cohort in `outputs_real/perfusion_cohort.json` is measured on
+downloaded series. An earlier
 version of this census reported only that stream 4 had no sequential pairs, with
 the rationale "BraTS is a single pre-operative timepoint" -- a BraTS-specific
 fact that read as a statement about what exists anywhere, and was wrong.
@@ -1056,6 +1063,60 @@ def _stream4_resolution() -> Dict[str, Any]:
         return {"error": f"{type(exc).__name__}: {exc}"}
 
 
+def _perfusion_cohort_evidence(data_dir: str = "data") -> Optional[Dict[str, Any]]:
+    import json
+
+    """The committed DSC perfusion cohort, plus the series cached on disk.
+
+    Read from the record rather than restated, and paired with a live count of
+    the downloaded series directories: a cohort artefact whose series have been
+    deleted is a number with nothing behind it, and this function is the one
+    place that notices.
+    """
+    path = os.path.join("outputs_real", "perfusion_cohort.json")
+    cached = 0
+    root = os.path.join(data_dir, "tcia", "perfusion")
+    if os.path.isdir(root):
+        for name in os.listdir(root):
+            if any(n.endswith(".dcm") for n in os.listdir(os.path.join(root, name))):
+                cached += 1
+    try:
+        with open(path) as fh:
+            rows = json.load(fh)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(rows, list) or not rows:
+        return None
+    return {
+        "record": path,
+        "n_cases": len(rows),
+        "n_series_cached": cached,
+        "patients": [r.get("patient_id") for r in rows],
+        "selection": "the smallest DSC series by listed FileSize, fixed before outcomes",
+        "endpoint_note": (
+            "PFS is censored in every arm of this cohort (no pair progressed); "
+            "the informative readout is the final burden, which differs between "
+            "transport arms"
+        ),
+        "max_field_contrast": max(
+            (
+                arm.get("field_contrast_ratio", 0.0)
+                for r in rows
+                for arm in (r.get("engine", {}).get("arms", {}) or {}).values()
+            ),
+            default=0.0,
+        ),
+        "largest_burden_effect": max(
+            (
+                arm.get("max_abs_relative_burden_difference", 0.0)
+                for r in rows
+                for arm in (r.get("engine", {}).get("arms", {}) or {}).values()
+            ),
+            default=0.0,
+        ),
+    }
+
+
 def _availability_manifest() -> Dict[str, Any]:
     """Counts from a cached availability manifest, if one is present.
 
@@ -1113,6 +1174,7 @@ def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
     # question the probe answered from scan dates alone.
     sequential_pairs_cached = 0
     archive = _archive_availability()
+    perfusion_evidence = _perfusion_cohort_evidence(data_dir)
     n_retrievable = archive.get("n_patients_longitudinal")
     manifest = _availability_manifest()
     n_manifest_pairs = manifest.get("n_patients_with_usable_pair")
@@ -1149,17 +1211,27 @@ def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
             "n_buildable_cases": len(set(t1ce_files) & {s.replace('_seg', '_t1ce') for s in seg_files}),
             "status": "MEASURABLE" if t1ce_files and seg_files else "REFUSED",
             "n_archive_dsc_patients": archive.get("n_patients_dsc_perfusion"),
-            "n_archive_processed_perfusion_patients": archive.get(
+            "n_archive_processed_captk_patients": archive.get(
                 "n_patients_processed_perfusion"
             ),
+            "archive_processed_series_are": (
+                "CaPTk-processed STRUCTURAL volumes (verified by download), not "
+                "rCBV/Ktrans maps; the census key keeps its legacy name"
+            ),
+            "dsc": perfusion_evidence if perfusion_evidence is not None else {
+                "error": "perfusion cohort record unreadable"
+            },
             "detail": (
                 "real cached data: BraTS-2021 t1ce contrast volumes + expert "
-                "segmentations; vascular proxy, not measured Ktrans. The probed "
-                "archive carries the measured form: DSC perfusion series for "
-                f"{archive.get('n_patients_dsc_perfusion')} patients and "
-                f"CaPTk-processed rCBV/Ktrans maps for "
-                f"{archive.get('n_patients_processed_perfusion')}, neither of "
-                "which is downloaded"
+                "segmentations -- a vascular proxy, not measured perfusion. The "
+                "MEASURED arm is now separate and real: raw DSC series from the "
+                f"archive ({archive.get('n_patients_dsc_perfusion')} patients "
+                "carry one; a series downloads and was read), turned into a "
+                "relative-CBV map by `danon/perfusion.py` and measured on "
+                f"{(perfusion_evidence or {}).get('n_cases', 0)} downloaded "
+                "series. Do not confuse the archive's 628 CaPTk-processed "
+                "series with perfusion: those are co-registered structural "
+                "volumes."
             ),
         },
         "stream4_sequential": {
