@@ -1,8 +1,8 @@
 {
  "key": "lnp",
  "title": "LNP formulation search",
- "generated_utc": "2026-09-24T18:04:47Z",
- "source": "danon.lnp_generator.DanonLNPGenerator(DanonConfig()).generate_candidates(0, 48) + score_candidates",
+ "generated_utc": "2026-09-27T15:18:07Z",
+ "source": "danon.vector_design.lnp_generator.DanonLNPGenerator(DanonConfig()).generate_candidates(0, 48) + score_candidates",
  "notes": [
   "formulation scores come from the generator's own heuristic model (cardiac delivery, hepatic avoidance, endosomal escape, size, immune activation); they are design priorities, not measured potencies",
   "particle size is predicted, not light-scattering measured",

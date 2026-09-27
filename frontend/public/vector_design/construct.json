@@ -1,8 +1,8 @@
 {
  "key": "construct",
  "title": "Synthesis-ready AAV9-LAMP2B plasmid",
- "generated_utc": "2026-09-24T18:04:50Z",
- "source": "danon.construct_builder.ConstructBuilder().build_construct()",
+ "generated_utc": "2026-09-27T15:18:08Z",
+ "source": "danon.vector_design.construct_builder.ConstructBuilder().build_construct()",
  "notes": [
   "the elemental sequences (ITR, LAMP2B CDS, WPRE, polyA) are real published sequences; the assembled plasmid has not been synthesised",
   "the promoter and the 4x miRNA detarget cassette are designed, not experimentally validated",

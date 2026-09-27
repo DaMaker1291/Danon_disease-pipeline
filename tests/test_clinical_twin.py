@@ -14,22 +14,28 @@ import numpy as np
 import pytest
 
 from danon.clinical_twin import (
+    CLEARANCE_GAMMA,
+    DIFFUSION_GAMMA,
     KI67_REF,
     STREAM3_COHORT_PATH,
+    STREAM3_D0_MM2_PER_DAY,
     STREAM4_RESOLUTION_PATH,
     assemble_digital_twin_state,
     build_stream3_clearance,
+    build_stream3_diffusion_field,
     build_stream3_vessels,
     clinical_stream_census,
     decimate_t1ce_to_engine_grid,
     stream1_initial_state,
     stream2_clones,
     stream2_growth_rate,
+    stream3_diffusion_contrast,
     stream4_velocity,
     stream4_velocity_agreement,
     stream3_report,
     stream4_resolution_report,
 )
+from danon.cure import EvidenceStatus
 from danon.evosteer import DEFAULT_CLONES
 
 
@@ -398,6 +404,188 @@ def test_census_carries_the_resolvable_delta_with_formatted_detail():
     # an unrounded float in prose is how a derived number looks invented
     assert "0.021904" not in s4["detail"]
     assert "an OBSERVATION cannot move a C-index" in s4["detail"]
+
+
+# ---------------------------------------------------------------------------
+# Stream 3, diffusion arm: D_chemo(x) = D0*(1+gamma*rCBV(x))
+# ---------------------------------------------------------------------------
+
+
+def test_diffusion_field_neutral_value_is_uniform_transport():
+    """Uniform rCBV (and gamma=0) return the engine's homogeneous transport."""
+    uniform = build_stream3_diffusion_field(np.full((4, 5, 6), 0.3))
+    assert uniform.d_engine.min() == uniform.d_engine.max()
+    assert uniform.contrast_ratio == pytest.approx(1.0)
+    # the simulator re-normalises to a mean-one pattern, so the neutral
+    # field's pattern is exactly 1 everywhere
+    pattern = uniform.d_engine / uniform.d_engine.mean()
+    assert np.allclose(pattern, 1.0, rtol=0, atol=1e-15)
+    # gamma = 0 removes the perfusion gain entirely, whatever the map says
+    flat = build_stream3_diffusion_field(np.array([[[0.0, 0.9], [0.3, 0.1]]]), gamma=0.0)
+    assert flat.d_engine.min() == flat.d_engine.max()
+
+
+def test_diffusion_field_d0_and_units_cancel_in_the_pattern():
+    """The claim in the builder: only gamma and the map reach the integrator."""
+    rcbv = np.array([[[0.0, 0.4], [0.8, 0.2]]])
+    a = build_stream3_diffusion_field(rcbv, d0_mm2_per_day=0.35, voxel_mm=1.0)
+    b = build_stream3_diffusion_field(rcbv, d0_mm2_per_day=7.0, voxel_mm=3.0)
+    # physical arrays differ by both factors ...
+    assert not np.allclose(a.d_mm2_per_day, b.d_mm2_per_day)
+    # ... and the mean-one pattern the engine integrates is identical
+    pa = a.d_engine / a.d_engine.mean()
+    pb = b.d_engine / b.d_engine.mean()
+    assert np.allclose(pa, pb, rtol=1e-12, atol=1e-15)
+    # so D0 cannot be a hidden tuning knob, which is the point of saying it
+    assert b.d_mm2_per_day[0, 0, 1] / a.d_mm2_per_day[0, 0, 1] == pytest.approx(20.0)
+
+
+def test_diffusion_field_gain_is_the_declared_specification_value():
+    """gamma is the specification's 2.5 and is shared with nothing else."""
+    assert DIFFUSION_GAMMA == 2.5
+    # the clearance mapping is a SEPARATE declared gain, not this one
+    assert CLEARANCE_GAMMA != DIFFUSION_GAMMA
+    field = build_stream3_diffusion_field(
+        np.array([[[0.0, 1.0]]]), d0_mm2_per_day=1.0, voxel_mm=1.0
+    )
+    assert field.d_mm2_per_day[0, 0, 1] == pytest.approx(1.0 + DIFFUSION_GAMMA)
+    assert field.d_mm2_per_day[0, 0, 0] == pytest.approx(1.0)
+
+
+def test_diffusion_field_provenance_labels_the_perfusion_proxy():
+    """Neither the map nor the gain may claim to be measured."""
+    field = build_stream3_diffusion_field(np.full((3, 3, 3), 0.5))
+    assert field.provenance["perfusion_map"] is EvidenceStatus.UNKNOWN
+    assert field.provenance["gain_gamma"] is EvidenceStatus.UNKNOWN
+    assert field.provenance["unit_conversion"] is EvidenceStatus.ESTABLISHED
+
+
+@pytest.mark.parametrize(
+    "bad, match",
+    [
+        (np.zeros((4, 5)), "must be 3D"),
+        (np.full((2, 2, 2), -0.1), "must be non-negative"),
+        (np.full((2, 2, 2), np.nan), "non-finite"),
+        (np.full((2, 2, 2), np.inf), "non-finite"),
+    ],
+)
+def test_diffusion_field_refuses_unusable_maps(bad, match):
+    with pytest.raises(ValueError, match=match):
+        build_stream3_diffusion_field(bad)
+
+
+def test_diffusion_field_refuses_negative_gain_and_bad_scales():
+    ok = np.full((2, 2, 2), 0.2)
+    with pytest.raises(ValueError, match="gamma must be non-negative"):
+        build_stream3_diffusion_field(ok, gamma=-1.0)
+    with pytest.raises(ValueError, match="voxel_mm must be positive"):
+        build_stream3_diffusion_field(ok, voxel_mm=0.0)
+    with pytest.raises(ValueError, match="d0 must be positive"):
+        build_stream3_diffusion_field(ok, d0_mm2_per_day=0.0)
+
+
+def test_uniform_diffusion_field_reproduces_the_default_transport_path():
+    """The identity that makes a uniform perfusion map the neutral value.
+
+    div(D grad C) with constant D IS D*laplacian(C), so the field supplies no
+    new physics at the neutral value. The two branches sum in a different
+    order, so the match is at round-off, not bit-identical -- asserted at that
+    tolerance rather than overstated.
+    """
+    from danon.evosteer import MTDPolicy, TumorEvolutionSimulator, TumorGeometry
+
+    n = 16
+    zz, yy, xx = np.mgrid[0:n, 0:n, 0:n]
+    r = np.sqrt((zz - n / 2) ** 2 + (yy - n / 2) ** 2 + (xx - n / 2) ** 2)
+    mask = r < 6
+    geom = TumorGeometry(
+        tumor_mask=mask,
+        proliferative=mask & (r > 4),
+        vessels=(mask & (r > 4) & (xx < n / 2)),
+        voxel_mm=1.0,
+    )
+    kwargs = dict(days=40, seed=7, initial_resistant_fraction=0.02)
+    default = TumorEvolutionSimulator(geom).run(MTDPolicy(), **kwargs)
+    neutral = TumorEvolutionSimulator(
+        geom, diffusion_field=build_stream3_diffusion_field(np.full(mask.shape, 0.4))
+    ).run(MTDPolicy(), **kwargs)
+    assert np.allclose(default.burden_S, neutral.burden_S, rtol=1e-9, atol=1e-9)
+    assert np.allclose(default.burden_R, neutral.burden_R, rtol=1e-9, atol=1e-9)
+    assert default.pfs_day == neutral.pfs_day
+
+
+def test_heterogeneous_diffusion_field_actually_changes_the_trajectory():
+    """The hook is live: a non-uniform field must not be a no-op."""
+    from danon.evosteer import MTDPolicy, TumorEvolutionSimulator, TumorGeometry
+
+    n = 16
+    zz, yy, xx = np.mgrid[0:n, 0:n, 0:n]
+    r = np.sqrt((zz - n / 2) ** 2 + (yy - n / 2) ** 2 + (xx - n / 2) ** 2)
+    mask = r < 6
+    geom = TumorGeometry(
+        tumor_mask=mask,
+        proliferative=mask & (r > 4),
+        vessels=(mask & (r > 4) & (xx < n / 2)),
+        voxel_mm=1.0,
+    )
+    kwargs = dict(days=40, seed=7, initial_resistant_fraction=0.02)
+    default = TumorEvolutionSimulator(geom).run(MTDPolicy(), **kwargs)
+    gradient = build_stream3_diffusion_field(np.where(mask, xx / float(n), 0.0))
+    perfused = TumorEvolutionSimulator(geom, diffusion_field=gradient).run(
+        MTDPolicy(), **kwargs
+    )
+    assert not np.allclose(default.burden_S, perfused.burden_S, rtol=1e-9, atol=1e-9)
+    # and the field itself really is heterogeneous
+    assert gradient.contrast_ratio > 1.0
+
+
+def test_diffusion_contrast_refuses_a_case_that_is_not_cached(tmp_path):
+    """No cached case means a refusal naming the path, never a generated one."""
+    with pytest.raises(FileNotFoundError, match="is not cached"):
+        stream3_diffusion_contrast(
+            "99999", brats_dir=str(tmp_path), engineered_dir=str(tmp_path), seeds=(1,)
+        )
+
+
+def test_diffusion_contrast_rejects_an_unknown_policy(tmp_path):
+    """Policy is validated before any engine time is spent."""
+    with pytest.raises(ValueError, match="policy must be one of"):
+        stream3_diffusion_contrast(
+            "01017", engineered_dir=str(tmp_path), policy="moon-shot", seeds=(1,)
+        )
+
+
+STREAM3_DIFFUSION_PATH = os.path.join(
+    "outputs_real", "stream3_diffusion_cohort.json"
+)
+
+
+@pytest.mark.skipif(
+    not os.path.exists(STREAM3_DIFFUSION_PATH),
+    reason="diffusion cohort not built (run _stream3_diffusion_cohort.py)",
+)
+def test_committed_diffusion_cohort_is_internally_consistent():
+    """The committed measurement cannot go stale against its own arrays."""
+    import json
+
+    records = json.load(open(STREAM3_DIFFUSION_PATH))
+    assert records, "cohort file exists but is empty"
+    for rec in records:
+        assert rec["case_id"].isdigit()
+        for policy in ("mtd", "steering"):
+            arm = rec["arms"][policy]
+            assert len(arm["seeds"]) == len(arm["pfs_uniform"]) == len(arm["pfs_perfusion"])
+            assert len(arm["toxicity_uniform"]) == len(arm["toxicity_perfusion"])
+            # the stored median delta must equal the delta of the stored arrays
+            assert arm["median_pfs_delta_days"] == pytest.approx(
+                float(np.median(arm["pfs_perfusion"]) - np.median(arm["pfs_uniform"]))
+            )
+            assert arm["n_pairs_in_disagreement"] == sum(
+                a != b for a, b in zip(arm["pfs_uniform"], arm["pfs_perfusion"])
+            )
+            assert arm["gamma"] == DIFFUSION_GAMMA
+            assert arm["field_contrast_ratio"] > 1.0, "a uniform field measures nothing"
+            assert arm["voxels_active"] > 0
 
 
 def test_missing_resolution_artifact_refuses_rather_than_guesses(monkeypatch, tmp_path):

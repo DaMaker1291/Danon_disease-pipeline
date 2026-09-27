@@ -13,6 +13,7 @@ count rather than back-filled.
     stream 1  5-ALA fluorescence        -> initial tumour density N(x, t=0)
     stream 2  H&E / Ki-67 histomorphometry -> growth rate r0
     stream 3  DSC-perfusion rCBV/Ktrans -> vasculature + clearance lambda(x)
+                                        + diffusivity D_chemo(x)
     stream 4  sequential-MRI delta-volume -> observed clonal velocity
 
 DATA REALITY (checked live at build time, not assumed)
@@ -43,6 +44,17 @@ stream 3, clearance   : lambda(x) = lambda_0 * (1 + gamma * rCBV(x)) --
     the request's D_chemo(x) = D0 * (1 + gamma*rCBV) shape, applied to drug
     CLEARANCE via the new run(clearance_pattern=...) hook. gamma defaults to
     1.0 and is declared. Identity: rCBV uniform == uniform pattern == default.
+stream 3, diffusion   : D_chemo(x) = D0 * (1 + gamma * rCBV(x)) through the
+    engine's own `diffusion_field` hook, via the tested anisotropy bridge.
+    gamma defaults to 2.5 (the specification's value) and is declared. Two
+    properties are stated in the builder rather than left implicit: the
+    field is reduced to a mean-one relative pattern, so D0 and the unit
+    conversion CANCEL exactly and gamma is this stream's only live constant;
+    and an rCBV map is scalar, so the result is isotropic per voxel -- a
+    diffusion tensor needs DTI and is not fabricated from perfusion. The
+    clearance and diffusion mappings are SEPARATE declared mappings sharing a
+    formula shape; applying one physical parameter's shape to another is
+    visible here rather than buried.
 stream 1, initial map : N_S(x) = alpha * I(x) * (1 - r0_target),
     N_R(x) = alpha * I(x) * r0_target, alpha normalised so the total equals
     the engine's standard fill (identity: uniform I == sim.seed layout in
@@ -83,6 +95,19 @@ KI67_REF = 0.15
 
 #: Stream 3: clearance-vs-perfusion gain, lambda(x) = lambda_0*(1+gamma*rCBV).
 CLEARANCE_GAMMA = 1.0
+
+#: Stream 3: diffusion-vs-perfusion gain, D_chemo(x) = D0*(1+gamma*rCBV(x)).
+#: The specification writes 2.5. DECLARED, not measured: nothing cached here
+#: pairs a perfusion map with a measured drug diffusivity in the same tissue,
+#: so the gain is a modelling choice and is labelled one wherever it appears.
+DIFFUSION_GAMMA = 2.5
+
+#: Stream 3: reference absolute diffusivity for the physical array only. It
+#: cannot move any result -- the simulator reduces a supplied field to a
+#: mean-one RELATIVE pattern (see `TumorEvolutionSimulator.__init__`), so D0
+#: cancels out of the dynamics exactly. Kept so `d_mm2_per_day` stays
+#: inspectable; the engine's calibrated value is 0.35 voxel^2/day at 1 mm.
+STREAM3_D0_MM2_PER_DAY = 0.35
 
 #: Stream 1: the resistant fraction assigned when digitising a 5-ALA map
 #: (no measured clonal assay exists; must be supplied with provenance).
@@ -194,6 +219,9 @@ def build_stream3_vessels(
 
     in_tumour = vessels[m]
     return {
+        # The map itself: every statistic below is derived from it, and the
+        # diffusion arm needs the array rather than a round-trip through disk.
+        "vessels": vessels,
         "engine_grid": [int(v) for v in vessels.shape],
         "tumour_voxels": int(m.sum()),
         "voxels_with_enhancement": int((in_tumour > 0.05).sum()),
@@ -208,6 +236,197 @@ def build_stream3_vessels(
             "segmentation's engine transform; vascular PROXY, not measured Ktrans"
         ),
     }
+
+
+def build_stream3_diffusion_field(
+    rcbv_engine: np.ndarray,
+    *,
+    gamma: float = DIFFUSION_GAMMA,
+    voxel_mm: float = 1.0,
+    d0_mm2_per_day: float = STREAM3_D0_MM2_PER_DAY,
+) -> "DiffusionField":
+    """Stream 3, layer 2b: rCBV -> per-voxel drug diffusivity D_chemo(x).
+
+    D_chemo(x) = D0 * (1 + gamma * rCBV(x)) -- the specification's own formula,
+    converted to engine units by the tested `danon.anisotropy` bridge.
+
+    TWO THINGS THE FORMULA IMPLIES THAT ARE WORTH STATING PLAINLY
+
+    1. **D0 and the unit conversion cancel.** The simulator reduces any
+       supplied field to a mean-one relative pattern, so only
+       `(1 + gamma*rCBV)/mean(1 + gamma*rCBV)` reaches the integrator. D0 is
+       therefore NOT a free parameter of this stream and no result can be
+       tuned by it; the mapping's only live constant is `gamma`.
+    2. **It is isotropic per voxel.** An rCBV map is scalar -- it carries a
+       magnitude and no direction -- so it cannot produce a diffusion TENSOR.
+       Directionality needs DTI and is not fabricated here; the DTI path
+       already exists as `DiffusionField.from_tissue_classes(anisotropy=...)`.
+
+    Identity: uniform rCBV reproduces the engine's homogeneous transport -- the
+    SAME operator (div(D grad C) with constant D equals D*laplacian(C)), so the
+    neutral value is recovered. It is not bit-identical: the two branches sum in
+    a different order, and the measured gap on a 60-day synthetic run is ~6e-14
+    on the burden arrays. Pinned by test at that tolerance rather than claimed
+    as exact equality.
+    """
+    from danon.anisotropy import DiffusionField, voxel_area_mm2
+
+    rcbv = np.asarray(rcbv_engine, dtype=float)
+    if rcbv.ndim != 3:
+        raise ValueError(f"rCBV map must be 3D, got shape {rcbv.shape}")
+    if not np.all(np.isfinite(rcbv)):
+        raise ValueError("rCBV map contains non-finite values")
+    if rcbv.min() < 0.0:
+        raise ValueError("rCBV values must be non-negative")
+    if float(gamma) < 0.0:
+        raise ValueError(f"gamma must be non-negative, got {gamma}")
+    if float(voxel_mm) <= 0.0:
+        raise ValueError(f"voxel_mm must be positive, got {voxel_mm}")
+    if float(d0_mm2_per_day) <= 0.0:
+        raise ValueError(f"d0 must be positive, got {d0_mm2_per_day}")
+    raw = 1.0 + float(gamma) * rcbv
+    if float(raw.mean()) <= 0.0:
+        raise ValueError("diffusion field has zero mean: no transport at all")
+    physical = float(d0_mm2_per_day) * raw
+    return DiffusionField(
+        d_engine=physical / voxel_area_mm2(float(voxel_mm)),
+        d_mm2_per_day=physical,
+        voxel_mm=float(voxel_mm),
+        provenance={
+            # t1ce enhancement is a vascular proxy, not a measured rCBV series.
+            "perfusion_map": EvidenceStatus.UNKNOWN,
+            "gain_gamma": EvidenceStatus.UNKNOWN,
+            "unit_conversion": EvidenceStatus.ESTABLISHED,
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Stream 3, diffusion arm -- what the perfusion-derived field changes, measured
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class DiffusionContrast:
+    """Homogeneous vs perfusion-derived transport: same geometry, same seeds.
+
+    The only thing that differs between the two arms is the transport field,
+    so a difference in outcome is attributable to the mapping and not to a
+    change of geometry, seed, policy, or initial condition.
+    """
+
+    case_id: str
+    n_voxels: int
+    gamma: float
+    field_min_mm2_per_day: float
+    field_max_mm2_per_day: float
+    field_contrast_ratio: float
+    voxels_active: int
+    policy: str
+    seeds: Tuple[int, ...]
+    pfs_uniform_days: Tuple[int, ...]
+    pfs_perfusion_days: Tuple[int, ...]
+    toxicity_uniform: Tuple[float, ...]
+    toxicity_perfusion: Tuple[float, ...]
+
+    @property
+    def median_pfs_delta_days(self) -> float:
+        return float(
+            np.median(self.pfs_perfusion_days) - np.median(self.pfs_uniform_days)
+        )
+
+    @property
+    def n_pairs_in_disagreement(self) -> int:
+        """Pairs where the two arms' PFS differ (the resolution of this test)."""
+        return int(
+            sum(a != b for a, b in zip(self.pfs_uniform_days, self.pfs_perfusion_days))
+        )
+
+    def describe(self) -> str:
+        return (
+            f"case {self.case_id} ({self.n_voxels} voxels, {self.voxels_active} carrying "
+            f"perfusion): gamma={self.gamma:g} gives "
+            f"{self.field_min_mm2_per_day:.4g}-{self.field_max_mm2_per_day:.4g} mm^2/day "
+            f"({self.field_contrast_ratio:.1f}x contrast); {self.policy} over "
+            f"seeds {list(self.seeds)}: PFS {self.median_pfs_delta_days:+.1f} d median "
+            f"paired delta, {self.n_pairs_in_disagreement}/{len(self.seeds)} pairs differ"
+        )
+
+
+def stream3_diffusion_contrast(
+    case_id: str,
+    *,
+    brats_dir: str = "data/brats",
+    engineered_dir: str = "data/engine_ready",
+    gamma: float = DIFFUSION_GAMMA,
+    policy: str = "steering",
+    seeds: Tuple[int, ...] = (101, 102, 103),
+    days: int = 365,
+    r0: float = 0.005,
+) -> DiffusionContrast:
+    """Pair the uniform and perfusion-derived transport arms on one real case.
+
+    Same protocol as the committed stream-3 cohort: BraTS-2021 t1ce through the
+    segmentation's own engine transform, engine-ready mask and proliferation,
+    fixed seeds, paired so a difference is attributable to the field alone.
+    """
+    from danon.evosteer import CollateralSwitchPolicy, MTDPolicy
+
+    policies = {"mtd": MTDPolicy, "steering": CollateralSwitchPolicy}
+    if policy not in policies:
+        raise ValueError(f"policy must be one of {sorted(policies)}, got {policy!r}")
+
+    mask_file = os.path.join(engineered_dir, f"BraTS2021_{case_id}_mask.nii.gz")
+    prolif_file = os.path.join(engineered_dir, f"BraTS2021_{case_id}_prolif.nii.gz")
+    t1ce = os.path.join(brats_dir, f"BraTS2021_{case_id}_t1ce.nii.gz")
+    seg = os.path.join(brats_dir, f"BraTS2021_{case_id}_seg.nii.gz")
+    for path in (mask_file, prolif_file, t1ce, seg):
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                f"{path} is not cached; this measurement runs on the committed "
+                f"BraTS-2021 case files, not on generated input"
+            )
+
+    vessels = build_stream3_vessels(t1ce, seg)
+    rcbv = np.asarray(vessels["vessels"], dtype=float)
+    field = build_stream3_diffusion_field(rcbv, gamma=gamma)
+    page = from_nifti_mask(
+        mask_file,
+        proliferative_path=prolif_file,
+        vessels_path=os.path.join(engineered_dir, f"BraTS2021_{case_id}_vessels_t1ce.nii.gz"),
+    )
+    pfs_u: List[int] = []
+    pfs_p: List[int] = []
+    tox_u: List[float] = []
+    tox_p: List[float] = []
+    for seed in seeds:
+        for arm, sim in (
+            (pfs_u, TumorEvolutionSimulator(page.geometry)),
+            (pfs_p, TumorEvolutionSimulator(page.geometry, diffusion_field=field)),
+        ):
+            traj = sim.run(
+                policies[policy](), days=days, initial_resistant_fraction=r0, seed=seed
+            )
+            arm.append(int(traj.pfs_day) if traj.pfs_day is not None else days)
+            (tox_u if arm is pfs_u else tox_p).append(float(traj.toxicity))
+
+    lo = float(field.d_mm2_per_day[field.d_mm2_per_day > 0].min())
+    hi = float(field.d_mm2_per_day.max())
+    return DiffusionContrast(
+        case_id=case_id,
+        n_voxels=int(rcbv.size),
+        gamma=float(gamma),
+        field_min_mm2_per_day=lo,
+        field_max_mm2_per_day=hi,
+        field_contrast_ratio=(hi / lo) if lo > 0 else float("inf"),
+        voxels_active=int(np.count_nonzero(rcbv)),
+        policy=policy,
+        seeds=tuple(seeds),
+        pfs_uniform_days=tuple(pfs_u),
+        pfs_perfusion_days=tuple(pfs_p),
+        toxicity_uniform=tuple(tox_u),
+        toxicity_perfusion=tuple(tox_p),
+    )
 
 
 def build_stream3_clearance(
@@ -525,9 +744,14 @@ class TwinStreamState:
     clearance_pattern: Optional[np.ndarray]
     velocity_observation: Optional[Dict[str, Any]]
     stream_status: Dict[str, str]
+    #: Stream 3's diffusion arm: the per-voxel D_chemo(x) the simulator takes as
+    #: `diffusion_field=`. Separate from `clearance_pattern` because they are
+    #: separate physical parameters that happen to share a formula shape.
+    diffusion_field: Optional["DiffusionField"] = None
     notes: List[str] = field(default_factory=list)
 
     def to_json_dict(self) -> Dict[str, Any]:
+        field = self.diffusion_field
         return {
             "stream_status": self.stream_status,
             "notes": self.notes,
@@ -536,6 +760,18 @@ class TwinStreamState:
             "has_clones_override": self.clones_override is not None,
             "has_vessels": self.vessels_path is not None,
             "has_clearance_pattern": self.clearance_pattern is not None,
+            "has_diffusion_field": field is not None,
+            "diffusion_field": None if field is None else {
+                "shape": list(field.shape),
+                "voxel_mm": field.voxel_mm,
+                "d_mm2_per_day_min": float(field.d_mm2_per_day.min()),
+                "d_mm2_per_day_max": float(field.d_mm2_per_day.max()),
+                "contrast_ratio": field.contrast_ratio,
+                "provenance": {
+                    k: v.value if hasattr(v, "value") else str(v)
+                    for k, v in field.provenance.items()
+                },
+            },
         }
 
 
@@ -549,6 +785,8 @@ def assemble_digital_twin_state(
     r0: float = DEFAULT_ALA_R0,
     r0_source: str = DEFAULT_ALA_R0_SOURCE,
     clearance_gamma: float = CLEARANCE_GAMMA,
+    diffusion_gamma: float = DIFFUSION_GAMMA,
+    voxel_mm: float = 1.0,
     scan_interval_days: float = DEFAULT_SCAN_INTERVAL_DAYS,
 ) -> TwinStreamState:
     """Combine whichever routine-hospital datastreams are supplied.
@@ -558,6 +796,14 @@ def assemble_digital_twin_state(
     stream_status records which ones were applied. This is the identity
     property at the composition level: no streams -> a state that runs the
     engine exactly as before.
+
+    `mri_rcbv_tensor` feeds TWO parameters, because the specification's
+    formula shape appears against both and they are not interchangeable:
+    `clearance_pattern` (drug removal) and `diffusion_field` (drug transport).
+    They are returned as separate fields so a caller can supply one without
+    the other, and so the engine's `run(clearance_pattern=...)` and
+    `TumorEvolutionSimulator(diffusion_field=...)` never receive a value
+    derived for the wrong parameter.
     """
     applied: Dict[str, str] = {}
     notes: List[str] = []
@@ -587,20 +833,34 @@ def assemble_digital_twin_state(
 
     vessels_path = None
     clearance_pattern = None
+    diffusion_field = None
     if mri_rcbv_tensor is not None:
         clearance_pattern = build_stream3_clearance(
             mri_rcbv_tensor, gamma=clearance_gamma
+        )
+        diffusion_field = build_stream3_diffusion_field(
+            mri_rcbv_tensor, gamma=diffusion_gamma, voxel_mm=voxel_mm
         )
         applied["stream3_perfusion_clearance"] = (
             f"applied (gamma={clearance_gamma}; mean-normalised pattern; "
             "vascular source map must be ingested separately via vessels_path)"
         )
+        applied["stream3_perfusion_diffusion"] = (
+            f"applied (gamma={diffusion_gamma}; {diffusion_field.contrast_ratio:.1f}x "
+            f"contrast in D(x); pass as TumorEvolutionSimulator(diffusion_field=...))"
+        )
         notes.append(
             "stream 3 vasculature: pass the engine-grid t1ce map as vessels_path "
             "to from_nifti_mask; this function consumes the ALREADY-ingested grid"
         )
+        notes.append(
+            f"stream 3 diffusion: D0 and the unit conversion cancel in the "
+            f"engine's mean-one pattern, so gamma={diffusion_gamma} is the only "
+            f"constant that moves this parameter"
+        )
     else:
         applied["stream3_perfusion_clearance"] = "not supplied -- uniform clearance retained"
+        applied["stream3_perfusion_diffusion"] = "not supplied -- homogeneous transport retained"
 
     velocity_observation = None
     if delta_volume_velocity is not None:
@@ -619,6 +879,7 @@ def assemble_digital_twin_state(
         clearance_pattern=clearance_pattern,
         velocity_observation=velocity_observation,
         stream_status=applied,
+        diffusion_field=diffusion_field,
         notes=notes,
     )
 
@@ -626,6 +887,14 @@ def assemble_digital_twin_state(
 # ---------------------------------------------------------------------------
 # Measured stream-3 cohort report (the module's honesty artefact)
 # ---------------------------------------------------------------------------
+
+#: The committed stream-3 DIFFUSION cohort: 6 cases x 2 policies x 3 seeds,
+#: each run paired (same geometry, same seed, same vessels source) with the
+#: uniform-transport arm. Committed at outputs_real/stream3_diffusion_cohort.json;
+#: rebuildable per case via `python _stream3_diffusion_cohort.py INDEX`.
+STREAM3_DIFFUSION_COHORT_PATH = os.path.join(
+    "outputs_real", "stream3_diffusion_cohort.json"
+)
 
 #: The committed cohort measurement: 6 BraTS cases x 2 policies x 3 seeds,
 #: each run PAIRED (same geometry, same seed) with real t1ce vasculature vs

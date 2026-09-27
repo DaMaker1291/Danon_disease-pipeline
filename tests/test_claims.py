@@ -114,9 +114,29 @@ class TestTheThreePitchDrifts:
     def test_test_count_is_computed_and_not_quoted(self):
         md = render_claims_markdown()
         assert "528" not in md
-        detail = CHECKS["test_suite_counted"]().detail
-        quoted = int(detail.split()[0])
+        res = CHECKS["test_suite_counted"]()
+        quoted = int(res.detail.split()[0])
         assert quoted > 400
+        # The README's own suite row is part of the check now: it advertised a
+        # count 1068 for a 1059-function suite, which only hand-editing could
+        # have kept true, so it defers to this check instead.
+        assert res.supported
+        assert "defers to this check" in res.detail
+
+    def test_a_remembered_suite_count_in_the_readme_is_caught(self, monkeypatch):
+        import danon.claims as claims_mod
+
+        real_read = claims_mod._read
+
+        def doctored(relpath):
+            if relpath == "README.md":
+                return "| Full integration suite | **1068 passed, 0 failed** | x |"
+            return real_read(relpath)
+
+        monkeypatch.setattr(claims_mod, "_read", doctored)
+        res = claims_mod.check_test_suite_is_counted_live()
+        assert not res.supported
+        assert "remembered count" in res.detail
 
     def test_determinism_is_not_claimed(self):
         claim = next(c for c in CLAIMS if c.id == "seeded_reproducibility")

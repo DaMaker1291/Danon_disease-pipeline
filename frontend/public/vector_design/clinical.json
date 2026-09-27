@@ -1,8 +1,8 @@
 {
  "key": "clinical",
  "title": "Modelled cardiomyocyte rescue (8-ODE cell simulator)",
- "generated_utc": "2026-09-24T18:04:50Z",
- "source": "danon.cell_simulator.DanonCellSimulator.dose_response_panel + compare_mutation_types(vcn=10.0) + benchmark scores",
+ "generated_utc": "2026-09-27T15:18:08Z",
+ "source": "danon.vector_design.cell_simulator.DanonCellSimulator.dose_response_panel + compare_mutation_types(vcn=10.0) + benchmark scores",
  "notes": [
   "every curve here is an 8-ODE MODEL of one cardiomyocyte with literature-calibrated parameters, not a measurement and not patient data",
   "the UCL comparison is a score against a published trial's reported figures, not a head-to-head result",

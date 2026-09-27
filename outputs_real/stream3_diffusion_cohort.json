@@ -1,0 +1,227 @@
+[
+ {
+  "case_id": "01017",
+  "arms": {
+   "mtd": {
+    "gamma": 2.5,
+    "n_voxels": 8064,
+    "voxels_active": 1543,
+    "field_min_mm2_per_day": 0.35,
+    "field_max_mm2_per_day": 1.170943870261002,
+    "field_contrast_ratio": 3.3455539150314344,
+    "seeds": [
+     101,
+     102,
+     103
+    ],
+    "pfs_uniform": [
+     290,
+     296,
+     210
+    ],
+    "pfs_perfusion": [
+     289,
+     296,
+     210
+    ],
+    "toxicity_uniform": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "toxicity_perfusion": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "median_pfs_delta_days": -1.0,
+    "n_pairs_in_disagreement": 1
+   },
+   "steering": {
+    "gamma": 2.5,
+    "n_voxels": 8064,
+    "voxels_active": 1543,
+    "field_min_mm2_per_day": 0.35,
+    "field_max_mm2_per_day": 1.170943870261002,
+    "field_contrast_ratio": 3.3455539150314344,
+    "seeds": [
+     101,
+     102,
+     103
+    ],
+    "pfs_uniform": [
+     365,
+     365,
+     365
+    ],
+    "pfs_perfusion": [
+     365,
+     365,
+     365
+    ],
+    "toxicity_uniform": [
+     356.29999999999984,
+     354.79999999999984,
+     359.2999999999999
+    ],
+    "toxicity_perfusion": [
+     350.29999999999967,
+     349.0999999999997,
+     342.4999999999993
+    ],
+    "median_pfs_delta_days": 0.0,
+    "n_pairs_in_disagreement": 0
+   }
+  }
+ },
+ {
+  "case_id": "01018",
+  "arms": {
+   "mtd": {
+    "gamma": 2.5,
+    "n_voxels": 10304,
+    "voxels_active": 1821,
+    "field_min_mm2_per_day": 0.35,
+    "field_max_mm2_per_day": 1.197581669634962,
+    "field_contrast_ratio": 3.4216619132427484,
+    "seeds": [
+     101,
+     102,
+     103
+    ],
+    "pfs_uniform": [
+     365,
+     328,
+     365
+    ],
+    "pfs_perfusion": [
+     365,
+     328,
+     365
+    ],
+    "toxicity_uniform": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "toxicity_perfusion": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "median_pfs_delta_days": 0.0,
+    "n_pairs_in_disagreement": 0
+   },
+   "steering": {
+    "gamma": 2.5,
+    "n_voxels": 10304,
+    "voxels_active": 1821,
+    "field_min_mm2_per_day": 0.35,
+    "field_max_mm2_per_day": 1.197581669634962,
+    "field_contrast_ratio": 3.4216619132427484,
+    "seeds": [
+     101,
+     102,
+     103
+    ],
+    "pfs_uniform": [
+     365,
+     365,
+     365
+    ],
+    "pfs_perfusion": [
+     365,
+     365,
+     365
+    ],
+    "toxicity_uniform": [
+     361.0999999999999,
+     360.7999999999999,
+     361.0999999999999
+    ],
+    "toxicity_perfusion": [
+     361.3999999999999,
+     360.7999999999999,
+     361.0999999999999
+    ],
+    "median_pfs_delta_days": 0.0,
+    "n_pairs_in_disagreement": 0
+   }
+  }
+ },
+ {
+  "case_id": "01019",
+  "arms": {
+   "mtd": {
+    "gamma": 2.5,
+    "n_voxels": 12122,
+    "voxels_active": 2673,
+    "field_min_mm2_per_day": 0.35,
+    "field_max_mm2_per_day": 1.2069523803166635,
+    "field_contrast_ratio": 3.4484353723333245,
+    "seeds": [
+     101,
+     102,
+     103
+    ],
+    "pfs_uniform": [
+     289,
+     281,
+     288
+    ],
+    "pfs_perfusion": [
+     289,
+     281,
+     288
+    ],
+    "toxicity_uniform": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "toxicity_perfusion": [
+     365.0,
+     365.0,
+     365.0
+    ],
+    "median_pfs_delta_days": 0.0,
+    "n_pairs_in_disagreement": 0
+   },
+   "steering": {
+    "gamma": 2.5,
+    "n_voxels": 12122,
+    "voxels_active": 2673,
+    "field_min_mm2_per_day": 0.35,
+    "field_max_mm2_per_day": 1.2069523803166635,
+    "field_contrast_ratio": 3.4484353723333245,
+    "seeds": [
+     101,
+     102,
+     103
+    ],
+    "pfs_uniform": [
+     365,
+     365,
+     365
+    ],
+    "pfs_perfusion": [
+     365,
+     365,
+     365
+    ],
+    "toxicity_uniform": [
+     354.19999999999976,
+     359.2999999999999,
+     359.5999999999999
+    ],
+    "toxicity_perfusion": [
+     352.69999999999965,
+     359.2999999999999,
+     359.5999999999999
+    ],
+    "median_pfs_delta_days": 0.0,
+    "n_pairs_in_disagreement": 0
+   }
+  }
+ }
+]

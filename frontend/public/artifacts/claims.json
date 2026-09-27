@@ -1,7 +1,7 @@
 {
  "key": "claims",
  "title": "Bound-claim audit (what this project may say)",
- "generated_utc": "2026-09-25T22:05:16Z",
+ "generated_utc": "2026-09-27T15:18:06Z",
  "source": "danon.claims.audit_claims()",
  "notes": [
   "each row is a sentence plus the check that supports it, re-run at build time; a check that failed is recorded as failed",
@@ -12,8 +12,8 @@
   "clinical_benefit": "unknown"
  },
  "data": {
-  "n_claims": 36,
-  "n_passed": 36,
+  "n_claims": 37,
+  "n_passed": 37,
   "n_failed": 0,
   "claims": [
    {
@@ -106,13 +106,13 @@
    },
    {
     "id": "engineering_rigor",
-    "sentence": "The repository carries an automated test suite covering the physics, the statistics and the refusal paths, with the count computed live rather than quoted.",
+    "sentence": "The repository carries an automated test suite covering the physics, the statistics and the refusal paths, with the count computed live and the README's own suite row checked against it rather than maintained by hand.",
     "tier": "established",
     "substantiated_by": "tests/",
     "check": "test_suite_counted",
     "limit": "Tests verify the implementation. They are not evidence about biology.",
     "supported": true,
-    "detail": "1018 test functions in 138 classes across tests/",
+    "detail": "1060 test functions in 147 classes across tests/ and danon/multiagent/ (pytest collects more than this wherever a test is parametrised); README defers to this check rather than quoting a count",
     "study": "tumour_twin"
    },
    {
@@ -145,7 +145,7 @@
     "check": "runtime_365",
     "limit": "Runtime is machine-dependent; the audit prints the machine's own number.",
     "supported": true,
-    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 3.41 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)",
+    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 0.81 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)",
     "study": "tumour_twin"
    },
    {
@@ -337,13 +337,24 @@
    },
    {
     "id": "stream3_real_vasculature_measured_small_effect",
-    "sentence": "Stream 3 (perfusion) is measured on real cached data: t1ce contrast volumes block-averaged through the segmentations' exact engine transform for 6 BraTS cases (tumour mean enhancement 0.37-0.49), then run PAIRED (same geometry, same seeds) against the null-uniform vasculature: MTD PFS moves by a mean of -1.17 days (sd 1.01, max 3, 18 paired runs; 5/6 cases earlier), steering stays horizon-censored in both geometries (paired delta exactly 0). At engine scale the vessel-source variation contributes ~1 day: the sanctuary structure lives in D(x), which both geometries share.",
+    "sentence": "Stream 3 (perfusion) is measured on real cached data: t1ce contrast volumes block-averaged through the segmentations' exact engine transform for 6 BraTS cases (tumour mean enhancement 0.37-0.49), then run PAIRED (same geometry, same seeds) against the null-uniform vasculature: MTD PFS moves by a mean of -1.17 days (sd 1.01, max 3, 18 paired runs; 5/6 cases earlier), steering stays horizon-censored in both geometries (paired delta exactly 0). At engine scale the vessel-source variation contributes about one day. This claim previously ended by asserting that the sanctuary structure 'lives in D(x), which both geometries share' -- a speculation stated as a finding, with no check behind it. It has since been MEASURED: varying D(x) by 3.3x does not restore the difference either (see stream3_diffusion_measured).",
     "tier": "established",
     "substantiated_by": "danon/clinical_twin.py::stream3_report over outputs_real/stream3_cohort.json (rebuildable via _stream3_cohort.py)",
     "check": "stream3_cohort_measured",
     "limit": "A wired-and-measured stream whose measured effect is small is a result, not a failure; t1ce is a vascular proxy, not Ktrans.",
     "supported": true,
     "detail": "cohort 6 cases / 18 paired runs: True; live re-run of 01017 seed 101 reproduces the committed PFS: True (paired delta -3 d; committed mean -1.17 d)",
+    "study": "tumour_twin"
+   },
+   {
+    "id": "stream3_diffusion_measured",
+    "sentence": "Stream 3's diffusion arm (D_chemo(x) = D0*(1+2.5*rCBV(x)), the specification's own formula) is implemented against the engine's `diffusion_field` hook and measured on real cached BraTS-2021 cases, PAIRED transport-only: identical mask, proliferation, vessels source and seeds, differing only in the transport field. The mapping produces a 3.35-3.45x contrast in D(x) (1543-2673 perfused voxels per case), and across 3 cases x 2 policies x 3 seeds (18 paired runs) only 1 of 6 policy-arms moves AT ALL: MTD paired deltas -1, 0, 0 days (one seed pair in one case), steering exactly 0 in every case. That is within seed noise at this cohort size -- a 3.4x transport contrast does NOT eliminate a delivery blind spot here, and the effect is of the same order as the vasculature arm. The arm is transport-only by construction because the simulator reduces a supplied field to a mean-one relative pattern, so D0 and the unit conversion cancel exactly and gamma=2.5 is this parameter's only live constant: no absolute diffusivity claim rides on this mapping.",
+    "tier": "established",
+    "substantiated_by": "danon/claims.py::check_stream3_diffusion_is_measured over outputs_real/stream3_diffusion_cohort.json (rebuildable via _stream3_diffusion_cohort.py), field stats re-derived live each audit",
+    "check": "stream3_diffusion_measured",
+    "limit": "The engine arms are the committed measurement, not re-run inside the audit; the field statistics ARE recomputed live. An rCBV map is scalar, so this mapping is isotropic per voxel -- it is not a diffusion tensor, and no anisotropy is fabricated from perfusion.",
+    "supported": true,
+    "detail": "3 cases x 2 policies x 3 seeds, paired transport-only: MTD paired PFS delta -1..+0 d (medians +0.0 d), steering +0..+0 d; 1/6 policy-arms move at all; cohort self-consistent: True; case 01017 live field D(x) = 0.35-1.171 mm^2/day (3.3x), 1543 perfused voxels; matches committed arms: True",
     "study": "tumour_twin"
    },
    {
@@ -365,7 +376,7 @@
     "check": "readme_claim_count_current",
     "limit": "It checks that the README agrees with the registry, not that the registry is right: claims can be wrong together and still agree.",
     "supported": true,
-    "detail": "README advertises 36/36 verified; the registry holds 36 claims",
+    "detail": "README advertises 37/37 verified; the registry holds 37 claims",
     "study": "tumour_twin"
    },
    {

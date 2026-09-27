@@ -180,25 +180,60 @@ def check_parameters_are_declared_assumptions() -> CheckResult:
     )
 
 
-def check_test_suite_is_counted_live() -> CheckResult:
-    """Never quote a test count that was not recomputed.
+def _suite_function_count() -> Tuple[int, int]:
+    """Test functions in the suite the README's own command runs.
 
     Counts test *functions*, at module level and inside classes: an anchored
     `^def test_` misses every method in a test class, which understated this
-    suite by more than half the first time it ran.
+    suite by more than half the first time it ran. Both roots are covered
+    because the documented command is `pytest tests/ danon/multiagent/`; a
+    count over `tests/` alone is not the number that command collects.
     """
     total = 0
     classes = 0
-    tests_dir = os.path.join(ROOT, "tests")
-    for name in sorted(os.listdir(tests_dir)):
-        if not (name.startswith("test_") and name.endswith(".py")):
-            continue
-        text = _read(os.path.join("tests", name))
-        total += len(re.findall(r"^\s*def test_", text, flags=re.M))
-        classes += len(re.findall(r"^class Test", text, flags=re.M))
+    for root in ("tests", "danon/multiagent"):
+        abs_root = os.path.join(ROOT, root)
+        for name in sorted(os.listdir(abs_root)):
+            if not (name.startswith("test_") and name.endswith(".py")):
+                continue
+            text = _read(os.path.join(root, name))
+            total += len(re.findall(r"^\s*def test_", text, flags=re.M))
+            classes += len(re.findall(r"^class Test", text, flags=re.M))
+    return total, classes
+
+
+def check_test_suite_is_counted_live() -> CheckResult:
+    """Never quote a test count that was not recomputed -- including in README.
+
+    Two failure modes, both of which happened. Counting: an anchored
+    `^def test_` understated the suite by more than half. Quoting: the README's
+    suite row advertised 1068 passed while the tree it describes held 1059 test
+    functions -- a remembered number for a quantity that changes every time a
+    test is added, so the row could only be kept true by hand. The row now
+    defers to this check and the number is published where it is derived.
+    """
+    total, classes = _suite_function_count()
+    try:
+        readme = _read("README.md")
+    except OSError as exc:
+        return CheckResult(supported=False, detail=f"README unreadable: {exc}")
+    if "check_test_suite_is_counted_live" not in readme:
+        return CheckResult(
+            supported=False,
+            detail=(
+                "the README's suite row does not defer to this check: a "
+                "remembered count is how 1068 came to be advertised for a "
+                "1059-function suite"
+            ),
+        )
     return CheckResult(
         supported=total > 0,
-        detail=f"{total} test functions in {classes} classes across tests/",
+        detail=(
+            f"{total} test functions in {classes} classes across tests/ and "
+            f"danon/multiagent/ (pytest collects more than this wherever a "
+            f"test is parametrised); README defers to this check rather than "
+            f"quoting a count"
+        ),
     )
 
 
@@ -860,6 +895,86 @@ def check_stream_identities_hold() -> CheckResult:
     )
 
 
+def check_stream3_diffusion_is_measured() -> CheckResult:
+    """The rCBV -> D(x) arm: field stats re-derived live, engine arms consistent.
+
+    The field statistics are recomputed from the cached BraTS case on every
+    check (cheap, no engine time). The engine arms are read from the committed
+    cohort and required to be self-consistent, because re-running six paired
+    engine trials inside an audit is minutes of compute, not milliseconds.
+    """
+    import json
+
+    from danon.clinical_twin import (
+        DIFFUSION_GAMMA,
+        STREAM3_DIFFUSION_COHORT_PATH,
+        build_stream3_diffusion_field,
+        build_stream3_vessels,
+    )
+
+    if not os.path.exists(STREAM3_DIFFUSION_COHORT_PATH):
+        return CheckResult(
+            supported=False,
+            detail="stream-3 diffusion cohort missing; rebuild via "
+            "_stream3_diffusion_cohort.py",
+        )
+    records = json.load(open(STREAM3_DIFFUSION_COHORT_PATH))
+    consistent = bool(records)
+    for rec in records:
+        for arm in rec["arms"].values():
+            consistent = consistent and (
+                arm["gamma"] == DIFFUSION_GAMMA
+                and len(arm["pfs_uniform"]) == len(arm["pfs_perfusion"])
+                and arm["median_pfs_delta_days"]
+                == float(np.median(arm["pfs_perfusion"]) - np.median(arm["pfs_uniform"]))
+                and arm["n_pairs_in_disagreement"]
+                == sum(a != b for a, b in zip(arm["pfs_uniform"], arm["pfs_perfusion"]))
+            )
+
+    # Live re-derivation of the field itself from the real cached case.
+    case = "01017"
+    t1ce = os.path.join(ROOT, "data", "brats", f"BraTS2021_{case}_t1ce.nii.gz")
+    seg = os.path.join(ROOT, "data", "brats", f"BraTS2021_{case}_seg.nii.gz")
+    live_ok = False
+    live_detail = "cached case missing"
+    if os.path.exists(t1ce) and os.path.exists(seg):
+        vessels = build_stream3_vessels(t1ce, seg)
+        field = build_stream3_diffusion_field(vessels["vessels"])
+        committed = [r for r in records if r["case_id"] == case]
+        if committed:
+            arm = committed[0]["arms"]["mtd"]
+            live_ok = (
+                abs(arm["field_min_mm2_per_day"] - float(field.d_mm2_per_day[field.d_mm2_per_day > 0].min())) < 1e-9
+                and abs(arm["field_max_mm2_per_day"] - float(field.d_mm2_per_day.max())) < 1e-9
+                and arm["voxels_active"] == int(np.count_nonzero(vessels["vessels"]))
+            )
+            live_detail = (
+                f"case {case} live field D(x) = "
+                f"{float(field.d_mm2_per_day[field.d_mm2_per_day > 0].min()):.4g}-"
+                f"{float(field.d_mm2_per_day.max()):.4g} mm^2/day "
+                f"({field.contrast_ratio:.1f}x), {int(np.count_nonzero(vessels['vessels']))} "
+                f"perfused voxels; matches committed arms: {live_ok}"
+            )
+
+    mtd = [r["arms"]["mtd"]["median_pfs_delta_days"] for r in records]
+    st = [r["arms"]["steering"]["median_pfs_delta_days"] for r in records]
+    disagree = [
+        r["arms"][pol]["n_pairs_in_disagreement"]
+        for r in records
+        for pol in ("mtd", "steering")
+    ]
+    return CheckResult(
+        supported=consistent and live_ok,
+        detail=(
+            f"{len(records)} cases x 2 policies x 3 seeds, paired transport-only: "
+            f"MTD paired PFS delta {min(mtd):+.0f}..{max(mtd):+.0f} d (medians "
+            f"{np.median(mtd):+.1f} d), steering {min(st):+.0f}..{max(st):+.0f} d; "
+            f"{sum(disagree)}/{len(disagree)} policy-arms move at all; "
+            f"cohort self-consistent: {consistent}; {live_detail}"
+        ),
+    )
+
+
 def check_stream3_cohort_is_measured() -> CheckResult:
     """The committed stream-3 cohort file must match a live re-run of case 01017."""
     from danon.clinical_twin import STREAM3_COHORT_PATH, stream3_report
@@ -1191,6 +1306,7 @@ CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "resistance_is_emergent": check_resistance_is_emergent,
     "stream_identities": check_stream_identities_hold,
     "stream3_cohort_measured": check_stream3_cohort_is_measured,
+    "stream3_diffusion_measured": check_stream3_diffusion_is_measured,
     "stream_census_refuses": check_stream_census_refuses_honestly,
     "stream4_agreement_is_a_validation_target": check_stream4_agreement_is_a_validation_target,
 }
@@ -1318,7 +1434,8 @@ CLAIMS: Tuple[Claim, ...] = (
         "engineering_rigor",
         "The repository carries an automated test suite covering the physics, "
         "the statistics and the refusal paths, with the count computed live "
-        "rather than quoted.",
+        "and the README's own suite row checked against it rather than "
+        "maintained by hand.",
         EvidenceStatus.ESTABLISHED,
         "tests/",
         "test_suite_counted",
@@ -1602,14 +1719,46 @@ CLAIMS: Tuple[Claim, ...] = (
         "vasculature: MTD PFS moves by a mean of -1.17 days (sd 1.01, max 3, "
         "18 paired runs; 5/6 cases earlier), steering stays horizon-censored "
         "in both geometries (paired delta exactly 0). At engine scale the "
-        "vessel-source variation contributes ~1 day: the sanctuary structure "
-        "lives in D(x), which both geometries share.",
+        "vessel-source variation contributes about one day. This claim "
+        "previously ended by asserting that the sanctuary structure 'lives "
+        "in D(x), which both geometries share' -- a speculation stated as a "
+        "finding, with no check behind it. It has since been MEASURED: "
+        "varying D(x) by 3.3x does not restore the difference either (see "
+        "stream3_diffusion_measured).",
         EvidenceStatus.ESTABLISHED,
         "danon/clinical_twin.py::stream3_report over "
         "outputs_real/stream3_cohort.json (rebuildable via _stream3_cohort.py)",
         "stream3_cohort_measured",
         "A wired-and-measured stream whose measured effect is small is a "
         "result, not a failure; t1ce is a vascular proxy, not Ktrans.",
+    ),
+    Claim(
+        "stream3_diffusion_measured",
+        "Stream 3's diffusion arm (D_chemo(x) = D0*(1+2.5*rCBV(x)), the "
+        "specification's own formula) is implemented against the engine's "
+        "`diffusion_field` hook and measured on real cached BraTS-2021 cases, "
+        "PAIRED transport-only: identical mask, proliferation, vessels source "
+        "and seeds, differing only in the transport field. The mapping "
+        "produces a 3.35-3.45x contrast in D(x) (1543-2673 perfused voxels per "
+        "case), and across 3 cases x 2 policies x 3 seeds (18 paired runs) "
+        "only 1 of 6 policy-arms moves AT ALL: MTD paired deltas -1, 0, 0 days "
+        "(one seed pair in one case), steering exactly 0 in every case. That "
+        "is within seed noise at this cohort size -- a 3.4x transport contrast "
+        "does NOT eliminate a delivery blind spot here, and the effect is of "
+        "the same order as the vasculature arm. The arm is transport-only by construction "
+        "because the simulator reduces a supplied field to a mean-one "
+        "relative pattern, so D0 and the unit conversion cancel exactly and "
+        "gamma=2.5 is this parameter's only live constant: no absolute "
+        "diffusivity claim rides on this mapping.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/claims.py::check_stream3_diffusion_is_measured over "
+        "outputs_real/stream3_diffusion_cohort.json (rebuildable via "
+        "_stream3_diffusion_cohort.py), field stats re-derived live each audit",
+        "stream3_diffusion_measured",
+        "The engine arms are the committed measurement, not re-run inside the "
+        "audit; the field statistics ARE recomputed live. An rCBV map is "
+        "scalar, so this mapping is isotropic per voxel -- it is not a "
+        "diffusion tensor, and no anisotropy is fabricated from perfusion.",
     ),
     Claim(
         "longitudinal_availability_is_counted_from_the_manifest",
