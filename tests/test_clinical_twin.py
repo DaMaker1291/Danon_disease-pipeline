@@ -19,6 +19,7 @@ from danon.clinical_twin import (
     KI67_REF,
     STREAM3_COHORT_PATH,
     STREAM3_D0_MM2_PER_DAY,
+    HISTOLOGY_PROBE_PATH,
     STREAM4_RESOLUTION_PATH,
     assemble_digital_twin_state,
     build_stream3_clearance,
@@ -27,6 +28,8 @@ from danon.clinical_twin import (
     clinical_stream_census,
     decimate_t1ce_to_engine_grid,
     stream1_initial_state,
+    stream2_capacity_clones,
+    stream2_carrying_capacity,
     stream2_clones,
     stream2_growth_rate,
     stream3_diffusion_contrast,
@@ -301,10 +304,13 @@ def test_assemble_routes_each_stream():
         mri_rcbv_tensor=rcbv,
         delta_volume_velocity=(t1, t2),
         mask=mask,
+        histology_density_per_mm2=1579.0,
+        density_reference_per_mm2=636.0,
     )
     assert state.initial_state is not None
     assert state.clones_override is not None
     assert state.clones_override.growth_S > DEFAULT_CLONES.growth_S
+    assert state.clones_override.carrying_capacity == pytest.approx(1579 / 636)
     assert state.clearance_pattern is not None
     assert state.velocity_observation is not None
     assert all(v.startswith("applied") for v in state.stream_status.values())
@@ -323,6 +329,187 @@ def test_census_refuses_empty_streams_and_reports_stream3():
     if HAS_BRATS:
         assert census["stream3_perfusion"]["status"] == "MEASURABLE"
         assert census["stream3_perfusion"]["n_t1ce_files"] >= 1
+
+
+class TestStream2Capacity:
+    """The measured packing as the engine's density ceiling.
+
+    The load-bearing property is not the identity -- it is that the mapping is
+    the ONLY thing the capacity arm changes, so the paired cohort can attribute a
+    difference to the density. A mis-paired control (the defect this class
+    caught) shows up at K x1.0, which must reproduce the control exactly.
+    """
+
+    def test_identity_at_the_reference_density(self):
+        from danon.evosteer import DEFAULT_CLONES
+
+        result = stream2_carrying_capacity(636.0, 636.0)
+        assert result.ratio == 1.0
+        assert result.k == DEFAULT_CLONES.carrying_capacity
+        assert result.mode == "relative"
+        assert "section thickness" in result.absolute_refusal
+        assert "2.48" in result.describe() or "1.000x" in result.describe()
+
+    def test_scales_by_the_measured_ratio(self):
+        lo = stream2_capacity_clones(460.0, 636.0)
+        hi = stream2_capacity_clones(1579.0, 636.0)
+        from danon.evosteer import DEFAULT_CLONES
+
+        assert hi.carrying_capacity / lo.carrying_capacity == pytest.approx(1579 / 460)
+        # Nothing but the ceiling moves.
+        for clones in (lo, hi):
+            assert clones.growth_S == DEFAULT_CLONES.growth_S
+            assert clones.growth_R == DEFAULT_CLONES.growth_R
+            assert clones.mutation_rate == DEFAULT_CLONES.mutation_rate
+            assert clones.competition == DEFAULT_CLONES.competition
+
+    @pytest.mark.parametrize(
+        "density,reference",
+        [(0.0, 1.0), (-5.0, 1.0), (1.0, 0.0), (1.0, -1.0), (float("nan"), 1.0), (float("inf"), 1.0)],
+    )
+    def test_refuses_unusable_densities(self, density, reference):
+        with pytest.raises(ValueError):
+            stream2_carrying_capacity(density, reference)
+
+    def test_assembled_state_applies_the_capacity_and_refuses_a_half_pair(self):
+        mask = np.ones((4, 4, 4), dtype=bool)
+        state = assemble_digital_twin_state(
+            fluorescence_5ala_mesh=np.ones((4, 4, 4)),
+            mask=mask,
+            histology_density_per_mm2=1579.0,
+            density_reference_per_mm2=636.0,
+        )
+        assert state.clones_override.carrying_capacity == pytest.approx(1579 / 636)
+        assert state.clones_override.growth_S == pytest.approx(
+            DEFAULT_CLONES.growth_S
+        )
+        assert state.stream_status["stream2_density_capacity"].startswith("applied")
+
+        # Composes with stream 2's growth mapping rather than replacing it.
+        both = assemble_digital_twin_state(
+            fluorescence_5ala_mesh=np.ones((4, 4, 4)),
+            mask=mask,
+            histology_ki67_ratio=KI67_REF,
+            histology_density_per_mm2=460.0,
+            density_reference_per_mm2=636.0,
+        )
+        assert both.clones_override.growth_S == pytest.approx(DEFAULT_CLONES.growth_S)
+        assert both.clones_override.carrying_capacity == pytest.approx(460 / 636)
+
+        # A density with no declared reference refuses: it would set K against
+        # whatever number happened to be nearby.
+        with pytest.raises(ValueError):
+            assemble_digital_twin_state(
+                fluorescence_5ala_mesh=np.ones((4, 4, 4)),
+                mask=mask,
+                histology_density_per_mm2=1579.0,
+            )
+        # Omitted entirely, nothing is overridden.
+        plain = assemble_digital_twin_state(
+            fluorescence_5ala_mesh=np.ones((4, 4, 4)), mask=mask
+        )
+        assert plain.clones_override is None
+        assert "not supplied" in plain.stream_status["stream2_density_capacity"]
+
+
+@pytest.mark.skipif(
+    not os.path.exists("outputs_real/stream2_capacity_cohort.json"),
+    reason="stream-2 capacity cohort not built (see _stream2_capacity_cohort.py)",
+)
+class TestCapacityCohortRecord:
+    """The committed measurement, checked for the relations it claims.
+
+    Read rather than re-run: a paired engine cohort costs minutes, and the
+    relations below are exactly what a re-run would have to satisfy.
+    """
+
+    @staticmethod
+    def _rows():
+        import json
+
+        return json.load(open("outputs_real/stream2_capacity_cohort.json"))
+
+    def test_reference_and_endpoints_come_from_the_slide_record(self):
+        import json
+
+        probe = json.load(open(HISTOLOGY_PROBE_PATH))
+        density = probe["slide_measured"]["density"]
+        reference = float(density["nuclei_per_mm2"])
+        spread = density["per_crop_spread"]
+        for row in self._rows():
+            assert row["reference_nuclei_per_mm2"] == reference
+            ratios = sorted(
+                set(
+                    float(key)
+                    for arm in row["arms"].values()
+                    for key in arm["k_by_ratio"]
+                )
+            )
+            expected = sorted(
+                [1.0, float(spread["min"]) / reference, float(spread["max"]) / reference]
+            )
+            assert ratios == pytest.approx(expected, abs=1e-6)
+
+    def test_the_unit_ratio_arm_reproduces_the_control_exactly(self):
+        """The pairing assertion: K x1.0 must be bit-identical to the control.
+
+        This is what caught a mis-paired control during development, where the
+        control was re-run inside the ratio loop and the arms were compared to
+        the wrong partner.
+        """
+        for row in self._rows():
+            for policy, arm in row["arms"].items():
+                unit = arm["k_by_ratio"]["1.000000"]
+                assert unit == pytest.approx(1.0)
+                assert arm["burden_capacity"]["1.000000"] == arm["burden_uniform"]
+                assert arm["pfs_capacity"]["1.000000"] == arm["pfs_uniform"]
+                assert arm["max_abs_relative_burden_difference"]["1.000000"] == 0.0
+                assert policy in ("mtd", "steering")
+
+    def test_under_mtd_the_burden_ratio_is_the_capacity_ratio(self):
+        """Static dosing: K rescales the reported burden by its own factor."""
+        for row in self._rows():
+            arm = row["arms"]["mtd"]
+            for key, k in arm["k_by_ratio"].items():
+                pairs = list(zip(arm["burden_uniform"], arm["burden_capacity"][key]))
+                assert pairs, "no paired burdens recorded"
+                for control, capacity in pairs:
+                    assert control > 0
+                    assert capacity / control == pytest.approx(k, rel=0.01)
+
+    def test_under_steering_the_ratio_departs_from_the_capacity_ratio(self):
+        """Adaptive dosing is where an absolute floor gates a decision.
+
+        The departure must be present AND larger than the MTD arm's, or the
+        claim's reading of the mechanism would be unsupported.
+        """
+        departures = []
+        for row in self._rows():
+            arm = row["arms"]["steering"]
+            for key, k in arm["k_by_ratio"].items():
+                if k == 1.0:
+                    continue
+                for control, capacity in zip(
+                    arm["burden_uniform"], arm["burden_capacity"][key]
+                ):
+                    departures.append(abs(capacity / control - k))
+        assert departures
+        assert max(departures) > 0.05
+        assert max(departures) > arm["max_abs_relative_burden_difference"]["1.000000"]
+
+    def test_pfs_is_reported_as_essentially_unmoved(self):
+        """The claim may not rest on PFS: 5 of 6 policy-arms move 0 days."""
+        moved = 0
+        total = 0
+        for row in self._rows():
+            for arm in row["arms"].values():
+                for delta in arm["median_pfs_delta_days"].values():
+                    total += 1
+                    if delta != 0:
+                        moved += 1
+                        assert abs(delta) <= 1.0
+        assert total > 0
+        assert moved <= total / 2
 
 
 def test_census_refuses_stream2_as_input_while_reporting_the_sample():

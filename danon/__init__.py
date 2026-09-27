@@ -741,6 +741,13 @@ from danon.histology import (
 )
 
 from danon.clinical_twin import (
+    CAPACITY_COHORT_PATH,
+    HISTOLOGY_PROBE_PATH,
+    CarryCapacityResult,
+    CapacityContrast,
+    stream2_capacity_clones,
+    stream2_capacity_contrast,
+    stream2_carrying_capacity,
     CLEARANCE_GAMMA,
     DEFAULT_ALA_R0,
     DEFAULT_ALA_R0_SOURCE,

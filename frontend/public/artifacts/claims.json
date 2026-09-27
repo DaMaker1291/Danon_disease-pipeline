@@ -1,7 +1,7 @@
 {
  "key": "claims",
  "title": "Bound-claim audit (what this project may say)",
- "generated_utc": "2026-09-27T16:21:19Z",
+ "generated_utc": "2026-09-27T16:47:55Z",
  "source": "danon.claims.audit_claims()",
  "notes": [
   "each row is a sentence plus the check that supports it, re-run at build time; a check that failed is recorded as failed",
@@ -12,8 +12,8 @@
   "clinical_benefit": "unknown"
  },
  "data": {
-  "n_claims": 39,
-  "n_passed": 39,
+  "n_claims": 40,
+  "n_passed": 40,
   "n_failed": 0,
   "claims": [
    {
@@ -112,7 +112,7 @@
     "check": "test_suite_counted",
     "limit": "Tests verify the implementation. They are not evidence about biology.",
     "supported": true,
-    "detail": "1093 test functions in 156 classes across tests/ and danon/multiagent/ (pytest collects more than this wherever a test is parametrised); README defers to this check rather than quoting a count",
+    "detail": "1102 test functions in 158 classes across tests/ and danon/multiagent/ (pytest collects more than this wherever a test is parametrised); README defers to this check rather than quoting a count",
     "study": "tumour_twin"
    },
    {
@@ -145,7 +145,7 @@
     "check": "runtime_365",
     "limit": "Runtime is machine-dependent; the audit prints the machine's own number.",
     "supported": true,
-    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 0.84 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)",
+    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 0.72 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)",
     "study": "tumour_twin"
    },
    {
@@ -387,7 +387,7 @@
     "check": "readme_claim_count_current",
     "limit": "It checks that the README agrees with the registry, not that the registry is right: claims can be wrong together and still agree.",
     "supported": true,
-    "detail": "README advertises 39/39 verified; the registry holds 39 claims",
+    "detail": "README advertises 40/40 verified; the registry holds 40 claims",
     "study": "tumour_twin"
    },
    {
@@ -424,6 +424,17 @@
     "study": "tumour_twin"
    },
    {
+    "id": "stream2_capacity_is_measured_and_is_a_scale_under_mtd",
+    "sentence": "Stream 2's measured cellularity reaches the engine's per-voxel density ceiling and is measured there, PAIRED on real cached BraTS-2021 geometry (same mask, proliferation, seeds, policy and initial resistant fraction; the ONLY difference is clones.carrying_capacity). The sweep's endpoints are read from the slide record rather than chosen: its own measured crop extremes over its own pooled density. What it measures is a scale and not a lever. Under continuous MTD the per-seed burden ratio equals the capacity ratio to within a fraction of a percent, so the reported burden is rescaled by K and the tumour's course is unchanged, and PFS does not move. Under the adaptive steering policy the ratio DEPARTS from K, because the engine's switch is gated on ABSOLUTE floors (MIN_VIABLE_DENSITY, DETECTION_BURDEN_DENSITY) that a K rescale does not move with it. So measured packing can matter only where an absolute floor gates a decision, and the ~100%+ burden differences reported at high K are that rescaling, not a treatment effect. An ABSOLUTE cells/mm^3 ceiling is refused: a whole-slide image counts per unit area and the archive's slides record MPP and AppMag with no section thickness to divide by.",
+    "tier": "established",
+    "substantiated_by": "danon/claims.py::check_stream2_capacity_mapping_is_measured over outputs_real/stream2_capacity_cohort.json (rebuildable via _stream2_capacity_cohort.py); ratios and reference re-derived from outputs_real/histology_probe.json on every audit",
+    "check": "stream2_capacity_measured",
+    "limit": "Three cases x two seeds per arm is a small paired cohort, and the steering departure is seed-dependent, so the MECHANISM is measured while the magnitude is not: no confidence interval is claimed here. The density is one slide (TCGA-06-5418) held fixed across the geometry of three different BraTS cases, so this is a sensitivity of the engine to K, not a statement about any patient's tumour. Nothing here moves a clinical endpoint: PFS moved 0 days in all but one policy-arm.",
+    "supported": true,
+    "detail": "mapping identity at the reference: True; sweep ratios match the slide record's crops (0.7233, 1.0000, 2.4827); 3 real cases x 2 seeds paired: MTD |burden ratio - K| max 6.43e-03 (pure scale), steering max 1.693 (a floor gates the switch); PFS moved in 1 of 18 policy-arms",
+    "study": "tumour_twin"
+   },
+   {
     "id": "restriction_never_mistaken_for_signal",
     "sentence": "Restricting to patients recording RT plus temozolomide is measured as cohort selection first: kept 356 of 595, membership delta -0.0112 C against the full-cohort fold sd 0.0247, with within-restricted-set covariate deltas (KPS -0.0043, MGMT +0.0046) reported separately and below their own fold sd.",
     "tier": "established",
@@ -440,9 +451,9 @@
     "tier": "established",
     "substantiated_by": "danon/claims.py::check_stream2_histology_measured_and_ki67_refused over outputs_real/histology_probe.json (rebuildable via _histology_probe.py)",
     "check": "stream2_histology_measured",
-    "limit": "The 636 nuclei/mm^2 is ONE slide, the smallest by listed size -- not a cohort statistic. The zero-Ki-67 finding generalises only as far as the file index plus this one slide's pixels: the index carries barcodes, not markers, so none being named is a lower bound on identifiability, and the remaining 2,052 slides were not downloaded or read. The stain call is a hue-fraction heuristic, not a validated assay, and the nuclei count comes from connected components in a hue band with an area filter -- clumped nuclei are dropped rather than split, which is part of why crops spread 3.4x. No pathologist count anchors any of it, and nothing here is a grade, a WHO criterion, or a statement about a patient.",
+    "limit": "The 636 nuclei/mm^2 is ONE slide, the smallest by listed size -- not a cohort statistic. The zero-Ki-67 finding generalises only as far as the file index plus this one slide's pixels: the index carries barcodes, not markers, so none being named is a lower bound on identifiability, and the remaining 2,052 slides were not downloaded or read. The slide itself is a gitignored cache under data/tcia/ (re-downloadable via _histology_probe.py); the committed record is the evidence, and when the cache is present its size is checked against the record. The stain call is a hue-fraction heuristic, not a validated assay, and the nuclei count comes from connected components in a hue band with an area filter -- clumped nuclei are dropped rather than split, which is part of why crops spread 3.4x. No pathologist count anchors any of it, and nothing here is a grade, a WHO criterion, or a statement about a patient.",
     "supported": true,
-    "detail": "2053 TCGA-GBM slide images retrievable, 0 named Ki-67; the downloaded slide is haematoxylin-only (brown 0.0) at MPP 2.0037, giving 636 nuclei/mm^2 over 4 crops; Ki-67 refusal exercised and stream 2 still refused as an input",
+    "detail": "2053 TCGA-GBM slide images retrievable, 0 named Ki-67; the downloaded slide is haematoxylin-only (brown 0.0) at MPP 2.0037, giving 636 nuclei/mm^2 over 4 crops; cached slide size matches the record; Ki-67 refusal exercised and stream 2 still refused as an input",
     "study": "tumour_twin"
    }
   ],

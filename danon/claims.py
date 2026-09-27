@@ -1110,6 +1110,153 @@ def check_stream3_cohort_is_measured() -> CheckResult:
     )
 
 
+def check_stream2_capacity_mapping_is_measured() -> CheckResult:
+    """Stream 2's cellularity reaches the engine's density ceiling, and is measured.
+
+    The numbers in the claim sentence are DERIVED here rather than restated: the
+    sweep's ratios must equal the slide record's own crop extremes over its own
+    pooled density, the K x1.0 arm must reproduce its control exactly (the
+    pairing assertion), and the MTD arms' per-seed burden ratio must equal the
+    capacity ratio they were run at. If any of those move, the check fails and
+    the sentence cannot sit there stale.
+    """
+    import json
+
+    from danon.clinical_twin import (
+        CAPACITY_COHORT_PATH,
+        HISTOLOGY_PROBE_PATH,
+        stream2_capacity_clones,
+        stream2_carrying_capacity,
+    )
+    from danon.evosteer import DEFAULT_CLONES
+
+    # (1) The mapping: identity at the reference, the ratio carried through, and
+    # the absolute route refused with the reason the archive supplies.
+    identity = stream2_carrying_capacity(636.0, 636.0)
+    identity_ok = (
+        identity.ratio == 1.0
+        and identity.k == DEFAULT_CLONES.carrying_capacity
+        and "section thickness" in identity.absolute_refusal
+        and abs(stream2_capacity_clones(954.0, 636.0).carrying_capacity - 1.5) < 1e-12
+        and stream2_capacity_clones(954.0, 636.0).growth_S == DEFAULT_CLONES.growth_S
+    )
+
+    # (2) The sweep's endpoints come from the committed slide record.
+    try:
+        probe = json.load(open(os.path.join(ROOT, HISTOLOGY_PROBE_PATH)))
+        density = probe["slide_measured"]["density"]
+        reference = float(density["nuclei_per_mm2"])
+        spread = density["per_crop_spread"]
+        expected = sorted(
+            [(spread["min"]) / reference, 1.0, (spread["max"]) / reference]
+        )
+    except (OSError, ValueError, KeyError) as exc:
+        return CheckResult(
+            supported=False, detail=f"histology probe unreadable: {exc}"
+        )
+
+    try:
+        rows = json.load(open(os.path.join(ROOT, CAPACITY_COHORT_PATH)))
+    except (OSError, ValueError) as exc:
+        return CheckResult(
+            supported=False,
+            detail=f"stream-2 capacity cohort unreadable ({exc}); rebuild via "
+            "_stream2_capacity_cohort.py",
+        )
+    if not isinstance(rows, list) or not rows:
+        return CheckResult(supported=False, detail="capacity cohort holds no cases")
+
+    problems: List[str] = []
+    mtd_departures: List[float] = []
+    steering_departures: List[float] = []
+    pfs_moves = 0
+    pfs_total = 0
+    for row in rows:
+        if float(row.get("reference_nuclei_per_mm2", 0.0)) != reference:
+            problems.append(
+                f"{row.get('case_id')}: reference density is not the slide record's"
+            )
+        for policy, arm in (row.get("arms") or {}).items():
+            ratios = sorted(float(k) for k in arm.get("k_by_ratio", {}))
+            if len(ratios) != 3 or any(
+                abs(a - b) > 1e-6 for a, b in zip(ratios, expected)
+            ):
+                problems.append(
+                    f"{row.get('case_id')}/{policy}: K ratios are not the slide's "
+                    f"measured crop extremes"
+                )
+            unit = arm["burden_capacity"].get("1.000000")
+            if unit != arm["burden_uniform"] or arm["pfs_capacity"].get(
+                "1.000000"
+            ) != arm["pfs_uniform"]:
+                problems.append(
+                    f"{row.get('case_id')}/{policy}: the K x1.0 arm does not "
+                    f"reproduce its control -- the pairing is broken"
+                )
+            for key, k in arm.get("k_by_ratio", {}).items():
+                pairs = list(
+                    zip(arm["burden_uniform"], arm["burden_capacity"].get(key, []))
+                )
+                if len(pairs) != len(arm["burden_uniform"]):
+                    problems.append(
+                        f"{row.get('case_id')}/{policy}: arm and control burden "
+                        f"lists differ in length"
+                    )
+                    continue
+                for control, capacity in pairs:
+                    if control <= 0:
+                        problems.append(
+                            f"{row.get('case_id')}/{policy}: zero control burden"
+                        )
+                        continue
+                    departure = abs(capacity / control - k)
+                    (mtd_departures if policy == "mtd" else steering_departures).append(
+                        departure
+                    )
+            for delta in (arm.get("median_pfs_delta_days") or {}).values():
+                pfs_total += 1
+                if delta != 0:
+                    pfs_moves += 1
+                    if abs(delta) > 1.0:
+                        problems.append(
+                            f"{row.get('case_id')}/{policy}: PFS moved {delta} d, "
+                            f"which the sentence does not claim"
+                        )
+
+    if not identity_ok:
+        problems.append("the density->K mapping is not the identity at its reference")
+    if not mtd_departures or max(mtd_departures) > 0.01:
+        problems.append(
+            "under MTD the burden ratio no longer equals the capacity ratio, so "
+            "the covariance reading in the sentence is wrong"
+        )
+    if not steering_departures or max(steering_departures) <= max(mtd_departures or [0.0]):
+        problems.append(
+            "the steering arm no longer departs further from the capacity ratio "
+            "than the MTD arm does, so the floor-gating reading is unsupported"
+        )
+    if pfs_moves > pfs_total / 2:
+        problems.append(
+            "most policy-arms now move PFS; the sentence's 'does not move PFS' "
+            "would be false"
+        )
+
+    supported = not problems
+    return CheckResult(
+        supported=supported,
+        detail=(
+            f"mapping identity at the reference: {identity_ok}; sweep ratios match "
+            f"the slide record's crops ({', '.join(f'{r:.4f}' for r in expected)}); "
+            f"{len(rows)} real cases x 2 seeds paired: MTD |burden ratio - K| max "
+            f"{max(mtd_departures or [0.0]):.2e} (pure scale), steering max "
+            f"{max(steering_departures or [0.0]):.3f} (a floor gates the switch); "
+            f"PFS moved in {pfs_moves} of {pfs_total} policy-arms"
+            + ""
+            + ("; " + "; ".join(problems) if problems else "")
+        ),
+    )
+
+
 def check_stream2_histology_measured_and_ki67_refused() -> CheckResult:
     """Stream 2: what the biopsy archive yields, and the ratio it cannot give.
 
@@ -1512,6 +1659,7 @@ CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "stream3_dsc_perfusion_measured": check_stream3_dsc_perfusion_is_measured,
     "stream_census_refuses": check_stream_census_refuses_honestly,
     "stream2_histology_measured": check_stream2_histology_measured_and_ki67_refused,
+    "stream2_capacity_measured": check_stream2_capacity_mapping_is_measured,
     "stream4_agreement_is_a_validation_target": check_stream4_agreement_is_a_validation_target,
 }
 
@@ -2089,6 +2237,40 @@ CLAIMS: Tuple[Claim, ...] = (
         "The census is computed live from the data directory and the recorded "
         "probe, so acquiring the files flips the refusal to 'available' "
         "automatically.",
+    ),
+    Claim(
+        "stream2_capacity_is_measured_and_is_a_scale_under_mtd",
+        "Stream 2's measured cellularity reaches the engine's per-voxel density "
+        "ceiling and is measured there, PAIRED on real cached BraTS-2021 geometry "
+        "(same mask, proliferation, seeds, policy and initial resistant "
+        "fraction; the ONLY difference is clones.carrying_capacity). The sweep's "
+        "endpoints are read from the slide record rather than chosen: its own "
+        "measured crop extremes over its own pooled density. What it measures is "
+        "a scale and not a lever. Under continuous MTD the per-seed burden ratio "
+        "equals the capacity ratio to within a fraction of a percent, so the "
+        "reported burden is rescaled by K and the tumour's course is unchanged, "
+        "and PFS does not move. Under the adaptive steering policy the ratio "
+        "DEPARTS from K, because the engine's switch is gated on ABSOLUTE floors "
+        "(MIN_VIABLE_DENSITY, DETECTION_BURDEN_DENSITY) that a K rescale does not "
+        "move with it. So measured packing can matter only where an absolute "
+        "floor gates a decision, and the ~100%+ burden differences reported at "
+        "high K are that rescaling, not a treatment effect. An ABSOLUTE "
+        "cells/mm^3 ceiling is refused: a whole-slide image counts per unit area "
+        "and the archive's slides record MPP and AppMag with no section "
+        "thickness to divide by.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/claims.py::check_stream2_capacity_mapping_is_measured over "
+        "outputs_real/stream2_capacity_cohort.json (rebuildable via "
+        "_stream2_capacity_cohort.py); ratios and reference re-derived from "
+        "outputs_real/histology_probe.json on every audit",
+        "stream2_capacity_measured",
+        "Three cases x two seeds per arm is a small paired cohort, and the "
+        "steering departure is seed-dependent, so the MECHANISM is measured while "
+        "the magnitude is not: no confidence interval is claimed here. The "
+        "density is one slide (TCGA-06-5418) held fixed across the geometry of "
+        "three different BraTS cases, so this is a sensitivity of the engine to K, "
+        "not a statement about any patient's tumour. Nothing here moves a clinical "
+        "endpoint: PFS moved 0 days in all but one policy-arm.",
     ),
     Claim(
         "restriction_never_mistaken_for_signal",

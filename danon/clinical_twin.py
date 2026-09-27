@@ -79,9 +79,10 @@ stream 4, velocity    : OBSERVATION ONLY. The engine has no mechanism to
 
 from __future__ import annotations
 
+import math
 import os
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass, field, replace
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
@@ -99,6 +100,14 @@ from danon.imaging import from_nifti_mask, read_nifti, write_nifti
 
 #: Stream 2: GBM Ki-67 labelling index the growth mapping normalises to.
 KI67_REF = 0.15
+
+#: The committed whole-slide probe: the density stream 2's capacity mapping
+#: reads its reference and endpoints from, so no number is chosen by hand.
+HISTOLOGY_PROBE_PATH = os.path.join("outputs_real", "histology_probe.json")
+
+#: The paired stream-2 capacity cohort: uniform K vs packing-derived K, on real
+#: cached geometry, with the sweep's endpoints read from the probe above.
+CAPACITY_COHORT_PATH = os.path.join("outputs_real", "stream2_capacity_cohort.json")
 
 #: Stream 3: clearance-vs-perfusion gain, lambda(x) = lambda_0*(1+gamma*rCBV).
 CLEARANCE_GAMMA = 1.0
@@ -782,6 +791,274 @@ class TwinStreamState:
         }
 
 
+@dataclass(frozen=True)
+class CarryCapacityResult:
+    """The measured packing as a relative per-voxel density ceiling."""
+
+    ratio: float
+    k: float
+    baseline_k: float
+    density_per_mm2: float
+    reference_per_mm2: float
+    mode: str
+    provenance: str
+    absolute_refusal: str
+
+    def describe(self) -> str:
+        return (
+            f"K = {self.k:.4g} ({self.ratio:.3f}x the {self.baseline_k:g} baseline) "
+            f"from {self.density_per_mm2:g} nuclei/mm^2 against a "
+            f"{self.reference_per_mm2:g}/mm^2 reference"
+        )
+
+
+def stream2_carrying_capacity(
+    nuclei_per_mm2: float,
+    reference_nuclei_per_mm2: float,
+    *,
+    baseline_k: Optional[float] = None,
+) -> CarryCapacityResult:
+    """Measured cell packing -> the engine's per-voxel density ceiling, RELATIVELY.
+
+    Call it with a density and the reference it is meant relative to; the result
+    is the ratio the engine's K is scaled by, in the mean-one relative-pattern
+    convention the transport field already uses. An ABSOLUTE ceiling is refused:
+    the slide counts nuclei per unit area and the engine's K is per unit volume,
+    and the archive's slides record no section thickness (see
+    `danon.histology.cells_per_mm2_to_per_mm3`), so that route would set the
+    tumour's density from an assumed Z.
+
+    This is not a scale-only knob. The engine carries two ABSOLUTE floors --
+    `MIN_VIABLE_DENSITY` (a voxel holding less than half a cell is emptied) and
+    `DETECTION_BURDEN_DENSITY` (below it no policy may act) -- so moving K moves
+    the seeded tumour's distance from those floors, and where a floor bites the
+    trajectory changes. Where it does not, it does not; that is what the paired
+    contrast measures rather than assumes.
+    """
+    from danon.evosteer import DEFAULT_CLONES
+
+    k0 = float(DEFAULT_CLONES.carrying_capacity if baseline_k is None else baseline_k)
+    for name, value in (
+        ("nuclei_per_mm2", nuclei_per_mm2),
+        ("reference_nuclei_per_mm2", reference_nuclei_per_mm2),
+    ):
+        if not isinstance(value, (int, float)) or not math.isfinite(float(value)):
+            raise ValueError(f"{name} must be a finite number, got {value!r}")
+        if float(value) <= 0.0:
+            raise ValueError(f"{name} must be positive, got {value!r}")
+    if k0 <= 0.0:
+        raise ValueError(f"baseline carrying capacity must be positive, got {k0!r}")
+
+    ratio = float(nuclei_per_mm2) / float(reference_nuclei_per_mm2)
+    return CarryCapacityResult(
+        ratio=ratio,
+        k=k0 * ratio,
+        baseline_k=k0,
+        density_per_mm2=float(nuclei_per_mm2),
+        reference_per_mm2=float(reference_nuclei_per_mm2),
+        mode="relative",
+        provenance=(
+            "declared: K is scaled by the measured areal density ratio, taking "
+            "the slide's own density as the reference (mean-one convention)"
+        ),
+        absolute_refusal=(
+            "an absolute cells/mm^3 ceiling is not derivable from a whole-slide "
+            "image: the archive's slides record MPP and AppMag but no section "
+            "thickness, so the areal-to-volumetric division has no Z to divide by"
+        ),
+    )
+
+
+def stream2_capacity_clones(
+    nuclei_per_mm2: float,
+    reference_nuclei_per_mm2: float,
+    *,
+    base: Optional[CloneParams] = None,
+) -> CloneParams:
+    """The clone parameters with the measured packing as the density ceiling.
+
+    Same shape as `stream2_clones`: everything except `carrying_capacity` is the
+    base set, so a paired run differs in K and nothing else.
+    """
+    from danon.evosteer import DEFAULT_CLONES
+
+    result = stream2_carrying_capacity(nuclei_per_mm2, reference_nuclei_per_mm2)
+    return replace(
+        base if base is not None else DEFAULT_CLONES, carrying_capacity=result.k
+    )
+
+
+@dataclass(frozen=True)
+class CapacityContrast:
+    """Uniform ceiling vs packing-derived ceiling: same geometry, same seeds.
+
+    The only thing that differs between the arms is `clones.carrying_capacity`,
+    so a difference in outcome is attributable to the density mapping rather than
+    to geometry, seed, policy or initial resistant fraction.
+    """
+
+    case_id: str
+    n_voxels: int
+    density_per_mm2: float
+    reference_per_mm2: float
+    reference_role: str
+    policy: str
+    seeds: Tuple[int, ...]
+    ratios: Tuple[float, ...]
+    k_by_ratio: Dict[str, float]
+    pfs_uniform_days: Tuple[int, ...]
+    pfs_capacity_days: Dict[str, Tuple[int, ...]]
+    burden_uniform: Tuple[float, ...]
+    burden_capacity: Dict[str, Tuple[float, ...]]
+
+    def median_pfs_delta_days(self, ratio: float) -> float:
+        return float(
+            np.median(self.pfs_capacity_days[_key(ratio)])
+            - np.median(self.pfs_uniform_days)
+        )
+
+    def max_abs_relative_burden_difference(self, ratio: float) -> float:
+        """Largest |burden_capacity - burden_uniform| / burden_uniform, paired.
+
+        The readout with resolution when every arm is censored: a censored PFS
+        cannot distinguish arms, so the claim must rest on the burden when it
+        cannot rest on PFS.
+        """
+        pairs = zip(self.burden_uniform, self.burden_capacity[_key(ratio)])
+        return float(
+            max(
+                (
+                    abs(b - u) / u if u > 0 else (0.0 if b == 0 else float("inf"))
+                    for u, b in pairs
+                ),
+                default=0.0,
+            )
+        )
+
+    def n_pairs_in_disagreement(self, ratio: float) -> int:
+        return int(
+            sum(
+                a != b
+                for a, b in zip(self.pfs_uniform_days, self.pfs_capacity_days[_key(ratio)])
+            )
+        )
+
+    def describe(self) -> str:
+        parts = []
+        for ratio in self.ratios:
+            parts.append(
+                f"K x{ratio:.3f}: PFS delta "
+                f"{self.median_pfs_delta_days(ratio):+.1f} d, "
+                f"burden up to {self.max_abs_relative_burden_difference(ratio):.2%}"
+            )
+        return (
+            f"case {self.case_id} ({self.n_voxels} voxels, {self.policy}, "
+            f"{len(self.seeds)} paired seeds): " + "; ".join(parts)
+        )
+
+
+def _key(ratio: float) -> str:
+    """Ratio -> JSON-safe key, so records round-trip without losing precision."""
+    return f"{float(ratio):.6f}"
+
+
+def stream2_capacity_contrast(
+    case_id: str,
+    *,
+    nuclei_per_mm2: float,
+    reference_nuclei_per_mm2: float,
+    reference_role: str,
+    ratios: Sequence[float],
+    brats_dir: str = "data/brats",
+    engineered_dir: str = "data/engine_ready",
+    policy: str = "steering",
+    seeds: Tuple[int, ...] = (101, 102, 103),
+    days: int = 365,
+    r0: float = 0.005,
+) -> CapacityContrast:
+    """Run the uniform-K control against packing-derived K on one real case.
+
+    Paired by seed and policy on identical engine-ready geometry, so K is the
+    only difference. K itself is set by `stream2_capacity_clones`, i.e. by the
+    measured density ratio, never by hand.
+    """
+    from danon.evosteer import CollateralSwitchPolicy, MTDPolicy
+
+    policies = {"mtd": MTDPolicy, "steering": CollateralSwitchPolicy}
+    if policy not in policies:
+        raise ValueError(f"policy must be one of {sorted(policies)}, got {policy!r}")
+    if not ratios:
+        raise ValueError("at least one K ratio is required")
+
+    mask_file = os.path.join(engineered_dir, f"BraTS2021_{case_id}_mask.nii.gz")
+    prolif_file = os.path.join(engineered_dir, f"BraTS2021_{case_id}_prolif.nii.gz")
+    for path in (mask_file, prolif_file):
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                f"{path} is not cached; this measurement runs on the committed "
+                f"BraTS-2021 case files, not on generated input"
+            )
+    page = from_nifti_mask(mask_file, proliferative_path=prolif_file)
+
+    pfs_u: List[int] = []
+    bur_u: List[float] = []
+    pfs_c: Dict[str, List[int]] = {_key(r): [] for r in ratios}
+    bur_c: Dict[str, List[float]] = {_key(r): [] for r in ratios}
+    k_by_ratio: Dict[str, float] = {}
+    for ratio in ratios:
+        clones = stream2_capacity_clones(
+            nuclei_per_mm2 * ratio, reference_nuclei_per_mm2
+        )
+        k_by_ratio[_key(ratio)] = clones.carrying_capacity
+    def run(sim: TumorEvolutionSimulator, seed: int) -> Tuple[int, float]:
+        traj = sim.run(
+            policies[policy](), days=days, initial_resistant_fraction=r0, seed=seed
+        )
+        pfs = int(traj.pfs_day) if traj.pfs_day is not None else days
+        # The trajectory exposes per-day burden arrays; the end-of-horizon total
+        # is their last element, the quantity the engine aggregates internally as
+        # `final_burden`.
+        burden = (
+            float(traj.burden_S[-1] + traj.burden_R[-1]) if len(traj.burden_S) else 0.0
+        )
+        return pfs, burden
+
+    # The control runs ONCE per seed, and every arm is paired to that same run.
+    # Re-running the control inside the ratio loop left `bur_u` one element long
+    # per ratio while each arm held one per seed, so the paired differences were
+    # computed against the wrong partner. The K x1.0 arm -- which must reproduce
+    # the control exactly -- is what exposed it.
+    for seed in seeds:
+        pfs, burden = run(TumorEvolutionSimulator(page.geometry), seed)
+        pfs_u.append(pfs)
+        bur_u.append(burden)
+        for ratio in ratios:
+            clones = stream2_capacity_clones(
+                nuclei_per_mm2 * ratio, reference_nuclei_per_mm2
+            )
+            pfs, burden = run(
+                TumorEvolutionSimulator(page.geometry, clones=clones), seed
+            )
+            pfs_c[_key(ratio)].append(pfs)
+            bur_c[_key(ratio)].append(burden)
+
+    return CapacityContrast(
+        case_id=case_id,
+        n_voxels=int(page.geometry.tumor_mask.size),
+        density_per_mm2=float(nuclei_per_mm2),
+        reference_per_mm2=float(reference_nuclei_per_mm2),
+        reference_role=reference_role,
+        policy=policy,
+        seeds=tuple(int(s) for s in seeds),
+        ratios=tuple(float(r) for r in ratios),
+        k_by_ratio=k_by_ratio,
+        pfs_uniform_days=tuple(pfs_u),
+        pfs_capacity_days={k: tuple(v) for k, v in pfs_c.items()},
+        burden_uniform=tuple(bur_u),
+        burden_capacity={k: tuple(v) for k, v in bur_c.items()},
+    )
+
+
 def assemble_digital_twin_state(
     fluorescence_5ala_mesh: Optional[np.ndarray] = None,
     histology_ki67_ratio: Optional[float] = None,
@@ -789,6 +1066,8 @@ def assemble_digital_twin_state(
     delta_volume_velocity: Optional[Tuple[np.ndarray, np.ndarray]] = None,
     *,
     mask: Optional[np.ndarray] = None,
+    histology_density_per_mm2: Optional[float] = None,
+    density_reference_per_mm2: Optional[float] = None,
     r0: float = DEFAULT_ALA_R0,
     r0_source: str = DEFAULT_ALA_R0_SOURCE,
     clearance_gamma: float = CLEARANCE_GAMMA,
@@ -837,6 +1116,31 @@ def assemble_digital_twin_state(
         )
     else:
         applied["stream2_ki67_growth"] = "not supplied -- calibrated growth retained"
+
+    # Measured cell packing -> the per-voxel density ceiling. Relative by
+    # construction (the slide's own density is the reference); the absolute
+    # route needs a section thickness the archive's slides do not record.
+    from danon.evosteer import DEFAULT_CLONES
+
+    if (histology_density_per_mm2 is None) != (density_reference_per_mm2 is None):
+        raise ValueError(
+            "stream 2's density mapping needs BOTH histology_density_per_mm2 and "
+            "density_reference_per_mm2: a density with no declared reference "
+            "would set K against whatever number happened to be nearby"
+        )
+    if histology_density_per_mm2 is not None:
+        capacity = stream2_carrying_capacity(
+            histology_density_per_mm2, density_reference_per_mm2
+        )
+        clones_override = replace(
+            clones_override if clones_override is not None else DEFAULT_CLONES,
+            carrying_capacity=capacity.k,
+        )
+        applied["stream2_density_capacity"] = f"applied ({capacity.describe()})"
+    else:
+        applied["stream2_density_capacity"] = (
+            "not supplied -- calibrated carrying capacity retained"
+        )
 
     vessels_path = None
     clearance_pattern = None
@@ -1272,6 +1576,18 @@ def clinical_stream_census(data_dir: str = "data") -> Dict[str, Any]:
             ),
             "wsi": histology_evidence if histology_evidence is not None else {
                 "error": "histology probe record unreadable (run _histology_probe.py)"
+            },
+            # Where the measured density goes. The numbers live in the probe and
+            # cohort records and in the bound claim; the census only points.
+            "capacity": {
+                "mapping": "stream2_carrying_capacity (relative; mean-one convention)",
+                "absolute_ceiling": (
+                    "REFUSED -- a whole-slide image counts nuclei per unit AREA "
+                    "and these slides record no section thickness to divide by"
+                ),
+                "cohort_record": (
+                    CAPACITY_COHORT_PATH if os.path.exists(CAPACITY_COHORT_PATH) else None
+                ),
             },
             "detail": (
                 "the Ki-67 numerator does not exist in this source, so r0 is "

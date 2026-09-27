@@ -47,6 +47,7 @@ __all__ = [
     "HistologyError",
     "SlideMeta",
     "read_slide_metadata",
+    "cells_per_mm2_to_per_mm3",
     "classify_stain",
     "measure_nuclei_density",
     "ki67_fraction",
@@ -84,6 +85,7 @@ class SlideMeta:
     levels: int
     format: str
     description: str = ""
+    section_thickness_um: Optional[float] = None
 
     def provenance(self) -> Dict[str, object]:
         return {
@@ -94,6 +96,7 @@ class SlideMeta:
             "pyramid_levels": self.levels,
             "format": self.format,
             "mm2_per_pixel": (self.mpp_um / 1000.0) ** 2 if self.mpp_um else None,
+            "section_thickness_um": self.section_thickness_um,
         }
 
 
@@ -135,6 +138,11 @@ def read_slide_metadata(path: str) -> SlideMeta:
         description = raw
     mpp = re.search(r"MPP\s*=\s*([0-9.]+)", description)
     mag = re.search(r"AppMag\s*=\s*([0-9.]+)", description)
+    # Section thickness is the missing Z of a whole-slide image: it is what would
+    # turn an areal nuclei count into a volumetric one. Aperio writes scan
+    # geometry (MPP, AppMag, StripeWidth) and only sometimes a thickness, so this
+    # is read when present and reported as None when absent rather than assumed.
+    thick = re.search(r"(?:Slice)?Thickness\s*=\s*([0-9.]+)", description)
     return SlideMeta(
         path=path,
         width=int(im.size[0]),
@@ -144,7 +152,33 @@ def read_slide_metadata(path: str) -> SlideMeta:
         levels=int(getattr(im, "n_frames", 1)),
         format=str(im.format or "unknown"),
         description=description,
+        section_thickness_um=float(thick.group(1)) if thick else None,
     )
+
+
+def cells_per_mm2_to_per_mm3(
+    nuclei_per_mm2: float, section_thickness_um: Optional[float]
+) -> float:
+    """Areal nuclei density -> volumetric, or a refusal naming the missing Z.
+
+    A whole-slide image counts nuclei per unit *area*; the engine's carrying
+    capacity is a *volumetric* cell ceiling. The conversion is a division by the
+    section thickness, which the archive's slides do not record (their metadata
+    carries MPP and AppMag and no thickness field), so this raises rather than
+    assuming a section thickness -- assuming one would set the tumour's density
+    from a habit instead of from the slide.
+    """
+    if section_thickness_um is None or section_thickness_um <= 0:
+        raise HistologyError(
+            f"cannot convert {nuclei_per_mm2:g} nuclei/mm^2 to a volumetric "
+            f"density without the section thickness: a whole-slide image counts "
+            f"per unit AREA, and the slides here record MPP and AppMag but no "
+            f"thickness field. Any absolute cells/mm^3 from this archive would be "
+            f"an assumed section thickness wearing a measurement's units"
+        )
+    if not np.isfinite(nuclei_per_mm2) or nuclei_per_mm2 <= 0:
+        raise HistologyError(f"nuclei density must be positive, got {nuclei_per_mm2!r}")
+    return float(nuclei_per_mm2) / (float(section_thickness_um) / 1000.0)
 
 
 def classify_stain(rgb: np.ndarray, *, sample_px: int = 2_000_000) -> Dict[str, object]:
