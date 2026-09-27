@@ -102,6 +102,21 @@ def main() -> None:
         print(f"  K x{ratio:.4f} -> {result.k:.4f}", flush=True)
 
     merged = json.load(open(OUT)) if os.path.exists(OUT) else []
+    # Refuse to mix references. Every row's sweep is anchored to the density the
+    # probe recorded when that row was run, so appending a case after the probe
+    # changed would leave one file holding two different references -- and the
+    # claim's check would (correctly) fail on it rather than silently averaging.
+    stale = [
+        row.get("case_id")
+        for row in merged
+        if float(row.get("reference_nuclei_per_mm2", -1.0)) != reference
+    ]
+    if stale:
+        raise SystemExit(
+            f"{OUT} holds cases measured against a different reference "
+            f"({', '.join(str(c) for c in stale)}); the slide record now gives "
+            f"{reference:g} nuclei/mm^2. Delete the record and re-run every case."
+        )
     for idx in (int(a) for a in sys.argv[1:]):
         case = CASES[idx]
         if any(row.get("case_id") == case for row in merged):

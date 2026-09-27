@@ -15,6 +15,7 @@ import pytest
 
 from danon.clinical_twin import (
     CLEARANCE_GAMMA,
+    DEFAULT_ALA_R0,
     DIFFUSION_GAMMA,
     KI67_REF,
     STREAM3_COHORT_PATH,
@@ -29,6 +30,7 @@ from danon.clinical_twin import (
     decimate_t1ce_to_engine_grid,
     stream1_initial_state,
     stream2_capacity_clones,
+    stream2_capacity_contrast,
     stream2_carrying_capacity,
     stream2_clones,
     stream2_growth_rate,
@@ -371,6 +373,62 @@ class TestStream2Capacity:
         with pytest.raises(ValueError):
             stream2_carrying_capacity(density, reference)
 
+    def test_the_seed_scales_with_the_measured_ceiling(self):
+        """fill_fraction is calibrated AGAINST K, so both must move together.
+
+        Seeding at the default 1.0 while the ceiling sat at a measured K divided
+        the calibrated fill by K -- at K=2.48 the tumour started at 26% of its
+        stated fill, which is a different initial condition, not a rescaled one.
+        """
+        mask = np.ones((4, 4, 4), dtype=bool)
+        fluo = np.where(mask, 1.0, 0.0)
+        n_voxels = int(mask.sum())
+        for density in (460.0, 636.0, 1579.0):
+            state = assemble_digital_twin_state(
+                fluorescence_5ala_mesh=fluo,
+                mask=mask,
+                histology_density_per_mm2=density,
+                density_reference_per_mm2=636.0,
+            )
+            burden = float(state.initial_state[0].sum() + state.initial_state[1].sum())
+            k = state.clones_override.carrying_capacity
+            assert burden / (k * n_voxels) == pytest.approx(0.65, rel=1e-9)
+        # With no density the seed is the engine's own default, unchanged. The
+        # total is what the stream promises: the seed splits into S and R by r0.
+        plain = assemble_digital_twin_state(fluorescence_5ala_mesh=fluo, mask=mask)
+        total = float(plain.initial_state[0].sum() + plain.initial_state[1].sum())
+        assert total == pytest.approx(0.65 * n_voxels)
+        assert float(plain.initial_state[1].sum()) == pytest.approx(
+            total * DEFAULT_ALA_R0
+        )
+
+    @pytest.mark.parametrize("scalar", [np.float32(636.0), np.float64(636.0), np.int64(636)])
+    def test_accepts_numpy_scalars(self, scalar):
+        """A density measured off an array arrives as a numpy scalar.
+
+        The first version rejected np.float32 with the message "must be a finite
+        number, got 636.0" -- wrong on both counts.
+        """
+        assert stream2_carrying_capacity(scalar, 636.0).ratio == pytest.approx(1.0)
+
+    @pytest.mark.parametrize("junk", [True, "636", None, object()])
+    def test_refuses_non_numbers(self, junk):
+        with pytest.raises(ValueError):
+            stream2_carrying_capacity(junk, 636.0)
+
+    def test_the_contrast_refuses_an_empty_cohort(self):
+        """No seeds is no measurement, not a null result."""
+        with pytest.raises(ValueError) as err:
+            stream2_capacity_contrast(
+                "01017",
+                nuclei_per_mm2=636.0,
+                reference_nuclei_per_mm2=636.0,
+                reference_role="empty-seed case",
+                ratios=[1.0],
+                seeds=(),
+            )
+        assert "empty cohort" in str(err.value)
+
     def test_assembled_state_applies_the_capacity_and_refuses_a_half_pair(self):
         mask = np.ones((4, 4, 4), dtype=bool)
         state = assemble_digital_twin_state(
@@ -496,6 +554,28 @@ class TestCapacityCohortRecord:
         assert departures
         assert max(departures) > 0.05
         assert max(departures) > arm["max_abs_relative_burden_difference"]["1.000000"]
+
+    @pytest.mark.skipif(
+        not os.path.exists("data/engine_ready/BraTS2021_01017_mask.nii.gz"),
+        reason="engine-ready BraTS case not cached",
+    )
+    def test_a_uniform_slide_collapses_to_one_arm(self):
+        """A slide whose crops all measure the same density yields ratio 1.0
+        three times over. The arms are keyed by ratio, so an undeduplicated list
+        would leave an arm longer than its control and read as a broken cohort.
+        """
+        contrast = stream2_capacity_contrast(
+            "01017",
+            nuclei_per_mm2=636.0,
+            reference_nuclei_per_mm2=636.0,
+            reference_role="uniform-slide case",
+            ratios=[1.0, 1.0, 1.0],
+            seeds=(101,),
+        )
+        assert contrast.ratios == (1.0,)
+        assert len(contrast.pfs_capacity_days["1.000000"]) == len(
+            contrast.pfs_uniform_days
+        )
 
     def test_pfs_is_reported_as_essentially_unmoved(self):
         """The claim may not rest on PFS: 5 of 6 policy-arms move 0 days."""

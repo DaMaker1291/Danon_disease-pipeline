@@ -1147,8 +1147,15 @@ def check_stream2_capacity_mapping_is_measured() -> CheckResult:
         density = probe["slide_measured"]["density"]
         reference = float(density["nuclei_per_mm2"])
         spread = density["per_crop_spread"]
+        # Deduped, because a perfectly uniform slide measures the same density in
+        # its smallest and largest crop: the sweep then legitimately collapses to
+        # one arm, and demanding exactly three would fail a valid cohort.
         expected = sorted(
-            [(spread["min"]) / reference, 1.0, (spread["max"]) / reference]
+            {
+                (spread["min"]) / reference,
+                1.0,
+                (spread["max"]) / reference,
+            }
         )
     except (OSError, ValueError, KeyError) as exc:
         return CheckResult(
@@ -1178,7 +1185,7 @@ def check_stream2_capacity_mapping_is_measured() -> CheckResult:
             )
         for policy, arm in (row.get("arms") or {}).items():
             ratios = sorted(float(k) for k in arm.get("k_by_ratio", {}))
-            if len(ratios) != 3 or any(
+            if not (1 <= len(ratios) <= 3) or len(ratios) != len(expected) or any(
                 abs(a - b) > 1e-6 for a, b in zip(ratios, expected)
             ):
                 problems.append(
@@ -1251,7 +1258,6 @@ def check_stream2_capacity_mapping_is_measured() -> CheckResult:
             f"{max(mtd_departures or [0.0]):.2e} (pure scale), steering max "
             f"{max(steering_departures or [0.0]):.3f} (a floor gates the switch); "
             f"PFS moved in {pfs_moves} of {pfs_total} policy-arms"
-            + ""
             + ("; " + "; ".join(problems) if problems else "")
         ),
     )

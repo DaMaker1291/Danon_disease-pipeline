@@ -80,6 +80,7 @@ stream 4, velocity    : OBSERVATION ONLY. The engine has no mechanism to
 from __future__ import annotations
 
 import math
+import numbers
 import os
 from dataclasses import dataclass, field, replace
 from typing import Any, Dict, List, Optional, Sequence, Tuple
@@ -842,8 +843,16 @@ def stream2_carrying_capacity(
         ("nuclei_per_mm2", nuclei_per_mm2),
         ("reference_nuclei_per_mm2", reference_nuclei_per_mm2),
     ):
-        if not isinstance(value, (int, float)) or not math.isfinite(float(value)):
-            raise ValueError(f"{name} must be a finite number, got {value!r}")
+        # numbers.Real, not (int, float): a density measured off an array is as
+        # likely to arrive as np.float32 as as a Python float, and rejecting a
+        # numpy scalar while claiming it "is not a finite number" was both wrong
+        # and unhelpful. A bool is a Real too, and is not a measurement.
+        if isinstance(value, bool) or not isinstance(value, numbers.Real):
+            raise ValueError(
+                f"{name} must be a real number, got {type(value).__name__}"
+            )
+        if not math.isfinite(float(value)):
+            raise ValueError(f"{name} must be finite, got {value!r}")
         if float(value) <= 0.0:
             raise ValueError(f"{name} must be positive, got {value!r}")
     if k0 <= 0.0:
@@ -989,6 +998,16 @@ def stream2_capacity_contrast(
         raise ValueError(f"policy must be one of {sorted(policies)}, got {policy!r}")
     if not ratios:
         raise ValueError("at least one K ratio is required")
+    if not seeds:
+        raise ValueError(
+            "no seeds: an empty cohort is not a null result, it is no measurement"
+        )
+    # A perfectly uniform slide yields ratio 1.0 for its min AND its max crop, so
+    # the distinct ratios a caller passes can repeat. Keep the first of each: the
+    # arms are keyed by ratio, and a duplicate key would leave an arm and the
+    # control lists different lengths -- which the pairing check would (rightly)
+    # flag as a broken cohort rather than as the uniform slide it is.
+    ratios = list(dict.fromkeys(float(r) for r in ratios))
 
     mask_file = os.path.join(engineered_dir, f"BraTS2021_{case_id}_mask.nii.gz")
     prolif_file = os.path.join(engineered_dir, f"BraTS2021_{case_id}_prolif.nii.gz")
@@ -1004,12 +1023,17 @@ def stream2_capacity_contrast(
     bur_u: List[float] = []
     pfs_c: Dict[str, List[int]] = {_key(r): [] for r in ratios}
     bur_c: Dict[str, List[float]] = {_key(r): [] for r in ratios}
-    k_by_ratio: Dict[str, float] = {}
-    for ratio in ratios:
-        clones = stream2_capacity_clones(
+    # Built once per ratio and reused across seeds: CloneParams is frozen, so an
+    # arm's clones are the same object every replicate.
+    clones_by_ratio = {
+        _key(ratio): stream2_capacity_clones(
             nuclei_per_mm2 * ratio, reference_nuclei_per_mm2
         )
-        k_by_ratio[_key(ratio)] = clones.carrying_capacity
+        for ratio in ratios
+    }
+    k_by_ratio = {
+        key: clones.carrying_capacity for key, clones in clones_by_ratio.items()
+    }
     def run(sim: TumorEvolutionSimulator, seed: int) -> Tuple[int, float]:
         traj = sim.run(
             policies[policy](), days=days, initial_resistant_fraction=r0, seed=seed
@@ -1033,11 +1057,11 @@ def stream2_capacity_contrast(
         pfs_u.append(pfs)
         bur_u.append(burden)
         for ratio in ratios:
-            clones = stream2_capacity_clones(
-                nuclei_per_mm2 * ratio, reference_nuclei_per_mm2
-            )
             pfs, burden = run(
-                TumorEvolutionSimulator(page.geometry, clones=clones), seed
+                TumorEvolutionSimulator(
+                    page.geometry, clones=clones_by_ratio[_key(ratio)]
+                ),
+                seed,
             )
             pfs_c[_key(ratio)].append(pfs)
             bur_c[_key(ratio)].append(burden)
@@ -1095,18 +1119,6 @@ def assemble_digital_twin_state(
     notes: List[str] = []
 
     initial_state = None
-    if fluorescence_5ala_mesh is not None:
-        if mask is None:
-            raise ValueError("stream 1 needs the tumour mask alongside the fluorescence map")
-        initial_state = stream1_initial_state(
-            fluorescence_5ala_mesh, mask, r0=r0
-        )
-        applied["stream1_5ala_initial_state"] = (
-            f"applied (r0={r0:.4f}, source: {r0_source})"
-        )
-    else:
-        applied["stream1_5ala_initial_state"] = "not supplied -- engine clustered seed retained"
-
     clones_override = None
     if histology_ki67_ratio is not None:
         clones_override = stream2_clones(histology_ki67_ratio)
@@ -1128,18 +1140,45 @@ def assemble_digital_twin_state(
             "density_reference_per_mm2: a density with no declared reference "
             "would set K against whatever number happened to be nearby"
         )
+    capacity_k = DEFAULT_CLONES.carrying_capacity
     if histology_density_per_mm2 is not None:
+        # Through the stream's own function, on top of whatever the growth
+        # mapping already produced, so there is ONE place that decides how a
+        # measured density lands on clones.
+        clones_override = stream2_capacity_clones(
+            histology_density_per_mm2,
+            density_reference_per_mm2,
+            base=clones_override if clones_override is not None else DEFAULT_CLONES,
+        )
         capacity = stream2_carrying_capacity(
             histology_density_per_mm2, density_reference_per_mm2
         )
-        clones_override = replace(
-            clones_override if clones_override is not None else DEFAULT_CLONES,
-            carrying_capacity=capacity.k,
-        )
+        capacity_k = capacity.k
         applied["stream2_density_capacity"] = f"applied ({capacity.describe()})"
     else:
         applied["stream2_density_capacity"] = (
             "not supplied -- calibrated carrying capacity retained"
+        )
+
+    # Stream 1 seeds LAST, because the seed scales with the ceiling: `fill_fraction`
+    # is CALIBRATED against K, so seeding at the default 1.0 while the ceiling sits
+    # at a measured K would silently divide the fill by K -- at K=2.48 the tumour
+    # would start at 26% of its stated fill. The engine's own `seed()` scales the
+    # same way, so an unmeasured run is unchanged (capacity_k is the baseline).
+    if fluorescence_5ala_mesh is not None:
+        if mask is None:
+            raise ValueError(
+                "stream 1 needs the tumour mask alongside the fluorescence map"
+            )
+        initial_state = stream1_initial_state(
+            fluorescence_5ala_mesh, mask, r0=r0, carrying_capacity=capacity_k
+        )
+        applied["stream1_5ala_initial_state"] = (
+            f"applied (r0={r0:.4f}, source: {r0_source})"
+        )
+    else:
+        applied["stream1_5ala_initial_state"] = (
+            "not supplied -- engine clustered seed retained"
         )
 
     vessels_path = None
