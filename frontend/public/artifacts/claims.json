@@ -1,7 +1,7 @@
 {
  "key": "claims",
  "title": "Bound-claim audit (what this project may say)",
- "generated_utc": "2026-09-28T18:46:59Z",
+ "generated_utc": "2026-09-28T19:28:46Z",
  "source": "danon.claims.audit_claims()",
  "notes": [
   "each row is a sentence plus the check that supports it, re-run at build time; a check that failed is recorded as failed",
@@ -12,8 +12,8 @@
   "clinical_benefit": "unknown"
  },
  "data": {
-  "n_claims": 42,
-  "n_passed": 42,
+  "n_claims": 43,
+  "n_passed": 43,
   "n_failed": 0,
   "claims": [
    {
@@ -112,7 +112,7 @@
     "check": "test_suite_counted",
     "limit": "Tests verify the implementation. They are not evidence about biology.",
     "supported": true,
-    "detail": "1142 test functions in 159 classes across tests/ and danon/multiagent/ (pytest collects more than this wherever a test is parametrised); README defers to this check rather than quoting a count",
+    "detail": "1157 test functions in 159 classes across tests/ and danon/multiagent/ (pytest collects more than this wherever a test is parametrised); README defers to this check rather than quoting a count",
     "study": "tumour_twin"
    },
    {
@@ -145,7 +145,7 @@
     "check": "runtime_365",
     "limit": "Runtime is machine-dependent; the audit prints the machine's own number.",
     "supported": true,
-    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 1.98 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)",
+    "detail": "one 365-day arm on the engine's 3178-voxel phantom: 0.78 s on this machine (re-measured at audit time; a full paired case with replicates on real geometry costs ~20 s)",
     "study": "tumour_twin"
    },
    {
@@ -387,7 +387,7 @@
     "check": "readme_claim_count_current",
     "limit": "It checks that the README agrees with the registry, not that the registry is right: claims can be wrong together and still agree.",
     "supported": true,
-    "detail": "README states the claim count 2x (42/42, 42/42); the registry holds 42 claims",
+    "detail": "README states the claim count 2x (43/43, 43/43); the registry holds 43 claims",
     "study": "tumour_twin"
    },
    {
@@ -476,6 +476,17 @@
     "limit": "It is a phantom: no part of it is measured, and the engine's constants are the repository's declared assumptions, so this demonstrates that the pipeline runs and is reproducible -- it is NOT evidence about any patient, and the MTD-versus-switching contrast is the engine's own qualitative behaviour on a synthetic substrate, not a clinical result. The sample ships homogeneous transport: the heterogeneous D(x) branch is implemented and reachable by a config flag, but costs about 19x per run at this grid, so the default keeps the command to seconds.",
     "supported": true,
     "detail": "5 committed sample files are byte-identical to build_sample_dataset's output; the loaded mask and proliferation map equal the phantom's exactly and the vessel map is within one quantisation step; a config-driven run executes both arms; the committed report agrees with the dataset (3,178 tumour voxels of 13,824)",
+    "study": "tumour_twin"
+   },
+   {
+    "id": "uncertainty_is_measured_and_the_posterior_label_refused",
+    "sentence": "Uncertainty is measured rather than asserted, and the label it is NOT is stated first. Propagating the real per-donor MGMT promoter beta distribution (140 TCGA-GBM donors over two probes, mean beta band 0.0119-0.6695) through both arms on a committed BraTS-2021 case gives an interval whose coverage is over (donor, seed) jointly and which is explicitly NOT a Bayesian credible interval -- a posterior needs a likelihood, and this repository holds ZERO engine-output/patient-outcome pairs to build one from (recorded as PROVEN_FAILED so no renderer can call it one). What the decomposition then establishes bounds the 'patient-specific twin' story with numbers: for MTD progression-free survival, re-running the model on the SAME donor moves the answer with an SD of 29.92 days while moving to a different donor's MGMT status moves it 10.38 days -- a repeat run is 2.88x the patient-specific signal, and the input does not clear a 0.05 F test (F = 1.241 on 139/140 df, p = 0.102). The day-365 burden readout DOES resolve it (input fraction 24.6%, p = 0.0016), so which endpoint is read decides whether the patient is visible at all. The arm that looks best is the worst on this axis: the switching policy's PFS is identical for every donor and every seed (365 d, no spread to decompose), and its day-365 burden is not resolvable above the model's own noise at all (MSB 1.80 < MSW 6.99, sigma^2_between <= 0, recorded unclipped).",
+    "tier": "established",
+    "substantiated_by": "danon/claims.py::check_uncertainty_budget_separates_input_from_noise over outputs_real/uncertainty_budget.{json,txt} (rebuildable via _uncertainty_cohort.py), with danon/uncertainty.py and tests/test_uncertainty.py",
+    "check": "uncertainty_budget_separates_input_from_noise",
+    "limit": "It is not a credible interval and not a clinical bound. One scalar input is measured here -- MGMT beta, the only engine input in this repository with a real per-donor distribution -- on ONE committed geometry, at ONE trial design (365 days, r0 = 0.01), through a mapping beta -> r0 that is a DECLARED convention rather than a fit, with the engine's rate constants still declared assumptions. So the input channel quantified here is a LOWER bound on the true input uncertainty, and a different anchor moves every number without any code changing. The switching arm's conclusion is about this design: it saturates at the horizon, so another horizon or switch threshold could change it. The F tests ask whether the cohort's beta spread is resolvable THROUGH THE ENGINE, which is a question about the model, not about patients, and the beta of a donor tumour is not the beta of the patient whose case would be simulated.",
+    "supported": true,
+    "detail": "2 row(s) resolve the input above the noise, 1 refuse it (negative component recorded unclipped), 1 degenerate; MTD PFS: repeat-run SD 29.92 d vs donor-to-donor SD 10.38 d (ratio 2.883), F p=0.10201 (not significant at 0.05); MTD burden: input fraction 24.6%, p=0.00163; credible interval refused in the record and in the provenance; the live panel reproduces the record's 140 donors and its beta band [0.0119188, 0.669455] median 0.051325 (n=140)",
     "study": "tumour_twin"
    }
   ],

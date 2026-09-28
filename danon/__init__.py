@@ -709,6 +709,23 @@ from danon.evolution_export import (
     write_pvd_series,
 )
 
+from danon.uncertainty import (
+    ArmBudget,
+    Band,
+    UncertaintyError,
+    UncertaintyReport,
+    VarianceBudget,
+    budget_from_groups,
+    mgmt_input_distribution,
+    percentile_band,
+    propagate_mgmt_uncertainty,
+    render_uncertainty_report,
+    run_input_grid,
+    uncertainty_provenance,
+    variance_budget,
+    what_this_decomposition_cannot_show,
+)
+
 from danon.reproduce import (
     SAMPLE_ROOT,
     build_sample_dataset,
@@ -1256,6 +1273,13 @@ __all__ = [
     # The committed sample dataset and the config-driven paired trial
     "SAMPLE_ROOT", "build_sample_dataset", "format_trial_report",
     "load_trial_config", "reproduce_main", "run_trial_config", "sample_config_path",
+
+    # Variance budget: what the patient's measured input moves vs the model's own noise
+    "ArmBudget", "Band", "UncertaintyError", "UncertaintyReport", "VarianceBudget",
+    "budget_from_groups", "mgmt_input_distribution", "percentile_band",
+    "propagate_mgmt_uncertainty", "render_uncertainty_report", "run_input_grid",
+    "uncertainty_provenance", "variance_budget",
+    "what_this_decomposition_cannot_show",
 
     # Predictive measurement (held-out discrimination, noise robustness,
     # invariants) and the explicit no-C-index verdict

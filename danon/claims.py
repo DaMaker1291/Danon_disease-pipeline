@@ -1931,6 +1931,239 @@ def check_sample_trial_runs_without_a_download() -> CheckResult:
     )
 
 
+def check_uncertainty_budget_separates_input_from_noise() -> CheckResult:
+    """Where the spread lives, re-derived -- and the posterior label refused.
+
+    The record's every verdict is recomputed here from its own mean squares:
+    the sign of (MSB - MSW)/r decides whether a row is resolvable, refused, or
+    degenerate, and the fraction must be that component over the total. When
+    the panel's cache is present the donor count and the input band are re-read
+    from the LIVE panel, so a rebuilt panel with different betas cannot leave
+    this sentence standing on an old distribution.
+    """
+    import json
+
+    from danon.uncertainty import (
+        percentile_band,
+        uncertainty_provenance,
+    )
+
+    path = os.path.join(ROOT, "outputs_real", "uncertainty_budget.json")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            record = json.load(fh)
+    except (OSError, ValueError) as exc:
+        return CheckResult(
+            supported=False,
+            detail=(
+                f"uncertainty record unreadable ({exc}); rebuild via "
+                "_uncertainty_cohort.py"
+            ),
+        )
+
+    problems: List[str] = []
+    if record.get("is_credible_interval") is not False:
+        problems.append("the record does not refuse the credible-interval label")
+    if uncertainty_provenance()["credible_interval"].name != "PROVEN_FAILED":
+        problems.append("the provenance no longer marks a credible interval as refused")
+
+    reps = int(record.get("replicates") or 0)
+    if reps < 2:
+        problems.append(
+            f"the record's replicate count ({reps}) cannot support a within estimate"
+        )
+
+    degenerate: List[Tuple[str, str]] = []
+    resolvable: List[Tuple[str, str]] = []
+    refused: List[Tuple[str, str]] = []
+    for row in record.get("arms", []):
+        slot = (str(row.get("arm")), str(row.get("readout")))
+        budget = row.get("budget") or {}
+        if not {"ms_between", "ms_within"} <= set(budget):
+            problems.append(f"{slot}: the row records no mean squares")
+            continue
+        msb, msw = float(budget["ms_between"]), float(budget["ms_within"])
+        between = (msb - msw) / reps if reps else 0.0
+        if bool(budget.get("is_degenerate")):
+            if msb != 0.0 or msw != 0.0:
+                problems.append(f"{slot}: flagged degenerate with non-zero mean squares")
+            degenerate.append(slot)
+        elif between <= 0.0:
+            if budget.get("component_between") is not None:
+                problems.append(f"{slot}: a negative component was recorded as a number")
+            elif budget.get("input_fraction") is not None:
+                problems.append(f"{slot}: a fraction was recorded with no component")
+            else:
+                refused.append(slot)
+        else:
+            recorded = budget.get("component_between")
+            if recorded is None:
+                problems.append(f"{slot}: a positive component was recorded as missing")
+            elif abs(float(recorded) - between) > 1e-9 * max(abs(between), 1e-300):
+                problems.append(f"{slot}: the recorded component is not (MSB - MSW)/r")
+            else:
+                fraction = between / (between + msw)
+                expected = budget.get("input_fraction")
+                if expected is None or abs(float(expected) - fraction) > 1e-9:
+                    problems.append(
+                        f"{slot}: the recorded fraction is not the component over the total"
+                    )
+                else:
+                    resolvable.append(slot)
+
+        propagated = row.get("propagated_band") or {}
+        span = row.get("input_span") or {}
+        for label, band in (("propagated", propagated), ("input span", span)):
+            if not {"lo", "median", "hi", "n"} <= set(band):
+                problems.append(f"{slot}: the {label} is not a band")
+                continue
+            if not float(band["lo"]) <= float(band["median"]) <= float(band["hi"]):
+                problems.append(f"{slot}: the {label} is not an ordered interval")
+        if int(propagated.get("n", -1)) != int(record["n_donors"]) * reps:
+            problems.append(
+                f"{slot}: the propagated band does not hold one outcome per donor x seed"
+            )
+        if int(span.get("n", -1)) != int(record["n_donors"]):
+            problems.append(f"{slot}: the input span is not one value per donor")
+
+    if ("steering", "pfs_days") not in degenerate:
+        problems.append(
+            "the switching arm's PFS is no longer degenerate: the sentence's claim "
+            "that it carries no spread at this design is wrong"
+        )
+    if not refused:
+        problems.append(
+            "no row is recorded as unresolvable, so the sentence's 'not resolvable "
+            "above the model's own noise' has nothing behind it"
+        )
+    if "mtd" not in {arm for arm, _ in resolvable + refused}:
+        problems.append("the MTD arm is missing from the record entirely")
+
+    # The sentence quotes a standard-deviation ratio and two significance classes.
+    # Both are re-derived here from the recorded mean squares, because a quoted
+    # number that nothing recomputes is the one thing this registry exists to stop.
+    from danon.uncertainty import VarianceBudget, f_p_value
+
+    def _budget(slot: Tuple[str, str]) -> Optional[VarianceBudget]:
+        for row in record.get("arms", []):
+            if (str(row.get("arm")), str(row.get("readout"))) != slot:
+                continue
+            b = row.get("budget") or {}
+            return VarianceBudget(
+                n_inputs=int(b["n_inputs"]),
+                n_replicates=int(b["n_replicates"]),
+                df_between=int(b["df_between"]),
+                df_within=int(b["df_within"]),
+                ms_between=float(b["ms_between"]),
+                ms_within=float(b["ms_within"]),
+            )
+        return None
+
+    ratio_text = "no mtd/pfs_days row"
+    mtd = _budget(("mtd", "pfs_days"))
+    if mtd is None:
+        problems.append("the record has no mtd/pfs_days row")
+    else:
+        ratio = mtd.noise_to_signal_sd_ratio
+        mtd_p = f_p_value(mtd.f_ratio, mtd.df_between, mtd.df_within) if mtd.f_ratio else None
+        if ratio is None:
+            problems.append(
+                "the MTD PFS input component is no longer positive, so the sentence's "
+                "'a repeat run moves further than a different donor' has no content"
+            )
+        else:
+            # Not tighter than this on purpose: a one-day shift in a progression
+            # day on a different platform moves the ratio, and the sentence's
+            # claim is its magnitude, not its last digit.
+            if not 2.5 <= ratio <= 3.3:
+                problems.append(
+                    f"the MTD PFS noise-to-signal SD ratio moved from 2.883 to "
+                    f"{ratio:.3f}"
+                )
+            ratio_text = (
+                f"MTD PFS: repeat-run SD {mtd.within_sd:.2f} d vs donor-to-donor SD "
+                f"{mtd.between_sd:.2f} d (ratio {ratio:.3f})"
+            )
+        if mtd_p is None:
+            problems.append("scipy is unavailable, so the F verdict cannot be computed")
+        elif not 0.05 < mtd_p <= 0.15:
+            problems.append(
+                f"the MTD PFS F test left the 'not significant at 0.05' class "
+                f"(p={mtd_p:.5f})"
+            )
+        else:
+            ratio_text += f", F p={mtd_p:.5f} (not significant at 0.05)"
+
+    burden = _budget(("mtd", "final_burden"))
+    if burden is None or burden.component_between is None:
+        problems.append(
+            "the MTD burden row no longer resolves the input, so the sentence's "
+            "'the burden readout does resolve it' is false"
+        )
+    else:
+        burden_p = (
+            f_p_value(burden.f_ratio, burden.df_between, burden.df_within)
+            if burden.f_ratio
+            else None
+        )
+        if burden_p is None or burden_p >= 0.01:
+            problems.append(
+                f"the MTD burden F test is no longer significant at 0.01 "
+                f"(p={burden_p})"
+            )
+        else:
+            ratio_text += f"; MTD burden: input fraction {burden.input_fraction * 100:.1f}%, p={burden_p:.5f}"
+
+    # Bind the donor set to the live panel when its cache is present. The cache
+    # is gitignored and re-downloadable, so a miss is reported, not failed.
+    panel_note = ""
+    from danon.mgmt import MGMT_BETA_CACHE
+
+    if os.path.exists(os.path.join(ROOT, MGMT_BETA_CACHE)):
+        from danon.mgmt import load_mgmt_beta_panel
+
+        panel = load_mgmt_beta_panel()
+        values = [v for v in (panel.mean_beta(p) for p in panel.patient_ids) if v is not None]
+        live_band = percentile_band(values)
+        if panel.n_patients != int(record["n_donors"]):
+            problems.append(
+                f"the record's {record['n_donors']} donors are not the live panel's "
+                f"{panel.n_patients}"
+            )
+        recorded_band = record.get("input_band") or {}
+        recorded_lo, recorded_hi = recorded_band.get("lo"), recorded_band.get("hi")
+        if (
+            recorded_lo is None
+            or recorded_hi is None
+            or abs(live_band.lo - float(recorded_lo)) > 1e-12
+            or abs(live_band.hi - float(recorded_hi)) > 1e-12
+        ):
+            problems.append(
+                "the record's input band is not the live panel's: the distribution "
+                "changed and the record is stale"
+            )
+        panel_note = (
+            f"the live panel reproduces the record's {panel.n_patients} donors and "
+            f"its beta band {live_band}"
+        )
+    else:
+        panel_note = (
+            f"panel cache absent ({MGMT_BETA_CACHE}); the donor count and band were "
+            "checked against the record only"
+        )
+
+    return CheckResult(
+        supported=not problems,
+        detail=(
+            f"{len(resolvable)} row(s) resolve the input above the noise, "
+            f"{len(refused)} refuse it (negative component recorded unclipped), "
+            f"{len(degenerate)} degenerate; {ratio_text}; credible interval refused "
+            f"in the record and in the provenance; {panel_note}"
+            + ("; " + "; ".join(problems) if problems else "")
+        ),
+    )
+
+
 CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "evidence_status_vocabulary": check_evidence_status_vocabulary,
     "readme_claim_count_current": check_readme_claim_count_matches_the_registry,
@@ -1973,6 +2206,7 @@ CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "stream4_agreement_is_a_validation_target": check_stream4_agreement_is_a_validation_target,
     "solver_verified_against_analytic_solutions": check_solver_verified_against_analytic_solutions,
     "sample_trial_runs_without_a_download": check_sample_trial_runs_without_a_download,
+    "uncertainty_budget_separates_input_from_noise": check_uncertainty_budget_separates_input_from_noise,
 }
 
 
@@ -2683,6 +2917,49 @@ CLAIMS: Tuple[Claim, ...] = (
         "The sample ships homogeneous transport: the heterogeneous D(x) branch "
         "is implemented and reachable by a config flag, but costs about 19x "
         "per run at this grid, so the default keeps the command to seconds.",
+    ),
+    Claim(
+        "uncertainty_is_measured_and_the_posterior_label_refused",
+        "Uncertainty is measured rather than asserted, and the label it is NOT is "
+        "stated first. Propagating the real per-donor MGMT promoter beta "
+        "distribution (140 TCGA-GBM donors over two probes, mean beta band "
+        "0.0119-0.6695) through both arms on a committed BraTS-2021 case gives an "
+        "interval whose coverage is over (donor, seed) jointly and which is "
+        "explicitly NOT a Bayesian credible interval -- a posterior needs a "
+        "likelihood, and this repository holds ZERO engine-output/patient-outcome "
+        "pairs to build one from (recorded as PROVEN_FAILED so no renderer can call "
+        "it one). What the decomposition then establishes bounds the "
+        "'patient-specific twin' story with numbers: for MTD progression-free "
+        "survival, re-running the model on the SAME donor moves the answer with an "
+        "SD of 29.92 days while moving to a different donor's MGMT status moves it "
+        "10.38 days -- a repeat run is 2.88x the patient-specific signal, and the "
+        "input does not clear a 0.05 F test (F = 1.241 on 139/140 df, p = 0.102). "
+        "The day-365 burden readout DOES resolve it (input fraction 24.6%, "
+        "p = 0.0016), so which endpoint is read decides whether the patient is "
+        "visible at all. The arm that looks best is the worst on this axis: the "
+        "switching policy's PFS is identical for every donor and every seed "
+        "(365 d, no spread to decompose), and its day-365 burden is not resolvable "
+        "above the model's own noise at all (MSB 1.80 < MSW 6.99, "
+        "sigma^2_between <= 0, recorded unclipped).",
+        EvidenceStatus.ESTABLISHED,
+        "danon/claims.py::check_uncertainty_budget_separates_input_from_noise "
+        "over outputs_real/uncertainty_budget.{json,txt} (rebuildable via "
+        "_uncertainty_cohort.py), with danon/uncertainty.py and "
+        "tests/test_uncertainty.py",
+        "uncertainty_budget_separates_input_from_noise",
+        "It is not a credible interval and not a clinical bound. One scalar input "
+        "is measured here -- MGMT beta, the only engine input in this repository "
+        "with a real per-donor distribution -- on ONE committed geometry, at ONE "
+        "trial design (365 days, r0 = 0.01), through a mapping beta -> r0 that is a "
+        "DECLARED convention rather than a fit, with the engine's rate constants "
+        "still declared assumptions. So the input channel quantified here is a "
+        "LOWER bound on the true input uncertainty, and a different anchor moves "
+        "every number without any code changing. The switching arm's conclusion is "
+        "about this design: it saturates at the horizon, so another horizon or "
+        "switch threshold could change it. The F tests ask whether the cohort's "
+        "beta spread is resolvable THROUGH THE ENGINE, which is a question about "
+        "the model, not about patients, and the beta of a donor tumour is not the "
+        "beta of the patient whose case would be simulated.",
     ),
 )
 

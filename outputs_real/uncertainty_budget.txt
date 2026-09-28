@@ -1,0 +1,32 @@
+==============================================================================
+VARIANCE BUDGET: WHAT THE PATIENT MOVES vs WHAT THE MODEL MOVES
+==============================================================================
+  geometry: BraTS2021_01017 (committed BraTS-2021 engine-ready mask + proliferation) -- 1,774 tumour voxels of 8,064
+  input: MGMT promoter methylation beta -> r0 = 0.75 * (1 - beta)  (140 donors, band [0.0119188, 0.669455] median 0.051325 (n=140))
+  trial: 365 days, r0(input) fixed per donor
+
+  credible interval: False  (see the module docstring)
+
+  [mtd] pfs_days
+    propagated 95% band (donor x seed): [275, 365] median 321 (n=280)
+    input span (per-donor medians)    : [297.5, 361.762] median 302.25 (n=140)
+    mtd/pfs_days: the input accounts for 10.7% of the total variance (sigma^2_between 107.708 vs sigma^2_within 895.214; F=1.24 on 139/140 df)
+  [mtd] final_burden
+    propagated 95% band (donor x seed): [1143.71, 2505.65] median 1927.1 (n=280)
+    input span (per-donor medians)    : [1297.31, 2219.4] median 2148 (n=140)
+    mtd/final_burden: the input accounts for 24.6% of the total variance (sigma^2_between 43069.1 vs sigma^2_within 132321; F=1.65 on 139/140 df)
+  [steering] pfs_days
+    propagated 95% band (donor x seed): [365, 365] median 365 (n=280)
+    input span (per-donor medians)    : [365, 365] median 365 (n=140)
+    steering/pfs_days: every donor and seed returned the same value, so there is no spread to attribute
+  [steering] final_burden
+    propagated 95% band (donor x seed): [12.8173, 19.3499] median 14.7217 (n=280)
+    input span (per-donor medians)    : [13.729, 17.1365] median 15.7557 (n=140)
+    steering/final_burden: the input effect is NOT resolvable above the model's own noise (MSB 1.80096 < MSW 6.99101, sigma^2_between = -2.59503 <= 0) -- the estimator's sign is the verdict, and it is not clipped
+
+What this cannot show:
+  - that this is a Bayesian credible interval: a credible interval is a posterior quantile, a posterior needs a likelihood, and this repository holds ZERO engine-output/patient-outcome pairs to build one from. The interval here is the empirical spread of a measured input propagated through the engine, with coverage over (donor, seed) jointly
+  - that MGMT beta is the only uncertainty in the prediction: it is the one input this repository can measure per donor, and the engine's rate constants remain declared assumptions, so the input channel measured here is a lower bound on the true input uncertainty
+  - that a band from donor tumours bounds the error for a NEW patient: the one-beta-per-case contract is a cohort distribution applied to a case
+  - that the mapping beta -> r0 is right: it is a declared convention anchored on the calibrated default, and a different anchor moves every number in the band without any code changing
+  - that the trial design is fixed: the switching arm saturates at the horizon, so its PFS readout has no spread to decompose and the conclusion drawn from it is about THIS design, not the policy family
