@@ -1,0 +1,24 @@
+{
+  "subject": "sub-01",
+  "synthetic": true,
+  "note": "NOT patient data. This is a phantom in a BIDS-SHAPED directory (sub-<label>/<datatype>/<file>) so the same loader path the app uses can be exercised with no download. It is not a BIDS-conformant dataset: BIDS describes participant data. The phantom's proliferation and vasculature are synthetic, the engine constants are declared assumptions, and no number a run produces is a clinical prediction.",
+  "inputs": {
+    "mask": "sub-01_mask.nii.gz",
+    "proliferative": "anat/sub-01_prolif.nii.gz",
+    "vessels": "perf/sub-01_vessels.nii.gz"
+  },
+  "trial": {
+    "days": 365,
+    "seeds": [
+      101,
+      102,
+      103
+    ],
+    "arms": [
+      "mtd",
+      "steering"
+    ],
+    "initial_resistant_fraction": 0.005,
+    "diffusion_from_vessels": false
+  }
+}

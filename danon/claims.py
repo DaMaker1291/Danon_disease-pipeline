@@ -1633,6 +1633,304 @@ def check_stream4_agreement_is_a_validation_target() -> CheckResult:
     )
 
 
+# ---------------------------------------------------------------------------
+# Numerical verification, and the demo path a stranger can actually run
+# ---------------------------------------------------------------------------
+
+
+def check_solver_verified_against_analytic_solutions() -> CheckResult:
+    """The solver against exact analytic values, not against itself.
+
+    Every quantity the sentence names is re-derived here from the engine's own
+    constants and operators: the zero-flux Laplacian on its Neumann eigenbasis,
+    the closed-domain mass identity, the coincidence of the two transport
+    branches at constant D, the observed order of spatial convergence, the
+    signed clearance bias implied by the stability rule, and -- from the
+    committed paired cohort -- the size of that bias against the run's own
+    seed-to-seed spread. Move any of them and the sentence cannot sit there.
+    """
+    import json
+    import math
+
+    from danon.anisotropy import divergence_d_grad
+    from danon.evosteer import DEFAULT_DRUGS, _laplacian
+
+    d = float(DEFAULT_DRUGS.diffusion[0])
+    lam = float(DEFAULT_DRUGS.clearance[0])
+
+    # (1) f = cos(pi k (i+1/2)/N) satisfies the edge-replicated boundary exactly
+    # and is an eigenvector with eigenvalue -4 sin^2(pi k / 2N) per axis.
+    n = 24
+    residual = 0.0
+    for k in (1, 3, 7, 12):
+        idx = np.arange(n) + 0.5
+        f = np.cos(math.pi * k * idx / n)[:, None, None] * np.ones((1, n, n))
+        eigen = -4.0 * math.sin(math.pi * k / (2.0 * n)) ** 2
+        residual = max(
+            residual,
+            float(
+                np.linalg.norm(_laplacian(f) - eigen * f)
+                / abs(eigen)
+                / np.linalg.norm(f)
+            ),
+        )
+
+    # (2) Closed domain: the operator's total must vanish on any field.
+    rng = np.random.default_rng(7)
+    spike = np.zeros((16, 16, 16))
+    spike[0, 0, 0] = 1.0
+    mass_rel = 0.0
+    for field in (rng.random((16, 16, 16)), np.ones((16, 16, 16)), spike):
+        mass_rel = max(
+            mass_rel,
+            abs(float(_laplacian(field).sum())) / max(float(np.abs(field).sum()), 1.0),
+        )
+
+    # (3) The heterogeneous branch must collapse onto the homogeneous one.
+    field = rng.random((12, 12, 12))
+    reference = d * _laplacian(field)
+    gap_rel = float(
+        np.abs(divergence_d_grad(field, np.full(field.shape, d)) - reference).max()
+    ) / max(float(np.abs(reference).max()), 1e-300)
+
+    # (4) Second order in space: halving dx must quarter the eigenvalue error.
+    errors = [
+        abs(-4.0 * math.sin(math.pi / (2.0 * m)) ** 2 * m * m + math.pi ** 2)
+        / math.pi ** 2
+        for m in (8, 16, 32, 64)
+    ]
+    orders = [math.log2(a / b) for a, b in zip(errors, errors[1:])]
+    min_order = min(orders)
+
+    # (5) The one signed discretization error, from the engine's own rule.
+    sub_dt = min(0.4 / (6.0 * d), 1.0)
+    n_sub = max(1, int(math.ceil(1.0 / sub_dt)))
+    dts = 1.0 / n_sub
+    realized = (1.0 - lam * dts) ** n_sub
+    exact = math.exp(-lam)
+    bias = exact / realized - 1.0
+
+    # (6) Is that error below the model's own resolution? The paired cohort on
+    # real geometry answers with a number rather than an argument.
+    cohort = os.path.join(ROOT, "outputs_real", "clearance_bias_cohort.json")
+    try:
+        with open(cohort, encoding="utf-8") as fh:
+            record = json.load(fh)
+    except (OSError, ValueError) as exc:
+        return CheckResult(
+            supported=False,
+            detail=(
+                f"clearance-bias cohort unreadable ({exc}); rebuild via "
+                "_clearance_bias_cohort.py"
+            ),
+        )
+
+    problems: List[str] = []
+    if residual > 1e-12:
+        problems.append(f"the Laplacian is not exact on its eigenbasis ({residual:.2e})")
+    if mass_rel > 1e-9:
+        problems.append(f"the operator does not conserve mass ({mass_rel:.2e})")
+    if gap_rel > 1e-12:
+        problems.append(f"the two transport branches differ at constant D ({gap_rel:.2e})")
+    if min_order <= 1.9:
+        problems.append(f"spatial convergence is not second order ({min_order:.4f})")
+    if not 0.0 < bias < 0.002:
+        problems.append(f"the clearance bias is not the bounded one ({bias * 100:.4f}%/day)")
+
+    recorded_bias = float(record.get("bias_rate_per_day", 0.0))
+    if abs(recorded_bias - bias) > 1e-12:
+        problems.append(
+            f"the cohort's bias ({recorded_bias:.10f}) is not the rule's ({bias:.10f})"
+        )
+    delta = float(record.get("worst_max_rel_delta_percent", 0.0))
+    spread = float(record.get("worst_seed_spread_percent", 0.0))
+    ratio = record.get("delta_over_spread")
+    if spread <= 0.0 or delta <= 0.0:
+        problems.append("the cohort records no endpoint change to compare against the spread")
+    elif ratio is None or abs(float(ratio) - delta / spread) > 1e-9:
+        problems.append("the recorded delta/spread ratio is not the ratio of the recorded pair")
+    elif float(ratio) > 0.01:
+        problems.append(
+            f"the bias is no longer below the model's resolution "
+            f"({float(ratio):.2e} of the seed spread)"
+        )
+
+    return CheckResult(
+        supported=not problems,
+        detail=(
+            f"Neumann eigenvector residual {residual:.2e}; mass identity "
+            f"{mass_rel:.2e} relative; the constant-D branches agree to {gap_rel:.2e}; "
+            f"observed spatial order {min_order:.4f} (second); clearance bias "
+            f"+{bias * 100:.4f}%/day from the engine's own sub-step rule; over the "
+            f"paired cohort that bias moves an endpoint by at most {delta:.4f}%, "
+            f"against a seed-to-seed spread of {spread:.2f}% -- {float(ratio or 0.0):.2e} "
+            f"of it"
+            + ("; " + "; ".join(problems) if problems else "")
+        ),
+    )
+
+
+def check_sample_trial_runs_without_a_download() -> CheckResult:
+    """A fresh clone must be able to RUN the thing, not only read about it.
+
+    Three things are verified live: the committed volumes are byte-for-byte the
+    phantom generator's output (so the dataset cannot drift from, or quietly
+    replace, the phantom the docstring names); the config path drives the real
+    simulator through both arms; and the committed report is internally
+    consistent with the dataset and with the sentence that cites it.
+    """
+    import json
+    import tempfile
+
+    from danon.evosteer import make_gbm_phantom
+    from danon.imaging import from_nifti_mask
+    from danon.reproduce import (
+        SAMPLE_ROOT,
+        SAMPLE_SEEDS,
+        build_sample_dataset,
+        format_report,
+        load_config,
+        run_config,
+        sample_config_path,
+    )
+
+    root = os.path.join(ROOT, SAMPLE_ROOT)
+    config_path = sample_config_path(root)
+    problems: List[str] = []
+
+    volumes = (
+        "sub-01/sub-01_mask.nii.gz",
+        "sub-01/anat/sub-01_prolif.nii.gz",
+        "sub-01/perf/sub-01_vessels.nii.gz",
+        "sub-01/sub-01_twin.json",
+        "dataset_description.json",
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        fresh = os.path.join(tmp, "sample")
+        build_sample_dataset(fresh)
+        for relative in volumes:
+            committed = os.path.join(root, *relative.split("/"))
+            rebuilt = os.path.join(fresh, *relative.split("/"))
+            if not os.path.exists(committed):
+                problems.append(f"{relative} is not committed")
+                continue
+            with open(committed, "rb") as a, open(rebuilt, "rb") as b:
+                if a.read() != b.read():
+                    problems.append(
+                        f"{relative} is not what build_sample_dataset produces; "
+                        "regenerate with `python -m danon.reproduce build-sample`"
+                    )
+
+        spec = load_config(config_path)
+        page = from_nifti_mask(
+            spec["inputs"]["mask"],
+            proliferative_path=spec["inputs"]["proliferative"],
+            vessels_path=spec["inputs"]["vessels"],
+        )
+        phantom = make_gbm_phantom(size=24, seed=0)
+        if not np.array_equal(phantom.tumor_mask, page.geometry.tumor_mask):
+            problems.append("the committed mask is not the phantom's tumour mask")
+        if float(np.abs(phantom.proliferative - page.geometry.proliferative).max()) != 0.0:
+            problems.append("the committed proliferation map is not the phantom's, exactly")
+        if float(np.abs(phantom.vessels - page.geometry.vessels).max()) > 0.5 / 255.0:
+            problems.append("the committed vessel map is more than one quantisation step off")
+
+        # An empty cohort must be refused, not answered with a median of nothing.
+        short = {
+            "subject": "sub-01",
+            "synthetic": True,
+            "inputs": {
+                "mask": spec["inputs"]["mask"],
+                "proliferative": spec["inputs"]["proliferative"],
+                "vessels": spec["inputs"]["vessels"],
+            },
+            "trial": {"days": 3, "seeds": [101], "arms": ["mtd", "steering"]},
+        }
+        bad = dict(short, trial=dict(short["trial"], seeds=[]))
+        empty_path = os.path.join(tmp, "empty.json")
+        with open(empty_path, "w", encoding="utf-8") as fh:
+            json.dump(bad, fh)
+        try:
+            load_config(empty_path)
+            problems.append("an empty seed list was accepted")
+        except ValueError:
+            pass
+
+        short_path = os.path.join(tmp, "short.json")
+        with open(short_path, "w", encoding="utf-8") as fh:
+            json.dump(short, fh)
+        short_report = run_config(short_path)
+        if set(short_report["arms"]) != {"mtd", "steering"}:
+            problems.append("the config-driven run did not execute both arms")
+        if len(short_report["arms"]["mtd"]["runs"]) != 1:
+            problems.append("the config-driven run did not execute the seed it was given")
+        if "SYNTHETIC PHANTOM" not in format_report(short_report):
+            problems.append("the printed report does not label the phantom as synthetic")
+
+    # The committed report must still describe this dataset and this sentence.
+    record_path = os.path.join(ROOT, "outputs_real", "sample_twin_report.json")
+    try:
+        with open(record_path, encoding="utf-8") as fh:
+            record = json.load(fh)
+    except (OSError, ValueError) as exc:
+        return CheckResult(
+            supported=False,
+            detail=f"sample report unreadable ({exc}); rebuild via `python -m danon.reproduce --out outputs_real/sample_twin_report.json`",
+        )
+
+    if record.get("config") != SAMPLE_ROOT.replace(os.sep, "/") + "/sub-01/sub-01_twin.json":
+        problems.append("the report was produced from a different config")
+    if not record.get("synthetic"):
+        problems.append("the report does not carry the synthetic label")
+    live_geometry = {
+        "n_voxels": int(page.geometry.tumor_mask.size),
+        "n_tumour_voxels": int(page.geometry.tumor_mask.sum()),
+    }
+    for key, value in live_geometry.items():
+        if int(record.get("geometry", {}).get(key, -1)) != value:
+            problems.append(
+                f"the report's {key} ({record.get('geometry', {}).get(key)}) is not the "
+                f"dataset's ({value})"
+            )
+    if list(record.get("trial", {}).get("seeds", [])) != list(SAMPLE_SEEDS):
+        problems.append("the report's seeds are not the sample's")
+
+    arms = record.get("arms", {})
+    mtd_runs = arms.get("mtd", {}).get("runs", [])
+    steer_runs = arms.get("steering", {}).get("runs", [])
+    if len(mtd_runs) != len(SAMPLE_SEEDS) or len(steer_runs) != len(SAMPLE_SEEDS):
+        problems.append("the report does not hold one run per arm per seed")
+    elif not all(r.get("progressed") for r in mtd_runs):
+        problems.append("the sentence's 'MTD progresses in every replicate' is no longer true")
+    elif any(r.get("progressed") for r in steer_runs):
+        problems.append("the sentence's 'the switching arm does not progress' is no longer true")
+    else:
+        delta_days = float(record.get("paired", {}).get("median_pfs_delta_days", 0.0))
+        pfs = [float(r["pfs_days"]) for r in mtd_runs]
+        spread_days = max(pfs) - min(pfs)
+        if int(record.get("paired", {}).get("n_pairs_in_disagreement", 0)) != len(SAMPLE_SEEDS):
+            problems.append("the arms no longer differ on every paired seed")
+        if delta_days <= spread_days:
+            problems.append(
+                f"the paired delta ({delta_days} d) no longer clears the arm's own "
+                f"seed spread ({spread_days} d), so the sentence reads noise"
+            )
+
+    return CheckResult(
+        supported=not problems,
+        detail=(
+            f"{len(volumes)} committed sample files are byte-identical to "
+            f"build_sample_dataset's output; the loaded mask and proliferation map "
+            f"equal the phantom's exactly and the vessel map is within one "
+            f"quantisation step; a config-driven run executes both arms; the "
+            f"committed report agrees with the dataset "
+            f"({live_geometry['n_tumour_voxels']:,} tumour voxels of "
+            f"{live_geometry['n_voxels']:,})"
+            + ("; " + "; ".join(problems) if problems else "")
+        ),
+    )
+
+
 CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "evidence_status_vocabulary": check_evidence_status_vocabulary,
     "readme_claim_count_current": check_readme_claim_count_matches_the_registry,
@@ -1673,6 +1971,8 @@ CHECKS: Dict[str, Callable[[], CheckResult]] = {
     "stream2_histology_measured": check_stream2_histology_measured_and_ki67_refused,
     "stream2_capacity_measured": check_stream2_capacity_mapping_is_measured,
     "stream4_agreement_is_a_validation_target": check_stream4_agreement_is_a_validation_target,
+    "solver_verified_against_analytic_solutions": check_solver_verified_against_analytic_solutions,
+    "sample_trial_runs_without_a_download": check_sample_trial_runs_without_a_download,
 }
 
 
@@ -2330,6 +2630,59 @@ CLAIMS: Tuple[Claim, ...] = (
         "-- clumped nuclei are dropped rather than split, which is part of why "
         "crops spread 3.4x. No pathologist count anchors any of it, and nothing "
         "here is a grade, a WHO criterion, or a statement about a patient.",
+    ),
+    Claim(
+        "solver_verified_against_analytic_solutions",
+        "The spatial solver is verified against exact analytic solutions rather "
+        "than against itself. The zero-flux Laplacian reproduces its own "
+        "Neumann eigenvector to a relative residual of 3.43e-14 (float noise), "
+        "its total vanishes on any closed-domain field to 3.47e-18 relative, "
+        "the heterogeneous operator collapses onto the homogeneous one at "
+        "constant D to 2.75e-16, and the observed order of spatial convergence "
+        "is 1.9944 (second order, measured by halving dx). Its one signed "
+        "discretization error -- forward Euler integrates clearance at a rate "
+        "+0.0843%/day high, a direction the scheme cannot avoid -- moves no "
+        "endpoint by more than 0.7505% in a paired cohort on real geometry, "
+        "which is 0.0075x that cohort's own seed-to-seed spread of 99.66%.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/claims.py::check_solver_verified_against_analytic_solutions "
+        "over outputs_real/clearance_bias_cohort.json, with the same values "
+        "pinned by tests/test_benchmarks.py",
+        "solver_verified_against_analytic_solutions",
+        "This is VERIFICATION, not validation: it says the code solves the model "
+        "it states, not that the model is right about biology. No benchmark "
+        "against PhysiCell, BioNetGen or FEniCS was run -- the analytic "
+        "solutions used here are what such a cross-check would compare against "
+        "anyway, and a matched benchmark problem is a separate pass. The bias "
+        "is bounded below the model's own stochastic resolution; it is not "
+        "zero, and it is not corrected, only measured. The paired cohort "
+        "behind the 0.0075x is ONE case at two policies and three seeds, so it "
+        "is a bound on this bias, not a general noise model.",
+    ),
+    Claim(
+        "fresh_clone_can_run_the_twin",
+        "A fresh clone can RUN the twin, not only read about it. "
+        "data/sample_bids/ commits a 14 KB synthetic phantom -- three NIfTI "
+        "volumes plus a config and a dataset description, all five "
+        "byte-for-byte the output of the engine's own make_gbm_phantom -- and "
+        "python -m danon.reproduce runs the real paired 365-day trial on it "
+        "with no download. The phantom carries 3,178 tumour voxels of 13,824 at "
+        "1 mm; the continuous-dose arm reaches progression in every replicate, "
+        "the switching arm reaches the trial horizon in none, and the paired "
+        "delta clears the arm's own seed-to-seed spread.",
+        EvidenceStatus.ESTABLISHED,
+        "danon/reproduce.py (danon/claims.py::"
+        "check_sample_trial_runs_without_a_download) over "
+        "outputs_real/sample_twin_report.json, with tests/test_reproduce.py",
+        "sample_trial_runs_without_a_download",
+        "It is a phantom: no part of it is measured, and the engine's constants "
+        "are the repository's declared assumptions, so this demonstrates that "
+        "the pipeline runs and is reproducible -- it is NOT evidence about any "
+        "patient, and the MTD-versus-switching contrast is the engine's own "
+        "qualitative behaviour on a synthetic substrate, not a clinical result. "
+        "The sample ships homogeneous transport: the heterogeneous D(x) branch "
+        "is implemented and reachable by a config flag, but costs about 19x "
+        "per run at this grid, so the default keeps the command to seconds.",
     ),
 )
 

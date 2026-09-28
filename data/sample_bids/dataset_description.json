@@ -1,0 +1,13 @@
+{
+  "Name": "EvoTwin-10X sample twin input (synthetic phantom)",
+  "BIDSVersion": "1.9.0",
+  "DatasetType": "derivative",
+  "GeneratedBy": [
+    {
+      "Name": "danon.reproduce.build_sample_dataset",
+      "Description": "danon.evosteer.make_gbm_phantom written as NIfTI-1 uint8; regenerate with `python -m danon.reproduce build-sample`"
+    }
+  ],
+  "Synthetic": true,
+  "Caveat": "NOT patient data. This is a phantom in a BIDS-SHAPED directory (sub-<label>/<datatype>/<file>) so the same loader path the app uses can be exercised with no download. It is not a BIDS-conformant dataset: BIDS describes participant data. The phantom's proliferation and vasculature are synthetic, the engine constants are declared assumptions, and no number a run produces is a clinical prediction."
+}

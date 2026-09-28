@@ -709,6 +709,16 @@ from danon.evolution_export import (
     write_pvd_series,
 )
 
+from danon.reproduce import (
+    SAMPLE_ROOT,
+    build_sample_dataset,
+    format_report as format_trial_report,
+    load_config as load_trial_config,
+    main as reproduce_main,
+    run_config as run_trial_config,
+    sample_config_path,
+)
+
 from danon.dicomio import (
     DicomError,
     DicomSlice,
@@ -1242,6 +1252,10 @@ __all__ = [
     "CHECKS", "CLAIMS", "Claim", "ClaimAudit", "CheckResult", "audit_claims",
     "claims_provenance", "render_claims_markdown",
     "what_these_claims_cannot_establish",
+
+    # The committed sample dataset and the config-driven paired trial
+    "SAMPLE_ROOT", "build_sample_dataset", "format_trial_report",
+    "load_trial_config", "reproduce_main", "run_trial_config", "sample_config_path",
 
     # Predictive measurement (held-out discrimination, noise robustness,
     # invariants) and the explicit no-C-index verdict

@@ -1,0 +1,123 @@
+{
+ "config": "data/sample_bids/sub-01/sub-01_twin.json",
+ "subject": "sub-01",
+ "synthetic": true,
+ "inputs": {
+  "mask": "data/sample_bids/sub-01/sub-01_mask.nii.gz",
+  "proliferative": "data/sample_bids/sub-01/anat/sub-01_prolif.nii.gz",
+  "vessels": "data/sample_bids/sub-01/perf/sub-01_vessels.nii.gz",
+  "proliferative_source": "file",
+  "vasculature_source": "file"
+ },
+ "geometry": {
+  "n_voxels": 13824,
+  "n_tumour_voxels": 3178,
+  "voxel_mm": 1.0,
+  "vessels_median_inside_tumour": 0.0,
+  "vessels_max": 1.0
+ },
+ "trial": {
+  "days": 365,
+  "seeds": [
+   101,
+   102,
+   103
+  ],
+  "arms": [
+   "mtd",
+   "steering"
+  ],
+  "initial_resistant_fraction": 0.005,
+  "transport": "homogeneous (engine's calibrated D)"
+ },
+ "arms": {
+  "mtd": {
+   "runs": [
+    {
+     "seed": 101,
+     "pfs_days": 172.0,
+     "progressed": true,
+     "final_burden": 4621.438880333244,
+     "final_resistant_fraction": 1.0,
+     "resistant_dominance_day": 25,
+     "toxicity": 365.0
+    },
+    {
+     "seed": 102,
+     "pfs_days": 148.0,
+     "progressed": true,
+     "final_burden": 4678.826457159625,
+     "final_resistant_fraction": 1.0,
+     "resistant_dominance_day": 31,
+     "toxicity": 365.0
+    },
+    {
+     "seed": 103,
+     "pfs_days": 166.0,
+     "progressed": true,
+     "final_burden": 4640.23668100429,
+     "final_resistant_fraction": 1.0,
+     "resistant_dominance_day": 25,
+     "toxicity": 365.0
+    }
+   ],
+   "median_pfs_days": 166.0,
+   "median_final_burden": 4640.23668100429,
+   "burden_min": 4621.438880333244,
+   "burden_max": 4678.826457159625,
+   "burden_spread_fraction": 0.01234982285793619
+  },
+  "steering": {
+   "runs": [
+    {
+     "seed": 101,
+     "pfs_days": 365.0,
+     "progressed": false,
+     "final_burden": 13.944908058615328,
+     "final_resistant_fraction": 0.0,
+     "resistant_dominance_day": 99,
+     "toxicity": 352.69999999999976
+    },
+    {
+     "seed": 102,
+     "pfs_days": 365.0,
+     "progressed": false,
+     "final_burden": 18.57766813870929,
+     "final_resistant_fraction": 0.0,
+     "resistant_dominance_day": 97,
+     "toxicity": 352.39999999999975
+    },
+    {
+     "seed": 103,
+     "pfs_days": 365.0,
+     "progressed": false,
+     "final_burden": 16.819371841932558,
+     "final_resistant_fraction": 0.0,
+     "resistant_dominance_day": 94,
+     "toxicity": 352.69999999999976
+    }
+   ],
+   "median_pfs_days": 365.0,
+   "median_final_burden": 16.819371841932558,
+   "burden_min": 13.944908058615328,
+   "burden_max": 18.57766813870929,
+   "burden_spread_fraction": 0.28167271039287317
+  }
+ },
+ "paired": {
+  "arms": [
+   "mtd",
+   "steering"
+  ],
+  "pfs_delta_days": [
+   193.0,
+   217.0,
+   199.0
+  ],
+  "median_pfs_delta_days": 199.0,
+  "n_pairs_in_disagreement": 3,
+  "n_pairs": 3
+ },
+ "how_to_reproduce": "python -m danon.reproduce run --config data/sample_bids/sub-01/sub-01_twin.json",
+ "caveat": "NOT patient data. This is a phantom in a BIDS-SHAPED directory (sub-<label>/<datatype>/<file>) so the same loader path the app uses can be exercised with no download. It is not a BIDS-conformant dataset: BIDS describes participant data. The phantom's proliferation and vasculature are synthetic, the engine constants are declared assumptions, and no number a run produces is a clinical prediction."
+}

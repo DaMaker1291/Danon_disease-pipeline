@@ -168,7 +168,11 @@ def write_nifti(
     data: np.ndarray,
     voxel_sizes: Tuple[float, float, float] = (1.0, 1.0, 1.0),
 ) -> str:
-    """Write a 3D uint8 NIfTI-1 single file (.nii, or .nii.gz if named so)."""
+    """Write a 3D uint8 NIfTI-1 single file (.nii, or .nii.gz if named so).
+
+    Byte-reproducible: the same array written twice produces the same bytes,
+    including for .nii.gz (no gzip timestamp, no embedded filename).
+    """
     arr = np.asarray(data)
     if arr.ndim != 3:
         raise ValueError(f"expected a 3D array, got ndim={arr.ndim}")
@@ -190,8 +194,13 @@ def write_nifti(
     payload = out.astype("<u1").tobytes(order="F")           # x-fastest
     blob = bytes(hdr) + b"\x00\x00\x00\x00" + payload
     if path.endswith(".gz"):
-        with gzip.open(path, "wb") as fh:
-            fh.write(blob)
+        # mtime=0 and no embedded filename, so the output is byte-reproducible:
+        # plain `gzip.open` stamps the current time into the header and writes
+        # the file's own name, which makes two writers of the SAME array
+        # produce different bytes. Nothing reads either field back.
+        with open(path, "wb") as raw:
+            with gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as fh:
+                fh.write(blob)
     else:
         with open(path, "wb") as fh:
             fh.write(blob)
