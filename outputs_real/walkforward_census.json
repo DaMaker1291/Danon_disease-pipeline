@@ -1,0 +1,214 @@
+{
+ "recorded_on": "2026-10-06T18:03:01",
+ "api": "https://services.cancerimagingarchive.net/nbia-api/services/v1/",
+ "offline": false,
+ "repository": {
+  "scorable_pairs": 0,
+  "sources": {
+   "CFB-GBM": {
+    "manifest_rows": 554,
+    "patients_in_manifest": 264,
+    "timepoints_by_label": {
+     "t0": 264,
+     "t1": 170,
+     "t2": 120
+    },
+    "usable_pairs_declared": 393,
+    "patients_with_usable_pair": 168,
+    "min_pair_interval_weeks": 4,
+    "median_pair_interval_weeks": 16.0,
+    "max_pair_interval_weeks": 55,
+    "same_machine_pairs": 356,
+    "cross_machine_pairs": 37,
+    "images_present": false,
+    "note": "availability manifest only: it declares which MRI timepoints exist on TCIA, and no image or segmentation from it is cached here, so nothing in it is scorable -- and a pair that crosses scanners is a delta-volume confound before it is a test case"
+   },
+   "GLASS": {
+    "files_in_tree": 0,
+    "usable_pairs_declared": 0,
+    "note": "a genomics consortium release under controlled access; no record of it exists in this tree, so there is nothing to join to a simulation"
+   },
+   "LUMIERE": {
+    "files_in_tree": 0,
+    "host": "Figshare (Springer Nature), collection 5904905 -- not TCIA/NBIA",
+    "declared_by": "Suter et al., Scientific Data 9:768 (2022), and the collection's own article list read back through the Figshare API",
+    "patients": 91,
+    "study_dates": 638,
+    "images": 2487,
+    "expert_rano_ratings": 616,
+    "expert_asset": "a per-timepoint RANO response class (progressive / stable / partial / complete), its rating rationale, and bi-dimensional Macdonald measurements -- a response label, NOT a segmentation",
+    "segmentations": "AUTOMATED: DeepBraTumIA and HD-GLIO-AUTO, two U-Net tools, shipped as the collection's own separate article titled 'MRI data and automated segmentations'",
+    "pathology": "MGMT promoter methylation (37 methylated / 43 unmethylated / 11 unavailable) and IDH1; NO Ki-67, so it cannot supply the growth-rate mapping either",
+    "treatment": "single-centre and single-regimen: resection plus temozolomide-based chemo-radiation (Inselspital Bern, 2008-2013) -- no adaptive arm and no dose variation, so it cannot test steering against MTD",
+    "licence": "ambiguous across sources: the paper is CC BY 4.0, the dataset's own repository states non-commercial use; unresolved here",
+    "scorable_for_a_spatial_dice": false,
+    "note": "reachable and genuinely longitudinal, but it does not satisfy the spatial-Dice requirement: its masks are automated, so a Dice against them scores this engine against another algorithm, and its expert asset is a response class rather than a mask. Nothing from it is cached here, so the 0-scorable-pairs refusal is unchanged. What it could support is a simulated-versus-expert time-to-progression comparison -- a different endpoint, and not implemented."
+   }
+  }
+ },
+ "tcia": {
+  "MU-Glioma-Post": {
+   "query": "getPatient?Collection=MU-Glioma-Post",
+   "get_patient": {
+    "status": 200,
+    "bytes": 0,
+    "records": 0
+   },
+   "get_series": {
+    "status": 200,
+    "bytes": 0,
+    "records": 0
+   }
+  },
+  "Brain-Tumor-Progression": {
+   "query": "getPatient?Collection=Brain-Tumor-Progression",
+   "get_patient": {
+    "status": 200,
+    "bytes": 0,
+    "records": 0
+   },
+   "get_series": {
+    "status": 200,
+    "bytes": 0,
+    "records": 0
+   }
+  },
+  "CFB-GBM": {
+   "query": "getPatient?Collection=CFB-GBM",
+   "get_patient": {
+    "status": 200,
+    "bytes": 0,
+    "records": 0
+   },
+   "get_series": {
+    "status": 200,
+    "bytes": 0,
+    "records": 0
+   }
+  }
+ },
+ "figshare": {
+  "LUMIERE": {
+   "collection_id": 5904905,
+   "host": "figshare.com (Springer Nature)",
+   "query": "https://api.figshare.com/v2/collections/5904905/articles",
+   "articles": [
+    {
+     "id": 21266241,
+     "title": "LUMIERE dataset - Readme file",
+     "doi": "10.6084/m9.figshare.21266241.v1"
+    },
+    {
+     "id": 21195430,
+     "title": "LUMIERE dataset - Information on completeness of individual MR studies",
+     "doi": "10.6084/m9.figshare.21195430.v1"
+    },
+    {
+     "id": 21195562,
+     "title": "LUMIERE dataset - MRI parameters",
+     "doi": "10.6084/m9.figshare.21195562.v1"
+    },
+    {
+     "id": 21195556,
+     "title": "LUMIERE dataset - Expert RANO rating",
+     "doi": "10.6084/m9.figshare.21195556.v1"
+    },
+    {
+     "id": 21249516,
+     "title": "LUMIERE dataset - MRI data and automated segmentations",
+     "doi": "10.6084/m9.figshare.21249516.v1"
+    },
+    {
+     "id": 21195559,
+     "title": "LUMIERE dataset - Demographics and pathology information",
+     "doi": "10.6084/m9.figshare.21195559.v1"
+    },
+    {
+     "id": 21251643,
+     "title": "LUMIERE dataset - CoLIAGe radiomic features",
+     "doi": "10.6084/m9.figshare.21251643.v1"
+    },
+    {
+     "id": 21187030,
+     "title": "LUMIERE dataset - Pyradiomics features based on HD-GLIO-AUTO segmentations",
+     "doi": "10.6084/m9.figshare.21187030.v1"
+    },
+    {
+     "id": 21187033,
+     "title": "LUMIERE dataset - Pyradiomics features based on DeepBraTumIA segmentations",
+     "doi": "10.6084/m9.figshare.21187033.v1"
+    }
+   ],
+   "status": 200,
+   "bytes": 7925,
+   "n_articles": 9,
+   "segmentation_article_is_automated": true,
+   "expert_article_is_rano": true
+  }
+ },
+ "cbioportal": {
+  "GLASS": {
+   "api": "https://www.cbioportal.org/api/",
+   "study_id": "difg_glass",
+   "mutations": {
+    "MSH6": {
+     "entrez_id": 2956,
+     "status": 200,
+     "records": 5,
+     "allele_counts_populated": true,
+     "mutation_statuses": [
+      "NA"
+     ],
+     "sample_ids": [
+      "GLSS-AT-00P6-R1",
+      "GLSS-CU-R007-R1"
+     ]
+    },
+    "MGMT": {
+     "entrez_id": 4255,
+     "status": 200,
+     "records": 4,
+     "allele_counts_populated": true,
+     "mutation_statuses": [
+      "NA"
+     ],
+     "sample_ids": [
+      "GLSS-HK-0005-TP",
+      "GLSS-SF-0018-R1",
+      "GLSS-SN-0007-R1",
+      "GLSS-SN-0007-R2"
+     ]
+    },
+    "TP53": {
+     "entrez_id": 7157,
+     "status": 200,
+     "records": 5,
+     "allele_counts_populated": true,
+     "mutation_statuses": [
+      "NA"
+     ],
+     "sample_ids": [
+      "GLSS-19-0266-TP",
+      "GLSS-19-0272-R1",
+      "GLSS-19-0272-TP",
+      "GLSS-19-0279-R1"
+     ]
+    }
+   },
+   "status": 200,
+   "name": "Diffuse Glioma (GLASS Consortium)",
+   "public_study": true,
+   "all_samples": 693,
+   "sequenced_samples": 629,
+   "pmid": "35649412,38117484",
+   "sample_types": {
+    "First Recurrence": 318,
+    "Tumor Primary": 309,
+    "Second Recurrence": 49,
+    "Third Recurrence": 14,
+    "Fourth recurrence": 2,
+    "First Metastasis": 1
+   }
+  }
+ }
+}

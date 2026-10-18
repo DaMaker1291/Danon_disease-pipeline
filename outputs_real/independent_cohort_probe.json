@@ -1,0 +1,50 @@
+{
+ "generated_from": "https://www.cbioportal.org/api",
+ "candidates": [
+  "difg_glass_2019",
+  "difg_tcga_gdc",
+  "difg_msk_2023",
+  "gbm_columbia_2019"
+ ],
+ "results": [
+  {
+   "study": "difg_glass_2019",
+   "patients": 208,
+   "pairs": 183,
+   "det_rows": 490,
+   "auroc": 0.7628872524123921,
+   "ci_low": 0.6927159793111172,
+   "ci_high": 0.8275523551569115,
+   "folds_above_chance": 25,
+   "n_folds": 25,
+   "beats_prevalence_resolvably": true,
+   "prevalence": 0.7306122448979592,
+   "operating_point": {
+    "sensitivity": 0.9581005586592178,
+    "specificity": 0.3560606060606061,
+    "ppv": 0.8014018691588785,
+    "npv": 0.7580645161290323,
+    "tp": 343,
+    "fp": 85,
+    "tn": 47,
+    "fn": 15
+   },
+   "decision_curve_reading": "the model earns its place at thresholds 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70: only there does acting on the score beat BOTH treating every row and treating none, in the units of the decision. Between those points the honest comparator is the one the curve crosses, so the threshold in any protocol must be read off this row of the curve rather than carried over from another cohort",
+   "condition": "measured here, published nowhere: this is an INDEPENDENT live cohort scored with the shipping rules",
+   "task_b_advantage": 0.002166854924970152,
+   "task_b_resolves": false
+  },
+  {
+   "study": "difg_tcga_gdc",
+   "refused": "the declared suffix rule labels 530 of 530 samples Unlabelled (kinds={'Unlabelled': 530}); no paired primary/recurrence set exists under the shipping rule, so nothing is guessed into a fold"
+  },
+  {
+   "study": "difg_msk_2023",
+   "refused": "the declared suffix rule labels 73 of 73 samples Unlabelled (kinds={'Unlabelled': 73}); no paired primary/recurrence set exists under the shipping rule, so nothing is guessed into a fold"
+  },
+  {
+   "study": "gbm_columbia_2019",
+   "refused": "the declared suffix rule labels 42 of 42 samples Unlabelled (kinds={'Unlabelled': 42}); no paired primary/recurrence set exists under the shipping rule, so nothing is guessed into a fold"
+  }
+ ]
+}

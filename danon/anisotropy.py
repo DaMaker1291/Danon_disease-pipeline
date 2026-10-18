@@ -240,13 +240,50 @@ def _harmonic_mean(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     return out
 
 
-def divergence_d_grad(c: np.ndarray, d: np.ndarray) -> np.ndarray:
+#: The definition above, kept under an explicit name: it is the reference that
+#: `danon.accel.harmonic_mean_into` is checked against, entry for entry.
+_harmonic_mean_reference = _harmonic_mean
+
+
+def divergence_d_grad(
+    c: np.ndarray,
+    d: np.ndarray,
+    workspace: Optional[object] = None,
+    out: Optional[np.ndarray] = None,
+) -> np.ndarray:
     """`div(D(x) grad C)` on a uniform grid with zero-flux boundaries.
 
     Finite-volume, second order, with harmonic face conductances. On constant
     `D` this reduces **exactly** to `D * laplacian(C)` (pinned by a test against
     `danon.evosteer._laplacian`), which is what makes it a drop-in for the
     scalar operator rather than a different model.
+
+    The formulation is the one written out in `_divergence_d_grad_reference`;
+    the arithmetic here is that same formulation evaluated in the same order by
+    `danon.accel`, which removes the two `np.pad` copies and the boolean masks
+    from the hot path. The two are bit-identical on every input the test suite
+    tries, including full patient fields, and `workspace` lets a caller that
+    calls this 12 times a simulated day reuse the buffers.
+    """
+    c = np.asarray(c, dtype=float)
+    d = np.asarray(d, dtype=float)
+    if c.shape != d.shape or c.ndim != 3:
+        raise ValueError("c and d must be matching 3D arrays")
+    if np.any(d < 0.0):
+        raise ValueError("diffusion coefficients must be non-negative")
+    from danon import accel
+
+    if out is None:
+        return accel.divergence_d_grad(c, d, workspace)
+    return accel.divergence_d_grad_into(c, d, out, workspace)
+
+
+def _divergence_d_grad_reference(c: np.ndarray, d: np.ndarray) -> np.ndarray:
+    """The formulation `divergence_d_grad` is checked against, kept verbatim.
+
+    Not used in any pipeline: it exists so the accelerated path has a reference
+    to be bit-identical TO, rather than merely a plausible story about being
+    equivalent.
     """
     c = np.asarray(c, dtype=float)
     d = np.asarray(d, dtype=float)

@@ -1,0 +1,1851 @@
+{
+ "geometry_voxels": 1774,
+ "mechanisms": {
+  "heterogeneous_transport": {
+   "mechanism": "heterogeneous_transport",
+   "removes": "the perfusion-derived spatial variation in drug diffusivity, leaving the calibrated mean diffusivity uniform",
+   "intact_note": "D(x) from the rCBV-derived field, reduced to a mean-one pattern",
+   "target": "simulator",
+   "days": 365,
+   "r0": 0.01,
+   "seeds": [
+    101,
+    102,
+    103
+   ],
+   "arms": {
+    "mtd": {
+     "intact": {
+      "label": "intact",
+      "arm": "mtd",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        283.0,
+        289.0,
+        203.0
+       ],
+       "mean_density": [
+        1.3245176672727499,
+        1.2920400220433832,
+        1.9979744772130292
+       ],
+       "final_resistant_fraction": [
+        0.9927383329824454,
+        0.9937340303846602,
+        0.9977405713919241
+       ],
+       "resistance_dominance_day": [
+        43.0,
+        41.0,
+        40.0
+       ]
+      },
+      "voxels": 1774
+     },
+     "ablated": {
+      "label": "ablated",
+      "arm": "mtd",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        283.0,
+        290.0,
+        204.0
+       ],
+       "mean_density": [
+        1.3233659361936885,
+        1.2930039344674682,
+        2.000733967768711
+       ],
+       "final_resistant_fraction": [
+        0.9955601316467109,
+        0.9965367789072096,
+        0.9989714461037975
+       ],
+       "resistance_dominance_day": [
+        40.0,
+        38.0,
+        38.0
+       ]
+      },
+      "voxels": 1774
+     },
+     "readouts": {
+      "pfs": {
+       "intact_mean": 258.3333333333333,
+       "ablated_mean": 259.0,
+       "delta": 0.6666666666666856,
+       "rel_delta": 0.0025806451612903963,
+       "intact_spread_rel": 0.33290322580645165,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.007751937984496344,
+       "verdict": "inert"
+      },
+      "mean_density": {
+       "intact_mean": 1.538177388843054,
+       "ablated_mean": 1.539034612809956,
+       "delta": 0.0008572239669017989,
+       "rel_delta": 0.0005572985099895163,
+       "intact_spread_rel": 0.45894216121628034,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.0012143109896736743,
+       "verdict": "inert"
+      },
+      "final_resistant_fraction": {
+       "intact_mean": 0.9947376449196765,
+       "ablated_mean": 0.9970227855525726,
+       "delta": 0.0022851406328960877,
+       "rel_delta": 0.0022972294700685718,
+       "intact_spread_rel": 0.005028701220895875,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.45682361491727574,
+       "verdict": "unresolved"
+      },
+      "resistance_dominance_day": {
+       "intact_mean": 41.333333333333336,
+       "ablated_mean": 38.666666666666664,
+       "delta": -2.6666666666666714,
+       "rel_delta": -0.06451612903225817,
+       "intact_spread_rel": 0.07258064516129031,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.8888888888888905,
+       "verdict": "unresolved"
+      }
+     },
+     "load_bearing_on": []
+    },
+    "steering": {
+     "intact": {
+      "label": "intact",
+      "arm": "steering",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.01330371215416133,
+        0.014168170339034654,
+        0.012659647149840242
+       ],
+       "final_resistant_fraction": [
+        0.013904133839806192,
+        0.01122799133647004,
+        0.04022752194219626
+       ],
+       "resistance_dominance_day": [
+        null,
+        null,
+        null
+       ]
+      },
+      "voxels": 1774
+     },
+     "ablated": {
+      "label": "ablated",
+      "arm": "steering",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.011313282786529497,
+        0.01123096953908086,
+        0.010694848966841272
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "resistance_dominance_day": [
+        null,
+        null,
+        null
+       ]
+      },
+      "voxels": 1774
+     },
+     "readouts": {
+      "pfs": {
+       "intact_mean": 365.0,
+       "ablated_mean": 365.0,
+       "delta": 0.0,
+       "rel_delta": 0.0,
+       "intact_spread_rel": 0.0,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      },
+      "mean_density": {
+       "intact_mean": 0.013377176547678742,
+       "ablated_mean": 0.011079700430817211,
+       "delta": -0.0022974761168615306,
+       "rel_delta": -0.1717459666225454,
+       "intact_spread_rel": 0.11276842940793631,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 1.522996884183424,
+       "verdict": "load_bearing"
+      },
+      "final_resistant_fraction": {
+       "intact_mean": 0.021786549039490833,
+       "ablated_mean": 0.0,
+       "delta": -0.021786549039490833,
+       "rel_delta": -1.0,
+       "intact_spread_rel": 1.3310749927930743,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.7512724718099016,
+       "verdict": "unresolved"
+      },
+      "resistance_dominance_day": {
+       "intact_mean": null,
+       "ablated_mean": null,
+       "delta": null,
+       "rel_delta": null,
+       "intact_spread_rel": null,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 0,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      }
+     },
+     "load_bearing_on": [
+      "mean_density"
+     ]
+    }
+   },
+   "voxels": 1774,
+   "load_bearing_on": [
+    "steering/mean_density"
+   ],
+   "verdicts_present": [
+    "degenerate",
+    "inert",
+    "load_bearing",
+    "unresolved"
+   ],
+   "any_load_bearing": true,
+   "all_inert": false
+  },
+  "asymmetric_competition": {
+   "mechanism": "asymmetric_competition",
+   "removes": "the asymmetric crowding term (R feels the full density of S) that makes holiday-phase suppression of the resistant clone possible",
+   "intact_note": "competition = DEFAULT_CLONES.competition (S feels R weakly)",
+   "target": "clones",
+   "days": 365,
+   "r0": 0.01,
+   "seeds": [
+    101,
+    102,
+    103
+   ],
+   "arms": {
+    "mtd": {
+     "intact": {
+      "label": "intact",
+      "arm": "mtd",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        283.0,
+        290.0,
+        204.0
+       ],
+       "mean_density": [
+        1.3233659361936885,
+        1.2930039344674682,
+        2.000733967768711
+       ],
+       "final_resistant_fraction": [
+        0.9955601316467109,
+        0.9965367789072096,
+        0.9989714461037975
+       ],
+       "resistance_dominance_day": [
+        40.0,
+        38.0,
+        38.0
+       ]
+      },
+      "voxels": 1774
+     },
+     "ablated": {
+      "label": "ablated",
+      "arm": "mtd",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        283.0,
+        290.0,
+        204.0
+       ],
+       "mean_density": [
+        1.3232832165102628,
+        1.2930754339313608,
+        2.0013242883066917
+       ],
+       "final_resistant_fraction": [
+        0.9961641792464825,
+        0.9975916772406915,
+        0.999636811540069
+       ],
+       "resistance_dominance_day": [
+        40.0,
+        38.0,
+        38.0
+       ]
+      },
+      "voxels": 1774
+     },
+     "readouts": {
+      "pfs": {
+       "intact_mean": 259.0,
+       "ablated_mean": 259.0,
+       "delta": 0.0,
+       "rel_delta": 0.0,
+       "intact_spread_rel": 0.33204633204633205,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.0,
+       "verdict": "inert"
+      },
+      "mean_density": {
+       "intact_mean": 1.539034612809956,
+       "ablated_mean": 1.5392276462494383,
+       "delta": 0.00019303343948240403,
+       "rel_delta": 0.00012542501505535686,
+       "intact_spread_rel": 0.45985322708829485,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.0002727501030046581,
+       "verdict": "inert"
+      },
+      "final_resistant_fraction": {
+       "intact_mean": 0.9970227855525726,
+       "ablated_mean": 0.9977975560090809,
+       "delta": 0.0007747704565083113,
+       "rel_delta": 0.0007770840022266051,
+       "intact_spread_rel": 0.0034215009992936292,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.22711786505017376,
+       "verdict": "unresolved"
+      },
+      "resistance_dominance_day": {
+       "intact_mean": 38.666666666666664,
+       "ablated_mean": 38.666666666666664,
+       "delta": 0.0,
+       "rel_delta": 0.0,
+       "intact_spread_rel": 0.05172413793103449,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.0,
+       "verdict": "inert"
+      }
+     },
+     "load_bearing_on": []
+    },
+    "steering": {
+     "intact": {
+      "label": "intact",
+      "arm": "steering",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.011313282786529497,
+        0.01123096953908086,
+        0.010694848966841272
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "resistance_dominance_day": [
+        null,
+        null,
+        null
+       ]
+      },
+      "voxels": 1774
+     },
+     "ablated": {
+      "label": "ablated",
+      "arm": "steering",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.01130845333766483,
+        0.011239215432999567,
+        0.01071819983427976
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "resistance_dominance_day": [
+        null,
+        null,
+        null
+       ]
+      },
+      "voxels": 1774
+     },
+     "readouts": {
+      "pfs": {
+       "intact_mean": 365.0,
+       "ablated_mean": 365.0,
+       "delta": 0.0,
+       "rel_delta": 0.0,
+       "intact_spread_rel": 0.0,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      },
+      "mean_density": {
+       "intact_mean": 0.011079700430817211,
+       "ablated_mean": 0.011088622868314718,
+       "delta": 8.922437497506722e-06,
+       "rel_delta": 0.0008052959151034217,
+       "intact_spread_rel": 0.05581683580253721,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.014427473423113965,
+       "verdict": "inert"
+      },
+      "final_resistant_fraction": {
+       "intact_mean": 0.0,
+       "ablated_mean": 0.0,
+       "delta": 0.0,
+       "rel_delta": null,
+       "intact_spread_rel": 0.0,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      },
+      "resistance_dominance_day": {
+       "intact_mean": null,
+       "ablated_mean": null,
+       "delta": null,
+       "rel_delta": null,
+       "intact_spread_rel": null,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 0,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      }
+     },
+     "load_bearing_on": []
+    }
+   },
+   "voxels": 1774,
+   "load_bearing_on": [],
+   "verdicts_present": [
+    "degenerate",
+    "inert",
+    "unresolved"
+   ],
+   "any_load_bearing": false,
+   "all_inert": false
+  },
+  "resistance_fitness_cost": {
+   "mechanism": "resistance_fitness_cost",
+   "removes": "the growth price a resistant cell pays, so the two clones grow at the same rate and the collateral trade-off disappears",
+   "intact_note": "growth_R = growth_S * (1 - cost_of_resistance)",
+   "target": "clones",
+   "days": 365,
+   "r0": 0.01,
+   "seeds": [
+    101,
+    102,
+    103
+   ],
+   "arms": {
+    "mtd": {
+     "intact": {
+      "label": "intact",
+      "arm": "mtd",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        283.0,
+        290.0,
+        204.0
+       ],
+       "mean_density": [
+        1.3233659361936885,
+        1.2930039344674682,
+        2.000733967768711
+       ],
+       "final_resistant_fraction": [
+        0.9955601316467109,
+        0.9965367789072096,
+        0.9989714461037975
+       ],
+       "resistance_dominance_day": [
+        40.0,
+        38.0,
+        38.0
+       ]
+      },
+      "voxels": 1774
+     },
+     "ablated": {
+      "label": "ablated",
+      "arm": "mtd",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        225.0,
+        230.0,
+        160.0
+       ],
+       "mean_density": [
+        1.9165012661703003,
+        1.885780576140004,
+        2.3458287243047784
+       ],
+       "final_resistant_fraction": [
+        0.9991319177633304,
+        0.9994640194014579,
+        0.9998146237832888
+       ],
+       "resistance_dominance_day": [
+        35.0,
+        34.0,
+        33.0
+       ]
+      },
+      "voxels": 1774
+     },
+     "readouts": {
+      "pfs": {
+       "intact_mean": 259.0,
+       "ablated_mean": 205.0,
+       "delta": -54.0,
+       "rel_delta": -0.2084942084942085,
+       "intact_spread_rel": 0.33204633204633205,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.627906976744186,
+       "verdict": "unresolved"
+      },
+      "mean_density": {
+       "intact_mean": 1.539034612809956,
+       "ablated_mean": 2.0493701888716944,
+       "delta": 0.5103355760617385,
+       "rel_delta": 0.3315946060043265,
+       "intact_spread_rel": 0.45985322708829485,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.721087917777422,
+       "verdict": "unresolved"
+      },
+      "final_resistant_fraction": {
+       "intact_mean": 0.9970227855525726,
+       "ablated_mean": 0.9994701869826924,
+       "delta": 0.002447401430119789,
+       "rel_delta": 0.0024547096270857876,
+       "intact_spread_rel": 0.0034215009992936292,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.717436478198476,
+       "verdict": "unresolved"
+      },
+      "resistance_dominance_day": {
+       "intact_mean": 38.666666666666664,
+       "ablated_mean": 34.0,
+       "delta": -4.666666666666664,
+       "rel_delta": -0.12068965517241374,
+       "intact_spread_rel": 0.05172413793103449,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 2.333333333333332,
+       "verdict": "load_bearing"
+      }
+     },
+     "load_bearing_on": [
+      "resistance_dominance_day"
+     ]
+    },
+    "steering": {
+     "intact": {
+      "label": "intact",
+      "arm": "steering",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.011313282786529497,
+        0.01123096953908086,
+        0.010694848966841272
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "resistance_dominance_day": [
+        null,
+        null,
+        null
+       ]
+      },
+      "voxels": 1774
+     },
+     "ablated": {
+      "label": "ablated",
+      "arm": "steering",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.011238920404564591,
+        0.015949498166056484,
+        0.01123570173561355
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.2816669689215705,
+        0.0
+       ],
+       "resistance_dominance_day": [
+        null,
+        null,
+        null
+       ]
+      },
+      "voxels": 1774
+     },
+     "readouts": {
+      "pfs": {
+       "intact_mean": 365.0,
+       "ablated_mean": 365.0,
+       "delta": 0.0,
+       "rel_delta": 0.0,
+       "intact_spread_rel": 0.0,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      },
+      "mean_density": {
+       "intact_mean": 0.011079700430817211,
+       "ablated_mean": 0.012808040102078208,
+       "delta": 0.001728339671260997,
+       "rel_delta": 0.15599155248401594,
+       "intact_spread_rel": 0.05581683580253721,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 2.794704326054348,
+       "verdict": "load_bearing"
+      },
+      "final_resistant_fraction": {
+       "intact_mean": 0.0,
+       "ablated_mean": 0.0938889896405235,
+       "delta": 0.0938889896405235,
+       "rel_delta": null,
+       "intact_spread_rel": 0.0,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      },
+      "resistance_dominance_day": {
+       "intact_mean": null,
+       "ablated_mean": null,
+       "delta": null,
+       "rel_delta": null,
+       "intact_spread_rel": null,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 0,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      }
+     },
+     "load_bearing_on": [
+      "mean_density"
+     ]
+    }
+   },
+   "voxels": 1774,
+   "load_bearing_on": [
+    "mtd/resistance_dominance_day",
+    "steering/mean_density"
+   ],
+   "verdicts_present": [
+    "degenerate",
+    "load_bearing",
+    "unresolved"
+   ],
+   "any_load_bearing": true,
+   "all_inert": false
+  },
+  "mutation": {
+   "mechanism": "mutation",
+   "removes": "spontaneous S->R mutation, so any resistance in the trial must already exist at day 0",
+   "intact_note": "mutation_rate = DEFAULT_CLONES.mutation_rate",
+   "target": "clones",
+   "days": 365,
+   "r0": 0.01,
+   "seeds": [
+    101,
+    102,
+    103
+   ],
+   "arms": {
+    "mtd": {
+     "intact": {
+      "label": "intact",
+      "arm": "mtd",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        283.0,
+        290.0,
+        204.0
+       ],
+       "mean_density": [
+        1.3233659361936885,
+        1.2930039344674682,
+        2.000733967768711
+       ],
+       "final_resistant_fraction": [
+        0.9955601316467109,
+        0.9965367789072096,
+        0.9989714461037975
+       ],
+       "resistance_dominance_day": [
+        40.0,
+        38.0,
+        38.0
+       ]
+      },
+      "voxels": 1774
+     },
+     "ablated": {
+      "label": "ablated",
+      "arm": "mtd",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        283.0,
+        290.0,
+        204.0
+       ],
+       "mean_density": [
+        1.3234435637204722,
+        1.292483848882208,
+        2.0010157343406814
+       ],
+       "final_resistant_fraction": [
+        0.9955763103258569,
+        0.996522059385076,
+        0.9989784804874539
+       ],
+       "resistance_dominance_day": [
+        40.0,
+        38.0,
+        38.0
+       ]
+      },
+      "voxels": 1774
+     },
+     "readouts": {
+      "pfs": {
+       "intact_mean": 259.0,
+       "ablated_mean": 259.0,
+       "delta": 0.0,
+       "rel_delta": 0.0,
+       "intact_spread_rel": 0.33204633204633205,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.0,
+       "verdict": "inert"
+      },
+      "mean_density": {
+       "intact_mean": 1.539034612809956,
+       "ablated_mean": 1.5389810489811204,
+       "delta": -5.3563828835478944e-05,
+       "rel_delta": -3.480352448843407e-05,
+       "intact_spread_rel": 0.45985322708829485,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 7.568398445043762e-05,
+       "verdict": "inert"
+      },
+      "final_resistant_fraction": {
+       "intact_mean": 0.9970227855525726,
+       "ablated_mean": 0.9970256167327957,
+       "delta": 2.831180223039631e-06,
+       "rel_delta": 2.839634423671197e-06,
+       "intact_spread_rel": 0.0034215009992936292,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.0008299382125732072,
+       "verdict": "inert"
+      },
+      "resistance_dominance_day": {
+       "intact_mean": 38.666666666666664,
+       "ablated_mean": 38.666666666666664,
+       "delta": 0.0,
+       "rel_delta": 0.0,
+       "intact_spread_rel": 0.05172413793103449,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.0,
+       "verdict": "inert"
+      }
+     },
+     "load_bearing_on": []
+    },
+    "steering": {
+     "intact": {
+      "label": "intact",
+      "arm": "steering",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.011313282786529497,
+        0.01123096953908086,
+        0.010694848966841272
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "resistance_dominance_day": [
+        null,
+        null,
+        null
+       ]
+      },
+      "voxels": 1774
+     },
+     "ablated": {
+      "label": "ablated",
+      "arm": "steering",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.011170170242979682,
+        0.011245129103201086,
+        0.010699297326483856
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "resistance_dominance_day": [
+        null,
+        null,
+        null
+       ]
+      },
+      "voxels": 1774
+     },
+     "readouts": {
+      "pfs": {
+       "intact_mean": 365.0,
+       "ablated_mean": 365.0,
+       "delta": 0.0,
+       "rel_delta": 0.0,
+       "intact_spread_rel": 0.0,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      },
+      "mean_density": {
+       "intact_mean": 0.011079700430817211,
+       "ablated_mean": 0.011038198890888208,
+       "delta": -4.150153992900363e-05,
+       "rel_delta": -0.0037457276203579247,
+       "intact_spread_rel": 0.05581683580253721,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.06710748766929671,
+       "verdict": "inert"
+      },
+      "final_resistant_fraction": {
+       "intact_mean": 0.0,
+       "ablated_mean": 0.0,
+       "delta": 0.0,
+       "rel_delta": null,
+       "intact_spread_rel": 0.0,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      },
+      "resistance_dominance_day": {
+       "intact_mean": null,
+       "ablated_mean": null,
+       "delta": null,
+       "rel_delta": null,
+       "intact_spread_rel": null,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 0,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      }
+     },
+     "load_bearing_on": []
+    }
+   },
+   "voxels": 1774,
+   "load_bearing_on": [],
+   "verdicts_present": [
+    "degenerate",
+    "inert"
+   ],
+   "any_load_bearing": false,
+   "all_inert": false
+  },
+  "cell_motility": {
+   "mechanism": "cell_motility",
+   "removes": "the only term that moves cells outwards, so the predicted tumour cannot leave its day-0 mask",
+   "intact_note": "motility = the legacy voxel-unit literal",
+   "target": "simulator",
+   "days": 365,
+   "r0": 0.01,
+   "seeds": [
+    101,
+    102,
+    103
+   ],
+   "arms": {
+    "mtd": {
+     "intact": {
+      "label": "intact",
+      "arm": "mtd",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        283.0,
+        290.0,
+        204.0
+       ],
+       "mean_density": [
+        1.3233659361936885,
+        1.2930039344674682,
+        2.000733967768711
+       ],
+       "final_resistant_fraction": [
+        0.9955601316467109,
+        0.9965367789072096,
+        0.9989714461037975
+       ],
+       "resistance_dominance_day": [
+        40.0,
+        38.0,
+        38.0
+       ]
+      },
+      "voxels": 1774
+     },
+     "ablated": {
+      "label": "ablated",
+      "arm": "mtd",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.030441837650844,
+        0.030533453920223108,
+        0.030405638256917368
+       ],
+       "final_resistant_fraction": [
+        0.6112674960917579,
+        0.6121809829597527,
+        0.610289972751153
+       ],
+       "resistance_dominance_day": [
+        59.0,
+        58.0,
+        59.0
+       ]
+      },
+      "voxels": 1774
+     },
+     "readouts": {
+      "pfs": {
+       "intact_mean": 259.0,
+       "ablated_mean": 365.0,
+       "delta": 106.0,
+       "rel_delta": 0.4092664092664093,
+       "intact_spread_rel": 0.33204633204633205,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 1.2325581395348837,
+       "verdict": "load_bearing"
+      },
+      "mean_density": {
+       "intact_mean": 1.539034612809956,
+       "ablated_mean": 0.030460309942661495,
+       "delta": -1.5085743028672944,
+       "rel_delta": -0.9802081709604651,
+       "intact_spread_rel": 0.45985322708829485,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 2.131567450699348,
+       "verdict": "load_bearing"
+      },
+      "final_resistant_fraction": {
+       "intact_mean": 0.9970227855525726,
+       "ablated_mean": 0.6112461506008878,
+       "delta": -0.3857766349516848,
+       "rel_delta": -0.3869286043827761,
+       "intact_spread_rel": 0.0034215009992936292,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 113.08738605151883,
+       "verdict": "load_bearing"
+      },
+      "resistance_dominance_day": {
+       "intact_mean": 38.666666666666664,
+       "ablated_mean": 58.666666666666664,
+       "delta": 20.0,
+       "rel_delta": 0.5172413793103449,
+       "intact_spread_rel": 0.05172413793103449,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 10.0,
+       "verdict": "load_bearing"
+      }
+     },
+     "load_bearing_on": [
+      "final_resistant_fraction",
+      "mean_density",
+      "pfs",
+      "resistance_dominance_day"
+     ]
+    },
+    "steering": {
+     "intact": {
+      "label": "intact",
+      "arm": "steering",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.011313282786529497,
+        0.01123096953908086,
+        0.010694848966841272
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "resistance_dominance_day": [
+        null,
+        null,
+        null
+       ]
+      },
+      "voxels": 1774
+     },
+     "ablated": {
+      "label": "ablated",
+      "arm": "steering",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.014343751700701466,
+        0.01487771409224461,
+        0.012603063535848768
+       ],
+       "final_resistant_fraction": [
+        0.1355407462340727,
+        0.1156369313270965,
+        0.0155207905811146
+       ],
+       "resistance_dominance_day": [
+        null,
+        null,
+        null
+       ]
+      },
+      "voxels": 1774
+     },
+     "readouts": {
+      "pfs": {
+       "intact_mean": 365.0,
+       "ablated_mean": 365.0,
+       "delta": 0.0,
+       "rel_delta": 0.0,
+       "intact_spread_rel": 0.0,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      },
+      "mean_density": {
+       "intact_mean": 0.011079700430817211,
+       "ablated_mean": 0.013941509776264948,
+       "delta": 0.0028618093454477363,
+       "rel_delta": 0.25829302545832966,
+       "intact_spread_rel": 0.05581683580253721,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 4.627511068024187,
+       "verdict": "load_bearing"
+      },
+      "final_resistant_fraction": {
+       "intact_mean": 0.0,
+       "ablated_mean": 0.08889948938076127,
+       "delta": 0.08889948938076127,
+       "rel_delta": null,
+       "intact_spread_rel": 0.0,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      },
+      "resistance_dominance_day": {
+       "intact_mean": null,
+       "ablated_mean": null,
+       "delta": null,
+       "rel_delta": null,
+       "intact_spread_rel": null,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 0,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      }
+     },
+     "load_bearing_on": [
+      "mean_density"
+     ]
+    }
+   },
+   "voxels": 1774,
+   "load_bearing_on": [
+    "mtd/final_resistant_fraction",
+    "mtd/mean_density",
+    "mtd/pfs",
+    "mtd/resistance_dominance_day",
+    "steering/mean_density"
+   ],
+   "verdicts_present": [
+    "degenerate",
+    "load_bearing"
+   ],
+   "any_load_bearing": true,
+   "all_inert": false
+  },
+  "resistant_kill_ceiling": {
+   "mechanism": "resistant_kill_ceiling",
+   "removes": "the resistant clone's reduced kill ceiling, so drug A kills both clones equally and resistance stops being a survival advantage",
+   "intact_note": "drug_sensitivity_scale_R = 0.25",
+   "target": "clones",
+   "days": 365,
+   "r0": 0.01,
+   "seeds": [
+    101,
+    102,
+    103
+   ],
+   "arms": {
+    "mtd": {
+     "intact": {
+      "label": "intact",
+      "arm": "mtd",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        283.0,
+        290.0,
+        204.0
+       ],
+       "mean_density": [
+        1.3233659361936885,
+        1.2930039344674682,
+        2.000733967768711
+       ],
+       "final_resistant_fraction": [
+        0.9955601316467109,
+        0.9965367789072096,
+        0.9989714461037975
+       ],
+       "resistance_dominance_day": [
+        40.0,
+        38.0,
+        38.0
+       ]
+      },
+      "voxels": 1774
+     },
+     "ablated": {
+      "label": "ablated",
+      "arm": "mtd",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        300.0
+       ],
+       "mean_density": [
+        0.6072271532919628,
+        0.5901741600865918,
+        1.0317915779096796
+       ],
+       "final_resistant_fraction": [
+        0.988290712272267,
+        0.9891104882628755,
+        0.9961970578027115
+       ],
+       "resistance_dominance_day": [
+        46.0,
+        44.0,
+        44.0
+       ]
+      },
+      "voxels": 1774
+     },
+     "readouts": {
+      "pfs": {
+       "intact_mean": 259.0,
+       "ablated_mean": 343.3333333333333,
+       "delta": 84.33333333333331,
+       "rel_delta": 0.32561132561132555,
+       "intact_spread_rel": 0.33204633204633205,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.9806201550387595,
+       "verdict": "unresolved"
+      },
+      "mean_density": {
+       "intact_mean": 1.539034612809956,
+       "ablated_mean": 0.743064297096078,
+       "delta": -0.7959703157138779,
+       "rel_delta": -0.5171880535296098,
+       "intact_spread_rel": 0.45985322708829485,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 1.1246807091130977,
+       "verdict": "load_bearing"
+      },
+      "final_resistant_fraction": {
+       "intact_mean": 0.9970227855525726,
+       "ablated_mean": 0.9911994194459514,
+       "delta": -0.005823366106621264,
+       "rel_delta": -0.0058407552876475356,
+       "intact_spread_rel": 0.0034215009992936292,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 1.7070739680781513,
+       "verdict": "load_bearing"
+      },
+      "resistance_dominance_day": {
+       "intact_mean": 38.666666666666664,
+       "ablated_mean": 44.666666666666664,
+       "delta": 6.0,
+       "rel_delta": 0.15517241379310345,
+       "intact_spread_rel": 0.05172413793103449,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 2.9999999999999996,
+       "verdict": "load_bearing"
+      }
+     },
+     "load_bearing_on": [
+      "final_resistant_fraction",
+      "mean_density",
+      "resistance_dominance_day"
+     ]
+    },
+    "steering": {
+     "intact": {
+      "label": "intact",
+      "arm": "steering",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.011313282786529497,
+        0.01123096953908086,
+        0.010694848966841272
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "resistance_dominance_day": [
+        null,
+        null,
+        null
+       ]
+      },
+      "voxels": 1774
+     },
+     "ablated": {
+      "label": "ablated",
+      "arm": "steering",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.0110959521893308,
+        0.011283184000681753,
+        0.010600631163171503
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "resistance_dominance_day": [
+        null,
+        null,
+        null
+       ]
+      },
+      "voxels": 1774
+     },
+     "readouts": {
+      "pfs": {
+       "intact_mean": 365.0,
+       "ablated_mean": 365.0,
+       "delta": 0.0,
+       "rel_delta": 0.0,
+       "intact_spread_rel": 0.0,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      },
+      "mean_density": {
+       "intact_mean": 0.011079700430817211,
+       "ablated_mean": 0.010993255784394687,
+       "delta": -8.644464642252464e-05,
+       "rel_delta": -0.007802074339671357,
+       "intact_spread_rel": 0.05581683580253721,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.13977994681161604,
+       "verdict": "unresolved"
+      },
+      "final_resistant_fraction": {
+       "intact_mean": 0.0,
+       "ablated_mean": 0.0,
+       "delta": 0.0,
+       "rel_delta": null,
+       "intact_spread_rel": 0.0,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      },
+      "resistance_dominance_day": {
+       "intact_mean": null,
+       "ablated_mean": null,
+       "delta": null,
+       "rel_delta": null,
+       "intact_spread_rel": null,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 0,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      }
+     },
+     "load_bearing_on": []
+    }
+   },
+   "voxels": 1774,
+   "load_bearing_on": [
+    "mtd/final_resistant_fraction",
+    "mtd/mean_density",
+    "mtd/resistance_dominance_day"
+   ],
+   "verdicts_present": [
+    "degenerate",
+    "load_bearing",
+    "unresolved"
+   ],
+   "any_load_bearing": true,
+   "all_inert": false
+  },
+  "second_agent": {
+   "mechanism": "second_agent",
+   "removes": "drug B entirely, leaving a single-agent schedule -- the control the combination arm exists to be compared against",
+   "intact_note": "kill_max[1] for both clones",
+   "target": "drugs",
+   "days": 365,
+   "r0": 0.01,
+   "seeds": [
+    101,
+    102,
+    103
+   ],
+   "arms": {
+    "mtd": {
+     "intact": {
+      "label": "intact",
+      "arm": "mtd",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        283.0,
+        290.0,
+        204.0
+       ],
+       "mean_density": [
+        1.3233659361936885,
+        1.2930039344674682,
+        2.000733967768711
+       ],
+       "final_resistant_fraction": [
+        0.9955601316467109,
+        0.9965367789072096,
+        0.9989714461037975
+       ],
+       "resistance_dominance_day": [
+        40.0,
+        38.0,
+        38.0
+       ]
+      },
+      "voxels": 1774
+     },
+     "ablated": {
+      "label": "ablated",
+      "arm": "mtd",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        283.0,
+        290.0,
+        204.0
+       ],
+       "mean_density": [
+        1.3233659361936885,
+        1.2930039344674682,
+        2.000733967768711
+       ],
+       "final_resistant_fraction": [
+        0.9955601316467109,
+        0.9965367789072096,
+        0.9989714461037975
+       ],
+       "resistance_dominance_day": [
+        40.0,
+        38.0,
+        38.0
+       ]
+      },
+      "voxels": 1774
+     },
+     "readouts": {
+      "pfs": {
+       "intact_mean": 259.0,
+       "ablated_mean": 259.0,
+       "delta": 0.0,
+       "rel_delta": 0.0,
+       "intact_spread_rel": 0.33204633204633205,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.0,
+       "verdict": "inert"
+      },
+      "mean_density": {
+       "intact_mean": 1.539034612809956,
+       "ablated_mean": 1.539034612809956,
+       "delta": 0.0,
+       "rel_delta": 0.0,
+       "intact_spread_rel": 0.45985322708829485,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.0,
+       "verdict": "inert"
+      },
+      "final_resistant_fraction": {
+       "intact_mean": 0.9970227855525726,
+       "ablated_mean": 0.9970227855525726,
+       "delta": 0.0,
+       "rel_delta": 0.0,
+       "intact_spread_rel": 0.0034215009992936292,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.0,
+       "verdict": "inert"
+      },
+      "resistance_dominance_day": {
+       "intact_mean": 38.666666666666664,
+       "ablated_mean": 38.666666666666664,
+       "delta": 0.0,
+       "rel_delta": 0.0,
+       "intact_spread_rel": 0.05172413793103449,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 0.0,
+       "verdict": "inert"
+      }
+     },
+     "load_bearing_on": []
+    },
+    "steering": {
+     "intact": {
+      "label": "intact",
+      "arm": "steering",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.011313282786529497,
+        0.01123096953908086,
+        0.010694848966841272
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "resistance_dominance_day": [
+        null,
+        null,
+        null
+       ]
+      },
+      "voxels": 1774
+     },
+     "ablated": {
+      "label": "ablated",
+      "arm": "steering",
+      "seeds": [
+       101,
+       102,
+       103
+      ],
+      "readouts": {
+       "pfs": [
+        125.0,
+        123.0,
+        117.0
+       ],
+       "mean_density": [
+        3.1754278417249084,
+        3.179467820329192,
+        3.275354272514608
+       ],
+       "final_resistant_fraction": [
+        0.07649949773179003,
+        0.06833132201711264,
+        0.1506504456336476
+       ],
+       "resistance_dominance_day": [
+        null,
+        null,
+        null
+       ]
+      },
+      "voxels": 1774
+     },
+     "readouts": {
+      "pfs": {
+       "intact_mean": 365.0,
+       "ablated_mean": 121.66666666666667,
+       "delta": -243.33333333333331,
+       "rel_delta": -0.6666666666666666,
+       "intact_spread_rel": 0.0,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      },
+      "mean_density": {
+       "intact_mean": 0.011079700430817211,
+       "ablated_mean": 3.2100833115229026,
+       "delta": 3.199003611092085,
+       "rel_delta": 288.7265437424949,
+       "intact_spread_rel": 0.05581683580253721,
+       "intact_spread_degenerate": false,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": 5172.750113673957,
+       "verdict": "load_bearing"
+      },
+      "final_resistant_fraction": {
+       "intact_mean": 0.0,
+       "ablated_mean": 0.09849375512751675,
+       "delta": 0.09849375512751675,
+       "rel_delta": null,
+       "intact_spread_rel": 0.0,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 3,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      },
+      "resistance_dominance_day": {
+       "intact_mean": null,
+       "ablated_mean": null,
+       "delta": null,
+       "rel_delta": null,
+       "intact_spread_rel": null,
+       "intact_spread_degenerate": true,
+       "n_seeds_with_a_value": 0,
+       "delta_over_spread": null,
+       "verdict": "degenerate"
+      }
+     },
+     "load_bearing_on": [
+      "mean_density"
+     ]
+    }
+   },
+   "voxels": 1774,
+   "load_bearing_on": [
+    "steering/mean_density"
+   ],
+   "verdicts_present": [
+    "degenerate",
+    "inert",
+    "load_bearing"
+   ],
+   "any_load_bearing": true,
+   "all_inert": false
+  }
+ },
+ "skipped": {},
+ "configuration": {
+  "heterogeneous_transport": "transport field supplied",
+  "asymmetric_competition": "homogeneous transport",
+  "resistance_fitness_cost": "homogeneous transport",
+  "mutation": "homogeneous transport",
+  "cell_motility": "homogeneous transport",
+  "resistant_kill_ceiling": "homogeneous transport",
+  "second_agent": "homogeneous transport"
+ },
+ "field_for": [
+  "heterogeneous_transport"
+ ],
+ "case": "BraTS2021_01017",
+ "mask_path": "data/engine_ready/BraTS2021_01017_mask.nii.gz",
+ "vessels_path": "data/engine_ready/BraTS2021_01017_vessels_t1ce.nii.gz",
+ "transport_field_voxel_mm": 3.634,
+ "transport_field_contrast": 3.5,
+ "seeds": [
+  101,
+  102,
+  103
+ ],
+ "days": 365,
+ "seconds": 483.19322896003723,
+ "what_this_cannot_show": [
+  "correctness: a wrong coefficient and a right one produce the same positive effect size when the same model is ablated",
+  "that the mechanism is the one a real tumour uses: an inert mechanism could be inert because it is wrong, or right but second-order at this design, and this harness distinguishes those two only by the size of the seed spread it reports beside the effect",
+  "anything about white-matter tract invasion: the engine's transport is scalar or perfusion-derived, and no diffusion-tensor map exists in this repository, so an 'anisotropic tensor PDE' is not what is being ablated",
+  "a clinical readout: the endpoints are simulated PFS and burden under declared constants"
+ ],
+ "leaderboard": [
+  {
+   "mechanism": "cell_motility",
+   "n_load_bearing_readouts": 5
+  },
+  {
+   "mechanism": "resistant_kill_ceiling",
+   "n_load_bearing_readouts": 3
+  },
+  {
+   "mechanism": "resistance_fitness_cost",
+   "n_load_bearing_readouts": 2
+  },
+  {
+   "mechanism": "heterogeneous_transport",
+   "n_load_bearing_readouts": 1
+  },
+  {
+   "mechanism": "second_agent",
+   "n_load_bearing_readouts": 1
+  },
+  {
+   "mechanism": "asymmetric_competition",
+   "n_load_bearing_readouts": 0
+  },
+  {
+   "mechanism": "mutation",
+   "n_load_bearing_readouts": 0
+  }
+ ]
+}

@@ -1,7 +1,7 @@
 {
  "key": "pipeline",
  "title": "AAV9-LAMP2B design pipeline (24 phases)",
- "generated_utc": "2026-09-25T17:56:54Z",
+ "generated_utc": "2026-10-17T13:32:59Z",
  "source": "api_server.run_full_pipeline(PipelineConstraints(candidate_pool=240, random_seed=42))",
  "notes": [
   "engine output, not an experiment: sequences and scores come from the design pipeline's own scorers (NSGA-II Pareto selection, Poisson-Boltzmann charge masking, Horizon-2 phase gates)",

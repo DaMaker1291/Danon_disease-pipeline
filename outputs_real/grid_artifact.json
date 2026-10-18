@@ -1,0 +1,3817 @@
+{
+ "case": "data\\brats\\BraTS2021_01017_seg.nii.gz",
+ "geometry": {
+  "seg_path": "data\\brats\\BraTS2021_01017_seg.nii.gz",
+  "source_grid": [
+   240,
+   240,
+   155
+  ],
+  "source_spacing_mm": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "source_tumour_voxels": 98447,
+  "source_volume_mm3": 98447.0,
+  "bbox_stop_xyz": [
+   127,
+   144,
+   138
+  ],
+  "levels": {
+   "fine_2p0mm": {
+    "name": "fine_2p0mm",
+    "factors": [
+     2,
+     2,
+     2
+    ],
+    "input_grid": [
+     58,
+     96,
+     72
+    ],
+    "grid": [
+     29,
+     48,
+     36
+    ],
+    "source_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "decimated_spacing_mm": [
+     2.0,
+     2.0,
+     2.0
+    ],
+    "voxel_mm": 2.0,
+    "voxel_mm3": 8.0,
+    "source_volume_mm3": 98447.0,
+    "tumour_voxels": 11952,
+    "volume_mm3": 95616.0,
+    "volume_bias": -0.02875658984021856,
+    "dice_vs_source": 0.9633572602711491,
+    "boundary_voxels": 3087,
+    "boundary_fraction": 0.2582831325301205,
+    "maxpool_tumour_voxels": 13825,
+    "maxpool_volume_mm3": 110600.0,
+    "maxpool_volume_bias": 0.12344713399087826,
+    "merged_voxels": 1873,
+    "merged_fraction_of_tumour": 0.15671017402945114,
+    "shipped_tumour_voxels": 11776,
+    "shipped_volume_mm3": 94208.0,
+    "shipped_volume_bias": -0.043058701636413454,
+    "shipped_dice_vs_aligned": 0.3817430883344572,
+    "shipped_agrees_voxelwise": false,
+    "shipped_disagreeing_voxels": 14670
+   },
+   "engine_3p6mm": {
+    "name": "engine_3p6mm",
+    "factors": [
+     4,
+     4,
+     3
+    ],
+    "input_grid": [
+     58,
+     96,
+     72
+    ],
+    "grid": [
+     14,
+     24,
+     24
+    ],
+    "source_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "decimated_spacing_mm": [
+     4.0,
+     4.0,
+     3.0
+    ],
+    "voxel_mm": 3.634241185664279,
+    "voxel_mm3": 48.0,
+    "source_volume_mm3": 98447.0,
+    "tumour_voxels": 2026,
+    "volume_mm3": 97248.0,
+    "volume_bias": -0.012179142076447214,
+    "dice_vs_source": 0.9309793300799714,
+    "boundary_voxels": 844,
+    "boundary_fraction": 0.4165844027640671,
+    "maxpool_tumour_voxels": 2726,
+    "maxpool_volume_mm3": 130848.0,
+    "maxpool_volume_bias": 0.32912125306002205,
+    "merged_voxels": 700,
+    "merged_fraction_of_tumour": 0.3455083909180652,
+    "shipped_tumour_voxels": 1774,
+    "shipped_volume_mm3": 85152.0,
+    "shipped_volume_bias": -0.13504728432557622,
+    "shipped_dice_vs_aligned": 0.39052631578947367,
+    "shipped_agrees_voxelwise": false,
+    "shipped_disagreeing_voxels": 2316
+   },
+   "coarse_7p3mm": {
+    "name": "coarse_7p3mm",
+    "factors": [
+     8,
+     8,
+     6
+    ],
+    "input_grid": [
+     58,
+     96,
+     72
+    ],
+    "grid": [
+     7,
+     12,
+     12
+    ],
+    "source_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "decimated_spacing_mm": [
+     8.0,
+     8.0,
+     6.0
+    ],
+    "voxel_mm": 7.268482371328558,
+    "voxel_mm3": 384.0,
+    "source_volume_mm3": 98447.0,
+    "tumour_voxels": 249,
+    "volume_mm3": 95616.0,
+    "volume_bias": -0.02875658984021856,
+    "dice_vs_source": 0.8530425686503867,
+    "boundary_voxels": 165,
+    "boundary_fraction": 0.6626506024096386,
+    "maxpool_tumour_voxels": 446,
+    "maxpool_volume_mm3": 171264.0,
+    "maxpool_volume_bias": 0.7396568712098897,
+    "merged_voxels": 197,
+    "merged_fraction_of_tumour": 0.7911646586345381,
+    "shipped_tumour_voxels": 180,
+    "shipped_volume_mm3": 69120.0,
+    "shipped_volume_bias": -0.2978963300049773,
+    "shipped_dice_vs_aligned": 0.34498834498834496,
+    "shipped_agrees_voxelwise": false,
+    "shipped_disagreeing_voxels": 281
+   }
+  },
+  "partition_probe": {
+   "factors": [
+    4,
+    4,
+    3
+   ],
+   "shape": [
+    58,
+    96,
+    72
+   ],
+   "grid": [
+    14,
+    24,
+    24
+   ],
+   "n_probed": 200,
+   "n_landed_in_their_own_engine_voxel": 0,
+   "share_landed": 0.0,
+   "n_landed_elsewhere": 0,
+   "n_dropped_entirely": 200,
+   "max_displacement_in_engine_voxels": 0,
+   "is_a_block_partition": false
+  },
+  "shipped_level": "engine_3p6mm",
+  "shipped_rule_is_the_axis_aligned_block_vote": false,
+  "shipped_rule_dice_vs_axis_aligned": 0.39052631578947367
+ },
+ "round_trip": {
+  "derived_dir": "data\\engine_ready",
+  "factors": [
+   4,
+   4,
+   3
+  ],
+  "n_audited": 6,
+  "unaudited_no_cached_source": [],
+  "cases": {
+   "BraTS2021_01017": {
+    "seg_path": "data\\brats\\BraTS2021_01017_seg.nii.gz",
+    "derived_mask_path": "data\\engine_ready\\BraTS2021_01017_mask.nii.gz",
+    "factors": [
+     4,
+     4,
+     3
+    ],
+    "source_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "expected_spacing_mm": [
+     4.0,
+     4.0,
+     3.0
+    ],
+    "header_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "tumour_voxels": 1774,
+    "axis_aligned_tumour_voxels": 2026,
+    "stored_agrees_with_aligned_block_vote": false,
+    "stored_disagreeing_voxels": 2316,
+    "stored_dice_vs_aligned": 0.39052631578947367,
+    "reported_volume_mm3": 1774.0,
+    "traced_volume_mm3": 85152.0,
+    "source_volume_mm3": 98447.0,
+    "volume_report_factor": 48.0,
+    "spacing_consistent": false,
+    "volume_bias_vs_source": -0.13504728432557622
+   },
+   "BraTS2021_01018": {
+    "seg_path": "data\\brats\\BraTS2021_01018_seg.nii.gz",
+    "derived_mask_path": "data\\engine_ready\\BraTS2021_01018_mask.nii.gz",
+    "factors": [
+     4,
+     4,
+     3
+    ],
+    "source_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "expected_spacing_mm": [
+     4.0,
+     4.0,
+     3.0
+    ],
+    "header_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "tumour_voxels": 1840,
+    "axis_aligned_tumour_voxels": 2695,
+    "stored_agrees_with_aligned_block_vote": false,
+    "stored_disagreeing_voxels": 2921,
+    "stored_dice_vs_aligned": 0.35589856670341785,
+    "reported_volume_mm3": 1840.0,
+    "traced_volume_mm3": 88320.0,
+    "source_volume_mm3": 130763.0,
+    "volume_report_factor": 48.0,
+    "spacing_consistent": false,
+    "volume_bias_vs_source": -0.3245795829095386
+   },
+   "BraTS2021_01019": {
+    "seg_path": "data\\brats\\BraTS2021_01019_seg.nii.gz",
+    "derived_mask_path": "data\\engine_ready\\BraTS2021_01019_mask.nii.gz",
+    "factors": [
+     4,
+     4,
+     3
+    ],
+    "source_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "expected_spacing_mm": [
+     4.0,
+     4.0,
+     3.0
+    ],
+    "header_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "tumour_voxels": 2826,
+    "axis_aligned_tumour_voxels": 3307,
+    "stored_agrees_with_aligned_block_vote": false,
+    "stored_disagreeing_voxels": 3545,
+    "stored_dice_vs_aligned": 0.42197945540518506,
+    "reported_volume_mm3": 2826.0,
+    "traced_volume_mm3": 135648.0,
+    "source_volume_mm3": 161243.0,
+    "volume_report_factor": 48.0,
+    "spacing_consistent": false,
+    "volume_bias_vs_source": -0.15873557301712327
+   },
+   "BraTS2021_01020": {
+    "seg_path": "data\\brats\\BraTS2021_01020_seg.nii.gz",
+    "derived_mask_path": "data\\engine_ready\\BraTS2021_01020_mask.nii.gz",
+    "factors": [
+     4,
+     4,
+     3
+    ],
+    "source_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "expected_spacing_mm": [
+     4.0,
+     4.0,
+     3.0
+    ],
+    "header_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "tumour_voxels": 3623,
+    "axis_aligned_tumour_voxels": 3592,
+    "stored_agrees_with_aligned_block_vote": false,
+    "stored_disagreeing_voxels": 3059,
+    "stored_dice_vs_aligned": 0.576022176022176,
+    "reported_volume_mm3": 3623.0,
+    "traced_volume_mm3": 173904.0,
+    "source_volume_mm3": 173462.0,
+    "volume_report_factor": 48.0,
+    "spacing_consistent": false,
+    "volume_bias_vs_source": 0.0025481085194452024
+   },
+   "BraTS2021_01021": {
+    "seg_path": "data\\brats\\BraTS2021_01021_seg.nii.gz",
+    "derived_mask_path": "data\\engine_ready\\BraTS2021_01021_mask.nii.gz",
+    "factors": [
+     4,
+     4,
+     3
+    ],
+    "source_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "expected_spacing_mm": [
+     4.0,
+     4.0,
+     3.0
+    ],
+    "header_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "tumour_voxels": 2986,
+    "axis_aligned_tumour_voxels": 3476,
+    "stored_agrees_with_aligned_block_vote": false,
+    "stored_disagreeing_voxels": 4064,
+    "stored_dice_vs_aligned": 0.37109254100897554,
+    "reported_volume_mm3": 2986.0,
+    "traced_volume_mm3": 143328.0,
+    "source_volume_mm3": 168343.0,
+    "volume_report_factor": 48.0,
+    "spacing_consistent": false,
+    "volume_bias_vs_source": -0.1485954271932899
+   },
+   "BraTS2021_01022": {
+    "seg_path": "data\\brats\\BraTS2021_01022_seg.nii.gz",
+    "derived_mask_path": "data\\engine_ready\\BraTS2021_01022_mask.nii.gz",
+    "factors": [
+     4,
+     4,
+     3
+    ],
+    "source_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "expected_spacing_mm": [
+     4.0,
+     4.0,
+     3.0
+    ],
+    "header_spacing_mm": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "tumour_voxels": 2528,
+    "axis_aligned_tumour_voxels": 2900,
+    "stored_agrees_with_aligned_block_vote": false,
+    "stored_disagreeing_voxels": 3354,
+    "stored_dice_vs_aligned": 0.38209285187914516,
+    "reported_volume_mm3": 2528.0,
+    "traced_volume_mm3": 121344.0,
+    "source_volume_mm3": 140799.0,
+    "volume_report_factor": 48.0,
+    "spacing_consistent": false,
+    "volume_bias_vs_source": -0.1381756972705772
+   }
+  },
+  "all_arrays_are_the_axis_aligned_block_vote": false,
+  "all_headers_carry_the_decimated_spacing": false,
+  "n_with_array_disagreement": 6,
+  "n_with_spacing_mismatch": 6
+ },
+ "cohort": {
+  "seg_path": "data\\brats\\BraTS2021_01017_seg.nii.gz",
+  "geometry": {
+   "seg_path": "data\\brats\\BraTS2021_01017_seg.nii.gz",
+   "source_grid": [
+    240,
+    240,
+    155
+   ],
+   "source_spacing_mm": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "source_tumour_voxels": 98447,
+   "source_volume_mm3": 98447.0,
+   "bbox_stop_xyz": [
+    127,
+    144,
+    138
+   ],
+   "levels": {
+    "fine_2p0mm": {
+     "name": "fine_2p0mm",
+     "factors": [
+      2,
+      2,
+      2
+     ],
+     "input_grid": [
+      58,
+      96,
+      72
+     ],
+     "grid": [
+      29,
+      48,
+      36
+     ],
+     "source_spacing_mm": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "decimated_spacing_mm": [
+      2.0,
+      2.0,
+      2.0
+     ],
+     "voxel_mm": 2.0,
+     "voxel_mm3": 8.0,
+     "source_volume_mm3": 98447.0,
+     "tumour_voxels": 11952,
+     "volume_mm3": 95616.0,
+     "volume_bias": -0.02875658984021856,
+     "dice_vs_source": 0.9633572602711491,
+     "boundary_voxels": 3087,
+     "boundary_fraction": 0.2582831325301205,
+     "maxpool_tumour_voxels": 13825,
+     "maxpool_volume_mm3": 110600.0,
+     "maxpool_volume_bias": 0.12344713399087826,
+     "merged_voxels": 1873,
+     "merged_fraction_of_tumour": 0.15671017402945114,
+     "shipped_tumour_voxels": 11776,
+     "shipped_volume_mm3": 94208.0,
+     "shipped_volume_bias": -0.043058701636413454,
+     "shipped_dice_vs_aligned": 0.3817430883344572,
+     "shipped_agrees_voxelwise": false,
+     "shipped_disagreeing_voxels": 14670
+    },
+    "engine_3p6mm": {
+     "name": "engine_3p6mm",
+     "factors": [
+      4,
+      4,
+      3
+     ],
+     "input_grid": [
+      58,
+      96,
+      72
+     ],
+     "grid": [
+      14,
+      24,
+      24
+     ],
+     "source_spacing_mm": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "decimated_spacing_mm": [
+      4.0,
+      4.0,
+      3.0
+     ],
+     "voxel_mm": 3.634241185664279,
+     "voxel_mm3": 48.0,
+     "source_volume_mm3": 98447.0,
+     "tumour_voxels": 2026,
+     "volume_mm3": 97248.0,
+     "volume_bias": -0.012179142076447214,
+     "dice_vs_source": 0.9309793300799714,
+     "boundary_voxels": 844,
+     "boundary_fraction": 0.4165844027640671,
+     "maxpool_tumour_voxels": 2726,
+     "maxpool_volume_mm3": 130848.0,
+     "maxpool_volume_bias": 0.32912125306002205,
+     "merged_voxels": 700,
+     "merged_fraction_of_tumour": 0.3455083909180652,
+     "shipped_tumour_voxels": 1774,
+     "shipped_volume_mm3": 85152.0,
+     "shipped_volume_bias": -0.13504728432557622,
+     "shipped_dice_vs_aligned": 0.39052631578947367,
+     "shipped_agrees_voxelwise": false,
+     "shipped_disagreeing_voxels": 2316
+    },
+    "coarse_7p3mm": {
+     "name": "coarse_7p3mm",
+     "factors": [
+      8,
+      8,
+      6
+     ],
+     "input_grid": [
+      58,
+      96,
+      72
+     ],
+     "grid": [
+      7,
+      12,
+      12
+     ],
+     "source_spacing_mm": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "decimated_spacing_mm": [
+      8.0,
+      8.0,
+      6.0
+     ],
+     "voxel_mm": 7.268482371328558,
+     "voxel_mm3": 384.0,
+     "source_volume_mm3": 98447.0,
+     "tumour_voxels": 249,
+     "volume_mm3": 95616.0,
+     "volume_bias": -0.02875658984021856,
+     "dice_vs_source": 0.8530425686503867,
+     "boundary_voxels": 165,
+     "boundary_fraction": 0.6626506024096386,
+     "maxpool_tumour_voxels": 446,
+     "maxpool_volume_mm3": 171264.0,
+     "maxpool_volume_bias": 0.7396568712098897,
+     "merged_voxels": 197,
+     "merged_fraction_of_tumour": 0.7911646586345381,
+     "shipped_tumour_voxels": 180,
+     "shipped_volume_mm3": 69120.0,
+     "shipped_volume_bias": -0.2978963300049773,
+     "shipped_dice_vs_aligned": 0.34498834498834496,
+     "shipped_agrees_voxelwise": false,
+     "shipped_disagreeing_voxels": 281
+    }
+   },
+   "partition_probe": {
+    "factors": [
+     4,
+     4,
+     3
+    ],
+    "shape": [
+     58,
+     96,
+     72
+    ],
+    "grid": [
+     14,
+     24,
+     24
+    ],
+    "n_probed": 200,
+    "n_landed_in_their_own_engine_voxel": 0,
+    "share_landed": 0.0,
+    "n_landed_elsewhere": 0,
+    "n_dropped_entirely": 200,
+    "max_displacement_in_engine_voxels": 0,
+    "is_a_block_partition": false
+   },
+   "shipped_level": "engine_3p6mm",
+   "shipped_rule_is_the_axis_aligned_block_vote": false,
+   "shipped_rule_dice_vs_axis_aligned": 0.39052631578947367
+  },
+  "days": 365,
+  "r0": 0.01,
+  "seeds": [
+   101,
+   102,
+   103,
+   104,
+   105,
+   106
+  ],
+  "modes": {
+   "shipped_noise": 0.05,
+   "noise_off": 0.0
+  },
+  "configs": {
+   "fine_2p0mm_matched_D": {
+    "level": "fine_2p0mm",
+    "d_voxel": 0.0875,
+    "rule": "physical diffusivity preserved across grids",
+    "physical_d_mm2_per_day": 0.35
+   },
+   "fine_2p0mm_declared_D": {
+    "level": "fine_2p0mm",
+    "d_voxel": 0.35,
+    "rule": "engine constant used as-is (what the shipped pipeline does)",
+    "physical_d_mm2_per_day": 1.4
+   },
+   "engine_3p6mm_matched_D": {
+    "level": "engine_3p6mm",
+    "d_voxel": 0.026499675312135366,
+    "rule": "physical diffusivity preserved across grids",
+    "physical_d_mm2_per_day": 0.34999999999999987
+   },
+   "engine_3p6mm_declared_D": {
+    "level": "engine_3p6mm",
+    "d_voxel": 0.35,
+    "rule": "engine constant used as-is (what the shipped pipeline does)",
+    "physical_d_mm2_per_day": 4.622698148452476
+   },
+   "coarse_7p3mm_matched_D": {
+    "level": "coarse_7p3mm",
+    "d_voxel": 0.006624918828033842,
+    "rule": "physical diffusivity preserved across grids",
+    "physical_d_mm2_per_day": 0.34999999999999987
+   },
+   "coarse_7p3mm_declared_D": {
+    "level": "coarse_7p3mm",
+    "d_voxel": 0.35,
+    "rule": "engine constant used as-is (what the shipped pipeline does)",
+    "physical_d_mm2_per_day": 18.490792593809903
+   }
+  },
+  "reference_config": "fine_2p0mm_matched_D",
+  "level_spacing_mm": {
+   "fine_2p0mm": [
+    2.0,
+    2.0,
+    2.0
+   ],
+   "engine_3p6mm": [
+    4.0,
+    4.0,
+    3.0
+   ],
+   "coarse_7p3mm": [
+    8.0,
+    8.0,
+    6.0
+   ]
+  },
+  "runs": {
+   "shipped_noise": {
+    "fine_2p0mm_matched_D": {
+     "mtd": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        273.0,
+        348.0,
+        285.0,
+        247.0,
+        272.0,
+        234.0
+       ],
+       "mean_density": [
+        1.1508464810106311,
+        0.8801754484691509,
+        1.076445375355103,
+        1.1463278603214013,
+        1.0926023074327011,
+        1.1726726748555532
+       ],
+       "final_resistant_fraction": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "voxels": 11952
+     },
+     "steering": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.0015878384320580832,
+        0.0012420089241610768,
+        0.000854155727972764,
+        0.0009159579710242185,
+        0.0015016394656545548,
+        0.0014016566587894234
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "voxels": 11952
+     }
+    },
+    "fine_2p0mm_declared_D": {
+     "mtd": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        273.0,
+        350.0,
+        286.0,
+        248.0,
+        272.0,
+        234.0
+       ],
+       "mean_density": [
+        1.1401731270978055,
+        0.8721140846956942,
+        1.0668925196378813,
+        1.133925462533255,
+        1.081850594889423,
+        1.1597651699098463
+       ],
+       "final_resistant_fraction": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "voxels": 11952
+     },
+     "steering": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.0009438942795220188,
+        0.0009586946654073635,
+        0.001208144808043234,
+        0.0010504531963728236,
+        0.0009091267334139111,
+        0.0010664433342807659
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "voxels": 11952
+     }
+    },
+    "engine_3p6mm_matched_D": {
+     "mtd": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        184.0,
+        234.0,
+        161.0,
+        177.0,
+        174.0,
+        191.0
+       ],
+       "mean_density": [
+        1.57113434968652,
+        1.4592787324620966,
+        1.6077706217442047,
+        1.5794598850573982,
+        1.5844463622364324,
+        1.5548647867536856
+       ],
+       "final_resistant_fraction": [
+        0.9999831895671436,
+        0.9999821221262742,
+        0.9999835329702691,
+        0.9999833072939857,
+        0.9999834724882203,
+        0.9999834789218355
+       ]
+      },
+      "voxels": 2026
+     },
+     "steering": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.006672601681528382,
+        0.005784363169590525,
+        0.005934217984321323,
+        0.00789058937917646,
+        0.006033149572707943,
+        0.006519567244496881
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "voxels": 2026
+     }
+    },
+    "engine_3p6mm_declared_D": {
+     "mtd": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        185.0,
+        235.0,
+        161.0,
+        177.0,
+        174.0,
+        191.0
+       ],
+       "mean_density": [
+        1.4926875158248791,
+        1.4031416797000418,
+        1.5209627873083755,
+        1.5002468388180676,
+        1.503286639960044,
+        1.4808683885771896
+       ],
+       "final_resistant_fraction": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "voxels": 2026
+     },
+     "steering": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.008536005114865559,
+        0.009016555129767291,
+        0.0069294290751103745,
+        0.009183950553692491,
+        0.006625457414455317,
+        0.005627304064366362
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "voxels": 2026
+     }
+    },
+    "coarse_7p3mm_matched_D": {
+     "mtd": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        117.0,
+        133.0,
+        117.0,
+        130.0,
+        119.0,
+        114.0
+       ],
+       "mean_density": [
+        2.3020433840453314,
+        2.2504407713099095,
+        2.303809034193093,
+        2.2758765726714985,
+        2.2950948160141897,
+        2.311700073453431
+       ],
+       "final_resistant_fraction": [
+        0.999910958764856,
+        0.9999083699912602,
+        0.9999104592868179,
+        0.9999103369766666,
+        0.9999110492707677,
+        0.9999101710519429
+       ]
+      },
+      "voxels": 249
+     },
+     "steering": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.051630487197695266,
+        0.06270697655900896,
+        0.052245683691361795,
+        0.0519792719924186,
+        0.05049972405375685,
+        0.05299508213803769
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "voxels": 249
+     }
+    },
+    "coarse_7p3mm_declared_D": {
+     "mtd": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        118.0,
+        134.0,
+        117.0,
+        130.0,
+        120.0,
+        114.0
+       ],
+       "mean_density": [
+        2.0000262641493887,
+        1.970221175130074,
+        2.0010122400625723,
+        1.9874866292317865,
+        1.9958564265227852,
+        2.005044212990605
+       ],
+       "final_resistant_fraction": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "voxels": 249
+     },
+     "steering": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.0505482527908205,
+        0.05940528020683549,
+        0.04882178700900632,
+        0.05752788343283487,
+        0.05371780564862127,
+        0.04914727879125267
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "voxels": 249
+     }
+    }
+   },
+   "noise_off": {
+    "fine_2p0mm_matched_D": {
+     "mtd": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        273.0,
+        348.0,
+        285.0,
+        247.0,
+        272.0,
+        234.0
+       ],
+       "mean_density": [
+        1.1508395335589832,
+        0.8800770076929357,
+        1.0764910192729205,
+        1.1462513597094293,
+        1.0926299236601804,
+        1.1727267802381984
+       ],
+       "final_resistant_fraction": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "voxels": 11952
+     },
+     "steering": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.0015761036073689747,
+        0.0012425400954467944,
+        0.0008562895835833783,
+        0.000912603804964301,
+        0.0014986473767206279,
+        0.0013975789647665434
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "voxels": 11952
+     }
+    },
+    "fine_2p0mm_declared_D": {
+     "mtd": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        273.0,
+        350.0,
+        286.0,
+        248.0,
+        272.0,
+        234.0
+       ],
+       "mean_density": [
+        1.1402069607436678,
+        0.8720575861604267,
+        1.0669713367688771,
+        1.1338997226786685,
+        1.0818658982411942,
+        1.1597485239828162
+       ],
+       "final_resistant_fraction": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "voxels": 11952
+     },
+     "steering": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.0009466334836191997,
+        0.0008784425567387672,
+        0.0012087310347562168,
+        0.0010434969417390273,
+        0.0009128575472904421,
+        0.0010604059778161258
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "voxels": 11952
+     }
+    },
+    "engine_3p6mm_matched_D": {
+     "mtd": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        184.0,
+        234.0,
+        161.0,
+        177.0,
+        174.0,
+        191.0
+       ],
+       "mean_density": [
+        1.5711498804266721,
+        1.459432302573973,
+        1.607694683227956,
+        1.5794406769870821,
+        1.5844991042774255,
+        1.5548556983779782
+       ],
+       "final_resistant_fraction": [
+        0.9999831935141621,
+        0.9999821220656692,
+        0.9999835375199897,
+        0.9999833097241729,
+        0.9999834800120642,
+        0.9999834775645975
+       ]
+      },
+      "voxels": 2026
+     },
+     "steering": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.0066771184257596585,
+        0.005781391436903813,
+        0.005931997373494271,
+        0.00790112832525898,
+        0.006036935408339417,
+        0.006514490406163725
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "voxels": 2026
+     }
+    },
+    "engine_3p6mm_declared_D": {
+     "mtd": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        185.0,
+        235.0,
+        161.0,
+        177.0,
+        174.0,
+        191.0
+       ],
+       "mean_density": [
+        1.4927320983270616,
+        1.4031624477645874,
+        1.520917613249936,
+        1.5002267009680996,
+        1.5033085404598336,
+        1.4808311354391681
+       ],
+       "final_resistant_fraction": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "voxels": 2026
+     },
+     "steering": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.008575836655439631,
+        0.00901569995424967,
+        0.006913203724937945,
+        0.009212825595123361,
+        0.006609711007403098,
+        0.005627129542027061
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "voxels": 2026
+     }
+    },
+    "coarse_7p3mm_matched_D": {
+     "mtd": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        117.0,
+        133.0,
+        116.0,
+        130.0,
+        119.0,
+        114.0
+       ],
+       "mean_density": [
+        2.3022355576860978,
+        2.2501951364341433,
+        2.304378056372771,
+        2.2763249850285163,
+        2.29497632759593,
+        2.311786602468207
+       ],
+       "final_resistant_fraction": [
+        0.999911012719904,
+        0.9999083201153748,
+        0.9999103991263597,
+        0.9999103433964619,
+        0.9999110164680021,
+        0.999910206493308
+       ]
+      },
+      "voxels": 249
+     },
+     "steering": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.05171537570103391,
+        0.06179615345759558,
+        0.05274689902198472,
+        0.05214100882628155,
+        0.050481577350983596,
+        0.05278787332124792
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "voxels": 249
+     }
+    },
+    "coarse_7p3mm_declared_D": {
+     "mtd": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        118.0,
+        134.0,
+        117.0,
+        130.0,
+        120.0,
+        114.0
+       ],
+       "mean_density": [
+        2.000158769065829,
+        1.9700162698677235,
+        2.0014250951742256,
+        1.9877078723424255,
+        1.9955619943978293,
+        2.0052150835896283
+       ],
+       "final_resistant_fraction": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "voxels": 249
+     },
+     "steering": {
+      "seeds": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106
+      ],
+      "readouts": {
+       "pfs": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_density": [
+        0.05131768230370069,
+        0.06008693490141894,
+        0.049654456313751816,
+        0.05813407468310613,
+        0.05214465473583051,
+        0.049324553590220234
+       ],
+       "final_resistant_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "voxels": 249
+     }
+    }
+   }
+  },
+  "spreads": {
+   "shipped_noise": {
+    "fine_2p0mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "min": 234.0,
+       "max": 348.0,
+       "mean": 276.5,
+       "spread_rel": 0.41229656419529837,
+       "degenerate": false
+      },
+      "mean_density": {
+       "min": 0.8801754484691509,
+       "max": 1.1726726748555532,
+       "mean": 1.0865116912407566,
+       "spread_rel": 0.26920761989443587,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 1.0,
+       "max": 1.0,
+       "mean": 1.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     },
+     "steering": {
+      "pfs": {
+       "min": 365.0,
+       "max": 365.0,
+       "mean": 365.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      },
+      "mean_density": {
+       "min": 0.000854155727972764,
+       "max": 0.0015878384320580832,
+       "mean": 0.0012505428632766868,
+       "spread_rel": 0.5866913687091982,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.0,
+       "max": 0.0,
+       "mean": 0.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     }
+    },
+    "fine_2p0mm_declared_D": {
+     "mtd": {
+      "pfs": {
+       "min": 234.0,
+       "max": 350.0,
+       "mean": 277.1666666666667,
+       "spread_rel": 0.41852074564040886,
+       "degenerate": false
+      },
+      "mean_density": {
+       "min": 0.8721140846956942,
+       "max": 1.1597651699098463,
+       "mean": 1.075786826460651,
+       "spread_rel": 0.26738669608041865,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 1.0,
+       "max": 1.0,
+       "mean": 1.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     },
+     "steering": {
+      "pfs": {
+       "min": 365.0,
+       "max": 365.0,
+       "mean": 365.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      },
+      "mean_density": {
+       "min": 0.0009091267334139111,
+       "max": 0.001208144808043234,
+       "mean": 0.0010227928361733528,
+       "spread_rel": 0.2923544867092152,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.0,
+       "max": 0.0,
+       "mean": 0.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     }
+    },
+    "engine_3p6mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "min": 161.0,
+       "max": 234.0,
+       "mean": 186.83333333333334,
+       "spread_rel": 0.39072256913470116,
+       "degenerate": false
+      },
+      "mean_density": {
+       "min": 1.4592787324620966,
+       "max": 1.6077706217442047,
+       "mean": 1.5594924563233896,
+       "spread_rel": 0.0952180875771518,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.9999821221262742,
+       "max": 0.9999835329702691,
+       "mean": 0.9999831838946215,
+       "spread_rel": 1.4108677201537296e-06,
+       "degenerate": false
+      }
+     },
+     "steering": {
+      "pfs": {
+       "min": 365.0,
+       "max": 365.0,
+       "mean": 365.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      },
+      "mean_density": {
+       "min": 0.005784363169590525,
+       "max": 0.00789058937917646,
+       "mean": 0.006472414838636919,
+       "spread_rel": 0.325415824247369,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.0,
+       "max": 0.0,
+       "mean": 0.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     }
+    },
+    "engine_3p6mm_declared_D": {
+     "mtd": {
+      "pfs": {
+       "min": 161.0,
+       "max": 235.0,
+       "mean": 187.16666666666666,
+       "spread_rel": 0.39536954585930545,
+       "degenerate": false
+      },
+      "mean_density": {
+       "min": 1.4031416797000418,
+       "max": 1.5209627873083755,
+       "mean": 1.4835323083647662,
+       "spread_rel": 0.07941930684219671,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 1.0,
+       "max": 1.0,
+       "mean": 1.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     },
+     "steering": {
+      "pfs": {
+       "min": 365.0,
+       "max": 365.0,
+       "mean": 365.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      },
+      "mean_density": {
+       "min": 0.005627304064366362,
+       "max": 0.009183950553692491,
+       "mean": 0.007653116892042899,
+       "spread_rel": 0.46473176086256396,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.0,
+       "max": 0.0,
+       "mean": 0.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     }
+    },
+    "coarse_7p3mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "min": 114.0,
+       "max": 133.0,
+       "mean": 121.66666666666667,
+       "spread_rel": 0.15616438356164383,
+       "degenerate": false
+      },
+      "mean_density": {
+       "min": 2.2504407713099095,
+       "max": 2.311700073453431,
+       "mean": 2.2898274419479088,
+       "spread_rel": 0.026752802862476603,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.9999083699912602,
+       "max": 0.9999110492707677,
+       "mean": 0.9999102242237186,
+       "spread_rel": 2.6795200634719095e-06,
+       "degenerate": false
+      }
+     },
+     "steering": {
+      "pfs": {
+       "min": 365.0,
+       "max": 365.0,
+       "mean": 365.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      },
+      "mean_density": {
+       "min": 0.05049972405375685,
+       "max": 0.06270697655900896,
+       "mean": 0.05367620427204652,
+       "spread_rel": 0.22742391476458038,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.0,
+       "max": 0.0,
+       "mean": 0.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     }
+    },
+    "coarse_7p3mm_declared_D": {
+     "mtd": {
+      "pfs": {
+       "min": 114.0,
+       "max": 134.0,
+       "mean": 122.16666666666667,
+       "spread_rel": 0.1637107776261937,
+       "degenerate": false
+      },
+      "mean_density": {
+       "min": 1.970221175130074,
+       "max": 2.005044212990605,
+       "mean": 1.9932744913478686,
+       "spread_rel": 0.017470267146690546,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 1.0,
+       "max": 1.0,
+       "mean": 1.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     },
+     "steering": {
+      "pfs": {
+       "min": 365.0,
+       "max": 365.0,
+       "mean": 365.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      },
+      "mean_density": {
+       "min": 0.04882178700900632,
+       "max": 0.05940528020683549,
+       "mean": 0.05319471464656186,
+       "spread_rel": 0.19895760825390976,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.0,
+       "max": 0.0,
+       "mean": 0.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     }
+    }
+   },
+   "noise_off": {
+    "fine_2p0mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "min": 234.0,
+       "max": 348.0,
+       "mean": 276.5,
+       "spread_rel": 0.41229656419529837,
+       "degenerate": false
+      },
+      "mean_density": {
+       "min": 0.8800770076929357,
+       "max": 1.1727267802381984,
+       "mean": 1.086502604022108,
+       "spread_rel": 0.2693502725735832,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 1.0,
+       "max": 1.0,
+       "mean": 1.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     },
+     "steering": {
+      "pfs": {
+       "min": 365.0,
+       "max": 365.0,
+       "mean": 365.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      },
+      "mean_density": {
+       "min": 0.0008562895835833783,
+       "max": 0.0015761036073689747,
+       "mean": 0.0012472939054751033,
+       "spread_rel": 0.577100569982673,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.0,
+       "max": 0.0,
+       "mean": 0.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     }
+    },
+    "fine_2p0mm_declared_D": {
+     "mtd": {
+      "pfs": {
+       "min": 234.0,
+       "max": 350.0,
+       "mean": 277.1666666666667,
+       "spread_rel": 0.41852074564040886,
+       "degenerate": false
+      },
+      "mean_density": {
+       "min": 0.8720575861604267,
+       "max": 1.1597485239828162,
+       "mean": 1.0757916714292752,
+       "spread_rel": 0.26742253678183725,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 1.0,
+       "max": 1.0,
+       "mean": 1.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     },
+     "steering": {
+      "pfs": {
+       "min": 365.0,
+       "max": 365.0,
+       "mean": 365.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      },
+      "mean_density": {
+       "min": 0.0008784425567387672,
+       "max": 0.0012087310347562168,
+       "mean": 0.001008427923659963,
+       "spread_rel": 0.3275280962259641,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.0,
+       "max": 0.0,
+       "mean": 0.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     }
+    },
+    "engine_3p6mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "min": 161.0,
+       "max": 234.0,
+       "mean": 186.83333333333334,
+       "spread_rel": 0.39072256913470116,
+       "degenerate": false
+      },
+      "mean_density": {
+       "min": 1.459432302573973,
+       "max": 1.607694683227956,
+       "mean": 1.559512057645181,
+       "spread_rel": 0.09506972384545387,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.9999821220656692,
+       "max": 0.9999835375199897,
+       "mean": 0.9999831867334427,
+       "spread_rel": 1.4154781193411783e-06,
+       "degenerate": false
+      }
+     },
+     "steering": {
+      "pfs": {
+       "min": 365.0,
+       "max": 365.0,
+       "mean": 365.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      },
+      "mean_density": {
+       "min": 0.005781391436903813,
+       "max": 0.00790112832525898,
+       "mean": 0.00647384356265331,
+       "spread_rel": 0.32743097170027863,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.0,
+       "max": 0.0,
+       "mean": 0.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     }
+    },
+    "engine_3p6mm_declared_D": {
+     "mtd": {
+      "pfs": {
+       "min": 161.0,
+       "max": 235.0,
+       "mean": 187.16666666666666,
+       "spread_rel": 0.39536954585930545,
+       "degenerate": false
+      },
+      "mean_density": {
+       "min": 1.4031624477645874,
+       "max": 1.520917613249936,
+       "mean": 1.483529756034781,
+       "spread_rel": 0.07937499400085363,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 1.0,
+       "max": 1.0,
+       "mean": 1.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     },
+     "steering": {
+      "pfs": {
+       "min": 365.0,
+       "max": 365.0,
+       "mean": 365.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      },
+      "mean_density": {
+       "min": 0.005627129542027061,
+       "max": 0.009212825595123361,
+       "mean": 0.007659067746530128,
+       "spread_rel": 0.46816351176953197,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.0,
+       "max": 0.0,
+       "mean": 0.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     }
+    },
+    "coarse_7p3mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "min": 114.0,
+       "max": 133.0,
+       "mean": 121.5,
+       "spread_rel": 0.15637860082304528,
+       "degenerate": false
+      },
+      "mean_density": {
+       "min": 2.2501951364341433,
+       "max": 2.311786602468207,
+       "mean": 2.289982777597611,
+       "spread_rel": 0.02689603897313083,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.9999083201153748,
+       "max": 0.9999110164680021,
+       "mean": 0.9999102163865684,
+       "spread_rel": 2.696594737304435e-06,
+       "degenerate": false
+      }
+     },
+     "steering": {
+      "pfs": {
+       "min": 365.0,
+       "max": 365.0,
+       "mean": 365.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      },
+      "mean_density": {
+       "min": 0.050481577350983596,
+       "max": 0.06179615345759558,
+       "mean": 0.053611481279854545,
+       "spread_rel": 0.2110476307779922,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.0,
+       "max": 0.0,
+       "mean": 0.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     }
+    },
+    "coarse_7p3mm_declared_D": {
+     "mtd": {
+      "pfs": {
+       "min": 114.0,
+       "max": 134.0,
+       "mean": 122.16666666666667,
+       "spread_rel": 0.1637107776261937,
+       "degenerate": false
+      },
+      "mean_density": {
+       "min": 1.9700162698677235,
+       "max": 2.0052150835896283,
+       "mean": 1.9933475140729435,
+       "spread_rel": 0.017658142131967845,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 1.0,
+       "max": 1.0,
+       "mean": 1.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     },
+     "steering": {
+      "pfs": {
+       "min": 365.0,
+       "max": 365.0,
+       "mean": 365.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      },
+      "mean_density": {
+       "min": 0.049324553590220234,
+       "max": 0.06008693490141894,
+       "mean": 0.05344372608800472,
+       "spread_rel": 0.2013778248447069,
+       "degenerate": false
+      },
+      "final_resistant_fraction": {
+       "min": 0.0,
+       "max": 0.0,
+       "mean": 0.0,
+       "spread_rel": 0.0,
+       "degenerate": true
+      }
+     }
+    }
+   }
+  },
+  "contrasts": {
+   "shipped_noise": {
+    "fine_2p0mm_declared_D_vs_fine_2p0mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "base": [
+        273.0,
+        348.0,
+        285.0,
+        247.0,
+        272.0,
+        234.0
+       ],
+       "candidate": [
+        273.0,
+        350.0,
+        286.0,
+        248.0,
+        272.0,
+        234.0
+       ],
+       "mean_delta": 0.6666666666666666,
+       "mean_rel_delta": 0.0024110910186859553,
+       "max_abs_delta": 2.0,
+       "seeds_moving_the_same_way": 3,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.41229656419529837,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 0.005847953216374269
+      },
+      "mean_density": {
+       "base": [
+        1.1508464810106311,
+        0.8801754484691509,
+        1.076445375355103,
+        1.1463278603214013,
+        1.0926023074327011,
+        1.1726726748555532
+       ],
+       "candidate": [
+        1.1401731270978055,
+        0.8721140846956942,
+        1.0668925196378813,
+        1.133925462533255,
+        1.081850594889423,
+        1.1597651699098463
+       ],
+       "mean_delta": -0.01072486478010587,
+       "mean_rel_delta": -0.009870915211099538,
+       "max_abs_delta": 0.012907504945706805,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.26920761989443587,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 0.036666552064797464
+      },
+      "final_resistant_fraction": {
+       "base": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "candidate": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     },
+     "steering": {
+      "pfs": {
+       "base": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "candidate": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      },
+      "mean_density": {
+       "base": [
+        0.0015878384320580832,
+        0.0012420089241610768,
+        0.000854155727972764,
+        0.0009159579710242185,
+        0.0015016394656545548,
+        0.0014016566587894234
+       ],
+       "candidate": [
+        0.0009438942795220188,
+        0.0009586946654073635,
+        0.001208144808043234,
+        0.0010504531963728236,
+        0.0009091267334139111,
+        0.0010664433342807659
+       ],
+       "mean_delta": -0.00022775002710333396,
+       "mean_rel_delta": -0.18212092827156737,
+       "max_abs_delta": 0.0006439441525360643,
+       "seeds_moving_the_same_way": 4,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.5866913687091982,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 0.3104203299807503
+      },
+      "final_resistant_fraction": {
+       "base": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "candidate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": null,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     }
+    },
+    "engine_3p6mm_matched_D_vs_fine_2p0mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "base": [
+        273.0,
+        348.0,
+        285.0,
+        247.0,
+        272.0,
+        234.0
+       ],
+       "candidate": [
+        184.0,
+        234.0,
+        161.0,
+        177.0,
+        174.0,
+        191.0
+       ],
+       "mean_delta": -89.66666666666667,
+       "mean_rel_delta": -0.324291742013261,
+       "max_abs_delta": 124.0,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.41229656419529837,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 0.7865497076023392
+      },
+      "mean_density": {
+       "base": [
+        1.1508464810106311,
+        0.8801754484691509,
+        1.076445375355103,
+        1.1463278603214013,
+        1.0926023074327011,
+        1.1726726748555532
+       ],
+       "candidate": [
+        1.57113434968652,
+        1.4592787324620966,
+        1.6077706217442047,
+        1.5794598850573982,
+        1.5844463622364324,
+        1.5548647867536856
+       ],
+       "mean_delta": 0.4729807650826328,
+       "mean_rel_delta": 0.43532045618626164,
+       "max_abs_delta": 0.5791032839929457,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.26920761989443587,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 1.617043590211018
+      },
+      "final_resistant_fraction": {
+       "base": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "candidate": [
+        0.9999831895671436,
+        0.9999821221262742,
+        0.9999835329702691,
+        0.9999833072939857,
+        0.9999834724882203,
+        0.9999834789218355
+       ],
+       "mean_delta": -1.681610537860682e-05,
+       "mean_rel_delta": -1.681610537860682e-05,
+       "max_abs_delta": 1.7877873725757887e-05,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     },
+     "steering": {
+      "pfs": {
+       "base": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "candidate": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      },
+      "mean_density": {
+       "base": [
+        0.0015878384320580832,
+        0.0012420089241610768,
+        0.000854155727972764,
+        0.0009159579710242185,
+        0.0015016394656545548,
+        0.0014016566587894234
+       ],
+       "candidate": [
+        0.006672601681528382,
+        0.005784363169590525,
+        0.005934217984321323,
+        0.00789058937917646,
+        0.006033149572707943,
+        0.006519567244496881
+       ],
+       "mean_delta": 0.005221871975360232,
+       "mean_rel_delta": 4.175684119837222,
+       "max_abs_delta": 0.0069746314081522405,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.5866913687091982,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 7.117343704960756
+      },
+      "final_resistant_fraction": {
+       "base": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "candidate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": null,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     }
+    },
+    "engine_3p6mm_declared_D_vs_fine_2p0mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "base": [
+        273.0,
+        348.0,
+        285.0,
+        247.0,
+        272.0,
+        234.0
+       ],
+       "candidate": [
+        185.0,
+        235.0,
+        161.0,
+        177.0,
+        174.0,
+        191.0
+       ],
+       "mean_delta": -89.33333333333333,
+       "mean_rel_delta": -0.323086196503918,
+       "max_abs_delta": 124.0,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.41229656419529837,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 0.783625730994152
+      },
+      "mean_density": {
+       "base": [
+        1.1508464810106311,
+        0.8801754484691509,
+        1.076445375355103,
+        1.1463278603214013,
+        1.0926023074327011,
+        1.1726726748555532
+       ],
+       "candidate": [
+        1.4926875158248791,
+        1.4031416797000418,
+        1.5209627873083755,
+        1.5002468388180676,
+        1.503286639960044,
+        1.4808683885771896
+       ],
+       "mean_delta": 0.39702061712400954,
+       "mean_rel_delta": 0.36540850901533006,
+       "max_abs_delta": 0.5229662312308909,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.26920761989443587,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 1.3573483141324802
+      },
+      "final_resistant_fraction": {
+       "base": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "candidate": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     },
+     "steering": {
+      "pfs": {
+       "base": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "candidate": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      },
+      "mean_density": {
+       "base": [
+        0.0015878384320580832,
+        0.0012420089241610768,
+        0.000854155727972764,
+        0.0009159579710242185,
+        0.0015016394656545548,
+        0.0014016566587894234
+       ],
+       "candidate": [
+        0.008536005114865559,
+        0.009016555129767291,
+        0.0069294290751103745,
+        0.009183950553692491,
+        0.006625457414455317,
+        0.005627304064366362
+       ],
+       "mean_delta": 0.006402574028766213,
+       "mean_rel_delta": 5.1198357263741565,
+       "max_abs_delta": 0.008267992582668273,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.5866913687091982,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 8.726625274270695
+      },
+      "final_resistant_fraction": {
+       "base": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "candidate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": null,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     }
+    },
+    "coarse_7p3mm_matched_D_vs_fine_2p0mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "base": [
+        273.0,
+        348.0,
+        285.0,
+        247.0,
+        272.0,
+        234.0
+       ],
+       "candidate": [
+        117.0,
+        133.0,
+        117.0,
+        130.0,
+        119.0,
+        114.0
+       ],
+       "mean_delta": -154.83333333333334,
+       "mean_rel_delta": -0.5599758890898132,
+       "max_abs_delta": 215.0,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.41229656419529837,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 1.3581871345029242
+      },
+      "mean_density": {
+       "base": [
+        1.1508464810106311,
+        0.8801754484691509,
+        1.076445375355103,
+        1.1463278603214013,
+        1.0926023074327011,
+        1.1726726748555532
+       ],
+       "candidate": [
+        2.3020433840453314,
+        2.2504407713099095,
+        2.303809034193093,
+        2.2758765726714985,
+        2.2950948160141897,
+        2.311700073453431
+       ],
+       "mean_delta": 1.2033157507071521,
+       "mean_rel_delta": 1.1075037299718418,
+       "max_abs_delta": 1.3702653228407586,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.26920761989443587,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 4.113939012596026
+      },
+      "final_resistant_fraction": {
+       "base": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "candidate": [
+        0.999910958764856,
+        0.9999083699912602,
+        0.9999104592868179,
+        0.9999103369766666,
+        0.9999110492707677,
+        0.9999101710519429
+       ],
+       "mean_delta": -8.977577628144218e-05,
+       "mean_rel_delta": -8.977577628144218e-05,
+       "max_abs_delta": 9.163000873979588e-05,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     },
+     "steering": {
+      "pfs": {
+       "base": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "candidate": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      },
+      "mean_density": {
+       "base": [
+        0.0015878384320580832,
+        0.0012420089241610768,
+        0.000854155727972764,
+        0.0009159579710242185,
+        0.0015016394656545548,
+        0.0014016566587894234
+       ],
+       "candidate": [
+        0.051630487197695266,
+        0.06270697655900896,
+        0.052245683691361795,
+        0.0519792719924186,
+        0.05049972405375685,
+        0.05299508213803769
+       ],
+       "mean_delta": 0.05242566140876984,
+       "mean_rel_delta": 41.92232265546142,
+       "max_abs_delta": 0.061464967634847885,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.5866913687091982,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 71.45549583880243
+      },
+      "final_resistant_fraction": {
+       "base": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "candidate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": null,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     }
+    },
+    "coarse_7p3mm_declared_D_vs_fine_2p0mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "base": [
+        273.0,
+        348.0,
+        285.0,
+        247.0,
+        272.0,
+        234.0
+       ],
+       "candidate": [
+        118.0,
+        134.0,
+        117.0,
+        130.0,
+        120.0,
+        114.0
+       ],
+       "mean_delta": -154.33333333333334,
+       "mean_rel_delta": -0.5581675708257987,
+       "max_abs_delta": 214.0,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.41229656419529837,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 1.3538011695906433
+      },
+      "mean_density": {
+       "base": [
+        1.1508464810106311,
+        0.8801754484691509,
+        1.076445375355103,
+        1.1463278603214013,
+        1.0926023074327011,
+        1.1726726748555532
+       ],
+       "candidate": [
+        2.0000262641493887,
+        1.970221175130074,
+        2.0010122400625723,
+        1.9874866292317865,
+        1.9958564265227852,
+        2.005044212990605
+       ],
+       "mean_delta": 0.9067628001071117,
+       "mean_rel_delta": 0.8345633161771336,
+       "max_abs_delta": 1.0900457266609231,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.26920761989443587,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 3.1000731573065807
+      },
+      "final_resistant_fraction": {
+       "base": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "candidate": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     },
+     "steering": {
+      "pfs": {
+       "base": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "candidate": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      },
+      "mean_density": {
+       "base": [
+        0.0015878384320580832,
+        0.0012420089241610768,
+        0.000854155727972764,
+        0.0009159579710242185,
+        0.0015016394656545548,
+        0.0014016566587894234
+       ],
+       "candidate": [
+        0.0505482527908205,
+        0.05940528020683549,
+        0.04882178700900632,
+        0.05752788343283487,
+        0.05371780564862127,
+        0.04914727879125267
+       ],
+       "mean_delta": 0.05194417178328517,
+       "mean_rel_delta": 41.537298167597754,
+       "max_abs_delta": 0.058163271282674414,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.5866913687091982,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 70.79923173062103
+      },
+      "final_resistant_fraction": {
+       "base": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "candidate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": null,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     }
+    }
+   },
+   "noise_off": {
+    "fine_2p0mm_declared_D_vs_fine_2p0mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "base": [
+        273.0,
+        348.0,
+        285.0,
+        247.0,
+        272.0,
+        234.0
+       ],
+       "candidate": [
+        273.0,
+        350.0,
+        286.0,
+        248.0,
+        272.0,
+        234.0
+       ],
+       "mean_delta": 0.6666666666666666,
+       "mean_rel_delta": 0.0024110910186859553,
+       "max_abs_delta": 2.0,
+       "seeds_moving_the_same_way": 3,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.41229656419529837,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 0.005847953216374269
+      },
+      "mean_density": {
+       "base": [
+        1.1508395335589832,
+        0.8800770076929357,
+        1.0764910192729205,
+        1.1462513597094293,
+        1.0926299236601804,
+        1.1727267802381984
+       ],
+       "candidate": [
+        1.1402069607436678,
+        0.8720575861604267,
+        1.0669713367688771,
+        1.1338997226786685,
+        1.0818658982411942,
+        1.1597485239828162
+       ],
+       "mean_delta": -0.010710932592832826,
+       "mean_rel_delta": -0.009858174801590151,
+       "max_abs_delta": 0.012978256255382181,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.2693502725735832,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 0.0365998322830619
+      },
+      "final_resistant_fraction": {
+       "base": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "candidate": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     },
+     "steering": {
+      "pfs": {
+       "base": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "candidate": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      },
+      "mean_density": {
+       "base": [
+        0.0015761036073689747,
+        0.0012425400954467944,
+        0.0008562895835833783,
+        0.000912603804964301,
+        0.0014986473767206279,
+        0.0013975789647665434
+       ],
+       "candidate": [
+        0.0009466334836191997,
+        0.0008784425567387672,
+        0.0012087310347562168,
+        0.0010434969417390273,
+        0.0009128575472904421,
+        0.0010604059778161258
+       ],
+       "mean_delta": -0.00023886598181514015,
+       "mean_rel_delta": -0.1915073750994994,
+       "max_abs_delta": 0.000629470123749775,
+       "seeds_moving_the_same_way": 4,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.577100569982673,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 0.3318440234866676
+      },
+      "final_resistant_fraction": {
+       "base": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "candidate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": null,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     }
+    },
+    "engine_3p6mm_matched_D_vs_fine_2p0mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "base": [
+        273.0,
+        348.0,
+        285.0,
+        247.0,
+        272.0,
+        234.0
+       ],
+       "candidate": [
+        184.0,
+        234.0,
+        161.0,
+        177.0,
+        174.0,
+        191.0
+       ],
+       "mean_delta": -89.66666666666667,
+       "mean_rel_delta": -0.324291742013261,
+       "max_abs_delta": 124.0,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.41229656419529837,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 0.7865497076023392
+      },
+      "mean_density": {
+       "base": [
+        1.1508395335589832,
+        0.8800770076929357,
+        1.0764910192729205,
+        1.1462513597094293,
+        1.0926299236601804,
+        1.1727267802381984
+       ],
+       "candidate": [
+        1.5711498804266721,
+        1.459432302573973,
+        1.607694683227956,
+        1.5794406769870821,
+        1.5844991042774255,
+        1.5548556983779782
+       ],
+       "mean_delta": 0.4730094536230733,
+       "mean_rel_delta": 0.43535050157454436,
+       "max_abs_delta": 0.5793552948810373,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.2693502725735832,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 1.6162987229040653
+      },
+      "final_resistant_fraction": {
+       "base": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "candidate": [
+        0.9999831935141621,
+        0.9999821220656692,
+        0.9999835375199897,
+        0.9999833097241729,
+        0.9999834800120642,
+        0.9999834775645975
+       ],
+       "mean_delta": -1.6813266557410184e-05,
+       "mean_rel_delta": -1.6813266557410184e-05,
+       "max_abs_delta": 1.78779343308344e-05,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     },
+     "steering": {
+      "pfs": {
+       "base": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "candidate": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      },
+      "mean_density": {
+       "base": [
+        0.0015761036073689747,
+        0.0012425400954467944,
+        0.0008562895835833783,
+        0.000912603804964301,
+        0.0014986473767206279,
+        0.0013975789647665434
+       ],
+       "candidate": [
+        0.0066771184257596585,
+        0.005781391436903813,
+        0.005931997373494271,
+        0.00790112832525898,
+        0.006036935408339417,
+        0.006514490406163725
+       ],
+       "mean_delta": 0.005226549657178208,
+       "mean_rel_delta": 4.19031122836071,
+       "max_abs_delta": 0.006988524520294679,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.577100569982673,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 7.260972257377118
+      },
+      "final_resistant_fraction": {
+       "base": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "candidate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": null,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     }
+    },
+    "engine_3p6mm_declared_D_vs_fine_2p0mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "base": [
+        273.0,
+        348.0,
+        285.0,
+        247.0,
+        272.0,
+        234.0
+       ],
+       "candidate": [
+        185.0,
+        235.0,
+        161.0,
+        177.0,
+        174.0,
+        191.0
+       ],
+       "mean_delta": -89.33333333333333,
+       "mean_rel_delta": -0.323086196503918,
+       "max_abs_delta": 124.0,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.41229656419529837,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 0.783625730994152
+      },
+      "mean_density": {
+       "base": [
+        1.1508395335589832,
+        0.8800770076929357,
+        1.0764910192729205,
+        1.1462513597094293,
+        1.0926299236601804,
+        1.1727267802381984
+       ],
+       "candidate": [
+        1.4927320983270616,
+        1.4031624477645874,
+        1.520917613249936,
+        1.5002267009680996,
+        1.5033085404598336,
+        1.4808311354391681
+       ],
+       "mean_delta": 0.3970271520126732,
+       "mean_rel_delta": 0.3654175798041571,
+       "max_abs_delta": 0.5230854400716517,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.2693502725735832,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 1.3566631149568618
+      },
+      "final_resistant_fraction": {
+       "base": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "candidate": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     },
+     "steering": {
+      "pfs": {
+       "base": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "candidate": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      },
+      "mean_density": {
+       "base": [
+        0.0015761036073689747,
+        0.0012425400954467944,
+        0.0008562895835833783,
+        0.000912603804964301,
+        0.0014986473767206279,
+        0.0013975789647665434
+       ],
+       "candidate": [
+        0.008575836655439631,
+        0.00901569995424967,
+        0.006913203724937945,
+        0.009212825595123361,
+        0.006609711007403098,
+        0.005627129542027061
+       ],
+       "mean_delta": 0.006411773841055024,
+       "mean_rel_delta": 5.140547719274498,
+       "max_abs_delta": 0.00830022179015906,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.577100569982673,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 8.907542266729765
+      },
+      "final_resistant_fraction": {
+       "base": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "candidate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": null,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     }
+    },
+    "coarse_7p3mm_matched_D_vs_fine_2p0mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "base": [
+        273.0,
+        348.0,
+        285.0,
+        247.0,
+        272.0,
+        234.0
+       ],
+       "candidate": [
+        117.0,
+        133.0,
+        116.0,
+        130.0,
+        119.0,
+        114.0
+       ],
+       "mean_delta": -155.0,
+       "mean_rel_delta": -0.5605786618444847,
+       "max_abs_delta": 215.0,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.41229656419529837,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 1.3596491228070178
+      },
+      "mean_density": {
+       "base": [
+        1.1508395335589832,
+        0.8800770076929357,
+        1.0764910192729205,
+        1.1462513597094293,
+        1.0926299236601804,
+        1.1727267802381984
+       ],
+       "candidate": [
+        2.3022355576860978,
+        2.2501951364341433,
+        2.304378056372771,
+        2.2763249850285163,
+        2.29497632759593,
+        2.311786602468207
+       ],
+       "mean_delta": 1.203480173575503,
+       "mean_rel_delta": 1.1076643250741944,
+       "max_abs_delta": 1.3701181287412076,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.2693502725735832,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 4.112356429012316
+      },
+      "final_resistant_fraction": {
+       "base": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "candidate": [
+        0.999911012719904,
+        0.9999083201153748,
+        0.9999103991263597,
+        0.9999103433964619,
+        0.9999110164680021,
+        0.999910206493308
+       ],
+       "mean_delta": -8.978361343159325e-05,
+       "mean_rel_delta": -8.978361343159325e-05,
+       "max_abs_delta": 9.167988462521759e-05,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     },
+     "steering": {
+      "pfs": {
+       "base": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "candidate": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      },
+      "mean_density": {
+       "base": [
+        0.0015761036073689747,
+        0.0012425400954467944,
+        0.0008562895835833783,
+        0.000912603804964301,
+        0.0014986473767206279,
+        0.0013975789647665434
+       ],
+       "candidate": [
+        0.05171537570103391,
+        0.06179615345759558,
+        0.05274689902198472,
+        0.05214100882628155,
+        0.050481577350983596,
+        0.05278787332124792
+       ],
+       "mean_delta": 0.05236418737437945,
+       "mean_rel_delta": 41.98223621916404,
+       "max_abs_delta": 0.06055361336214878,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.577100569982673,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 72.74682854744802
+      },
+      "final_resistant_fraction": {
+       "base": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "candidate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": null,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     }
+    },
+    "coarse_7p3mm_declared_D_vs_fine_2p0mm_matched_D": {
+     "mtd": {
+      "pfs": {
+       "base": [
+        273.0,
+        348.0,
+        285.0,
+        247.0,
+        272.0,
+        234.0
+       ],
+       "candidate": [
+        118.0,
+        134.0,
+        117.0,
+        130.0,
+        120.0,
+        114.0
+       ],
+       "mean_delta": -154.33333333333334,
+       "mean_rel_delta": -0.5581675708257987,
+       "max_abs_delta": 214.0,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.41229656419529837,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 1.3538011695906433
+      },
+      "mean_density": {
+       "base": [
+        1.1508395335589832,
+        0.8800770076929357,
+        1.0764910192729205,
+        1.1462513597094293,
+        1.0926299236601804,
+        1.1727267802381984
+       ],
+       "candidate": [
+        2.000158769065829,
+        1.9700162698677235,
+        2.0014250951742256,
+        1.9877078723424255,
+        1.9955619943978293,
+        2.0052150835896283
+       ],
+       "mean_delta": 0.9068449100508356,
+       "mean_rel_delta": 0.8346458689503364,
+       "max_abs_delta": 1.0899392621747879,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.2693502725735832,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 3.0987377921524897
+      },
+      "final_resistant_fraction": {
+       "base": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "candidate": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     },
+     "steering": {
+      "pfs": {
+       "base": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "candidate": [
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0,
+        365.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": 0.0,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      },
+      "mean_density": {
+       "base": [
+        0.0015761036073689747,
+        0.0012425400954467944,
+        0.0008562895835833783,
+        0.000912603804964301,
+        0.0014986473767206279,
+        0.0013975789647665434
+       ],
+       "candidate": [
+        0.05131768230370069,
+        0.06008693490141894,
+        0.049654456313751816,
+        0.05813407468310613,
+        0.05214465473583051,
+        0.049324553590220234
+       ],
+       "mean_delta": 0.05219643218252962,
+       "mean_rel_delta": 41.84774090004682,
+       "max_abs_delta": 0.058844394805972144,
+       "seeds_moving_the_same_way": 6,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.577100569982673,
+       "reference_spread_degenerate": false,
+       "delta_over_spread": 72.51377502764079
+      },
+      "final_resistant_fraction": {
+       "base": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "candidate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "mean_delta": 0.0,
+       "mean_rel_delta": null,
+       "max_abs_delta": 0.0,
+       "seeds_moving_the_same_way": 0,
+       "n_seeds": 6,
+       "reference_spread_rel": 0.0,
+       "reference_spread_degenerate": true,
+       "delta_over_spread": null
+      }
+     }
+    }
+   }
+  },
+  "declared_diffusion_voxel2_per_day": 0.35,
+  "declared_diffusion_anchor_mm": 1.0
+ },
+ "seconds": 309.49100399017334
+}

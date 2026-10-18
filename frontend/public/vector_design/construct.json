@@ -1,7 +1,7 @@
 {
  "key": "construct",
  "title": "Synthesis-ready AAV9-LAMP2B plasmid",
- "generated_utc": "2026-09-27T15:18:08Z",
+ "generated_utc": "2026-10-17T13:33:00Z",
  "source": "danon.vector_design.construct_builder.ConstructBuilder().build_construct()",
  "notes": [
   "the elemental sequences (ITR, LAMP2B CDS, WPRE, polyA) are real published sequences; the assembled plasmid has not been synthesised",

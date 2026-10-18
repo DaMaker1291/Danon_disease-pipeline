@@ -75,7 +75,7 @@ h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: var(--te
 .badge-accent { font-size: 10px; padding: 2px 8px; border-radius: var(--radius-sm); font-weight: 600;
   background: transparent; border: 1px solid var(--border-strong); color: var(--text2); }
 .badge-accent.cyan { border-color: var(--border-strong); color: var(--text2); }
-.h-right { display: flex; align-items: center; }
+.h-right { display: flex; align-items: center; gap: 12px; }
 .status-indicator { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
 .status-idle { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); opacity: 0.6; }
 .status-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--success);
@@ -111,6 +111,28 @@ h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: var(--te
 .nav-btn:hover { color: var(--text); }
 .nav-btn.active { color: var(--text); border-bottom-color: var(--accent); }
 .nav-label { font-weight: 500; }
+
+/*
+ * Research-only banner. It sits between the header and the nav so it is read
+ * before any tab is opened, and it is styled louder than the rest of the
+ * chrome on purpose: the whole page is a simulation, and a reader who skims
+ * only the first screen must still leave with that.
+ */
+.research-only-banner {
+  position: relative; z-index: 10;
+  padding: 9px 20px;
+  background: rgba(204, 95, 87, 0.10);
+  border-bottom: 1px solid rgba(204, 95, 87, 0.45);
+  border-left: 3px solid var(--danger);
+  color: var(--text2);
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+.research-only-banner strong {
+  color: var(--danger);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
 
 .app-main {
   position: relative; z-index: 10;
@@ -400,7 +422,7 @@ h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: var(--te
 .plddt-legend { font-size: 10px; color: var(--text3); margin-top: 8px; }
 .plddt-strip { padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px; overflow-x: auto; white-space: nowrap; }
 
-/* ---------------- Twin Planner (MRI → treatment plan) ---------------- */
+/* ---------------- Twin Planner (MRI → paired research simulation) ---------------- */
 .plan-metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .plan-metric { padding: 14px 16px; position: relative; overflow: hidden; }
 .plan-metric::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
@@ -490,6 +512,14 @@ h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: var(--te
 .chip-btn { cursor: pointer; }
 .chip-btn:hover { border-color: var(--accent2); color: #e2e8f0; }
 .chip-on { border-color: var(--accent2); background: rgba(6,182,212,0.12); color: #e2e8f0; }
+/* Evidence tiers are NOT the audit result: a claim can be verified against this
+   repository while its mechanism is only `emerging human`, and every refusal on
+   the landing page is `proven failed` or `unknown`. Colouring those green (the
+   colour reserved for measured real data) made "proven failed" read as a pass,
+   so the tone is set by the tier itself. */
+.chip-tier-real { border-color: rgba(34,197,94,0.4); color: #4ade80; }
+.chip-tier-neutral { border-color: rgba(148,163,184,0.4); color: #cbd5e1; }
+.chip-tier-warn { border-color: rgba(251,191,36,0.4); color: #fbbf24; }
 
 /* ---- overview ---- */
 .overview { display: flex; flex-direction: column; gap: 16px; max-width: 1400px; }
@@ -502,6 +532,9 @@ h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: var(--te
 .legend-row { display: flex; align-items: baseline; gap: 12px; font-size: 12px; color: var(--text2); line-height: 1.6; }
 .legend-row > span:last-child { max-width: 110ch; }
 .overview-counter { margin-left: 12px; font-size: 11px; color: var(--text3); font-weight: 400; font-family: 'JetBrains Mono', monospace; }
+.overview-note { margin-top: 10px; font-size: 10.5px; color: var(--text3); line-height: 1.6; max-width: 120ch; }
+.overview-tier { color: var(--text2); }
+.overview-fail-chip { margin-left: 8px; }
 .overview-stamp { margin-top: 12px; font-size: 10px; color: var(--text3); font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
 .overview-list { display: flex; flex-direction: column; gap: 7px; padding-left: 18px; }
 .overview-list li { font-size: 12px; color: var(--text2); line-height: 1.65; max-width: 120ch; }
@@ -533,3 +566,257 @@ h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: var(--te
 @media (max-width: 900px) {
   .overview-two { grid-template-columns: 1fr; }
 }
+
+/* ---------------- MRI Scans gallery ---------------- */
+/* Flat and quiet, like the rest of the instrument palette: the images are the
+   only thing on this page allowed to carry colour. */
+.scan-steps { display: flex; flex-wrap: wrap; gap: 10px; }
+.scan-step {
+  display: flex; align-items: flex-start; gap: 9px; flex: 1 1 250px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 9px 11px;
+  font-size: 11.5px; color: var(--text2); line-height: 1.5;
+}
+.scan-step strong { color: var(--text); font-weight: 600; }
+.scan-step-n {
+  flex: none; width: 17px; height: 17px; border-radius: 50%;
+  display: grid; place-items: center; margin-top: 1px;
+  background: rgba(76, 141, 219, 0.14); color: var(--accent);
+  font-size: 10px; font-weight: 700;
+}
+
+.scan-figure {
+  margin: 0; border-radius: var(--radius-sm); overflow: hidden;
+  border: 1px solid var(--border); background: #000;
+}
+.scan-figure img { display: block; width: 100%; }
+.scan-legend {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px;
+  padding: 8px 10px; background: var(--surface2);
+  border-top: 1px solid var(--border);
+  font-size: 10.5px; color: var(--text2);
+}
+.scan-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.scan-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.scan-legend-note { color: var(--text3); margin-left: auto; }
+
+.scan-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(268px, 1fr)); gap: 14px;
+}
+.scan-card {
+  padding: 10px; border-radius: var(--radius-sm); min-width: 0;
+  display: flex; flex-direction: column;
+  transition: border-color 0.15s;
+}
+.scan-card:hover { border-color: var(--border-strong); }
+.scan-card.is-standard { border-color: rgba(76, 141, 219, 0.45); }
+.scan-card-title {
+  display: flex; align-items: center; gap: 8px; margin-top: 9px;
+  font-size: 11px; font-weight: 600;
+}
+.scan-card-title .chip {
+  font-size: 9px; padding: 2px 7px;
+  border-color: rgba(76, 141, 219, 0.5); color: var(--accent);
+}
+.scan-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 7px; }
+.scan-stat {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 6px 8px;
+}
+.scan-stat span {
+  display: block; font-size: 8.5px; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text3);
+}
+.scan-stat strong { font-size: 13px; font-weight: 700; }
+.scan-meta {
+  margin-top: 6px; font-size: 9.5px; line-height: 1.55; color: var(--text3);
+}
+/* Six identical filled buttons would out-shout the scans they belong to, so
+   they sit quiet until wanted; the suggested case carries the only filled one. */
+.scan-run {
+  margin-top: auto; padding: 9px; width: 100%; font-size: 11.5px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: transparent; border: 1px solid var(--border-strong); color: var(--text2);
+}
+.scan-run:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--accent), #2563eb);
+  border-color: transparent; color: #fff; transform: none;
+}
+.scan-run:disabled { opacity: 0.8; cursor: wait; border-color: var(--border-strong); }
+.scan-card.is-standard .scan-run {
+  background: linear-gradient(135deg, var(--accent), #2563eb);
+  border-color: transparent; color: #fff;
+}
+.scan-card.is-standard .scan-run:hover:not(:disabled) {
+  transform: translateY(-1px); box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+}
+.scan-elapsed {
+  margin-top: 6px; text-align: center; font-size: 9.5px;
+  color: var(--text3); font-family: 'JetBrains Mono', monospace;
+}
+.scan-result { margin-top: 8px; animation: scan-fade 0.25s ease-out; }
+.scan-result span { width: 100%; }
+@keyframes scan-fade {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-card { transition: none; }
+  .scan-result { animation: none; }
+  .scan-run .spinner { animation: none; border-top-color: var(--accent); }
+}
+
+/*
+ * Evidence mode -- the switch that ADDS the caveats.
+ *
+ * A mode that strips the algorithmic detail from the screen is refused (see
+ * danon/claims.py::check_clinical_execution_ui_is_audited_not_implemented). This
+ * panel goes the other way: it sits under the research-only banner and surfaces
+ * the tier vocabulary, the live audit, the paired model comparison with its
+ * censoring, and the regulatory gate. Its left accent matches the banner's
+ * warning family so it reads as a caution, not a headline.
+ */
+.evidence-panel {
+  position: relative; z-index: 10;
+  margin: 10px 16px 0;
+  padding: 13px 16px 15px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent2);
+  border-radius: var(--radius);
+  background: rgba(17, 24, 39, 0.55);
+}
+.evidence-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.evidence-head strong { font-size: 13px; color: var(--text); }
+.evidence-sub { color: var(--text2); font-size: 11.5px; line-height: 1.6; margin: 7px 0 12px; }
+.evidence-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(238px, 1fr)); gap: 12px;
+}
+.evidence-card {
+  min-width: 0; padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: var(--radius); background: rgba(15, 23, 42, 0.45);
+}
+.evidence-card-title {
+  font-size: 10.5px; letter-spacing: .8px; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 7px;
+}
+.evidence-figure { font-size: 20px; font-weight: 650; font-variant-numeric: tabular-nums; color: var(--text); }
+.evidence-figure span { font-size: 12px; font-weight: 500; color: var(--text2); }
+.evidence-muted { color: var(--text2); font-size: 11px; line-height: 1.55; margin-top: 7px; }
+.evidence-warn { color: var(--warning); font-size: 11.5px; line-height: 1.55; }
+.evidence-body { color: var(--text2); font-size: 11.5px; line-height: 1.6; }
+.evidence-list { list-style: none; margin: 0 0 4px; padding: 0; }
+.evidence-list li {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 4px 0; border-bottom: 1px solid var(--border);
+  font-size: 11.5px; font-variant-numeric: tabular-nums;
+}
+.evidence-list li code { color: var(--text); }
+.evidence-table { width: 100%; border-collapse: collapse; margin-top: 9px; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.evidence-table th {
+  text-align: right; color: var(--text3); font-weight: 600; font-size: 10px;
+  text-transform: uppercase; letter-spacing: .6px; padding: 4px 6px;
+}
+.evidence-table th:first-child, .evidence-table td:first-child { text-align: left; }
+.evidence-table td { text-align: right; padding: 4px 6px; border-top: 1px solid var(--border); color: var(--text); }
+
+/* --------------------------------------------------------------------------
+   Evolution forecast — the one screen whose numbers come from real patients.
+
+   The range strip is the page's single loud element, and it is loud because it
+   carries the finding rather than decorating it: a band whose position relative
+   to the marker says whether the model cleared the nothing it had to beat. The
+   styling follows `is-resolved`, so a band can never be drawn calm while it
+   crosses the null. Everything else on the page stays quiet.
+   -------------------------------------------------------------------------- */
+.fc-task { padding: 16px 18px; border: 1px solid var(--border); border-radius: var(--radius); }
+.fc-task-title { font-size: 14px; font-weight: 640; color: var(--text); margin: 0 0 8px; }
+.fc-question { color: var(--text2); font-size: 11.5px; line-height: 1.65; margin: 8px 0 12px; }
+.fc-question-strong { color: var(--text); }
+
+.fc-strip { margin: 14px 0 4px; }
+.fc-strip-track {
+  position: relative; height: 26px; border-radius: 3px;
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0.10), rgba(148, 163, 184, 0.04));
+  border: 1px solid var(--border);
+}
+.fc-strip-band {
+  position: absolute; top: 4px; bottom: 4px; border-radius: 2px;
+  background: rgba(217, 119, 6, 0.30); border: 1px solid rgba(217, 119, 6, 0.75);
+}
+.fc-strip-band.is-resolved {
+  background: rgba(5, 150, 105, 0.28); border-color: rgba(5, 150, 105, 0.78);
+}
+.fc-strip-null {
+  position: absolute; top: -3px; bottom: -3px; width: 2px;
+  background: var(--text3); opacity: .9;
+}
+.fc-strip-point {
+  position: absolute; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px;
+  border-radius: 50%; background: var(--text); box-shadow: 0 0 0 2px rgba(15, 23, 42, .9);
+}
+.fc-strip-caption {
+  color: var(--text3); font-size: 11px; line-height: 1.5; margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.fc-figures {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px; margin: 14px 0 0;
+}
+.fc-figures dt {
+  color: var(--text3); font-size: 10.5px; line-height: 1.4; margin-bottom: 5px;
+  text-transform: none;
+}
+.fc-figures dd {
+  margin: 0; color: var(--text); font-size: 17px; font-weight: 640;
+  font-variant-numeric: tabular-nums;
+}
+.fc-figures dd span { font-size: 12px; font-weight: 500; color: var(--text2); }
+.fc-figures-cohort { margin-top: 4px; }
+
+.fc-verdict {
+  margin-top: 14px; padding: 11px 13px; border-radius: var(--radius);
+  border-left: 3px solid var(--warning); background: rgba(120, 53, 15, 0.20);
+  color: var(--text); font-size: 12px; line-height: 1.6;
+}
+.fc-verdict.is-resolved {
+  border-left-color: var(--accent2); background: rgba(6, 78, 59, 0.20);
+}
+
+.fc-crosscheck {
+  margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border);
+}
+.fc-crosscheck-head { color: var(--text3); font-size: 10.5px; line-height: 1.5; }
+.fc-crosscheck .fc-strip { margin-top: 10px; }
+
+.fc-calibration { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+.fc-calibration-head { color: var(--text3); font-size: 10.5px; line-height: 1.55; margin-bottom: 8px; }
+.fc-reliability { width: 100%; border-collapse: collapse; font-size: 11px; color: var(--text2); }
+.fc-reliability th {
+  text-align: right; font-weight: 560; color: var(--text3); padding: 0 0 6px;
+  border-bottom: 1px solid var(--border);
+}
+.fc-reliability th:first-child,
+.fc-reliability td:first-child { text-align: left; }
+.fc-reliability td {
+  text-align: right; padding: 4px 0; border-bottom: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+}
+.fc-reliability tr:last-child td { border-bottom: none; }
+.fc-calibration-reading { margin: 10px 0 0; color: var(--text2); font-size: 11.5px; line-height: 1.65; }
+
+/*
+  The pooling block: the unit and the label of every pooled score, with the
+  counts that made the older definition untenable. It is set apart from the
+  figures above because it is about how those figures were assembled rather than
+  about the tumour, and it carries the two candidate labels side by side so a
+  reader can see the disagreement rather than being told about it.
+*/
+.fc-pooling { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+.fc-pooling-head { color: var(--text3); font-size: 10.5px; line-height: 1.55; margin-bottom: 8px; }
+.fc-pooling .fc-figures { margin-top: 4px; }
+.fc-pooling-reading { margin: 10px 0 0; color: var(--text2); font-size: 11.5px; line-height: 1.65; }
+.fc-meta { color: var(--text3); font-size: 11px; line-height: 1.55; margin-top: 12px; }
+.fc-notes { color: var(--text2); font-size: 11.5px; line-height: 1.6; margin: 8px 0 0; padding-left: 18px; }
+.fc-notes li { margin-bottom: 5px; }

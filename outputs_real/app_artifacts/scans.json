@@ -1,0 +1,183 @@
+{
+ "key": "scans",
+ "title": "Real MRI scans committed to this repository",
+ "generated_utc": "2026-10-01T17:18:39Z",
+ "source": "_scan_gallery.py over data/brats/*_{t1ce,seg}.nii.gz (BraTS-2021, cached locally)",
+ "notes": [
+  "Every pixel comes from the committed NIfTI files; matplotlib renders, nothing is simulated.",
+  "Contours are the BraTS expert labels (1 = necrotic core, 2 = oedema, 4 = enhancing); no prediction is shown.",
+  "engine_mask_voxels is the downsampled mask the engine actually ran on, from data/engine_ready/.",
+  "engine_mask_file is that same mask served as a static asset, so 'Run live plan' posts the real mask to the local API instead of asking for a file you do not have."
+ ],
+ "provenance": {
+  "scan_pixels": "ESTABLISHED",
+  "segmentation_contours": "ESTABLISHED",
+  "engine_grid_voxels": "ESTABLISHED",
+  "model_prediction_on_these_images": "PROVEN_FAILED"
+ },
+ "data": {
+  "standard_case": "BraTS2021_01017",
+  "montage": {
+   "file": "BraTS2021_01017_views.png",
+   "case": "BraTS2021_01017",
+   "views": [
+    "axial",
+    "coronal",
+    "sagittal"
+   ]
+  },
+  "cases": [
+   {
+    "case": "BraTS2021_01017",
+    "image": "BraTS2021_01017_axial.png",
+    "engine_mask_file": "BraTS2021_01017_mask.nii.gz",
+    "plane": "axial",
+    "slice_index": 102,
+    "grid_shape_xyz": [
+     240,
+     240,
+     155
+    ],
+    "seg_voxels_by_label": {
+     "1": 4059,
+     "2": 73892,
+     "4": 20496
+    },
+    "seg_voxels_total": 98447,
+    "engine_mask_voxels": 1774,
+    "engine_grid_xyz": [
+     14,
+     24,
+     24
+    ],
+    "is_standard_case": true
+   },
+   {
+    "case": "BraTS2021_01018",
+    "image": "BraTS2021_01018_axial.png",
+    "engine_mask_file": "BraTS2021_01018_mask.nii.gz",
+    "plane": "axial",
+    "slice_index": 78,
+    "grid_shape_xyz": [
+     240,
+     240,
+     155
+    ],
+    "seg_voxels_by_label": {
+     "1": 36212,
+     "2": 60047,
+     "4": 34504
+    },
+    "seg_voxels_total": 130763,
+    "engine_mask_voxels": 1840,
+    "engine_grid_xyz": [
+     16,
+     23,
+     28
+    ],
+    "is_standard_case": false
+   },
+   {
+    "case": "BraTS2021_01019",
+    "image": "BraTS2021_01019_axial.png",
+    "engine_mask_file": "BraTS2021_01019_mask.nii.gz",
+    "plane": "axial",
+    "slice_index": 77,
+    "grid_shape_xyz": [
+     240,
+     240,
+     155
+    ],
+    "seg_voxels_by_label": {
+     "1": 22223,
+     "2": 92506,
+     "4": 46514
+    },
+    "seg_voxels_total": 161243,
+    "engine_mask_voxels": 2826,
+    "engine_grid_xyz": [
+     19,
+     22,
+     29
+    ],
+    "is_standard_case": false
+   },
+   {
+    "case": "BraTS2021_01020",
+    "image": "BraTS2021_01020_axial.png",
+    "engine_mask_file": "BraTS2021_01020_mask.nii.gz",
+    "plane": "axial",
+    "slice_index": 67,
+    "grid_shape_xyz": [
+     240,
+     240,
+     155
+    ],
+    "seg_voxels_by_label": {
+     "1": 13939,
+     "2": 121673,
+     "4": 37850
+    },
+    "seg_voxels_total": 173462,
+    "engine_mask_voxels": 3623,
+    "engine_grid_xyz": [
+     18,
+     23,
+     23
+    ],
+    "is_standard_case": false
+   },
+   {
+    "case": "BraTS2021_01021",
+    "image": "BraTS2021_01021_axial.png",
+    "engine_mask_file": "BraTS2021_01021_mask.nii.gz",
+    "plane": "axial",
+    "slice_index": 72,
+    "grid_shape_xyz": [
+     240,
+     240,
+     155
+    ],
+    "seg_voxels_by_label": {
+     "1": 24674,
+     "2": 72962,
+     "4": 70707
+    },
+    "seg_voxels_total": 168343,
+    "engine_mask_voxels": 2986,
+    "engine_grid_xyz": [
+     18,
+     26,
+     24
+    ],
+    "is_standard_case": false
+   },
+   {
+    "case": "BraTS2021_01022",
+    "image": "BraTS2021_01022_axial.png",
+    "engine_mask_file": "BraTS2021_01022_mask.nii.gz",
+    "plane": "axial",
+    "slice_index": 63,
+    "grid_shape_xyz": [
+     240,
+     240,
+     155
+    ],
+    "seg_voxels_by_label": {
+     "1": 3214,
+     "2": 118514,
+     "4": 19071
+    },
+    "seg_voxels_total": 140799,
+    "engine_mask_voxels": 2528,
+    "engine_grid_xyz": [
+     16,
+     25,
+     27
+    ],
+    "is_standard_case": false
+   }
+  ],
+  "disclaimer": "Images are real pre-operative patient scans committed to this repository (data/brats, 6 BraTS-2021 cases). The contours are the provided expert segmentation, not a model prediction -- no engine output is drawn on these images. The repository holds no post-operative imaging (claim #49), and orientation follows the NIfTI array order as stored."
+ }
+}

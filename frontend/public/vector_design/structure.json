@@ -1,7 +1,7 @@
 {
  "key": "structure",
  "title": "AAV9 capsid structure (3UX1) -- deposited coordinates, deposited symmetry",
- "generated_utc": "2026-09-27T15:18:08Z",
+ "generated_utc": "2026-10-17T13:33:00Z",
  "source": "danon.vector_design.structure.load_aav9_capsid() over PDB 3UX1; coordinates and REMARK 350 BIOMT operators read from data/pdb/3UX1.pdb",
  "notes": [
   "Coordinates are C-alpha only: this is a backbone trace of one deposited model, not an atomic surface.",

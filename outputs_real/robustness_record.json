@@ -1,0 +1,371 @@
+{
+  "record_version": "robustness_record_v3",
+  "generated_utc": "2026-10-13T21:12:20.819829+00:00",
+  "python": "3.11.9 on win32",
+  "probe_set": [
+    "probe_missing_values",
+    "probe_incorrect_units",
+    "probe_corrupted_file",
+    "probe_duplicate_records",
+    "probe_irregular_timestamps",
+    "probe_higher_noise",
+    "probe_missing_modalities",
+    "probe_baseline_dynamics",
+    "probe_unobserved_changes",
+    "probe_out_of_distribution",
+    "probe_conflicting_inputs",
+    "probe_overconfidence",
+    "probe_failed_solver",
+    "probe_band_calibration",
+    "probe_band_calibration_under_missingness",
+    "probe_band_under_miscalibrated_sigma",
+    "probe_band_widens_with_noise",
+    "probe_observer_recovery",
+    "probe_observer_unidentified_refusal",
+    "probe_observer_units_error",
+    "probe_observer_too_few_observations",
+    "probe_observer_degeneracy_invariant",
+    "probe_variant_allele_fraction_from_counts",
+    "probe_variant_bounds_are_bounded",
+    "probe_variant_purity_disagreement_refuses",
+    "probe_variant_pairing_contracts",
+    "probe_variant_depth_invariance"
+  ],
+  "probes": [
+    {
+      "probe_id": "D1_missing_observations",
+      "description": "40% readings dropped",
+      "status": "PASS",
+      "detail": "change_day=140, status=suspected, refusal=''",
+      "metrics": {
+        "n_observations": 42,
+        "status": "suspected"
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "D2_incorrect_units",
+      "description": "1000x-unit scale invariance",
+      "status": "PASS",
+      "detail": "status mm=suspected == um=suspected; day 147 vs 147 (equal=True)",
+      "metrics": {
+        "status_at_mm": "suspected",
+        "status_at_um": "suspected"
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "D3_corrupted_file",
+      "description": "NaN value rejected by the schema",
+      "status": "PASS",
+      "detail": "ETMeasurement rejected a NaN value at construction",
+      "metrics": {},
+      "error": ""
+    },
+    {
+      "probe_id": "D4_duplicate_records",
+      "description": "duplicate day rejected",
+      "status": "PASS",
+      "detail": "ObservationStream rejected two measurements on day 7",
+      "metrics": {},
+      "error": ""
+    },
+    {
+      "probe_id": "D5_irregular_timestamps",
+      "description": "irregular sampling",
+      "status": "PASS",
+      "detail": "irregular grid: status=confirmed, change_day=260",
+      "metrics": {},
+      "error": ""
+    },
+    {
+      "probe_id": "M1_higher_noise",
+      "description": "noise stress (default sigma x3)",
+      "status": "PASS",
+      "detail": "no CONFIRMED call on any negative control at 3x noise",
+      "metrics": {
+        "false_confirms": 0
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "M2_missing_modalities",
+      "description": "50% drop (modality loss proxy)",
+      "status": "PASS",
+      "detail": "50% dropped: status=suspected, refusal=''",
+      "metrics": {},
+      "error": ""
+    },
+    {
+      "probe_id": "B1_baseline_dynamics",
+      "description": "slow vs fast baseline",
+      "status": "PASS",
+      "detail": "slow=suspected, fast=confirmed",
+      "metrics": {},
+      "error": ""
+    },
+    {
+      "probe_id": "B2_unobserved_changes",
+      "description": "unobserved change location",
+      "status": "PASS",
+      "detail": "estimated change day 140 vs planted 120 (cadence 28)",
+      "metrics": {},
+      "error": ""
+    },
+    {
+      "probe_id": "B3_out_of_distribution",
+      "description": "all-negative series refuses",
+      "status": "PASS",
+      "detail": "state refused with: 'no positive value in the series'",
+      "metrics": {},
+      "error": ""
+    },
+    {
+      "probe_id": "F1_conflicting_inputs",
+      "description": "sigma miscalibrated x2",
+      "status": "PASS",
+      "detail": "sigma-doubled negative control: status=no_change",
+      "metrics": {},
+      "error": ""
+    },
+    {
+      "probe_id": "F2_overconfidence",
+      "description": "no confirmed false alarm",
+      "status": "PASS",
+      "detail": "0 of 6 negative controls CONFIRMED",
+      "metrics": {},
+      "error": ""
+    },
+    {
+      "probe_id": "F3_failed_solver",
+      "description": "degenerate fit refuses",
+      "status": "PASS",
+      "detail": "degenerate stream: status=insufficient_evidence, refusal='only 6 usable points; a two-segment fit needs at least 9'",
+      "metrics": {},
+      "error": ""
+    },
+    {
+      "probe_id": "U1_band_calibration",
+      "description": "nominal 95% band, floor 0.80",
+      "status": "PASS",
+      "detail": "sigma_2: 38/40 = 0.95; sigma_6: 38/40 = 0.95",
+      "metrics": {
+        "sigma_2": {
+          "covered": 38,
+          "n_cases": 40,
+          "coverage": 0.95,
+          "mean_band_width": 0.004232793820316763,
+          "n_insufficient": 0,
+          "true_rate": 0.003
+        },
+        "sigma_6": {
+          "covered": 38,
+          "n_cases": 40,
+          "coverage": 0.95,
+          "mean_band_width": 0.011948244040669876,
+          "n_insufficient": 0,
+          "true_rate": 0.003
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "U2_band_under_missing_data",
+      "description": "nominal 95% band at ~40% dropout, floor 0.80",
+      "status": "PASS",
+      "detail": "drop_40pct: 38/40 = 0.95",
+      "metrics": {
+        "drop_40pct": {
+          "covered": 38,
+          "n_cases": 40,
+          "coverage": 0.95,
+          "mean_band_width": 0.003680840222593587,
+          "n_insufficient": 0,
+          "true_rate": 0.003
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "U3_band_under_miscalibrated_sigma",
+      "description": "declared sigma wrong by 3x either way",
+      "status": "PASS",
+      "detail": "declared_3x_under: 38/40 = 0.95; declared_3x_over: 38/40 = 0.95",
+      "metrics": {
+        "declared_3x_under": {
+          "covered": 38,
+          "n_cases": 40,
+          "coverage": 0.95,
+          "mean_band_width": 0.011948244040669886,
+          "n_insufficient": 0,
+          "true_rate": 0.003
+        },
+        "declared_3x_over": {
+          "covered": 38,
+          "n_cases": 40,
+          "coverage": 0.95,
+          "mean_band_width": 0.004232793820316749,
+          "n_insufficient": 0,
+          "true_rate": 0.003
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "U4_band_monotone_in_noise",
+      "description": "band widens with noise",
+      "status": "PASS",
+      "detail": "mean width sigma_2=0.00422 vs sigma_6=0.01220 (ratio 2.89x)",
+      "metrics": {
+        "width_sigma_2": 0.004215707940093692,
+        "width_sigma_6": 0.01220160365757712,
+        "ratio": 2.8943190161569743
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "O1_observer_recovery",
+      "description": "planted r0=0.08 recovered",
+      "status": "PASS",
+      "detail": "planted r0=0.08 in [0.0343, 0.1301] median 0.0796; width 0.0958 vs prior 0.348; 351/1200 accepted",
+      "metrics": {
+        "planted_r0": 0.08,
+        "r0_q": [
+          0.03433448341413431,
+          0.07959620744485778,
+          0.1300974121080925
+        ],
+        "credible_width": 0.0957629286939582,
+        "n_accepted": 351
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "O2_observer_unidentified_refusal",
+      "description": "unreachable VAF stream refused",
+      "status": "PASS",
+      "detail": "verdict=refused_unidentified, reason='only 0/1200 surrogate candidates within tolerance 0.060 VAF rms -- stream not id'",
+      "metrics": {
+        "verdict": "refused_unidentified"
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "O3_observer_units_error",
+      "description": "VAF reported as a percentage",
+      "status": "PASS",
+      "detail": "percent-scale stream: verdict=refused_unidentified, reason='only 0/1200 surrogate candidates within tolerance 0.060 VAF rms -- str'",
+      "metrics": {
+        "verdict": "refused_unidentified",
+        "scale_factor": 100.0
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "O4_observer_too_few",
+      "description": "two draws and coarse cadence",
+      "status": "PASS",
+      "detail": "two draws -> refused_too_few_observations; coarse cadence -> refused_too_few_observations",
+      "metrics": {
+        "two_draws": "refused_too_few_observations",
+        "coarse_cadence": "refused_too_few_observations"
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "O5_observer_degeneracy_invariant",
+      "description": "no estimate escapes the degeneracy criterion",
+      "status": "PASS",
+      "detail": "6 estimated, 3 refused; widest band 0.321 of the prior against the 0.90 criterion; degenerate returns: 0",
+      "metrics": {
+        "n_estimated": 6,
+        "n_refused": 3,
+        "worst_width_fraction": 0.3205584445069267,
+        "threshold": 0.3132
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "V1_variant_af_from_counts",
+      "description": "AF computed, not declared",
+      "status": "PASS",
+      "detail": "AF(53,84) = 0.3869 computed from counts; refused: zero depth, float alt count, negative ref count",
+      "metrics": {
+        "allele_fraction": 0.38686131386861317,
+        "n_refused": 3,
+        "refused": [
+          "zero depth",
+          "float alt count",
+          "negative ref count"
+        ]
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "V2_variant_bounds_are_bounded",
+      "description": "only a lower bound is published",
+      "status": "PASS",
+      "detail": "lower bound 0.3870 (no purity) and 0.4838 at purity 0.8; k-bin summarisation refused=True, engine scorer refused a 3-bin support=True",
+      "metrics": {
+        "lower_bound_no_purity": 0.387,
+        "lower_bound_purity_0.8": 0.48375,
+        "summarisation_refused": true,
+        "engine_support_refused": true
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "V3_variant_purity_disagreement",
+      "description": "AF above purity cannot be scored",
+      "status": "PASS",
+      "detail": "refused: AF > purity, purity 0, AF > 1",
+      "metrics": {
+        "n_refused": 3,
+        "refused": [
+          "AF > purity",
+          "purity 0",
+          "AF > 1"
+        ]
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "V4_variant_pairing_contracts",
+      "description": "pairing and duplicate-locus contracts",
+      "status": "PASS",
+      "detail": "paired AF 0.10 -> 0.60 (delta +0.50); refused: two patients, same specimen, duplicate locus",
+      "metrics": {
+        "n_shared": 1,
+        "af_delta": {
+          "MSH6:2:48010530:C>T": 0.5
+        },
+        "refused": [
+          "two patients",
+          "same specimen",
+          "duplicate locus"
+        ]
+      },
+      "error": ""
+    },
+    {
+      "probe_id": "V5_variant_depth_invariance",
+      "description": "depth rescale cannot move the AF",
+      "status": "PASS",
+      "detail": "AF 0.386861 at 137 reads vs 0.386861 at 137,000 reads; max AF 0.999",
+      "metrics": {
+        "af_base": 0.38686131386861317,
+        "af_scaled": 0.38686131386861317,
+        "af_saturated": 0.999
+      },
+      "error": ""
+    }
+  ],
+  "aggregate": {
+    "n_probes": 27,
+    "n_pass": 27,
+    "n_fail": 0,
+    "n_error": 0,
+    "gate": "PASS"
+  },
+  "scope": "synthetic-only stress tests of the danon.detect change-point detector, the band it publishes, the danon.observer ABC state estimator and the danon.variants allele-fraction channel: every probe builds its own inputs, so the variant probes test the channel's contracts and the mappings it refuses WITHOUT scoring the real GLASS record (that record is re-derived by tests/test_variants.py, not by this gate). A passing probe records a challenge survived, not a guarantee about untested data; no clinical claim"
+}

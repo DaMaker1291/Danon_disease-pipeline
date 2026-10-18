@@ -15,11 +15,16 @@
 
 export type TabId =
   | 'overview'
+  | 'tumorboard'
+  | 'scans'
   | 'twin'
+  | 'dosing'
   | 'evolution'
   | 'outcome'
+  | 'trialdesign'
   | 'upload'
   | 'paraview'
+  | 'forecast'
   | 'verification';
 
 export type TabGroup =
@@ -67,20 +72,55 @@ export const TABS: TabDef[] = [
     label: 'Overview',
     desc: 'What this is, what is measured, and what it refuses to claim',
     purpose:
-      'A 3D spatial tumour-evolution engine for glioblastoma: drug transport, clonal competition, and the dosing schedule it derives. This page states which numbers on screen are measurements.',
+      'A tumour twin for exploring spatial tumour-evolution hypotheses as decision support for a care team, with every screen declaring its evidence tier and a clinician signing off. It does not identify a clinically effective schedule on its own, predict an individual patient outcome, or act without that sign-off.',
     source: 'danon/claims.py — the bound-claim registry, re-run and recorded as artifacts/claims.json',
     status: 'audit of this repository',
   },
   {
+    id: 'tumorboard',
+    group: 'Patient twin (glioblastoma)',
+    label: 'Tumour Board',
+    desc: 'Five panels a tumour board reads, and the fields refused for lack of a source',
+    purpose:
+      'The dashboard a tumour board would read: the data on file, the recorded frames, the clonal kinetics the switch rule acts on, the paired adaptive-vs-MTD outcome, and the audit bar — with every field this repository has no source for refused in place rather than filled in.',
+    source:
+      'artifacts/tumorboard.json: recorded outcome cards, recorded day frames, the measured engine performance record, the recorded claims audit and a live count of the test tree',
+    status: 'recorded engine output',
+    caveat: 'no molecular or intraoperative data exists for this case',
+  },
+  {
+    id: 'scans',
+    group: 'Patient twin (glioblastoma)',
+    label: 'MRI Scans',
+    desc: 'The six committed real BraTS-2021 cases, rendered with their expert segmentations',
+    purpose:
+      'Actual patient MRI from this repository: T1ce volumes with the provided BraTS expert segmentation drawn on top, and the engine grid each case was downsampled to. The contours are labels, not predictions.',
+    source:
+      'data/brats/*_{t1ce,seg}.nii.gz (BraTS-2021, cached locally), rendered by _scan_gallery.py into artifacts/scans.json',
+    status: 'measured real data',
+  },
+  {
     id: 'twin',
     group: 'Patient twin (glioblastoma)',
-    label: 'MRI → Plan',
-    desc: 'Upload a BraTS scan, get a dosing schedule',
+    label: 'MRI → Simulate',
+    desc: 'Run a research simulation on a NIfTI segmentation mask',
     purpose:
-      'Turn a patient mask into a spatial tumour state, simulate it forward under two dosing policies, and return the schedule.',
+      'Run a paired, model-based comparison on an uploaded segmentation mask. The output is a research simulation, not a patient-specific prediction or treatment schedule.',
     source: SOURCE_TWIN,
     status: 'live (needs local API)',
     caveat: 'needs the local API',
+  },
+  {
+    id: 'dosing',
+    group: 'Patient twin (glioblastoma)',
+    label: 'Dosing Console',
+    desc: 'Explore hypothetical schedules in a research simulator',
+    purpose:
+      'Explore hypothetical calendars on a synthetic phantom and compare model outputs. The declared ANC screen is not a clinical safety rule; neither screen results nor ranking should guide a real dose.',
+    source:
+      'danon/dosing.py (calendar, safety screen, grid search) over danon/evosteer.py::TumorEvolutionSimulator, served by POST /api/dosing/plan',
+    status: 'live (needs local API)',
+    caveat: 'the safety screen uses DECLARED parameters, not NCCN thresholds',
   },
   {
     id: 'evolution',
@@ -98,9 +138,21 @@ export const TABS: TabDef[] = [
     label: 'Day-365 State',
     desc: 'End-of-horizon burdens and outcome cards',
     purpose:
-      'The day-365 end state and the per-case outcome cards, including progression-free survival under each policy.',
+      'The day-365 simulated end state and recorded model outcomes. These are not observed patient progression-free survival or survival estimates.',
     source: 'engine runs recorded in outputs_real/outcome_cards.json',
     status: 'recorded engine output',
+  },
+  {
+    id: 'trialdesign',
+    group: 'Patient twin (glioblastoma)',
+    label: 'Trial Design',
+    desc: 'The counterfactual, the noise floor, and the calendars a declared screen refuses',
+    purpose:
+      'What the model did under declared assumptions, where the two arms cannot be separated at the recorded replicate count, and which calendars the declared ANC screen refused. It names no calendar to administer.',
+    source:
+      'computed live in this browser from outputs_real/outcome_cards.json, beside the recorded danon/trial_design report served as artifacts/trial_design.json',
+    status: 'runs in your browser',
+    caveat: 'a model compared against itself, not patient-level validation',
   },
   {
     id: 'upload',
@@ -123,6 +175,18 @@ export const TABS: TabDef[] = [
     status: 'measured real data',
   },
   {
+    id: 'forecast',
+    group: 'Data & provenance',
+    label: 'Evolution Forecast',
+    desc: 'Real paired tumours: does the earlier specimen predict the later change?',
+    purpose:
+      'The repository\u2019s one measured-in-patients result. Two questions are asked of paired GLASS specimens \u2014 is a variant measured in the primary seen again later, and how far does its fraction move \u2014 and each is scored against the dumbest honest baseline it must beat under repeated patient-level cross-validation, with the interval that decides resolvability drawn on the same axis. One result resolves (a modest AUC clear of chance); the other does not, and the page keeps both estimators so a reader can see what one split is worth. On top of the ranking, the screen publishes a clinical report for a tumour board: one call at a threshold declared before the cohort was ever read (sensitivity, specificity and both predictive values against this cohort\u2019s prevalence, with the counts beside them) and a decision curve weighing it against treating every row and treating none. It is decision support for a named clinician who may withhold it and records why; the intended use, approved actions and hard guardrails are in clinical_twin/docs/clinical_use_model_card.md, and no figure here is a treatment effect.',
+    source:
+      'paired real GLASS specimens (allele fractions computed from tumour/reference read counts), scored by danon.evolution_forecast and recorded as artifacts/evolution_forecast.json',
+    status: 'measured real data',
+    caveat: 'one public cohort, a declared 27-gene panel, no therapy or outcome joined; the pairing is inferred from the specimen id',
+  },
+  {
     id: 'verification',
     group: 'Data & provenance',
     label: 'Verification',
@@ -138,13 +202,13 @@ export const TABS: TabDef[] = [
 export const OVERVIEW_REFUSALS = [
   'no_engine_c_index',
   'no_inflated_estimand',
-  'no_rl_agent',
   'no_spatial_agreement_result',
 ];
 
 /** Measured results the landing page highlights. */
 export const OVERVIEW_RESULTS = [
   'heldout_discrimination',
+  'rl_policy_trained_and_measured',
   'stream4_cohort_resolution_is_a_design_calculation',
   'stream3_real_vasculature_measured_small_effect',
   'covariate_upgrades_measured_not_estimated',

@@ -580,6 +580,30 @@ from danon.evosteer import (
     what_this_model_cannot_know,
 )
 
+# RL dosing: a learned schedule policy trained on the EvoSteer engine itself.
+# The environment drives the real simulator through the engine's own day loop
+# (bit-identical trajectories, pinned by tests), the reward is fixed as minus
+# the normalised burden curve, and the evaluation compares the agent with the
+# closed-form rules on held-out seeds. NOT a clinical result: synthetic
+# geometry, authored reward, and `what_rl_cannot_show()` says so.
+from danon.rl_steering import (
+    ARTIFACT_PATH,
+    WEIGHTS_PATH,
+    EvoSteerEnv,
+    RetentionVerification,
+    SeedResult,
+    TrainedRLPolicy,
+    aubc,
+    evaluate_all,
+    load_artifact,
+    observation_features,
+    project_dose,
+    rl_steering_provenance,
+    verify_rl_policy_retention,
+    what_rl_cannot_show,
+    write_rl_artifact,
+)
+
 # EvoTwin: cohort-level evolutionary-trap analysis on the EvoSteer engine --
 # Kaplan-Meier endpoints, patient-varying cohorts, immune-clearance hypothesis
 # (CheckMate 143 anchors the GBM immunotherapy context as PROVEN_FAILED).
@@ -638,6 +662,7 @@ from danon.imaging import (
     read_nifti,
     write_nifti,
     from_nifti_mask,
+    mask_bytes_provenance,
     imaging_provenance,
     imaging_what_this_model_cannot_know,
 )
@@ -724,6 +749,112 @@ from danon.uncertainty import (
     uncertainty_provenance,
     variance_budget,
     what_this_decomposition_cannot_show,
+)
+
+from danon.grid_artifact import (
+    GRID_LEVELS,
+    SHIPPED_LEVEL,
+    block_decimation,
+    committed_derived_audit,
+    decimation_geometry,
+    derived_round_trip,
+    grid_artifact_provenance,
+    grid_resolution_cohort,
+    matched_diffusion,
+    measure_level,
+    partition_probe,
+    physical_diffusion_mm2_per_day,
+    render_grid_artifact_report,
+    render_round_trip_report,
+    what_the_grid_cannot_show,
+)
+
+from danon.ablation import (
+    MECHANISMS,
+    AblationError,
+    Mechanism,
+    ablate_all,
+    ablation_contrast,
+    ablation_provenance,
+    what_an_ablation_cannot_show,
+)
+
+from danon.walkforward import (
+    LongitudinalPair,
+    WalkForwardError,
+    clonal_jsd,
+    dice3d,
+    dilate_mask,
+    expansion_bound,
+    jaccard3d,
+    jensen_shannon_divergence,
+    longitudinal_census,
+    matched_volume_sphere,
+    migration_audit,
+    null_models,
+    score_prediction,
+    shape_departure,
+    surface_distance_p95,
+    surface_mask,
+    walkforward_provenance,
+    what_walk_forward_cannot_show,
+)
+
+from danon.tumor_board import (
+    build_tumor_board,
+    engine_source_hash,
+    tumor_board_provenance,
+    what_a_tumor_board_cannot_show,
+)
+
+from danon.uq import (
+    ReplicatePlan,
+    UQResult,
+    run_replicates,
+)
+
+from danon.fluorescence_standard import (
+    FieldDescriptor,
+    LayoutRun,
+    StandardReport,
+    layout_contrast,
+    layout_summary,
+    plant_field,
+    standard_geometry,
+    standard_refusals,
+    standard_report,
+    stream1_still_refused,
+)
+
+from danon.tumor_agnostic import (
+    BOUND_RATIO,
+    PORTABILITY_DISCLAIMER,
+    PORTABILITY_RECORD,
+    PortabilityRun,
+    generic_solid_mass,
+    portability_provenance,
+    portability_refusals,
+    portability_run,
+    portability_runs,
+    swap_surface,
+    swap_surface_fields,
+    tissue_inventory,
+    tumor_agnostic_report,
+    what_portability_cannot_show,
+)
+
+from danon.external_cohorts import (
+    CggaCohort,
+    CggaOodReport,
+    ExternalPipeline,
+    ExternalTest,
+    TcgaReference,
+    cgga_ood_report,
+    external_cohorts_provenance,
+    external_pipeline_matrix,
+    pitch_corrections,
+    read_cgga_clinical,
+    what_external_data_cannot_show,
 )
 
 from danon.reproduce import (
@@ -1133,6 +1264,13 @@ __all__ = [
     "sanctuary_sequestration", "evosteer_provenance",
     "print_evosteer_disclaimer", "what_this_model_cannot_know",
 
+    # RL dosing: the learned policy and its audit
+    "WEIGHTS_PATH", "ARTIFACT_PATH", "EvoSteerEnv", "TrainedRLPolicy",
+    "SeedResult", "RetentionVerification", "aubc", "evaluate_all",
+    "load_artifact", "observation_features", "project_dose",
+    "rl_steering_provenance", "verify_rl_policy_retention",
+    "what_rl_cannot_show", "write_rl_artifact",
+
     # EvoTwin: cohort evolutionary-trap layer
     "CHECKMATE143_MOS_MONTHS", "CHECKMATE143_HR",
     "GBM_RECURRENT_MEDIAN_OS_MONTHS", "LONG_TERM_CONTROL_DAYS", "NEOANTIGEN_RANGE",
@@ -1169,7 +1307,8 @@ __all__ = [
 
     # Imaging intake + verification campaign
     "NiftiHeader", "PatientGeometry", "read_nifti", "write_nifti",
-    "from_nifti_mask", "imaging_provenance", "imaging_what_this_model_cannot_know",
+    "from_nifti_mask", "mask_bytes_provenance",
+    "imaging_provenance", "imaging_what_this_model_cannot_know",
     "CampaignConfig", "CampaignStats", "run_campaign", "run_campaign_chunk",
     "check_trajectory", "check_final_fields", "determinism_probe",
     "bootstrap_ci_mean", "format_campaign_report", "campaign_provenance",
@@ -1279,6 +1418,34 @@ __all__ = [
     "budget_from_groups", "mgmt_input_distribution", "percentile_band",
     "propagate_mgmt_uncertainty", "render_uncertainty_report", "run_input_grid",
     "uncertainty_provenance", "variance_budget",
+    "GRID_LEVELS", "SHIPPED_LEVEL", "block_decimation", "committed_derived_audit",
+    "decimation_geometry", "derived_round_trip", "grid_artifact_provenance",
+    "grid_resolution_cohort", "matched_diffusion", "measure_level", "partition_probe",
+    "physical_diffusion_mm2_per_day", "render_grid_artifact_report",
+    "render_round_trip_report", "what_the_grid_cannot_show",
+    "LongitudinalPair", "WalkForwardError", "clonal_jsd", "dice3d", "dilate_mask",
+    "expansion_bound", "jaccard3d", "jensen_shannon_divergence",
+    "longitudinal_census", "migration_audit", "null_models", "score_prediction",
+    "matched_volume_sphere", "shape_departure",
+    "surface_distance_p95", "surface_mask", "walkforward_provenance",
+    "what_walk_forward_cannot_show",
+    "MECHANISMS", "AblationError", "Mechanism", "ablate_all", "ablation_contrast",
+    "ablation_provenance", "what_an_ablation_cannot_show",
+    "ReplicatePlan", "UQResult", "run_replicates",
+    "build_tumor_board", "engine_source_hash", "tumor_board_provenance",
+    "what_a_tumor_board_cannot_show",
+    "FieldDescriptor", "LayoutRun", "StandardReport", "layout_contrast",
+    "layout_summary", "plant_field", "standard_geometry", "standard_refusals",
+    "standard_report", "stream1_still_refused",
+    "BOUND_RATIO", "PORTABILITY_DISCLAIMER", "PORTABILITY_RECORD",
+    "PortabilityRun", "generic_solid_mass", "portability_provenance",
+    "portability_refusals", "portability_run", "portability_runs",
+    "swap_surface", "swap_surface_fields", "tissue_inventory",
+    "tumor_agnostic_report", "what_portability_cannot_show",
+    "CggaCohort", "CggaOodReport", "ExternalPipeline", "ExternalTest",
+    "TcgaReference", "cgga_ood_report", "external_cohorts_provenance",
+    "external_pipeline_matrix", "pitch_corrections", "read_cgga_clinical",
+    "what_external_data_cannot_show",
     "what_this_decomposition_cannot_show",
 
     # Predictive measurement (held-out discrimination, noise robustness,

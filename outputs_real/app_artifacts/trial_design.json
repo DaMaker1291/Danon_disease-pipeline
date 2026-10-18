@@ -1,0 +1,745 @@
+{
+ "key": "trial_design",
+ "title": "Trial design \u2014 the counterfactual, the noise floor, the rule-out",
+ "generated_utc": "2026-10-17T13:32:11Z",
+ "source": "danon.trial_design over outputs_real/outcome_cards.json (recorded paired replicates) and danon.dosing.MyelosuppressionModel (the DECLARED ANC screen)",
+ "notes": [
+  "the counterfactual is a statement about what the model did under declared assumptions, not a prediction about a patient",
+  "the noise floor is a resolvability ladder: the same paired differences at three scales, because whether a difference resolves is a property of the replicate count",
+  "the rule-out panel names calendars the DECLARED ANC screen refused. That screen's kernel is fitted to the label's single reported datum and its drug-B potency is assumed, so a rejection is a statement about the model and not a licence finding",
+  "nothing here names a calendar to administer; the benefit badge stays UNKNOWN"
+ ],
+ "provenance": {
+  "engine_arithmetic": "established",
+  "comparison_is_over_paired_replicates": "established",
+  "anc_screen_parameters_are_measured": "proven_failed",
+  "engine_predicts_patients": "unknown",
+  "clinical_benefit": "unknown"
+ },
+ "data": {
+  "source": "outputs_real/outcome_cards.json (recorded paired replicates)",
+  "n_cases": 9,
+  "n_pairs": 27,
+  "horizon_days": 365,
+  "bootstrap_seed": 20261008,
+  "levels": [
+   0.5,
+   0.8,
+   0.95
+  ],
+  "paired_difference_estimand": "policy PFS - MTD PFS in days, over replicates paired by position within a case",
+  "pooled": {
+   "mean_difference_days": 71.55555555555556,
+   "median_difference_days": 79.0,
+   "intervals": {
+    "ci50": [
+     65.51851851851852,
+     78.00925925925927
+    ],
+    "ci80": [
+     60.48148148148148,
+     83.55925925925926
+    ],
+    "ci95": [
+     54.1462962962963,
+     89.63148148148147
+    ]
+   },
+   "noise_floor": {
+    "status": "resolves",
+    "ci_spans_zero": false,
+    "n_pairs": 27,
+    "n_ties": 4,
+    "n_violations": 0,
+    "n_separated": 23,
+    "no_pair_separated": false,
+    "unresolvable_at_this_n": false,
+    "reason": "the widest interval excludes zero and 23 of 27 paired replicate(s) separated the arms; 4 tied and 0 went the other way",
+    "flag": null
+   },
+   "nesting": {
+    "n_pairs": 27,
+    "assumed_exchangeable": 27,
+    "n_configurations": 9,
+    "independent_units": 9,
+    "n_geometries": 3,
+    "configurations_per_geometry": 3,
+    "seeds_per_configuration": 3,
+    "note": "the pooled interval resamples 27 paired replicates as exchangeable, but they come from 9 configurations across 3 imaging geometries, 3 seeds each: seeds within a configuration are the same model under a different seed rather than a new patient, and configurations sharing a geometry are the same tumour under different synthetic initial conditions, so the interval rests on at most 9 nested units and is narrower than one over independent patients would be"
+   }
+  },
+  "cases": [
+   {
+    "case_id": "BraTS2021_01017",
+    "patient_id": "TCGA-02-0016",
+    "r0": 0.005,
+    "n_seeds": 3,
+    "n_pairs": 3,
+    "diffs_days": [
+     72.0,
+     66.0,
+     154.0
+    ],
+    "n_ties": 0,
+    "n_violations": 0,
+    "n_censored_policy_replicates": 3,
+    "is_right_censored_lower_bound": true,
+    "median_pfs_policy_days": 365.0,
+    "median_pfs_mtd_days": 293.0,
+    "ratio_of_medians_extension": 0.24573378839590454,
+    "ratio_of_medians_label": ">= +24.6% (policy arm never progressed; censored at the 365 d horizon)",
+    "inversion_day_policy": 16,
+    "inversion_day_mtd": 16,
+    "inversion_delay_days": 0,
+    "switch_threshold": 0.15,
+    "intervals": {
+     "ci50": null,
+     "ci80": null,
+     "ci95": null
+    },
+    "noise_floor": {
+     "status": "no_interval_at_this_replicate_count",
+     "ci_spans_zero": false,
+     "n_pairs": 3,
+     "n_ties": 0,
+     "n_violations": 0,
+     "n_separated": 3,
+     "no_pair_separated": false,
+     "unresolvable_at_this_n": true,
+     "reason": "3 paired replicate(s) is below the 5 the repository's own percentile method requires, so no interval exists here and the difference is unassessed rather than resolvable",
+     "flag": "[NO INTERVAL AT THIS REPLICATE COUNT - UNRESOLVED]"
+    }
+   },
+   {
+    "case_id": "BraTS2021_01017",
+    "patient_id": "TCGA-02-0038",
+    "r0": 0.2481307478832963,
+    "n_seeds": 3,
+    "n_pairs": 3,
+    "diffs_days": [
+     86.0,
+     79.0,
+     169.0
+    ],
+    "n_ties": 0,
+    "n_violations": 0,
+    "n_censored_policy_replicates": 3,
+    "is_right_censored_lower_bound": true,
+    "median_pfs_policy_days": 365.0,
+    "median_pfs_mtd_days": 279.0,
+    "ratio_of_medians_extension": 0.30824372759856633,
+    "ratio_of_medians_label": ">= +30.8% (policy arm never progressed; censored at the 365 d horizon)",
+    "inversion_day_policy": 10,
+    "inversion_day_mtd": 10,
+    "inversion_delay_days": 0,
+    "switch_threshold": 0.15,
+    "intervals": {
+     "ci50": null,
+     "ci80": null,
+     "ci95": null
+    },
+    "noise_floor": {
+     "status": "no_interval_at_this_replicate_count",
+     "ci_spans_zero": false,
+     "n_pairs": 3,
+     "n_ties": 0,
+     "n_violations": 0,
+     "n_separated": 3,
+     "no_pair_separated": false,
+     "unresolvable_at_this_n": true,
+     "reason": "3 paired replicate(s) is below the 5 the repository's own percentile method requires, so no interval exists here and the difference is unassessed rather than resolvable",
+     "flag": "[NO INTERVAL AT THIS REPLICATE COUNT - UNRESOLVED]"
+    }
+   },
+   {
+    "case_id": "BraTS2021_01017",
+    "patient_id": "TCGA-02-0039",
+    "r0": 0.3,
+    "n_seeds": 3,
+    "n_pairs": 3,
+    "diffs_days": [
+     86.0,
+     79.0,
+     169.0
+    ],
+    "n_ties": 0,
+    "n_violations": 0,
+    "n_censored_policy_replicates": 3,
+    "is_right_censored_lower_bound": true,
+    "median_pfs_policy_days": 365.0,
+    "median_pfs_mtd_days": 279.0,
+    "ratio_of_medians_extension": 0.30824372759856633,
+    "ratio_of_medians_label": ">= +30.8% (policy arm never progressed; censored at the 365 d horizon)",
+    "inversion_day_policy": 10,
+    "inversion_day_mtd": 10,
+    "inversion_delay_days": 0,
+    "switch_threshold": 0.15,
+    "intervals": {
+     "ci50": null,
+     "ci80": null,
+     "ci95": null
+    },
+    "noise_floor": {
+     "status": "no_interval_at_this_replicate_count",
+     "ci_spans_zero": false,
+     "n_pairs": 3,
+     "n_ties": 0,
+     "n_violations": 0,
+     "n_separated": 3,
+     "no_pair_separated": false,
+     "unresolvable_at_this_n": true,
+     "reason": "3 paired replicate(s) is below the 5 the repository's own percentile method requires, so no interval exists here and the difference is unassessed rather than resolvable",
+     "flag": "[NO INTERVAL AT THIS REPLICATE COUNT - UNRESOLVED]"
+    }
+   },
+   {
+    "case_id": "BraTS2021_01018",
+    "patient_id": "TCGA-02-0016",
+    "r0": 0.005,
+    "n_seeds": 3,
+    "n_pairs": 3,
+    "diffs_days": [
+     0.0,
+     34.0,
+     0.0
+    ],
+    "n_ties": 2,
+    "n_violations": 0,
+    "n_censored_policy_replicates": 3,
+    "is_right_censored_lower_bound": true,
+    "median_pfs_policy_days": 365.0,
+    "median_pfs_mtd_days": 365.0,
+    "ratio_of_medians_extension": 0.0,
+    "ratio_of_medians_label": ">= +0.0% (policy arm never progressed; censored at the 365 d horizon)",
+    "inversion_day_policy": 16,
+    "inversion_day_mtd": 16,
+    "inversion_delay_days": 0,
+    "switch_threshold": 0.15,
+    "intervals": {
+     "ci50": null,
+     "ci80": null,
+     "ci95": null
+    },
+    "noise_floor": {
+     "status": "no_interval_at_this_replicate_count",
+     "ci_spans_zero": false,
+     "n_pairs": 3,
+     "n_ties": 2,
+     "n_violations": 0,
+     "n_separated": 1,
+     "no_pair_separated": false,
+     "unresolvable_at_this_n": true,
+     "reason": "3 paired replicate(s) is below the 5 the repository's own percentile method requires, so no interval exists here and the difference is unassessed rather than resolvable",
+     "flag": "[NO INTERVAL AT THIS REPLICATE COUNT - UNRESOLVED]"
+    }
+   },
+   {
+    "case_id": "BraTS2021_01018",
+    "patient_id": "TCGA-02-0038",
+    "r0": 0.2481307478832963,
+    "n_seeds": 3,
+    "n_pairs": 3,
+    "diffs_days": [
+     0.0,
+     60.0,
+     11.0
+    ],
+    "n_ties": 1,
+    "n_violations": 0,
+    "n_censored_policy_replicates": 3,
+    "is_right_censored_lower_bound": true,
+    "median_pfs_policy_days": 365.0,
+    "median_pfs_mtd_days": 354.0,
+    "ratio_of_medians_extension": 0.031073446327683607,
+    "ratio_of_medians_label": ">= +3.1% (policy arm never progressed; censored at the 365 d horizon)",
+    "inversion_day_policy": 10,
+    "inversion_day_mtd": 10,
+    "inversion_delay_days": 0,
+    "switch_threshold": 0.15,
+    "intervals": {
+     "ci50": null,
+     "ci80": null,
+     "ci95": null
+    },
+    "noise_floor": {
+     "status": "no_interval_at_this_replicate_count",
+     "ci_spans_zero": false,
+     "n_pairs": 3,
+     "n_ties": 1,
+     "n_violations": 0,
+     "n_separated": 2,
+     "no_pair_separated": false,
+     "unresolvable_at_this_n": true,
+     "reason": "3 paired replicate(s) is below the 5 the repository's own percentile method requires, so no interval exists here and the difference is unassessed rather than resolvable",
+     "flag": "[NO INTERVAL AT THIS REPLICATE COUNT - UNRESOLVED]"
+    }
+   },
+   {
+    "case_id": "BraTS2021_01018",
+    "patient_id": "TCGA-02-0039",
+    "r0": 0.3,
+    "n_seeds": 3,
+    "n_pairs": 3,
+    "diffs_days": [
+     0.0,
+     60.0,
+     11.0
+    ],
+    "n_ties": 1,
+    "n_violations": 0,
+    "n_censored_policy_replicates": 3,
+    "is_right_censored_lower_bound": true,
+    "median_pfs_policy_days": 365.0,
+    "median_pfs_mtd_days": 354.0,
+    "ratio_of_medians_extension": 0.031073446327683607,
+    "ratio_of_medians_label": ">= +3.1% (policy arm never progressed; censored at the 365 d horizon)",
+    "inversion_day_policy": 10,
+    "inversion_day_mtd": 10,
+    "inversion_delay_days": 0,
+    "switch_threshold": 0.15,
+    "intervals": {
+     "ci50": null,
+     "ci80": null,
+     "ci95": null
+    },
+    "noise_floor": {
+     "status": "no_interval_at_this_replicate_count",
+     "ci_spans_zero": false,
+     "n_pairs": 3,
+     "n_ties": 1,
+     "n_violations": 0,
+     "n_separated": 2,
+     "no_pair_separated": false,
+     "unresolvable_at_this_n": true,
+     "reason": "3 paired replicate(s) is below the 5 the repository's own percentile method requires, so no interval exists here and the difference is unassessed rather than resolvable",
+     "flag": "[NO INTERVAL AT THIS REPLICATE COUNT - UNRESOLVED]"
+    }
+   },
+   {
+    "case_id": "BraTS2021_01019",
+    "patient_id": "TCGA-02-0016",
+    "r0": 0.005,
+    "n_seeds": 3,
+    "n_pairs": 3,
+    "diffs_days": [
+     74.0,
+     83.0,
+     77.0
+    ],
+    "n_ties": 0,
+    "n_violations": 0,
+    "n_censored_policy_replicates": 3,
+    "is_right_censored_lower_bound": true,
+    "median_pfs_policy_days": 365.0,
+    "median_pfs_mtd_days": 288.0,
+    "ratio_of_medians_extension": 0.26736111111111116,
+    "ratio_of_medians_label": ">= +26.7% (policy arm never progressed; censored at the 365 d horizon)",
+    "inversion_day_policy": 16,
+    "inversion_day_mtd": 16,
+    "inversion_delay_days": 0,
+    "switch_threshold": 0.15,
+    "intervals": {
+     "ci50": null,
+     "ci80": null,
+     "ci95": null
+    },
+    "noise_floor": {
+     "status": "no_interval_at_this_replicate_count",
+     "ci_spans_zero": false,
+     "n_pairs": 3,
+     "n_ties": 0,
+     "n_violations": 0,
+     "n_separated": 3,
+     "no_pair_separated": false,
+     "unresolvable_at_this_n": true,
+     "reason": "3 paired replicate(s) is below the 5 the repository's own percentile method requires, so no interval exists here and the difference is unassessed rather than resolvable",
+     "flag": "[NO INTERVAL AT THIS REPLICATE COUNT - UNRESOLVED]"
+    }
+   },
+   {
+    "case_id": "BraTS2021_01019",
+    "patient_id": "TCGA-02-0038",
+    "r0": 0.2481307478832963,
+    "n_seeds": 3,
+    "n_pairs": 3,
+    "diffs_days": [
+     89.0,
+     99.0,
+     93.0
+    ],
+    "n_ties": 0,
+    "n_violations": 0,
+    "n_censored_policy_replicates": 3,
+    "is_right_censored_lower_bound": true,
+    "median_pfs_policy_days": 365.0,
+    "median_pfs_mtd_days": 272.0,
+    "ratio_of_medians_extension": 0.34191176470588225,
+    "ratio_of_medians_label": ">= +34.2% (policy arm never progressed; censored at the 365 d horizon)",
+    "inversion_day_policy": 10,
+    "inversion_day_mtd": 10,
+    "inversion_delay_days": 0,
+    "switch_threshold": 0.15,
+    "intervals": {
+     "ci50": null,
+     "ci80": null,
+     "ci95": null
+    },
+    "noise_floor": {
+     "status": "no_interval_at_this_replicate_count",
+     "ci_spans_zero": false,
+     "n_pairs": 3,
+     "n_ties": 0,
+     "n_violations": 0,
+     "n_separated": 3,
+     "no_pair_separated": false,
+     "unresolvable_at_this_n": true,
+     "reason": "3 paired replicate(s) is below the 5 the repository's own percentile method requires, so no interval exists here and the difference is unassessed rather than resolvable",
+     "flag": "[NO INTERVAL AT THIS REPLICATE COUNT - UNRESOLVED]"
+    }
+   },
+   {
+    "case_id": "BraTS2021_01019",
+    "patient_id": "TCGA-02-0039",
+    "r0": 0.3,
+    "n_seeds": 3,
+    "n_pairs": 3,
+    "diffs_days": [
+     89.0,
+     99.0,
+     93.0
+    ],
+    "n_ties": 0,
+    "n_violations": 0,
+    "n_censored_policy_replicates": 3,
+    "is_right_censored_lower_bound": true,
+    "median_pfs_policy_days": 365.0,
+    "median_pfs_mtd_days": 272.0,
+    "ratio_of_medians_extension": 0.34191176470588225,
+    "ratio_of_medians_label": ">= +34.2% (policy arm never progressed; censored at the 365 d horizon)",
+    "inversion_day_policy": 10,
+    "inversion_day_mtd": 10,
+    "inversion_delay_days": 0,
+    "switch_threshold": 0.15,
+    "intervals": {
+     "ci50": null,
+     "ci80": null,
+     "ci95": null
+    },
+    "noise_floor": {
+     "status": "no_interval_at_this_replicate_count",
+     "ci_spans_zero": false,
+     "n_pairs": 3,
+     "n_ties": 0,
+     "n_violations": 0,
+     "n_separated": 3,
+     "no_pair_separated": false,
+     "unresolvable_at_this_n": true,
+     "reason": "3 paired replicate(s) is below the 5 the repository's own percentile method requires, so no interval exists here and the difference is unassessed rather than resolvable",
+     "flag": "[NO INTERVAL AT THIS REPLICATE COUNT - UNRESOLVED]"
+    }
+   }
+  ],
+  "by_geometry": [
+   {
+    "case_id": "BraTS2021_01017",
+    "n_pairs": 9,
+    "mean_difference_days": 106.66666666666667,
+    "median_pfs_policy_days": 365.0,
+    "median_pfs_mtd_days": 279.0,
+    "diffs_days": [
+     72.0,
+     66.0,
+     154.0,
+     86.0,
+     79.0,
+     169.0,
+     86.0,
+     79.0,
+     169.0
+    ],
+    "intervals": {
+     "ci50": [
+      96.66666666666667,
+      116.11111111111111
+     ],
+     "ci80": [
+      88.44444444444444,
+      125.77777777777777
+     ],
+     "ci95": [
+      80.64722222222225,
+      135.66666666666666
+     ]
+    },
+    "noise_floor": {
+     "status": "resolves",
+     "ci_spans_zero": false,
+     "n_pairs": 9,
+     "n_ties": 0,
+     "n_violations": 0,
+     "n_separated": 9,
+     "no_pair_separated": false,
+     "unresolvable_at_this_n": false,
+     "reason": "the widest interval excludes zero and 9 of 9 paired replicate(s) separated the arms; 0 tied and 0 went the other way",
+     "flag": null
+    },
+    "nesting": {
+     "n_pairs": 9,
+     "assumed_exchangeable": 9,
+     "n_configurations": 3,
+     "independent_units": 3,
+     "n_geometries": 1,
+     "configurations_per_geometry": 3,
+     "seeds_per_configuration": 3,
+     "note": "this pool's interval resamples 9 paired replicates as exchangeable, but they come from 3 configurations on a single image, 3 seeds each: seeds within a configuration are the same model under a different seed rather than a new patient, and configurations sharing a geometry are the same tumour under different synthetic initial conditions, so the interval rests on at most 3 nested units and is narrower than one over independent patients would be"
+    }
+   },
+   {
+    "case_id": "BraTS2021_01018",
+    "n_pairs": 9,
+    "mean_difference_days": 19.555555555555557,
+    "median_pfs_policy_days": 365.0,
+    "median_pfs_mtd_days": 354.0,
+    "diffs_days": [
+     0.0,
+     34.0,
+     0.0,
+     0.0,
+     60.0,
+     11.0,
+     0.0,
+     60.0,
+     11.0
+    ],
+    "intervals": {
+     "ci50": [
+      14.11111111111111,
+      25.0
+     ],
+     "ci80": [
+      10.333333333333334,
+      29.666666666666668
+     ],
+     "ci95": [
+      4.888888888888889,
+      35.799999999999876
+     ]
+    },
+    "noise_floor": {
+     "status": "resolves",
+     "ci_spans_zero": false,
+     "n_pairs": 9,
+     "n_ties": 4,
+     "n_violations": 0,
+     "n_separated": 5,
+     "no_pair_separated": false,
+     "unresolvable_at_this_n": false,
+     "reason": "the widest interval excludes zero and 5 of 9 paired replicate(s) separated the arms; 4 tied and 0 went the other way",
+     "flag": null
+    },
+    "nesting": {
+     "n_pairs": 9,
+     "assumed_exchangeable": 9,
+     "n_configurations": 3,
+     "independent_units": 3,
+     "n_geometries": 1,
+     "configurations_per_geometry": 3,
+     "seeds_per_configuration": 3,
+     "note": "this pool's interval resamples 9 paired replicates as exchangeable, but they come from 3 configurations on a single image, 3 seeds each: seeds within a configuration are the same model under a different seed rather than a new patient, and configurations sharing a geometry are the same tumour under different synthetic initial conditions, so the interval rests on at most 3 nested units and is narrower than one over independent patients would be"
+    }
+   },
+   {
+    "case_id": "BraTS2021_01019",
+    "n_pairs": 9,
+    "mean_difference_days": 88.44444444444444,
+    "median_pfs_policy_days": 365.0,
+    "median_pfs_mtd_days": 272.0,
+    "diffs_days": [
+     74.0,
+     83.0,
+     77.0,
+     89.0,
+     99.0,
+     93.0,
+     89.0,
+     99.0,
+     93.0
+    ],
+    "intervals": {
+     "ci50": [
+      86.55555555555556,
+      90.44444444444444
+     ],
+     "ci80": [
+      84.98888888888888,
+      91.9
+     ],
+     "ci95": [
+      82.77777777777777,
+      93.66666666666667
+     ]
+    },
+    "noise_floor": {
+     "status": "resolves",
+     "ci_spans_zero": false,
+     "n_pairs": 9,
+     "n_ties": 0,
+     "n_violations": 0,
+     "n_separated": 9,
+     "no_pair_separated": false,
+     "unresolvable_at_this_n": false,
+     "reason": "the widest interval excludes zero and 9 of 9 paired replicate(s) separated the arms; 0 tied and 0 went the other way",
+     "flag": null
+    },
+    "nesting": {
+     "n_pairs": 9,
+     "assumed_exchangeable": 9,
+     "n_configurations": 3,
+     "independent_units": 3,
+     "n_geometries": 1,
+     "configurations_per_geometry": 3,
+     "seeds_per_configuration": 3,
+     "note": "this pool's interval resamples 9 paired replicates as exchangeable, but they come from 3 configurations on a single image, 3 seeds each: seeds within a configuration are the same model under a different seed rather than a new patient, and configurations sharing a geometry are the same tumour under different synthetic initial conditions, so the interval rests on at most 3 nested units and is narrower than one over independent patients would be"
+    }
+   }
+  ],
+  "n_cases_unresolvable": 9,
+  "n_geometries_unresolvable": 0,
+  "resolvability": {
+   "definition": "the same paired differences viewed at three scales -- within one case, pooled over one image's cases, and pooled over the whole record -- because whether a simulated difference is resolvable is a property of the replicate count, not of the comparison",
+   "min_pairs_for_an_interval": 5,
+   "ladder": [
+    {
+     "scale": "within one case",
+     "groups": 9,
+     "pairs_per_group": 3,
+     "groups_without_a_resolvable_interval": 9
+    },
+    {
+     "scale": "pooled over one image",
+     "groups": 3,
+     "pairs_per_group": 9,
+     "groups_without_a_resolvable_interval": 0
+    },
+    {
+     "scale": "pooled over the whole record",
+     "groups": 1,
+     "pairs_per_group": 27,
+     "groups_without_a_resolvable_interval": 0
+    }
+   ],
+   "note": "a pool without a resolvable interval is either below the 5 paired replicates the method needs, or an interval that still contains zero: 9 of 9 single-case pools, 0 of 3 image pools, and 0 pooled whole-record row(s) are in that state"
+  },
+  "inversion": {
+   "definition": "the first 1-based day the simulated resistant fraction reaches the arm's own switch threshold",
+   "n_cases_with_a_delay": 0,
+   "n_cases_with_equal_inversion_day": 9,
+   "delay_note": "in the recorded replicates the two arms reach the switch threshold on the SAME simulated day in every case, so the model shows no simulated delay in this inversion -- the arms diverge after it, in burden, not in when it happens"
+  },
+  "anc_screen": {
+   "declared": true,
+   "is_a_regulatory_boundary": false,
+   "screen": "danon.dosing.MyelosuppressionModel",
+   "screen_status": "a DECLARED screen, not a licence: its kernel is fitted to the label's single reported datum (the median day of neutrophil nadir), drug B's marrow potency is an ASSUMED weight, the baseline count is a typical adult reference rather than this patient's, and its own docstring states it is not clinical decision support",
+   "budget_continuous_mg_m2": 69.0162125468497,
+   "anchors": {
+    "label_regimen_feasible": true,
+    "label_regimen_nadir_anc": 1.4999999999999996,
+    "label_regimen_nadir_day_first_cycle": 28,
+    "label_regimen_nadir_day_1based": 28,
+    "label_regimen_peak_over_budget": 1.0,
+    "one_extra_day_feasible": false,
+    "one_extra_day_nadir_anc": 0.9911667466696639,
+    "nadir_day_residual_days": 0,
+    "worst_later_cycle_nadir_ratio": 0.999946236396376,
+    "cycles_non_cumulative_ratio_note": "1.0 means the deepest later-cycle nadir equals the first cycle's; the label states myelosuppression 'was generally not cumulative'",
+    "max_continuous_mg_m2_per_day": 69.0162125468497,
+    "suppression_budget_mg_m2": 69.0162125468497
+   },
+   "candidates": [
+    {
+     "label": "label_regimen_150x5_of_28",
+     "note": "the FDA label's own regimen: 150 mg/m2, days 1-5 of each 28-day cycle. This is the calendar the screen's own budget is DEFINED by, so it is the reference row, not a proposal",
+     "feasible": true,
+     "nadir_anc": 1.4999999999999996,
+     "peak_exposure_over_budget": 1.0,
+     "assumed_potency_drugs": []
+    },
+    {
+     "label": "brief_arithmetic_150x5_of_19",
+     "note": "the brief's own arithmetic -- 5 days on, then a 14-day holiday -- which is a 19-day cycle, not the label's 28",
+     "feasible": false,
+     "nadir_anc": 1.49130086939135,
+     "peak_exposure_over_budget": 1.0028997102028832,
+     "assumed_potency_drugs": []
+    },
+    {
+     "label": "label_plus_one_day_150x6_of_28",
+     "note": "one extra dose-day per cycle at the label dose: the smallest duration escalation the screen can be asked about",
+     "feasible": false,
+     "nadir_anc": 0.9911667466696639,
+     "peak_exposure_over_budget": 1.1696110844434453,
+     "assumed_potency_drugs": []
+    },
+    {
+     "label": "continuous_150_every_day",
+     "note": "continuous dosing at the label's daily dose -- the standard-care arm the model is compared AGAINST, written as an unbroken calendar",
+     "feasible": false,
+     "nadir_anc": 0.0,
+     "peak_exposure_over_budget": 2.173402371191794,
+     "assumed_potency_drugs": []
+    },
+    {
+     "label": "escalated_200x5_of_28",
+     "note": "the same calendar at 200 mg/m2/day, to probe the dose axis",
+     "feasible": false,
+     "nadir_anc": 0.4999999999999992,
+     "peak_exposure_over_budget": 1.3333333333333335,
+     "assumed_potency_drugs": []
+    },
+    {
+     "label": "alternating_AB_150_block5_rest23",
+     "note": "A then B, 5 days each on a 28-day cycle: the only combination shape the screen permits at the label's own mg/m2",
+     "feasible": true,
+     "nadir_anc": 1.4999999999999996,
+     "peak_exposure_over_budget": 1.0,
+     "assumed_potency_drugs": [
+      "B"
+     ]
+    },
+    {
+     "label": "alternating_AB_150_block5_rest0",
+     "note": "A then B back to back, no holiday: a continuous two-drug calendar",
+     "feasible": false,
+     "nadir_anc": 0.0,
+     "peak_exposure_over_budget": 2.173402371191794,
+     "assumed_potency_drugs": [
+      "B"
+     ]
+    }
+   ],
+   "n_rejected": 5,
+   "rejected": [
+    "brief_arithmetic_150x5_of_19",
+    "label_plus_one_day_150x6_of_28",
+    "continuous_150_every_day",
+    "escalated_200x5_of_28",
+    "alternating_AB_150_block5_rest0"
+   ],
+   "rule_out_note": "a rejected row means the MODEL refused this calendar under its declared parameters. That is a statement about the math and is safe to publish as one; it is NOT a statement that a calendar is clinically unsafe, and the reverse -- naming a calendar to give -- is not something this screen can do at all"
+  },
+  "noise_floor_flag_text": "[SIMULATED BENEFIT WITHIN NOISE FLOOR - UNRESOLVABLE]",
+  "insufficient_replicates_flag_text": "[NO INTERVAL AT THIS REPLICATE COUNT - UNRESOLVED]",
+  "nested_replicates_flag_text": "[NESTED REPLICATES - NOT INDEPENDENT SAMPLES]",
+  "what_this_screen_is": [
+   "a statement about what the model DID under declared assumptions: two arms, the same recorded geometry and paired seeds, the model's own RANO >= 25% burden rule as the endpoint",
+   "a rule-out: calendars the DECLARED ANC screen refuses, named as such. Ruling a schedule out claims the model rejected it and nothing about a patient"
+  ],
+  "what_this_screen_is_not": [
+   "a sample of independent patients: the 27 paired replicates are nested -- 3 seeds on each of 9 configurations, and the 9 configurations are 3 synthetic initial conditions on each of 3 imaging geometries -- so the interval treats 27 pairs as exchangeable when at most 9 nested units stand behind them",
+   "a schedule to give anyone: naming a calendar to administer is a clinical claim this repository cannot make and does not make",
+   "an observed outcome: every replicate is a simulation, the adaptive arm is censored at the horizon, and no patient-level validation exists in this tree",
+   "a regulatory determination: the ANC screen is DECLARED, its kernel is fitted to a single label datum, and drug B's marrow potency is assumed"
+  ]
+ }
+}

@@ -1,0 +1,330 @@
+{
+  "path": "ARCHITECTURE_EVOTWIN_10X.md",
+  "sha256": "a72c522b98ca1fb2d4ee98712108aca97ddbeeb4a80838ca4fd6df911e258e7f",
+  "n_words": 1157,
+  "findings": [
+    {
+      "rule_id": "deterministic_engine",
+      "kind": "drift",
+      "status": "PRESENT",
+      "verdict": "REFUTED",
+      "matched": "deterministic, physics-constrained",
+      "snippet": "By connecting a synthetic $24^3$ grid, Lotka-Volterra asymmetry, log-normal toxicity convolution, and strict self-auditing, you haven't just built an app\u2014you have built a **deterministic, physics-constrained clinical trial simulator.**",
+      "claim": "the engine is a deterministic, physics-constrained simulator",
+      "correction": "the engine is STOCHASTIC by construction, which is why every headline number is a 30-seed median rather than a run: the S->R mutation is a Poisson draw and growth carries multiplicative noise. 'Deterministic math and physics, not a black box' is one of the three pitch drifts danon/claims.py was written to catch.",
+      "evidence": [
+        "danon/evosteer.py::TumorEvolutionSimulator.run (rng.poisson mutation draw)",
+        "danon/evosteer.py::run(growth_noise=0.05)",
+        "danon/claims.py::module docstring, third listed drift"
+      ]
+    },
+    {
+      "rule_id": "adaptive_switches_on_resistance",
+      "kind": "drift",
+      "status": "PRESENT",
+      "verdict": "REFUTED",
+      "matched": "Monitors the global Resistant Fraction",
+      "snippet": "* **AdaptiveDosePolicy:** Monitors the global Resistant Fraction ($\\frac{\\sum R}{\\sum S + \\sum R}$). Once that fraction crosses a critical threshold, it triggers a drug holiday or switches to Drug B, executing the evolutionary steering maneuver.",
+      "claim": "AdaptiveDosePolicy monitors the resistant fraction and switches or holidays on a threshold",
+      "correction": "AdaptiveDosePolicy is BURDEN-relative, not resistance-thresholded: it doses at maximum while total burden exceeds its own initial value and withdraws entirely when the tumour is pushed back to baseline. The resistance-threshold controller is a different policy, CollateralSwitchPolicy, with hysteresis (theta_on=0.15, theta_off=0.05). The write-up fuses two controllers into one description.",
+      "evidence": [
+        "danon/evosteer.py::AdaptiveDosePolicy.dose",
+        "danon/evosteer.py::CollateralSwitchPolicy (theta_on/theta_off)"
+      ]
+    },
+    {
+      "rule_id": "anc_has_additive_recovery_term",
+      "kind": "drift",
+      "status": "PRESENT",
+      "verdict": "REFUTED",
+      "matched": "+ \\text{RecoveryRate}",
+      "snippet": "$$\\text{ANC}(t) = \\text{ANC}_0 - \\int_0^t \\text{Dose}(\\tau) \\cdot \\text{LogNormal}(t-\\tau, \\mu, \\sigma) d\\tau + \\text{RecoveryRate}$$",
+      "claim": "ANC(t) = ANC0 - integral(Dose * lognormal) + RecoveryRate",
+      "correction": "there is no additive recovery term. The screen is a marrow RESERVOIR: the dose series is convolved with a unit-area log-normal kernel, and ANC = baseline * max(0, 1 - (1 - floor/baseline) * S / budget). Recovery is the kernel's tail, not a separate rate. The budget itself is DEFINED by the label's own 150 mg/m2 x5d q28d regimen, and the kernel is fitted to one label datum -- the median day of neutrophil nadir -- which the model declares about itself.",
+      "evidence": [
+        "danon/dosing.py::MyelosuppressionModel (budget, kernel, ANC from reservoir)",
+        "danon/dosing.py::MyelosuppressionModel.kernel  (fitted_to: the label's nadir day)",
+        "outputs_real/dosing.json::myelosuppression_model"
+      ]
+    },
+    {
+      "rule_id": "mutation_is_multiplicative_noise",
+      "kind": "drift",
+      "status": "PRESENT",
+      "verdict": "IMPRECISE",
+      "matched": "\\mu \\cdot S \\cdot (1 + \\text{Noise})",
+      "snippet": "* $$\\text{Mutation} = \\mu \\cdot S \\cdot (1 + \\text{Noise})$$",
+      "claim": "Mutation = mu * S * (1 + Noise)",
+      "correction": "the mutation term is a POISSON event count on realised growth, new_R = Poisson(grow_S * mu), where grow_S has already absorbed the noise factor and the competition room term. Poisson events with a mean, not a multiplicative perturbation of a rate, and the difference is visible at small populations.",
+      "evidence": [
+        "danon/evosteer.py::run (new_R = rng.poisson(np.clip(grow_S, 0, None) * mu))"
+      ]
+    },
+    {
+      "rule_id": "segmentation_labels_are_carrying_capacity",
+      "kind": "drift",
+      "status": "PRESENT",
+      "verdict": "IMPRECISE",
+      "matched": "directly to the spatial carrying capacity",
+      "snippet": "It reads a NIfTI `.nii.gz` file (e.g., from the BraTS-2021 dataset), applies an affine transform to map the patient's MRI coordinates to the engine's grid spacing, and maps the expert segmentation labels (edema, enhancing core) directly to the spatial carrying capacity ($K(\\mathbf{x})$).",
+      "claim": "BraTS segmentation labels map directly to a spatial K(x)",
+      "correction": "the labels become a PROLIFERATIVE field (after decimation and a bounding-box crop), not a carrying capacity: K is the scalar CloneParams.carrying_capacity. What the labels drive is where growth is suppressed and where tumour can sit, and the module reports its own provenance rather than pretending the mapping is a measurement.",
+      "evidence": [
+        "danon/realdata.py::_label_proliferation",
+        "danon/realdata.py::prepare_brats_case",
+        "danon/evosteer.py::CloneParams.carrying_capacity"
+      ]
+    },
+    {
+      "rule_id": "trial_in_seconds_unqualified",
+      "kind": "drift",
+      "status": "PRESENT",
+      "verdict": "QUALIFIED",
+      "matched": "to simulate a 365-day clinical trial in seconds",
+      "snippet": "that runs inside your repository to simulate a 365-day clinical trial in seconds.",
+      "claim": "a 365-day clinical trial is simulated in seconds",
+      "correction": "per engine RUN, yes, and measured: ~3.2 s for one 24^3 / 365-day seed single-threaded and ~0.88 s across the measured 4-worker candidate pool (3.63x). A 30-seed ARM is therefore ~26 s, and the release-1 alternating-vs-single stage -- 46 arms x 30 seeds -- took 5,388 s of wall clock. 'In seconds' without the seed count is the difference between one trajectory and a trial.",
+      "evidence": [
+        "outputs_real/dosing.json::wall_seconds",
+        "outputs_real/release2_sweep.json::wall_seconds"
+      ]
+    },
+    {
+      "rule_id": "claims_py_verifies_adaptive_beats_mtd",
+      "kind": "drift",
+      "status": "PRESENT",
+      "verdict": "REFUTED",
+      "matched": "It mathematically verifies that the Adaptive policy actually generated a higher",
+      "snippet": "It mathematically verifies that the Adaptive policy actually generated a higher Progression-Free Survival (PFS) than the MTD policy without breaching the ANC threshold. If the math checks out, it outputs the `ESTABLISHED` flag for the UI. If it doesn't, it outputs `PROVEN_FAILED`.",
+      "claim": "claims.py verifies that the Adaptive policy produced a higher PFS than MTD",
+      "correction": "claims.py runs a declared registry of claims, each bound to a live check that reads the repository; it does not compare two policies' PFS. The policy comparison that exists is the competitive-release experiment (continuous MTD vs a label-shaped pulsed calendar), and release 1's single-drug search returned a NULL -- no pulsed calendar beat the best baseline. The measured win came from ALTERNATING two drugs, which is a different experiment again.",
+      "evidence": [
+        "danon/claims.py::audit_claims",
+        "danon/dosing.py::run_competitive_release_experiment",
+        "outputs_real/dosing.json::search.notes (the null result)"
+      ]
+    },
+    {
+      "rule_id": "binary_evidence_flags",
+      "kind": "drift",
+      "status": "PRESENT",
+      "verdict": "REFUTED",
+      "matched": "it outputs the `ESTABLISHED` flag for the UI",
+      "snippet": "If the math checks out, it outputs the `ESTABLISHED` flag for the UI. If it doesn't, it outputs `PROVEN_FAILED`.",
+      "claim": "the UI receives ESTABLISHED or PROVEN_FAILED",
+      "correction": "the evidence vocabulary has five members -- ESTABLISHED, EMERGING_HUMAN, ANIMAL_ONLY, PROVEN_FAILED, UNKNOWN -- and the app artifact carries a per-claim row with its own verdict and detail, so a failing check is a visible row rather than a dropped one. A two-state description cannot represent 'measured in animals, not in humans', which is where most of this repository's honesty lives.",
+      "evidence": [
+        "danon/cure.py::EvidenceStatus",
+        "danon/app_artifacts.py::build_claims_artifact",
+        "frontend/public/artifacts/claims.json"
+      ]
+    },
+    {
+      "rule_id": "omits_immune_layer",
+      "kind": "omission",
+      "status": "OMITTED",
+      "verdict": "OMISSION",
+      "matched": null,
+      "snippet": "",
+      "claim": "a complete description would name the immune clearance layer",
+      "correction": "the engine carries an opt-in resistance-blind, density-gated immune kill (ImmuneParams.kill_max, neoantigen_factor), defaulting to None in both run and run_batch -- i.e. OFF in every number the write-up quotes. danon/evotwin.py is where it is switched on, and the module's own docstring states the base model has no immune compartment.",
+      "evidence": [
+        "danon/evosteer.py::run(immune: Optional[ImmuneParams] = None)",
+        "danon/evosteer.py::ImmuneParams",
+        "danon/evotwin.py::immune trait wiring"
+      ]
+    },
+    {
+      "rule_id": "omits_cell_motility",
+      "kind": "omission",
+      "status": "OMITTED",
+      "verdict": "OMISSION",
+      "matched": null,
+      "snippet": "",
+      "claim": "a complete description would mention cell migration",
+      "correction": "the day step applies a slow cell-migration Laplacian to both clones with a coefficient named in physical units -- the same coefficient is 0.02 mm^2/day on the phantom and 0.27 mm^2/day on the real 3.67 mm geometry, against a literature motility range of 0.001-0.005 mm^2/day. Omitting it hides a term that is out of range on the real-geometry path.",
+      "evidence": [
+        "danon/evosteer.py::run (motility Laplacian on N_S and N_R)",
+        "danon/anisotropy.py::LEGACY_CELL_MIGRATION_VOXEL2_PER_DAY"
+      ]
+    },
+    {
+      "rule_id": "omits_extinction_and_detection_floors",
+      "kind": "omission",
+      "status": "OMITTED",
+      "verdict": "OMISSION",
+      "matched": null,
+      "snippet": "",
+      "claim": "a complete description would name the extinction and detection floors",
+      "correction": "two floors decide the reported numbers: a sub-half-cell voxel is set to zero (continuous densities have no extinction and every nonzero population regrows), and the resistant fraction is gated on a detection burden so that an ERADICATED tumour cannot read as 100% resistant and trigger a policy switch. The second is why the engine's own claim text says a dominance day is a model event.",
+      "evidence": [
+        "danon/evosteer.py::MIN_VIABLE_DENSITY (extinction floor)",
+        "danon/evosteer.py::DETECTION_BURDEN_DENSITY (R-fraction gating)"
+      ]
+    },
+    {
+      "rule_id": "omits_partial_cross_resistance",
+      "kind": "omission",
+      "status": "OMITTED",
+      "verdict": "OMISSION",
+      "matched": null,
+      "snippet": "",
+      "claim": "a complete description would state that resistance is partial",
+      "correction": "resistance is not binary: drug A's kill of the resistant clone is scaled by CloneParams.drug_sensitivity_scale_R = 0.25, so A still prunes R in well-perfused regions. That single scale is what makes vasculature geometry, rather than the clone label, decide where R survives -- and it is invisible in a write-up that quotes only kill_max_S and kill_max_R.",
+      "evidence": [
+        "danon/evosteer.py::CloneParams.drug_sensitivity_scale_R",
+        "danon/evosteer.py::run (kill_R_A scaling)"
+      ]
+    },
+    {
+      "rule_id": "omits_endpoint_definition",
+      "kind": "omission",
+      "status": "OMITTED",
+      "verdict": "OMISSION",
+      "matched": null,
+      "snippet": "",
+      "claim": "a complete description would define how progression is decided",
+      "correction": "'PFS' is a BURDEN-RATIO endpoint: progression is the first day total burden exceeds (1 + RANO_PROGRESSION_FRACTION) * initial, with RANO_PROGRESSION_FRACTION = 0.25, censored at the horizon. It is neither an imaging endpoint nor a survival endpoint, and the qualifier 'RANO' in the constant's name is a nod to a clinical growth threshold, not a claim to measure RANO.",
+      "evidence": [
+        "danon/evosteer.py::RANO_PROGRESSION_FRACTION",
+        "danon/evosteer.py::run (pfs_threshold)",
+        "danon/evosteer.py::SimulationTrajectory.pfs_value (censored)"
+      ]
+    }
+  ],
+  "facts": {
+    "mutation_rate": 5e-05,
+    "mutation_draw_is_poisson_on_realized_growth": true,
+    "adaptive_dose_at_baseline_burden": [
+      0.0,
+      0.0
+    ],
+    "adaptive_dose_above_baseline_burden": [
+      1.0,
+      0.0
+    ],
+    "collateral_switch_theta_on": 0.15,
+    "collateral_switch_theta_off": 0.05,
+    "collateral_switch_dose_at_high_resistance": [
+      0.0,
+      1.0
+    ],
+    "collateral_switch_rejects_inverted_band": true,
+    "myelo_has_additive_recovery_field": false,
+    "myelo_fields": [
+      "anc_baseline",
+      "anc_floor",
+      "drug_weights",
+      "kernel_log_mu",
+      "kernel_log_sd",
+      "kernel_tail_days",
+      "tolerance"
+    ],
+    "myelo_budget_mg_m2": 69.0162125468497,
+    "myelo_anchor_checks": {
+      "label_regimen_feasible": true,
+      "label_regimen_nadir_anc": 1.4999999999999996,
+      "label_regimen_nadir_day_first_cycle": 28,
+      "label_regimen_nadir_day_1based": 28,
+      "label_regimen_peak_over_budget": 1.0,
+      "one_extra_day_feasible": false,
+      "one_extra_day_nadir_anc": 0.9911667466696639,
+      "nadir_day_residual_days": 0,
+      "worst_later_cycle_nadir_ratio": 0.999946236396376,
+      "cycles_non_cumulative_ratio_note": "1.0 means the deepest later-cycle nadir equals the first cycle's; the label states myelosuppression 'was generally not cumulative'",
+      "max_continuous_mg_m2_per_day": 69.0162125468497,
+      "suppression_budget_mg_m2": 69.0162125468497
+    },
+    "myelo_kernel_log_mu": 3.25,
+    "myelo_kernel_log_sd": 0.16,
+    "myelo_kernel_fitted_to_one_label_datum": true,
+    "myelo_status": "anchored_to_fda_label_with_declared_kernel_shape",
+    "myelo_measured_in_this_repository": false,
+    "myelo_anc_floor": 1.5,
+    "rano_progression_fraction": 0.25,
+    "pfs_threshold_is_burden_ratio": true,
+    "growth_noise_default": 0.05,
+    "batch_growth_noise_default": 0.05,
+    "immune_off_by_default": true,
+    "immune_off_by_default_in_batch": true,
+    "source_states_no_immune_compartment": true,
+    "extinction_floor_present": true,
+    "detection_gating_present": true,
+    "motility_term_present": true,
+    "drug_sensitivity_scale_R": 0.25,
+    "evidence_status_members": [
+      "ANIMAL_ONLY",
+      "EMERGING_HUMAN",
+      "ESTABLISHED",
+      "PROVEN_FAILED",
+      "UNKNOWN"
+    ],
+    "evidence_status_member_count": 5,
+    "has_derived_member": false,
+    "default_clones": {
+      "growth_S": 0.16,
+      "growth_R": 0.12,
+      "carrying_capacity": 1.0,
+      "mutation_rate": 5e-05,
+      "competition": 0.6,
+      "drug_sensitivity_scale_R": 0.25
+    },
+    "default_drugs": {
+      "kill_max_S": [
+        0.34,
+        0.1
+      ],
+      "kill_max_R": [
+        0.02,
+        0.34
+      ],
+      "ec50": [
+        0.3,
+        0.3
+      ],
+      "diffusion": [
+        0.35,
+        0.35
+      ],
+      "clearance": [
+        0.1,
+        0.1
+      ],
+      "toxicity_weight": [
+        1.0,
+        0.7
+      ],
+      "source_strength": 1.0
+    },
+    "every_claim_binds_a_declared_check": true,
+    "registry_is_not_empty": true
+  },
+  "counts": {
+    "present": 8,
+    "omitted": 5,
+    "rules": 13,
+    "refuted": 5,
+    "imprecise": 2,
+    "qualified": 1
+  },
+  "what_this_cannot_show": [
+    "The verdicts are about the DOCUMENT versus the CODE, not about the model versus biology. A statement marked confirmed is a correct description of this engine, which is silent on whether the engine is right.",
+    "The rule set is declared and finite. A drift no rule names -- a wrong constant, an invented citation, a swapped sign -- is not reported, and absence of a finding is not evidence of accuracy.",
+    "A rule is matched on literal phrases, so a reworded version of the same wrong statement can slip past it; the document digest recorded here is what makes a silent rewrite visible, not the matching itself."
+  ],
+  "generated_utc": "2026-10-04T22:30:07Z",
+  "what_this_is": "An audit of the submitted EvoTwin-10X architecture write-up against the code it describes. The document is preserved verbatim; every refuted or qualified statement is carried here with the code that judges it.",
+  "provenance": {
+    "engine_is_stochastic": "established",
+    "adaptive_policy_is_burden_based": "established",
+    "anc_model_has_no_additive_recovery": "established",
+    "document_statement_verdicts": "established",
+    "any_claim_about_biology_from_this_audit": "unknown"
+  },
+  "cannot_show": [
+    "The verdicts are about the DOCUMENT versus the CODE, not about the model versus biology. A statement marked confirmed is a correct description of this engine, which is silent on whether the engine is right.",
+    "The rule set is declared and finite. A drift no rule names -- a wrong constant, an invented citation, a swapped sign -- is not reported, and absence of a finding is not evidence of accuracy.",
+    "A rule is matched on literal phrases, so a reworded version of the same wrong statement can slip past it; the document digest recorded here is what makes a silent rewrite visible, not the matching itself."
+  ],
+  "wall_seconds": 0.02
+}

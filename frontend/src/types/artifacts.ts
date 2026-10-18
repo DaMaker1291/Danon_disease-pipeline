@@ -335,3 +335,486 @@ export interface ParaviewArtifactData {
   captions: { short: string };
   paraview_recipe: string[];
 }
+
+/* --------------------------------------------------------------- scans -- */
+
+/** One committed real MRI case, rendered with its expert segmentation. */
+export interface ScanCaseRow {
+  case: string;
+  image: string;
+  engine_mask_file: string;
+  plane: string;
+  slice_index: number;
+  grid_shape_xyz: number[];
+  seg_voxels_by_label: Record<string, number>;
+  seg_voxels_total: number;
+  engine_mask_voxels: number | null;
+  engine_grid_xyz: number[] | null;
+  is_standard_case: boolean;
+}
+
+/** data block of artifacts/scans.json, written by _scan_gallery.py. */
+export interface ScansArtifactData {
+  standard_case: string;
+  montage: { file: string; case: string; views: string[] };
+  cases: ScanCaseRow[];
+  disclaimer: string;
+}
+
+/* ----------------------------------------- paired-seed PFS extension -- */
+
+/**
+ * artifacts/paired_extension.json, written by
+ * `danon.paired_extension.paired_pfs_extension_report`.
+ *
+ * Two estimands are carried and they are NOT interchangeable: the paired
+ * replicate difference in DAYS (with a bootstrap interval over pairs), and the
+ * per-case RATIO OF MEDIANS the outcome cards call `pfs_extension`. The adaptive
+ * arm reaches the horizon in every recorded replicate, so the difference is a
+ * right-censored lower bound, not a point estimate.
+ */
+export interface PairedExtensionRecord {
+  case_id: string | null;
+  patient_id: string | null;
+  n_pairs: number;
+  median_pfs_policy: number | null;
+  median_pfs_mtd: number | null;
+  ratio_of_medians_extension: number | null;
+  paired_mean_difference_days: number | null;
+}
+
+export interface PairedExtensionData {
+  n_cases: number;
+  n_pairs: number;
+  horizon_days: number;
+  bootstrap_n_boot: number;
+  bootstrap_seed: number;
+  paired_difference_estimand: string;
+  paired_mean_difference_days: number | null;
+  paired_median_difference_days: number | null;
+  paired_mean_difference_ci95_days: [number, number] | null;
+  n_policy_replicates_at_horizon: number;
+  is_right_censored_lower_bound: boolean;
+  ratio_of_medians_estimand: string;
+  ratio_of_medians_extension_median: number | null;
+  records: PairedExtensionRecord[];
+  estimand_note: string;
+  lower_bound_note: string;
+  limit: string;
+}
+
+/* ------------------------------------------------------- trial design ----- */
+
+/**
+ * The trial-design screen's record, from `danon.trial_design`.
+ *
+ * Three ingredients, none of them a prescription: the counterfactual stated as
+ * a statement about the model under declared assumptions, a noise floor that
+ * says where the arms' spreads overlap (or where there are too few pairs to
+ * estimate anything), and a rule-out naming calendars the DECLARED ANC screen
+ * refused. The endpoint is the model's own RANO >= 25% burden rule over paired
+ * replicates, never an observed patient progress.
+ */
+export type NoiseFloorStatus =
+  | 'resolves'
+  | 'within_noise_floor'
+  | 'no_interval_at_this_replicate_count';
+
+export interface NoiseFloorState {
+  status: NoiseFloorStatus;
+  ci_spans_zero: boolean;
+  n_pairs: number;
+  n_ties: number;
+  n_violations: number;
+  n_separated: number;
+  no_pair_separated: boolean;
+  unresolvable_at_this_n: boolean;
+  reason: string;
+  flag: string | null;
+}
+
+/** A resampled interval at each recorded confidence level. */
+export interface IntervalFan {
+  ci50: [number, number] | null;
+  ci80: [number, number] | null;
+  ci95: [number, number] | null;
+}
+
+/**
+ * How many units a pool's pairs actually rest on.
+ *
+ * A bootstrap over paired replicates treats them as exchangeable. In this record
+ * they are NESTED on two axes -- seeds within a configuration, and
+ * configurations within one imaging geometry -- so `assumed_exchangeable` (what
+ * the interval is computed over) is larger than `independent_units` (how many
+ * genuinely distinct units stand behind it). Both are stated beside the count so
+ * a reader is never invited to read one as the other.
+ */
+export interface NestingBlock {
+  n_pairs: number;
+  assumed_exchangeable: number;
+  /** Distinct (geometry, synthetic initial condition) configurations. */
+  n_configurations: number;
+  independent_units: number;
+  n_geometries: number;
+  configurations_per_geometry: number;
+  seeds_per_configuration: number;
+  note: string;
+}
+
+export interface TrialDesignCase {
+  case_id: string | null;
+  patient_id: string | null;
+  /** The synthetic initial resistant fraction: this case is a CONFIGURATION. */
+  r0: number | null;
+  n_pairs: number;
+  /** Replicate seeds run under this configuration. */
+  n_seeds: number;
+  diffs_days: number[];
+  n_ties: number;
+  n_violations: number;
+  n_censored_policy_replicates: number;
+  is_right_censored_lower_bound: boolean;
+  median_pfs_policy_days: number | null;
+  median_pfs_mtd_days: number | null;
+  ratio_of_medians_extension: number | null;
+  ratio_of_medians_label: string | null;
+  inversion_day_policy: number | null;
+  inversion_day_mtd: number | null;
+  inversion_delay_days: number | null;
+  switch_threshold: number;
+  intervals: IntervalFan;
+  noise_floor: NoiseFloorState;
+}
+
+export interface TrialDesignGroup {
+  /** The image the group pools: every recorded case shares its geometry. */
+  case_id: string;
+  n_pairs: number;
+  mean_difference_days: number | null;
+  /** Each case's own median PFS, then the median across the group's cases. */
+  median_pfs_policy_days: number | null;
+  median_pfs_mtd_days: number | null;
+  diffs_days: number[];
+  intervals: IntervalFan;
+  noise_floor: NoiseFloorState;
+  nesting: NestingBlock;
+}
+
+export interface AncCandidate {
+  label: string;
+  note: string;
+  feasible: boolean;
+  nadir_anc: number;
+  peak_exposure_over_budget: number | null;
+  assumed_potency_drugs: string[];
+}
+
+export interface AncScreenData {
+  declared: boolean;
+  is_a_regulatory_boundary: boolean;
+  screen: string;
+  screen_status: string;
+  budget_continuous_mg_m2: number;
+  anchors: Record<string, unknown>;
+  candidates: AncCandidate[];
+  n_rejected: number;
+  rejected: string[];
+  rule_out_note: string;
+}
+
+export interface ResolvabilityRung {
+  scale: string;
+  groups: number;
+  pairs_per_group: number;
+  groups_without_a_resolvable_interval: number;
+}
+
+export interface TrialDesignPooled {
+  mean_difference_days: number | null;
+  median_difference_days: number | null;
+  intervals: IntervalFan;
+  noise_floor: NoiseFloorState;
+  nesting: NestingBlock;
+}
+
+export interface TrialDesignResolvability {
+  definition: string;
+  min_pairs_for_an_interval: number;
+  ladder: ResolvabilityRung[];
+  note: string;
+}
+
+export interface TrialDesignInversion {
+  definition: string;
+  n_cases_with_a_delay: number;
+  n_cases_with_equal_inversion_day: number;
+  delay_note: string;
+}
+
+/**
+ * Everything derivable from the recorded outcome cards alone.
+ *
+ * This is the shape `frontend/src/utils/trialDesign.ts` returns for the live
+ * comparison, and the shape the recorded artifact carries for the same fields.
+ * One model, two producers: the screen renders whichever it is handed, and
+ * `reconcileComparison` is the only place that arbitrates between them.
+ */
+export interface TrialDesignComparison {
+  n_cases: number;
+  n_pairs: number;
+  horizon_days: number;
+  bootstrap_seed: number;
+  levels: number[];
+  paired_difference_estimand: string;
+  pooled: TrialDesignPooled;
+  cases: TrialDesignCase[];
+  by_geometry: TrialDesignGroup[];
+  n_cases_unresolvable: number;
+  n_geometries_unresolvable: number;
+  resolvability: TrialDesignResolvability;
+  inversion: TrialDesignInversion;
+}
+
+/**
+ * The recorded artifact: the comparison, plus the parts that need the Python
+ * models the browser does not have.
+ *
+ * `anc_screen` is read rather than recomputed on purpose: the ANC screen is a
+ * Python model, and a second TypeScript implementation of it would be a second
+ * definition of the same number.
+ */
+/**
+ * `artifacts/evolution_forecast.json`, written by
+ * `danon.app_artifacts.build_evolution_forecast_artifact` from
+ * `outputs_real/glass_evolution_forecast.json`.
+ *
+ * The numbers are scored on REAL paired GLASS specimens: the primary tumour and
+ * a later recurrence from the same patient. Every metric that could be read as
+ * skill is carried BESIDE the baseline it has to beat and beside the interval
+ * that says whether beating it is resolvable at this cohort size -- so the
+ * screen cannot show a point estimate without the interval that qualifies it.
+ *
+ * The verdict strings are produced by the Python record and rendered verbatim:
+ * they are allowed to say the model beats NEITHER baseline (they do, on this
+ * cohort), and a UI that paraphrased them could only soften that.
+ */
+export interface EvolutionForecastTask {
+  task: string;
+  n_train_rows: number;
+  n_test_rows: number;
+  n_train_patients: number;
+  n_test_patients: number;
+  metrics: Record<string, number | boolean | null>;
+  notes: string[];
+}
+
+/** One fold of one repeat of the cross-validation. */
+export interface EvolutionForecastFold {
+  fold: number;
+  n_train_patients: number;
+  n_test_patients: number;
+  n_test_rows: number;
+  /** Task A carries auc_fitted / auc_primary_af_only / prevalence; task B the MAEs. */
+  [metric: string]: number | null | undefined;
+}
+
+/**
+ * A task re-estimated under repeated patient-level folds.
+ *
+ * This is the estimate the verdicts name, because one seeded split's point
+ * estimate is not a result: the pooled out-of-fold score gives every patient
+ * once per repeat, scored by a model that never saw it, and `per_fold` keeps
+ * every fold's own number so the spread can be read rather than believed.
+ */
+/**
+ * One bin of the reliability table: the probability the model gave, against the
+ * rate that actually happened over the patients in that bin.
+ */
+export interface EvolutionForecastCalibrationBin {
+  bin: number;
+  n: number;
+  mean_predicted: number;
+  observed_rate: number;
+  difference: number;
+}
+
+/**
+ * Whether a PROBABILITY can be read, which is a different question from whether
+ * the ranking separates. Present only on a task whose score is a chance; a
+ * regression's output is not a probability and carries no block.
+ */
+export interface EvolutionForecastCalibration {
+  /** The unit the curve is fitted on, named so it matches the AUC's own unit. */
+  unit: string;
+  n_bins: number;
+  tolerance: { slope: number; intercept: number; mean: number };
+  summary: Record<string, number | null>;
+  bins: EvolutionForecastCalibrationBin[];
+  reading: string;
+}
+
+/**
+ * What a POOLED score is, counted rather than asserted.
+ *
+ * The unit is a row and every row keeps its own measured label. This block
+ * exists because an earlier estimator collapsed the rows to one score per
+ * patient and read the patient's label off whichever row was written last --
+ * `mixed_label_patients` of the cohort hold both labels across their own rows,
+ * so that label was an accident of row order. The counts are published, so a
+ * reader can see what the alternative would have said.
+ */
+export interface EvolutionForecastPooling {
+  unit: string;
+  n_pooled_rows: number;
+  n_patients: number;
+  mixed_label_patients: number;
+  patients_positive_last_row: number;
+  patients_positive_any_row: number;
+  patients_disagreeing: number;
+  patient_endpoint: string;
+  reading: string;
+}
+
+/**
+ * One call at the DECLARED threshold: what it finds, what it misses, and both
+ * predictive values against this cohort's own prevalence.
+ *
+ * The confusion matrix is published beside every ratio so the sentence at the
+ * bottom can always be re-derived from the counts. The threshold is declared,
+ * never tuned: a threshold picked to flatter the measured curve is the same
+ * overfit as picking the seed.
+ */
+export interface EvolutionForecastOperatingPoint {
+  unit: string;
+  threshold: number;
+  threshold_tuned_on_this_cohort: boolean;
+  n_rows: number;
+  tp: number;
+  fp: number;
+  tn: number;
+  fn: number;
+  prevalence: number;
+  sensitivity: number | null;
+  specificity: number | null;
+  ppv: number | null;
+  npv: number | null;
+  accuracy: number;
+  false_positives_per_100_called_positive: number | null;
+  false_negatives_per_100_called_negative: number | null;
+  reading: string;
+}
+
+/** One threshold of a decision curve: net benefit against its two comparators. */
+export interface EvolutionForecastDecisionCurveRow {
+  threshold: number;
+  model: number;
+  treat_all: number;
+  treat_none: number;
+  beats_both: boolean;
+}
+
+export interface EvolutionForecastDecisionCurve {
+  unit: string;
+  prevalence: number;
+  axis: string;
+  rows: EvolutionForecastDecisionCurveRow[];
+  reading: string;
+}
+
+/**
+ * What the artifact licenses a CLINICAL reader to act on, built from the SAME
+ * pooled out-of-fold predictions the research screen ranks -- there is no
+ * second, rosier estimate behind the clinical view.
+ */
+export interface EvolutionForecastClinicalUse {
+  unit: string;
+  intended_use: string;
+  operating_point: EvolutionForecastOperatingPoint;
+  decision_curve: EvolutionForecastDecisionCurve;
+  conditions: string[];
+}
+
+export interface EvolutionForecastCrossValidated {
+  task: string;
+  n_folds: number;
+  n_repeats: number;
+  n_patients: number;
+  n_rows: number;
+  per_fold: EvolutionForecastFold[];
+  metrics: Record<string, number | boolean | null>;
+  notes: string[];
+  calibration: EvolutionForecastCalibration | null;
+  clinical_use: EvolutionForecastClinicalUse | null;
+  pooling: EvolutionForecastPooling | null;
+}
+
+/**
+ * What the release DECLARES about a specimen's kind, counted.
+ *
+ * It exists because the primary/recurrence pairing is an inference from the
+ * specimen identifier, and an inference must be auditable. `declared_types`
+ * with a single entry means the release's own sampleType column is
+ * uninformative, which is why the screen states the basis and the thing the
+ * pairing cannot prove rather than presenting the pairing as given.
+ */
+export interface EvolutionForecastCensus {
+  n_specimen_rows: number;
+  declared_types: Record<string, number>;
+  declared_types_distinct: number;
+  declared_type_carries_timepoint: boolean;
+  suffixes: Record<string, Record<string, number>>;
+  n_excluded_by_suffix: number;
+  basis: string;
+  cannot_establish: string;
+}
+
+export interface EvolutionForecastData {
+  record_version: string;
+  generated_utc: string;
+  source: {
+    raw_cache: string;
+    records_used: number;
+    records_dropped: number;
+    spectra: number;
+    patients: number;
+    paired_specimen_pairs: number;
+    note: string;
+  };
+  task_a_detection_at_recurrence: EvolutionForecastTask;
+  task_b_allele_fraction_change: EvolutionForecastTask;
+  task_a_cross_validated: EvolutionForecastCrossValidated;
+  task_b_cross_validated: EvolutionForecastCrossValidated;
+  timepoint_census: EvolutionForecastCensus;
+  verdict: {
+    task_a: string;
+    task_b: string;
+    task_a_resolved: boolean;
+    task_b_resolved: boolean;
+    task_a_calibration: string;
+    estimator: string;
+    baseline_first: string;
+  };
+  worked_example: {
+    patient_id: string;
+    variant: string;
+    primary_af: number;
+    primary_depth: number;
+    delta_af: number;
+    lower_bound_primary: number;
+    lower_bound_recurrence: number;
+  } | null;
+  provenance: Record<string, string>;
+  cannot_say: string;
+  limitations: string[];
+}
+
+export interface TrialDesignData extends TrialDesignComparison {
+  source: string;
+  anc_screen: AncScreenData;
+  noise_floor_flag_text: string;
+  insufficient_replicates_flag_text: string;
+  nested_replicates_flag_text: string;
+  what_this_screen_is: string[];
+  what_this_screen_is_not: string[];
+}

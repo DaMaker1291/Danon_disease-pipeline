@@ -1,0 +1,67 @@
+{
+ "study": "difg_glass_2019",
+ "endpoint": "OS_MONTHS + OS_STATUS (right-censored, Harrell's C)",
+ "model_score": {
+  "observed_c_index": 0.41176705863530916,
+  "n_permutations": 1000,
+  "p_two_sided": 0.001998001998001998,
+  "n": 173,
+  "n_events": 126,
+  "dropped": {
+   "no_survival_attr": 9,
+   "unparseable_time": 1,
+   "unparseable_event": 0
+  }
+ },
+ "measured_re-detection_rate": {
+  "observed_c_index": 0.49988000959923207,
+  "n_permutations": 1000,
+  "p_two_sided": 0.995004995004995,
+  "n": 173,
+  "n_events": 126,
+  "dropped": {
+   "no_survival_attr": 9,
+   "unparseable_time": 1,
+   "unparseable_event": 0
+  }
+ },
+ "cox_adjusted": {
+  "univariable": {
+   "score_per_sd": {
+    "coef": -0.2960880627448258,
+    "hr": 0.7437219309416698,
+    "ci_low": 0.6234484828594231,
+    "ci_high": 0.88719810180102
+   }
+  },
+  "adjusted_age_idh": {
+   "score_per_sd": {
+    "coef": 0.0777167605558768,
+    "hr": 1.0808164854514255,
+    "ci_low": 0.9063465742781658,
+    "ci_high": 1.2888715071868868
+   },
+   "age_per_sd": {
+    "coef": 0.3867244907211984,
+    "hr": 1.4721508441785653,
+    "ci_low": 1.1742803875363728,
+    "ci_high": 1.8455797533691956
+   },
+   "idh_mutant": {
+    "coef": -1.8172124348966239,
+    "hr": 0.16247803836048028,
+    "ci_low": 0.09716003178564867,
+    "ci_high": 0.2717075371867989
+   }
+  },
+  "reading": "the score's interval crosses 1 once age and IDH are in the model",
+  "skipped": {
+   "incomplete_survival": 10,
+   "missing_age": 0,
+   "unparsed_idh": 0
+  },
+  "n": 173,
+  "events": 126
+ },
+ "interpretation_guard": "a prognostic ASSOCIATION measured on one cohort; it is not a treatment effect, not evidence that anything here changes the course of anyone's disease, and not grounds for the banner's sentence to change"
+}

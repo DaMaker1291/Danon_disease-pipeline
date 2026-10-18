@@ -802,20 +802,116 @@ def probe_egfrviii_reachability(
 # ---------------------------------------------------------------------------
 
 
-def rl_policy_target() -> TargetVerdict:
-    """The claimed RL convergence rate, against the policies that exist.
+def rl_policy_target(artifact_path: Optional[str] = None) -> TargetVerdict:
+    """Report the legacy target honestly and the PPO simulator run separately.
 
-    No reinforcement-learning agent is present: every dosing policy is a
-    closed-form rule, and `requirements.txt` carries `ray[default]` for the
-    design-arm bandit (`danon.active_learner`), which selects protein candidates
-    rather than dosing a simulated patient. The metric itself is the deeper
-    problem -- `normalized reward retention` is defined by whoever writes the
-    reward and the normalization, so it cannot be falsified by any data. This
-    repository's comparable quantity is anchored externally instead: a paired
-    MTD control on the same geometry, a RANO progression threshold, and a
-    censored lower bound.
+    `danon.rl_steering` evaluates a saved PPO policy against closed-form rules
+    on held-out synthetic seeds. A valid artifact is re-hashed, checked for
+    internal consistency, and spot-reproduced from its weights before any
+    number is surfaced. The measured AUBC/retention definition is repository-
+    defined and is not the old claimed 95.4% metric. Both branches are live:
+
+      * absent or invalid artifact -> refuse a result; code/weights alone do
+        not establish a valid held-out measurement
+      * valid artifact -> report its exact sampled and greedy results, with the
+        fixed alternating reference and in-silico limitations visible
+
+    `REFUSED_ESTIMAND` is used for an internally consistent simulator ratio
+    when the MTD-to-selected-rule denominator is zero; that means the ratio is
+    not estimable, not that the underlying trajectories are absent.
+
+    A measured simulator result is not a validated biological or clinical
+    result, and this run does not show a PPO-specific advantage over a simple
+    deterministic alternating schedule.
     """
     from danon.evosteer import AdaptiveDosePolicy, CollateralSwitchPolicy, MTDPolicy
+    from danon.rl_steering import (
+        ARTIFACT_PATH,
+        WEIGHTS_PATH,
+        load_artifact,
+        verify_rl_policy_retention,
+    )
+
+    resolved_path = artifact_path if artifact_path is not None else ARTIFACT_PATH
+    try:
+        art = load_artifact(resolved_path)
+        artifact_problem = None
+        if art is not None:
+            check = verify_rl_policy_retention(
+                artifact_path=resolved_path, weights_path=WEIGHTS_PATH
+            )
+            if not check.ok:
+                artifact_problem = check.detail
+                art = None
+        else:
+            artifact_problem = f"no artifact at {resolved_path}"
+    except Exception as exc:
+        art = None
+        artifact_problem = f"could not validate artifact at {resolved_path}: {exc}"
+    if art is not None:
+        arms = art["arms"]
+        agent = arms["ppo_agent_sampled"]
+        greedy = arms["ppo_agent_greedy"]
+        best_rule = str(art.get("best_rule", "collateral_switch"))
+        rule = arms[best_rule]
+        mtd = arms["mtd"]
+        co = (art.get("co_dose_confound") or {})
+        alternate = (art.get("alternation_reference") or {})
+        retention = (art.get("retention") or {}).get("aubc")
+        greedy_retention = (art.get("retention") or {}).get("aubc_greedy")
+        determinism_gap = art.get("determinism_gap") or {}
+        retention_estimable = retention is not None
+        return TargetVerdict(
+            name="RL dosing-policy learning (simulator only)",
+            claimed="repository-defined AUBC improvement ratio; historical 95.4% target not evaluated by this metric",
+            metric=(
+                "median AUBC (area under the normalised burden curve) on held-out "
+                "simulator seeds, against the best closed-form rule"
+            ),
+            status=(
+                TargetStatus.MEASURED
+                if retention_estimable
+                else TargetStatus.REFUSED_ESTIMAND
+            ),
+            measured=None if retention is None else float(retention),
+            n=int(agent["n_seeds"]),
+            detail=(
+                f"a PPO policy was trained on this engine's own simulator and "
+                f"evaluated on {agent['n_seeds']} held-out seeds: the sampled policy "
+                f"has median AUBC {agent['median_aubc']:.4f} against "
+                f"{rule['median_aubc']:.4f} for the best closed-form rule "
+                f"({best_rule}, selected on a separate monitor partition) and "
+                f"{mtd['median_aubc']:.4f} for MTD; sampled retention (fraction of "
+                f"the MTD-to-best-rule improvement captured) = {retention}. Its "
+                f"own deterministic greedy projection has AUBC "
+                f"{greedy['median_aubc']:.4f} (retention {greedy_retention}); "
+                f"the fixed co-dose reference is {co.get('median_aubc')} and the "
+                f"deterministic alternation reference is {alternate.get('median_aubc')}. "
+                f"This sampled-versus-greedy gap ({determinism_gap.get('note', '')}) "
+                f"is part of the result, not hidden. IN SILICO: synthetic geometry, "
+                f"calibrated to an mCRPC adaptive-therapy anchor, no patient data"
+            ),
+            blockers=[
+                *([] if retention_estimable else [
+                    "the selected MTD-to-best-rule AUBC denominator is zero; "
+                    "the retention ratio is not estimable under the declared "
+                    "minimum material-improvement rule",
+                ]),
+                "the simulator is synthetic: the parameters are calibrated to an "
+                "mCRPC adaptive-therapy anchor in a different disease",
+                "both the reward and its normalization are author-defined: AUBC "
+                "is negative normalized burden, and retention is scaled by the "
+                "MTD-to-best-rule gap; neither is an externally validated endpoint",
+                "a fixed deterministic A/B alternation has lower held-out AUBC "
+                f"({alternate.get('median_aubc')}) than the sampled PPO policy "
+                f"({agent['median_aubc']}), while the PPO greedy projection "
+                f"matches MTD ({greedy['median_aubc']}); the result does not "
+                "establish a PPO-specific or learned deterministic advantage",
+                "one phantom geometry and one parameter set: thirty seeds do not "
+                "establish generalization beyond them",
+            ],
+            # The simulator metric is not the historical claim or a clinical endpoint.
+        )
 
     present = {
         cls.__name__: RULE_BASED_POLICIES[name]
@@ -837,21 +933,20 @@ def rl_policy_target() -> TargetVerdict:
         measured=None,
         n=0,
         detail=(
-            f"no reinforcement-learning agent exists in the repository. The three "
-            f"dosing policies are closed-form: "
-            f"{'; '.join(f'{k} {v}' for k, v in present.items())}. "
-            f"MTDPolicy.dose() returns {constant} for every state, so nothing is "
-            f"learned, trained, or converged"
+            f"no valid, reproducible RL evaluation artifact is available "
+            f"({artifact_problem}). The implementation contains a PPO policy, "
+            f"but code and weights alone do not establish a held-out result. The "
+            f"other dosing policies remain closed-form: "
+            f"{'; '.join(f'{k} {v}' for k, v in present.items())}."
         ),
         blockers=[
-            "no RL agent, environment or training loop is present",
-            "the three dosing policies are closed-form rules, one of which is a constant",
-            "`normalized reward retention` is self-defined: the reward and the "
-            "normalization are both chosen by the author, so the number cannot be "
-            "falsified by any measurement",
-            "the repo's comparable quantity is externally anchored instead: paired "
-            "MTD control on identical geometry against a RANO threshold, reported "
-            "as a censored lower bound",
+            str(artifact_problem or "valid held-out evaluation artifact is missing"),
+            "the historical 95.4% target is not measured by the repository-defined "
+            "AUBC improvement ratio reported in the PPO artifact",
+            "reward and normalization are author-defined; this is not an "
+            "externally validated or clinical endpoint",
+            "the repo's clinical engine comparison remains separately refused: "
+            "no patient-level paired MRI, administered schedule and outcome cohort",
         ],
     )
 
@@ -995,7 +1090,9 @@ def eval_targets_provenance() -> Dict[str, EvidenceStatus]:
         "hill_slope_vs_measured_curves": EvidenceStatus.UNKNOWN,
         "dice_degenerate_case": EvidenceStatus.ESTABLISHED,
         "egfrviii_open_reachability": EvidenceStatus.PROVEN_FAILED,
-        "rl_agent_absence": EvidenceStatus.PROVEN_FAILED,
+        # A trained policy and its held-out evaluation exist now; what the
+        # number is NOT is generalisable past the synthetic simulator.
+        "rl_retention_in_simulation": EvidenceStatus.UNKNOWN,
     }
 
 
@@ -1011,9 +1108,11 @@ def what_targets_cannot_show() -> List[str]:
         "them would be a fit to a lower bound.",
         "The engine's Hill slope is fixed at n=1 and has never been checked "
         "against measured dose-response curves.",
-        "A self-defined reward-retention metric cannot be evidence: the reward "
-        "and its normalization are chosen by the author, so no measurement can "
-        "contradict the number it produces.",
+        "The trained policy's reward is AUTHORED: it is fixed as minus the "
+        "normalised burden curve so that training and reporting share one "
+        "functional, but choosing burden over another quantity is a modelling "
+        "choice no data can contradict. What the held-out evaluation can "
+        "contradict is whether the policy keeps its recorded advantage.",
         "EGFRvIII status is not obtainable from open GDC data, so it cannot be "
         "listed as a feature of a classifier built on this repository.",
     ]

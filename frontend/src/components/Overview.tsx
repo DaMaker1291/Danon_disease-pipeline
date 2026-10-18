@@ -4,6 +4,7 @@ import type { TabId } from '../nav';
 import { useArtifact, artifactStamp } from '../utils/artifacts';
 import type { ClaimsArtifactData, ClaimRow } from '../types/artifacts';
 import ErrorBoundary from './ErrorBoundary';
+import { tierInfo, TIER_VOCABULARY_NOTE } from '../utils/evidenceTier';
 
 interface Props {
   onNavigate: (id: TabId) => void;
@@ -80,36 +81,67 @@ export default function Overview({ onNavigate }: Props) {
                 </span>
               </div>
               <div className="claim-list">
-                {rows(OVERVIEW_REFUSALS).map((c) => (
-                  <div key={c.id} className="claim-row">
-                    <span className={`chip ${c.supported ? 'chip-real' : 'chip-warn'}`}>
-                      {c.tier}
-                    </span>
-                    <div>
-                      <div className="claim-sentence">{c.sentence}</div>
-                      <div className="claim-meta">{c.substantiated_by} · checked by {c.check}</div>
+                {rows(OVERVIEW_REFUSALS).map((c) => {
+                  const tier = tierInfo(c.tier);
+                  return (
+                    <div
+                      key={c.id}
+                      className={`claim-row${c.supported ? '' : ' claim-row-fail'}`}
+                    >
+                      {/* The chip names the evidence tier of the mechanism being
+                          refused -- all three of these are `proven failed` or
+                          `unknown`, never `established`, so colouring them by the
+                          audit result painted refusals in the green reserved for
+                          measured real data. The audit result now has its own
+                          chip below, and appears only when it is bad news. */}
+                      <span className={`chip chip-tier-${tier.tone}`} title={tier.source}>
+                        {tier.label}
+                      </span>
+                      <div>
+                        <div className="claim-sentence">{c.sentence}</div>
+                        <div className="claim-meta">
+                          {c.substantiated_by} · checked by {c.check}
+                          {!c.supported && (
+                            <span className="chip chip-warn overview-fail-chip">check failing</span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
+              <div className="overview-note">{TIER_VOCABULARY_NOTE}</div>
             </section>
 
             <section className="panel glass">
               <div className="panel-title">What is actually measured</div>
               <div className="claim-list">
-                {rows(OVERVIEW_RESULTS).map((c) => (
-                  <div key={c.id} className="claim-row">
-                    <span className={`chip ${c.supported ? 'chip-real' : 'chip-warn'}`}>
-                      {c.supported ? 'verified' : 'not verified'}
-                    </span>
-                    <div>
-                      {/* The check's own wording is the claim; the sentence is the
-                          lengthier published form, kept underneath. */}
-                      <div className="claim-sentence">{c.sentence}</div>
-                      <div className="claim-detail">{c.detail}</div>
+                {rows(OVERVIEW_RESULTS).map((c) => {
+                  const tier = tierInfo(c.tier);
+                  return (
+                    <div key={c.id} className={`claim-row${c.supported ? '' : ' claim-row-fail'}`}>
+                      <span className={`chip ${c.supported ? 'chip-real' : 'chip-warn'}`}>
+                        {c.supported ? 'verified' : 'not verified'}
+                      </span>
+                      <div>
+                        {/* The check's own wording is the claim; the sentence is the
+                            lengthier published form, kept underneath. */}
+                        <div className="claim-sentence">{c.sentence}</div>
+                        <div className="claim-detail">{c.detail}</div>
+                        {/* "verified" means our check passes against this repo. It is
+                            not a statement about the strength of the underlying human
+                            evidence, so the tier is printed next to it. */}
+                        <div className="claim-meta">
+                          evidence tier{' '}
+                          <span className="overview-tier" title={tier.source}>
+                            {tier.label}
+                          </span>{' '}
+                          · {c.substantiated_by}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               <div className="overview-stamp">{artifactStamp(artifact)}</div>
             </section>

@@ -7,13 +7,14 @@ contract including its error paths.
 
 from __future__ import annotations
 
+import hashlib
 import os
 
 import numpy as np
 import pytest
 
 from danon.evosteer import make_gbm_phantom
-from danon.imaging import write_nifti
+from danon.imaging import read_nifti, write_nifti
 
 
 @pytest.fixture(scope="module")
@@ -126,6 +127,84 @@ class TestDownsample:
         assert int(out.sum()) == 1
 
 
+class TestDerivedSpacing:
+    """A downsampled file's header must carry the DOWNSAMPLED spacing.
+
+    Writing the source spacing back understates every physical volume taken
+    from the derived file by 8x per halving -- the defect `danon.grid_artifact`
+    records against the committed derived volumes (a 1 mm header over 48 mm^3
+    voxels), and what `danon.realdata` avoids by building `source_vox * factors`.
+    """
+
+    def test_scales_spacing_by_the_applied_factor(self):
+        from danon.twin_plan import derived_voxel_sizes
+
+        assert derived_voxel_sizes((1.0, 1.0, 2.0), [2, 2]) == (4.0, 4.0, 8.0)
+        assert derived_voxel_sizes((0.8, 0.8, 3.0), []) == (0.8, 0.8, 3.0)
+
+    def test_rejects_nonpositive_factors(self):
+        from danon.twin_plan import derived_voxel_sizes
+
+        with pytest.raises(ValueError, match="positive"):
+            derived_voxel_sizes((1.0, 1.0, 1.0), [2, 0])
+
+    def test_derived_volume_never_understates_the_source(self):
+        from danon.twin_plan import derived_voxel_sizes, downsample_mask_to_budget
+
+        m = np.zeros((128, 128, 128), dtype=bool)
+        m[40:80, 40:80, 40:80] = True  # 64,000 tumour voxels at 1 mm
+        out, factors = downsample_mask_to_budget(m, budget=40_000)
+        assert factors, "the budget should force at least one halving"
+        assert out.size <= 40_000
+        sizes = derived_voxel_sizes((1.0, 1.0, 1.0), factors)
+        assert float(np.prod(sizes)) == 64.0  # two halvings -> 4 mm per axis
+        source_mm3 = float(m.sum()) * 1.0 ** 3
+        derived_mm3 = float(out.sum()) * float(np.prod(sizes))
+        assert derived_mm3 >= source_mm3
+
+
+class TestInputProvenance:
+    """A recorded run must be re-identifiable from the file it was given."""
+
+    def test_digest_is_over_the_bytes_as_received(self, mask_path):
+        from danon.imaging import mask_bytes_provenance
+
+        raw = open(mask_path, "rb").read()
+        prov = mask_bytes_provenance(raw)
+        assert prov["input_sha256"] == hashlib.sha256(raw).hexdigest()
+        assert prov["original_grid_shape_xyz"] == [
+            int(s) for s in read_nifti(mask_path)[0].shape
+        ]
+        assert prov["source_voxel_mm"] > 0
+        assert len(prov["source_voxel_sizes_mm"]) == 3
+
+    def test_a_flipped_payload_byte_moves_the_digest(self, tmp_path):
+        from danon.imaging import mask_bytes_provenance
+
+        p = tmp_path / "m.nii"
+        write_nifti(str(p), np.ones((8, 8, 8), dtype="u1"))
+        raw = bytearray(p.read_bytes())
+        before = mask_bytes_provenance(bytes(raw))["input_sha256"]
+        raw[-1] ^= 0x01  # last payload byte; the header is untouched
+        assert mask_bytes_provenance(bytes(raw))["input_sha256"] != before
+
+    def test_compressed_input_is_hashed_compressed(self, tmp_path):
+        from danon.imaging import mask_bytes_provenance
+
+        arr = np.ones((8, 8, 8), dtype="u1")
+        plain, gz = tmp_path / "m.nii", tmp_path / "m.nii.gz"
+        write_nifti(str(plain), arr)
+        write_nifti(str(gz), arr)
+        raw_gz = gz.read_bytes()
+        prov = mask_bytes_provenance(raw_gz)
+        assert prov["input_sha256"] == hashlib.sha256(raw_gz).hexdigest()
+        # same array, same declared geometry -- different bytes, different id
+        assert prov["input_sha256"] != mask_bytes_provenance(plain.read_bytes())[
+            "input_sha256"
+        ]
+        assert prov["original_grid_shape_xyz"] == list(arr.shape)
+
+
 def plan_daily_shape(plan):
     return plan.geometry_summary["grid_shape_xyz"]
 
@@ -147,6 +226,17 @@ class TestApiEndpoint:
                     "events", "notes", "provenance", "vtiBase64"):
             assert key in d, key
         assert len(d["vtiBase64"]) > 1000
+        # The input's provenance is reported even when nothing was downsampled.
+        g = d["geometry"]
+        assert g["originalGridShapeXyz"] == g["gridShapeXyz"]
+        assert g["sourceVoxelMm"] > 0
+        assert len(g["sourceVoxelSizesMm"]) == 3
+        assert len(g["inputSha256"]) == 64
+        # The digest is also carried in the provenance record, so the run is
+        # tied to the file even for a reader who never looks at geometry.
+        assert d["provenance"]["inputSha256"] == g["inputSha256"]
+        assert "downsampleFactors" not in g
+        assert "downsamplePerAxis" not in g
 
     def test_endpoint_rejects_non_nifti(self):
         from fastapi.testclient import TestClient

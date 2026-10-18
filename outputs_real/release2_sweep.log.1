@@ -1,0 +1,160 @@
+==============================================================================
+RELEASE 2: REVERSAL MAP
+==============================================================================
+release-1 winner : alternating A/B continuous: A 150 mg/m2 at 0.3 x full x3d, B 150 mg/m2 at 0.5 x full x3d, no rest
+  shape          : A level 0.3, B level 0.5, block 3 d, rest 0 d at 150 mg/m2 face
+reference arm    : single-drug A: 150 mg/m2 x2d every 42d
+seeds            : 30 (declared)
+grid             : intensity (0.5, 0.75, 1.0, 1.25, 1.5) x r0 (0.001, 0.01, 0.1, 0.3) x noise (0.05, 0.2)
+workers          : 4 (measured optimum)
+
+[group] r0=0.001 noise=0.05
+    1/6 arms (release1_winner x0.75)    131s
+    2/6 arms (release1_winner x1.25)    131s
+    3/6 arms (release1_winner x1)    132s
+    4/6 arms (release1_winner x0.5)    134s
+    5/6 arms (release1_best_single[single-drug A: 150 mg/m2 x2d every 42d])    239s
+    6/6 arms (release1_winner x1.5)    239s
+  intensity 0.5: SATURATES  aubc_ratio   0.1484 dom_delta    140.5 pfs_delta   326.0 nadir 3.19
+  intensity 0.75: SATURATES  aubc_ratio   0.0548 dom_delta    140.5 pfs_delta   326.0 nadir 2.54
+  intensity 1: SATURATES  aubc_ratio   0.0365 dom_delta    140.5 pfs_delta   326.0 nadir 1.89
+  intensity 1.25: INFEASIBLE aubc_ratio   0.0300 dom_delta    140.5 pfs_delta   326.0 nadir 1.24
+  intensity 1.5: INFEASIBLE aubc_ratio   0.0264 dom_delta    140.5 pfs_delta   326.0 nadir 0.59
+  [group done in 239s; partial artifact written]
+
+[group] r0=0.001 noise=0.2
+    1/6 arms (release1_winner x0.75)    135s
+    2/6 arms (release1_winner x1)    135s
+    3/6 arms (release1_winner x0.5)    136s
+    4/6 arms (release1_winner x1.25)    136s
+    5/6 arms (release1_winner x1.5)    256s
+    6/6 arms (release1_best_single[single-drug A: 150 mg/m2 x2d every 42d])    256s
+  intensity 0.5: SATURATES  aubc_ratio   0.1482 dom_delta    140.5 pfs_delta   326.0 nadir 3.19
+  intensity 0.75: SATURATES  aubc_ratio   0.0548 dom_delta    140.5 pfs_delta   326.0 nadir 2.54
+  intensity 1: SATURATES  aubc_ratio   0.0365 dom_delta    140.5 pfs_delta   326.0 nadir 1.89
+  intensity 1.25: INFEASIBLE aubc_ratio   0.0300 dom_delta    140.5 pfs_delta   326.0 nadir 1.24
+  intensity 1.5: INFEASIBLE aubc_ratio   0.0264 dom_delta    140.5 pfs_delta   326.0 nadir 0.59
+  [group done in 257s; partial artifact written]
+
+[group] r0=0.01 noise=0.05
+    1/6 arms (release1_winner x0.5)    132s
+    2/6 arms (release1_winner x0.75)    132s
+    3/6 arms (release1_winner x1.25)    132s
+    4/6 arms (release1_winner x1)    135s
+    5/6 arms (release1_winner x1.5)    242s
+    6/6 arms (release1_best_single[single-drug A: 150 mg/m2 x2d every 42d])    243s
+  intensity 0.5: SATURATES  aubc_ratio   0.1349 dom_delta    150.5 pfs_delta   327.0 nadir 3.19
+  intensity 0.75: SATURATES  aubc_ratio   0.0499 dom_delta    150.5 pfs_delta   327.0 nadir 2.54
+  intensity 1: SATURATES  aubc_ratio   0.0332 dom_delta    150.5 pfs_delta   327.0 nadir 1.89
+  intensity 1.25: INFEASIBLE aubc_ratio   0.0274 dom_delta    150.5 pfs_delta   327.0 nadir 1.24
+  intensity 1.5: INFEASIBLE aubc_ratio   0.0240 dom_delta    150.5 pfs_delta   327.0 nadir 0.59
+  [group done in 243s; partial artifact written]
+
+[group] r0=0.01 noise=0.2
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 122, in spawn_main
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 122, in spawn_main
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 122, in spawn_main
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+    exitcode = _main(fd, parent_sentinel)
+    exitcode = _main(fd, parent_sentinel)
+    exitcode = _main(fd, parent_sentinel)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 131, in _main
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 131, in _main
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 131, in _main
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 131, in _main
+    prepare(preparation_data)
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 246, in prepare
+    prepare(preparation_data)
+    prepare(preparation_data)
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 246, in prepare
+    _fixup_main_from_path(data['init_main_from_path'])
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 297, in _fixup_main_from_path
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 246, in prepare
+    prepare(preparation_data)
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 246, in prepare
+    _fixup_main_from_path(data['init_main_from_path'])
+    main_content = runpy.run_path(main_path,
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 297, in _fixup_main_from_path
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 291, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\supro\Downloads\life-clean\_release2_sweep.py", line 50, in <module>
+    _fixup_main_from_path(data['init_main_from_path'])
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 297, in _fixup_main_from_path
+    _fixup_main_from_path(data['init_main_from_path'])
+    main_content = runpy.run_path(main_path,
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\multiprocessing\spawn.py", line 297, in _fixup_main_from_path
+    from danon.dosing import (  # noqa: E402
+  File "C:\Users\supro\Downloads\life-clean\danon\__init__.py", line 501, in <module>
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 291, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\supro\Downloads\life-clean\_release2_sweep.py", line 50, in <module>
+    main_content = runpy.run_path(main_path,
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 291, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\supro\Downloads\life-clean\_release2_sweep.py", line 50, in <module>
+    main_content = runpy.run_path(main_path,
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 291, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+    from danon.dosing import (  # noqa: E402
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\supro\Downloads\life-clean\danon\__init__.py", line 501, in <module>
+  File "C:\Users\supro\Downloads\life-clean\_release2_sweep.py", line 50, in <module>
+    from danon.dosing import (  # noqa: E402
+  File "C:\Users\supro\Downloads\life-clean\danon\__init__.py", line 501, in <module>
+    from danon.dosing import (  # noqa: E402
+  File "C:\Users\supro\Downloads\life-clean\danon\__init__.py", line 501, in <module>
+    from danon.claims import (
+    from danon.claims import (
+    from danon.claims import (
+  File "C:\Users\supro\Downloads\life-clean\danon\claims.py", line 3711, in <module>
+    from danon.claims import (
+  File "C:\Users\supro\Downloads\life-clean\danon\claims.py", line 3711, in <module>
+  File "C:\Users\supro\Downloads\life-clean\danon\claims.py", line 3711, in <module>
+  File "C:\Users\supro\Downloads\life-clean\danon\claims.py", line 3711, in <module>
+    "alternating_win_has_a_reversal_map": check_alternating_win_has_a_measured_reversal_map,
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    "alternating_win_has_a_reversal_map": check_alternating_win_has_a_measured_reversal_map,
+NameError: name 'check_alternating_win_has_a_measured_reversal_map' is not defined
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'check_alternating_win_has_a_measured_reversal_map' is not defined
+    "alternating_win_has_a_reversal_map": check_alternating_win_has_a_measured_reversal_map,
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'check_alternating_win_has_a_measured_reversal_map' is not defined
+    "alternating_win_has_a_reversal_map": check_alternating_win_has_a_measured_reversal_map,
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'check_alternating_win_has_a_measured_reversal_map' is not defined
+Traceback (most recent call last):
+  File "C:\Users\supro\Downloads\life-clean\_release2_sweep.py", line 443, in <module>
+    main()
+  File "C:\Users\supro\Downloads\life-clean\_release2_sweep.py", line 342, in main
+    scores = evaluate_candidates(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\supro\Downloads\life-clean\danon\dosing.py", line 1334, in evaluate_candidates
+    scores[i] = fut.result()
+                ^^^^^^^^^^^^
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\supro\AppData\Local\Programs\Python\Python311\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+concurrent.futures.process.BrokenProcessPool: A process in the process pool was terminated abruptly while the future was running or pending.

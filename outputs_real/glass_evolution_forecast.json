@@ -1,0 +1,820 @@
+{
+  "record_version": "glass_evolution_forecast_v5",
+  "generated_utc": "2026-10-17T13:32:09.209636+00:00",
+  "source": {
+    "raw_cache": "data\\glass_paired\\glass_mutations.json",
+    "records_used": 1686,
+    "records_dropped": 0,
+    "spectra": 543,
+    "patients": 281,
+    "paired_specimen_pairs": 248,
+    "note": "read from the cached real GLASS records; the source API, panel and the timepoint labelling rule are in outputs_real/glass_variants.json"
+  },
+  "task_a_detection_at_recurrence": {
+    "task": "detection_at_recurrence",
+    "n_train_rows": 480,
+    "n_test_rows": 174,
+    "n_train_patients": 158,
+    "n_test_patients": 68,
+    "metrics": {
+      "test_prevalence_detected": 0.6609195402298851,
+      "baseline_majority_accuracy": 0.6609195402298851,
+      "baseline_majority_auc": 0.5,
+      "auc_primary_af_only": 0.6485630066322771,
+      "auc_primary_depth_only": 0.33021370670596906,
+      "auc_fitted_logistic": 0.6657332350773766,
+      "auc_fitted_logistic_ci_low": 0.4790420060568087,
+      "auc_fitted_logistic_ci_high": 0.8319048722194411
+    },
+    "notes": [
+      "task A scores only variants the PRIMARY specimen measured, so every row is a reading rather than an assumption and no oracle is used",
+      "variants seen only at recurrence are excluded: their label follows from the definition of 'gained', so scoring them would let a model exploit the construction instead of the measurement",
+      "the rows of one tumour move together, so the interval resamples patients and not rows"
+    ]
+  },
+  "task_b_allele_fraction_change": {
+    "task": "allele_fraction_change",
+    "n_train_rows": 335,
+    "n_test_rows": 140,
+    "n_train_patients": 143,
+    "n_test_patients": 61,
+    "metrics": {
+      "baseline_persistence_mae": 0.1752812636347823,
+      "baseline_train_mean_mae": 0.17445211854146575,
+      "model_fitted_mae": 0.16721122287178514,
+      "model_beats_persistence": true,
+      "mae_advantage_over_persistence": 0.008070040762997166,
+      "mae_advantage_ci_low": -0.0016329082025379603,
+      "mae_advantage_ci_high": 0.01814227790676401,
+      "mae_advantage_share_of_draws_positive": 0.9455,
+      "mae_advantage_resolvable": false,
+      "mean_delta": -0.03261611305986112,
+      "n_test_with_a_resolvable_change": 135,
+      "model_sign_accuracy_on_resolvable": 0.5481481481481482,
+      "baseline_majority_sign_accuracy": 0.5481481481481482,
+      "persistence_sign_accuracy_on_resolvable": 0.0
+    },
+    "notes": [
+      "persistence is the honest floor: predicting no change costs the mean absolute change, which is what a model has to beat",
+      "a sign cannot be predicted by persistence at all, so its 0.0 is the declared floor rather than a measured failure; the baseline the fitted line actually has to clear is the majority direction",
+      "the advantage over persistence is reported with a patient-level interval, because one split can show a gain that does not survive resampling the tumours",
+      "these are bulk next-generation allele fractions: a change can come from sampling, depth, purity or a clone, and this task cannot say which"
+    ]
+  },
+  "task_a_cross_validated": {
+    "task": "detection_at_recurrence",
+    "n_folds": 5,
+    "n_repeats": 5,
+    "n_patients": 226,
+    "n_rows": 654,
+    "per_fold": [
+      {
+        "fold": 0,
+        "n_train_patients": 180,
+        "n_test_patients": 46,
+        "n_test_rows": 157,
+        "auc_fitted": 0.7860016090104586,
+        "auc_primary_af_only": 0.7956556717618665,
+        "prevalence": 0.7197452229299363
+      },
+      {
+        "fold": 1,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 118,
+        "auc_fitted": 0.6568428184281843,
+        "auc_primary_af_only": 0.668529810298103,
+        "prevalence": 0.6949152542372882
+      },
+      {
+        "fold": 2,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 119,
+        "auc_fitted": 0.5017959770114943,
+        "auc_primary_af_only": 0.4832974137931034,
+        "prevalence": 0.7310924369747899
+      },
+      {
+        "fold": 3,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 126,
+        "auc_fitted": 0.8229648062566655,
+        "auc_primary_af_only": 0.7854603626022041,
+        "prevalence": 0.7698412698412699
+      },
+      {
+        "fold": 4,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 134,
+        "auc_fitted": 0.8019462719298246,
+        "auc_primary_af_only": 0.8283991228070176,
+        "prevalence": 0.7164179104477612
+      },
+      {
+        "fold": 5,
+        "n_train_patients": 180,
+        "n_test_patients": 46,
+        "n_test_rows": 124,
+        "auc_fitted": 0.8056510118365788,
+        "auc_primary_af_only": 0.8098510882016037,
+        "prevalence": 0.782258064516129
+      },
+      {
+        "fold": 6,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 151,
+        "auc_fitted": 0.7893719806763285,
+        "auc_primary_af_only": 0.8147342995169082,
+        "prevalence": 0.7615894039735099
+      },
+      {
+        "fold": 7,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 132,
+        "auc_fitted": 0.556310425921087,
+        "auc_primary_af_only": 0.5415469035798275,
+        "prevalence": 0.6742424242424242
+      },
+      {
+        "fold": 8,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 106,
+        "auc_fitted": 0.8107098381070984,
+        "auc_primary_af_only": 0.7689912826899128,
+        "prevalence": 0.6886792452830188
+      },
+      {
+        "fold": 9,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 141,
+        "auc_fitted": 0.674009900990099,
+        "auc_primary_af_only": 0.6861386138613862,
+        "prevalence": 0.7163120567375887
+      },
+      {
+        "fold": 10,
+        "n_train_patients": 180,
+        "n_test_patients": 46,
+        "n_test_rows": 132,
+        "auc_fitted": 0.7627865961199295,
+        "auc_primary_af_only": 0.7746031746031746,
+        "prevalence": 0.7954545454545454
+      },
+      {
+        "fold": 11,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 129,
+        "auc_fitted": 0.7158730158730159,
+        "auc_primary_af_only": 0.7062169312169312,
+        "prevalence": 0.6511627906976745
+      },
+      {
+        "fold": 12,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 134,
+        "auc_fitted": 0.761808367071525,
+        "auc_primary_af_only": 0.7371120107962214,
+        "prevalence": 0.7089552238805971
+      },
+      {
+        "fold": 13,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 115,
+        "auc_fitted": 0.7828571428571428,
+        "auc_primary_af_only": 0.7880357142857143,
+        "prevalence": 0.6956521739130435
+      },
+      {
+        "fold": 14,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 144,
+        "auc_fitted": 0.619028119028119,
+        "auc_primary_af_only": 0.6008736008736009,
+        "prevalence": 0.7708333333333334
+      },
+      {
+        "fold": 15,
+        "n_train_patients": 180,
+        "n_test_patients": 46,
+        "n_test_rows": 142,
+        "auc_fitted": 0.7619318181818182,
+        "auc_primary_af_only": 0.803409090909091,
+        "prevalence": 0.7746478873239436
+      },
+      {
+        "fold": 16,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 109,
+        "auc_fitted": 0.6376190476190476,
+        "auc_primary_af_only": 0.5866666666666667,
+        "prevalence": 0.7706422018348624
+      },
+      {
+        "fold": 17,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 152,
+        "auc_fitted": 0.7882034632034632,
+        "auc_primary_af_only": 0.7869047619047619,
+        "prevalence": 0.7236842105263158
+      },
+      {
+        "fold": 18,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 128,
+        "auc_fitted": 0.6428571428571429,
+        "auc_primary_af_only": 0.6002376002376002,
+        "prevalence": 0.7109375
+      },
+      {
+        "fold": 19,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 123,
+        "auc_fitted": 0.7209302325581395,
+        "auc_primary_af_only": 0.7715116279069767,
+        "prevalence": 0.6504065040650406
+      },
+      {
+        "fold": 20,
+        "n_train_patients": 180,
+        "n_test_patients": 46,
+        "n_test_rows": 125,
+        "auc_fitted": 0.7481572481572482,
+        "auc_primary_af_only": 0.7363329238329238,
+        "prevalence": 0.704
+      },
+      {
+        "fold": 21,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 141,
+        "auc_fitted": 0.6506131834440471,
+        "auc_primary_af_only": 0.6287685232498722,
+        "prevalence": 0.7304964539007093
+      },
+      {
+        "fold": 22,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 113,
+        "auc_fitted": 0.7077272727272728,
+        "auc_primary_af_only": 0.7022727272727273,
+        "prevalence": 0.7787610619469026
+      },
+      {
+        "fold": 23,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 139,
+        "auc_fitted": 0.6845851742758959,
+        "auc_primary_af_only": 0.694526264113893,
+        "prevalence": 0.697841726618705
+      },
+      {
+        "fold": 24,
+        "n_train_patients": 181,
+        "n_test_patients": 45,
+        "n_test_rows": 136,
+        "auc_fitted": 0.822959322959323,
+        "auc_primary_af_only": 0.8188643188643189,
+        "prevalence": 0.7279411764705882
+      }
+    ],
+    "metrics": {
+      "n_folds_scored": 25,
+      "pooled_rows": 654,
+      "pooled_patients": 226,
+      "rows_per_patient": 2.893805309734513,
+      "oof_auc": 0.7118494560423405,
+      "oof_auc_ci_low": 0.6372097999750359,
+      "oof_auc_ci_high": 0.7878813202797528,
+      "patient_endpoint_auc": 0.6475044563279857,
+      "patient_endpoint_ci_low": 0.5012913400134987,
+      "patient_endpoint_ci_high": 0.7804142490144838,
+      "patient_endpoint_positive": 204,
+      "patient_endpoint_prevalence": 0.9026548672566371,
+      "fold_auc_median": 0.7481572481572482,
+      "fold_auc_min": 0.5017959770114943,
+      "fold_auc_max": 0.8229648062566655,
+      "fold_auc_iqr_low": 0.6568428184281843,
+      "fold_auc_iqr_high": 0.7882034632034632,
+      "folds_above_chance": 25,
+      "share_of_folds_above_chance": 1.0,
+      "baseline_majority_accuracy": 0.7262996941896025,
+      "baseline_majority_auc": 0.5,
+      "beats_prevalence_resolvably": true,
+      "patient_endpoint_resolvably_above_chance": true,
+      "seed": 13.0
+    },
+    "notes": [
+      "5 repeats of 5-fold cross-validation, split by patient, so every row of a patient is scored by a model that never saw that patient",
+      "the pooled unit is the ROW, each row carrying its own measured label; a per-patient mean score is still recorded, but the patient endpoint that labels it (a re-detection anywhere) is declared separately because the rows of one patient can disagree",
+      "the fold count is reported BECAUSE a single split's point estimate is not a result -- read folds_above_chance and the pooled interval, not the median",
+      "the interval resamples PATIENTS rather than rows, because the variants of one tumour are not independent draws",
+      "the calibration block answers a DIFFERENT question from the AUC: whether the probability itself can be read, not whether the ranking separates. It is one cohort's calibration, and it is checked against a constant-prevalence predictor rather than against nothing"
+    ],
+    "calibration": {
+      "unit": "row",
+      "n_bins": 5,
+      "tolerance": {
+        "slope": 0.35,
+        "intercept": 0.35,
+        "mean": 0.05
+      },
+      "summary": {
+        "brier_score": 0.1684620770656599,
+        "brier_score_constant_prevalence": 0.19878844840969243,
+        "brier_skill_score": 0.15255600406685343,
+        "calibration_slope": 0.9010220468863417,
+        "calibration_intercept": 0.07611726043689074,
+        "mean_predicted_probability": 0.7276373685589116,
+        "observed_re_detection_rate": 0.7262996941896025
+      },
+      "bins": [
+        {
+          "bin": 0,
+          "n": 130,
+          "mean_predicted": 0.4541076004151243,
+          "observed_rate": 0.3230769230769231,
+          "difference": -0.13103067733820123
+        },
+        {
+          "bin": 1,
+          "n": 131,
+          "mean_predicted": 0.6607921868171855,
+          "observed_rate": 0.8091603053435115,
+          "difference": 0.14836811852632592
+        },
+        {
+          "bin": 2,
+          "n": 131,
+          "mean_predicted": 0.7508329298739682,
+          "observed_rate": 0.8625954198473282,
+          "difference": 0.11176248997336002
+        },
+        {
+          "bin": 3,
+          "n": 131,
+          "mean_predicted": 0.8425584404134226,
+          "observed_rate": 0.8091603053435115,
+          "difference": -0.03339813506991118
+        },
+        {
+          "bin": 4,
+          "n": 131,
+          "mean_predicted": 0.927807671777576,
+          "observed_rate": 0.8244274809160306,
+          "difference": -0.10338019086154537
+        }
+      ],
+      "reading": "the out-of-fold PROBABILITIES are calibrated to this cohort's own declared tolerance (slope within 0.35, intercept within 0.35, mean within 0.05). Over 5 equal-count bins the Brier score is 0.1685 against a constant-prevalence predictor's 0.1988 (skill 0.1526); discrimination and calibration are separate claims and this is one public cohort's numbers, not a general one"
+    },
+    "clinical_use": {
+      "unit": "row",
+      "intended_use": "decision support for a clinician weighing whether a variant seen in this patient's primary specimen is likely to be seen again: the score ranks and calls, a named clinician decides, and the record here is the one audited on the research screen",
+      "operating_point": {
+        "unit": "row",
+        "threshold": 0.5,
+        "threshold_tuned_on_this_cohort": false,
+        "n_rows": 654,
+        "tp": 455,
+        "fp": 126,
+        "tn": 53,
+        "fn": 20,
+        "prevalence": 0.7262996941896025,
+        "sensitivity": 0.9578947368421052,
+        "specificity": 0.29608938547486036,
+        "ppv": 0.7831325301204819,
+        "npv": 0.726027397260274,
+        "accuracy": 0.7767584097859327,
+        "false_positives_per_100_called_positive": 21.686746987951807,
+        "false_negatives_per_100_called_negative": 27.397260273972602,
+        "reading": "at the declared threshold 0.500 -- set before this cohort was read, never tuned on it -- the model calls 581 of 654 measured rows positive: it keeps 95.8% of the 475 rows that re-appear later (specificity 29.6% against the 179 that do not), with 20 missed and 126 false alarms. Because the row-level rate here is 72.6%, the predictive values belong to THIS prevalence: a positive call is followed by re-detection 78.3% of the time, and a negative call is followed by no re-detection 72.6% of the time. Both predictive values move when the ward's prevalence moves, which is why they are printed beside the sensitivity and specificity rather than instead of them"
+      },
+      "decision_curve": {
+        "unit": "row",
+        "prevalence": 0.7262996941896025,
+        "axis": "net benefit = (true positives / rows) - (false positives / rows) * pt/(1-pt), so a false positive costs what an intervention at threshold pt is worth",
+        "rows": [
+          {
+            "threshold": 0.05,
+            "model": 0.7118944149364237,
+            "treat_all": 0.7118944149364237,
+            "treat_none": 0.0,
+            "beats_both": false
+          },
+          {
+            "threshold": 0.1,
+            "model": 0.6958885490995583,
+            "treat_all": 0.6958885490995583,
+            "treat_none": 0.0,
+            "beats_both": false
+          },
+          {
+            "threshold": 0.2,
+            "model": 0.661697247706422,
+            "treat_all": 0.6578746177370032,
+            "treat_none": 0.0,
+            "beats_both": true
+          },
+          {
+            "threshold": 0.3,
+            "model": 0.6151157710790739,
+            "treat_all": 0.6089995631280035,
+            "treat_none": 0.0,
+            "beats_both": true
+          },
+          {
+            "threshold": 0.4,
+            "model": 0.5596330275229358,
+            "treat_all": 0.5438328236493375,
+            "treat_none": 0.0,
+            "beats_both": true
+          },
+          {
+            "threshold": 0.5,
+            "model": 0.5030581039755351,
+            "treat_all": 0.452599388379205,
+            "treat_none": 0.0,
+            "beats_both": true
+          },
+          {
+            "threshold": 0.6,
+            "model": 0.4518348623853212,
+            "treat_all": 0.3157492354740063,
+            "treat_none": 0.0,
+            "beats_both": true
+          },
+          {
+            "threshold": 0.7,
+            "model": 0.2813455657492354,
+            "treat_all": 0.0876656472986751,
+            "treat_none": 0.0,
+            "beats_both": true
+          }
+        ],
+        "reading": "the model earns its place at thresholds 0.20, 0.30, 0.40, 0.50, 0.60, 0.70: only there does acting on the score beat BOTH treating every row and treating none, in the units of the decision. Between those points the honest comparator is the one the curve crosses, so the threshold in any protocol must be read off this row of the curve rather than carried over from another cohort"
+      },
+      "conditions": [
+        "the unit is a ROW (a variant), not a patient: this call is about one variant, and a patient-level re-detection is a separately declared endpoint with its own interval",
+        "the threshold is declared, never tuned on this cohort; a site acting at another threshold recalculates every figure above",
+        "no autonomous action: the output is decision support for a named clinician or tumour board, who may withhold it and must record why",
+        "one public cohort, one cohort's prevalence: the predictive values do not travel to a ward whose prevalence differs, and no prospective outcome has been shown by any figure in this block"
+      ]
+    },
+    "pooling": {
+      "unit": "row",
+      "n_pooled_rows": 654,
+      "n_patients": 226,
+      "mixed_label_patients": 83,
+      "patients_positive_last_row": 122,
+      "patients_positive_any_row": 204,
+      "patients_disagreeing": 82,
+      "patient_endpoint": "any primary-measured variant re-detected in the later draw",
+      "reading": "a pooled score is a ROW -- one measured locus in one patient -- and every row carries its own measured label; the 226 patients contribute 654 such rows. 83 of those patients hold BOTH labels across their own rows, so no single per-patient label is defined for them: reading the last row alone would call 122 patients positive while a re-detection anywhere calls 204, and the two disagree on 82. The published numbers are therefore ROW-level, with an interval that resamples patients, and the patient endpoint is reported separately rather than hidden inside the row result"
+    }
+  },
+  "task_b_cross_validated": {
+    "task": "allele_fraction_change",
+    "n_folds": 5,
+    "n_repeats": 5,
+    "n_patients": 204,
+    "n_rows": 475,
+    "per_fold": [
+      {
+        "fold": 0,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 102,
+        "persistence_mae": 0.17573330371612578,
+        "model_mae": 0.1803887907406949,
+        "mae_advantage": -0.0046554870245691105
+      },
+      {
+        "fold": 1,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 101,
+        "persistence_mae": 0.1606524327856607,
+        "model_mae": 0.16213612902510302,
+        "mae_advantage": -0.0014836962394423336
+      },
+      {
+        "fold": 2,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 105,
+        "persistence_mae": 0.14873341232831067,
+        "model_mae": 0.16143543094014007,
+        "mae_advantage": -0.012702018611829402
+      },
+      {
+        "fold": 3,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 109,
+        "persistence_mae": 0.17114581412597324,
+        "model_mae": 0.1807058892602041,
+        "mae_advantage": -0.00956007513423085
+      },
+      {
+        "fold": 4,
+        "n_train_patients": 164,
+        "n_test_patients": 40,
+        "n_test_rows": 58,
+        "persistence_mae": 0.18736553934899441,
+        "model_mae": 0.16918314634961992,
+        "mae_advantage": 0.01818239299937449
+      },
+      {
+        "fold": 5,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 112,
+        "persistence_mae": 0.17985241306444427,
+        "model_mae": 0.17889369332887986,
+        "mae_advantage": 0.0009587197355644117
+      },
+      {
+        "fold": 6,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 82,
+        "persistence_mae": 0.15847383305487744,
+        "model_mae": 0.17513356555081636,
+        "mae_advantage": -0.01665973249593891
+      },
+      {
+        "fold": 7,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 99,
+        "persistence_mae": 0.16486449160288075,
+        "model_mae": 0.17495790432141936,
+        "mae_advantage": -0.010093412718538614
+      },
+      {
+        "fold": 8,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 94,
+        "persistence_mae": 0.15984676819506846,
+        "model_mae": 0.1632823950259584,
+        "mae_advantage": -0.0034356268308899374
+      },
+      {
+        "fold": 9,
+        "n_train_patients": 164,
+        "n_test_patients": 40,
+        "n_test_rows": 88,
+        "persistence_mae": 0.16823057447843862,
+        "model_mae": 0.15705825868713316,
+        "mae_advantage": 0.011172315791305454
+      },
+      {
+        "fold": 10,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 78,
+        "persistence_mae": 0.16356556231035896,
+        "model_mae": 0.16552520405624388,
+        "mae_advantage": -0.0019596417458849213
+      },
+      {
+        "fold": 11,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 106,
+        "persistence_mae": 0.1776333480230903,
+        "model_mae": 0.17792676083656808,
+        "mae_advantage": -0.00029341281347777803
+      },
+      {
+        "fold": 12,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 91,
+        "persistence_mae": 0.18116092756555824,
+        "model_mae": 0.17502433890786437,
+        "mae_advantage": 0.00613658865769387
+      },
+      {
+        "fold": 13,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 90,
+        "persistence_mae": 0.14339246101553596,
+        "model_mae": 0.14730498317222593,
+        "mae_advantage": -0.003912522156689968
+      },
+      {
+        "fold": 14,
+        "n_train_patients": 164,
+        "n_test_patients": 40,
+        "n_test_rows": 110,
+        "persistence_mae": 0.16646892142111205,
+        "model_mae": 0.1775869783439457,
+        "mae_advantage": -0.011118056922833658
+      },
+      {
+        "fold": 15,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 93,
+        "persistence_mae": 0.14712953278229157,
+        "model_mae": 0.15466941236562554,
+        "mae_advantage": -0.007539879583333964
+      },
+      {
+        "fold": 16,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 97,
+        "persistence_mae": 0.15966441284842076,
+        "model_mae": 0.15455746687107266,
+        "mae_advantage": 0.005106945977348093
+      },
+      {
+        "fold": 17,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 90,
+        "persistence_mae": 0.1987603595477577,
+        "model_mae": 0.18978497202013275,
+        "mae_advantage": 0.008975387527624945
+      },
+      {
+        "fold": 18,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 103,
+        "persistence_mae": 0.18929907669619214,
+        "model_mae": 0.2017705110721936,
+        "mae_advantage": -0.012471434376001456
+      },
+      {
+        "fold": 19,
+        "n_train_patients": 164,
+        "n_test_patients": 40,
+        "n_test_rows": 92,
+        "persistence_mae": 0.13840287122593506,
+        "model_mae": 0.14296408153773296,
+        "mae_advantage": -0.004561210311797903
+      },
+      {
+        "fold": 20,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 98,
+        "persistence_mae": 0.18534610081807965,
+        "model_mae": 0.17755948016928674,
+        "mae_advantage": 0.007786620648792902
+      },
+      {
+        "fold": 21,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 96,
+        "persistence_mae": 0.13585757106682803,
+        "model_mae": 0.14909391922412585,
+        "mae_advantage": -0.013236348157297823
+      },
+      {
+        "fold": 22,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 94,
+        "persistence_mae": 0.1633769752719594,
+        "model_mae": 0.16863961655738693,
+        "mae_advantage": -0.005262641285427527
+      },
+      {
+        "fold": 23,
+        "n_train_patients": 163,
+        "n_test_patients": 41,
+        "n_test_rows": 95,
+        "persistence_mae": 0.18911469850568222,
+        "model_mae": 0.18471508976573514,
+        "mae_advantage": 0.004399608739947075
+      },
+      {
+        "fold": 24,
+        "n_train_patients": 164,
+        "n_test_patients": 40,
+        "n_test_rows": 92,
+        "persistence_mae": 0.16043716598533314,
+        "model_mae": 0.16855761520977947,
+        "mae_advantage": -0.008120449224446324
+      }
+    ],
+    "metrics": {
+      "n_folds_scored": 25,
+      "fold_mae_advantage_median": -0.003912522156689968,
+      "fold_mae_advantage_min": -0.01665973249593891,
+      "fold_mae_advantage_max": 0.01818239299937449,
+      "folds_beating_persistence": 8,
+      "share_of_folds_beating_persistence": 0.32,
+      "persistence_mae_per_patient": 0.15691310280761578,
+      "model_mae_per_patient": 0.15179283923695877,
+      "oof_mae_advantage": 0.005120263570657008,
+      "oof_mae_advantage_ci_low": -0.004080962991838091,
+      "oof_mae_advantage_ci_high": 0.014504822205295783,
+      "oof_mae_advantage_share_of_draws_positive": 0.8565,
+      "beats_persistence_resolvably": false,
+      "seed": 13.0
+    },
+    "notes": [
+      "5 repeats of 5-fold cross-validation, split by patient, so each patient is scored exactly once per repeat by a model that never saw it",
+      "the advantage is reported per PATIENT as well as per row: the many variants of one specimen are not independent draws, so a row-level mean would overstate the cohort this rests on",
+      "every repeat's fold assignment is recorded, so the spread can be checked rather than believed"
+    ],
+    "calibration": null,
+    "clinical_use": null,
+    "pooling": null
+  },
+  "timepoint_census": {
+    "n_specimen_rows": 693,
+    "declared_types": {
+      "Primary Solid Tumor": 693
+    },
+    "declared_types_distinct": 1,
+    "declared_type_carries_timepoint": false,
+    "suffixes": {
+      "M1": {
+        "Primary Solid Tumor": 1
+      },
+      "R1": {
+        "Primary Solid Tumor": 318
+      },
+      "R2": {
+        "Primary Solid Tumor": 49
+      },
+      "R3": {
+        "Primary Solid Tumor": 14
+      },
+      "R4": {
+        "Primary Solid Tumor": 2
+      },
+      "TP": {
+        "Primary Solid Tumor": 309
+      }
+    },
+    "n_excluded_by_suffix": 1,
+    "basis": "the identifier suffix only (TP -> Primary, R<digit> -> Recurrence); the release's own sampleType column is uniform and uninformative",
+    "cannot_establish": "that the suffix convention means what this module assumes: a specimen labelled R1 is taken to be a later draw from the same patient, and nothing in the cached release independently confirms the draw order, the interval between draws, or that a later specimen is a recurrence rather than a second primary or a re-biopsy of the same lesion"
+  },
+  "verdict": {
+    "task_a": "the primary specimen's own reading BEATS prevalence at predicting re-detection, row by row: pooled out-of-fold AUC 0.712 over 654 measured rows, with a patient-clustered interval [0.637, 0.788] clear of chance, and 25 of 25 folds above chance. the secondary patient endpoint -- a re-detection anywhere in the patient -- is AUC 0.648 with interval [0.501, 0.780], whose lower bound sits only 0.0013 above chance, so the ROW-level result is the clear one and the patient-level view is marginal. The single seeded split did NOT resolve this (its interval contained 0.5), so the earlier UNRESOLVED reading was this cohort's power, not the absence of a signal",
+    "task_b": "the fitted model does NOT beat persistence. Across 25 folds its median advantage is -0.00391 -- NEGATIVE, i.e. on a typical fold it is worse than predicting no change -- only 8 of 25 folds beat the floor, and the pooled advantage 0.00512 carries an interval [-0.00408, 0.01450] that still contains zero. The single seeded split showed a positive advantage; repeated folds show it was that split's luck, which is why both estimators are kept in this record",
+    "task_a_resolved": true,
+    "task_b_resolved": false,
+    "estimator": "cross-validated: 5 repeats of 5-fold, split by patient; the pooled unit is the ROW, each row carrying its own measured label, and the interval resamples PATIENTS; the secondary patient endpoint (a re-detection anywhere) is recorded beside it, and the single seeded split is kept as the cross-check that shows this cohort's power",
+    "baseline_first": "task A: majority-class accuracy 0.7262996941896025 and AUC 0.5; task B: per-patient persistence MAE 0.15691310280761578",
+    "task_a_calibration": "the out-of-fold PROBABILITIES are calibrated to this cohort's own declared tolerance (slope within 0.35, intercept within 0.35, mean within 0.05). Over 5 equal-count bins the Brier score is 0.1685 against a constant-prevalence predictor's 0.1988 (skill 0.1526); discrimination and calibration are separate claims and this is one public cohort's numbers, not a general one"
+  },
+  "worked_example": {
+    "patient_id": "GLSS-HF-3118",
+    "variant": "EGFR:7:55221822:C>T",
+    "primary_af": 0.925,
+    "primary_depth": 2800,
+    "delta_af": -0.8873655913978495,
+    "lower_bound_primary": 0.925,
+    "lower_bound_recurrence": 0.037634408602150504
+  },
+  "lower_bound_example": null,
+  "provenance": {
+    "allele_fractions_measured_from_real_specimens": "established",
+    "patient_level_split_enforced": "established",
+    "task_a_scores_re-detection_of_variants_the_primary_measured": "established",
+    "baselines_are_reported_beside_the_model": "established",
+    "change_is_caused_by_therapy": "unknown",
+    "engine_predicts_patients": "unknown",
+    "clinical_benefit": "unknown"
+  },
+  "cannot_say": "This scores a molecular prediction on real paired specimens: whether a locus is re-detected, and how far an allele fraction moves. It is not a treatment effect and not a patient outcome: the specimens carry no therapy record and no survival, several years separate the two draws, depth differs between them, and a change in an allele fraction can come from clonal expansion, from sampling, from sequencing depth or from tumour purity. A model that beats persistence here has beaten a statistical floor on one public cohort; it has not been validated clinically. It may enter a decision only as reviewed evidence beside the operating point and the decision curve published with it, for a named clinician who can withhold it and records why \u2014 never as a stand-alone instruction.",
+  "limitations": [
+    "task A scores only variants the PRIMARY measured (shared against lost), so it is neither mutation discovery nor a forecast of a locus nobody observed; variants seen only at recurrence are excluded because their label follows from the definition of 'gained' rather than from a measurement",
+    "both verdicts are interval-aware, so this build says the model beats task A with an interval clear of the null; task B does not",
+    "task A's AUC is a RANKING result and ranking is not calibration: the same pooled out-of-fold probabilities were then compared against the rates they actually produced, bin by bin, and this cohort's answer is recorded verbatim -- the out-of-fold PROBABILITIES are calibrated to this cohort's own declared tolerance (slope within 0.35, intercept within 0.35, mean within 0.05). Over 5 equal-count bins the Brier score is 0.1685 against a constant-prevalence predictor's 0.1988 (skill 0.1526); discrimination and calibration are separate claims and this is one public cohort's numbers, not a general one",
+    "THE POOLED UNIT IS DECLARED BECAUSE IT WAS ONCE WRONG: the first version of this estimator pooled one score per patient and read the patient's LABEL off whichever row happened to be written last. On this cohort 83 of the 226 patients hold BOTH labels across their own rows, so that label was an accident of row order -- 122 positives by 'last row wins' against 204 by 'a re-detection anywhere', disagreeing on 82 patients -- and it moved BOTH published numbers: the row-level AUC reads 0.712 here against the superseded 0.675, and the calibration block reads as calibrated (Brier skill +0.153) against the superseded 'worse than one constant' (-0.036). The pooling block below carries the counts and a sentence derived from them, and the audit re-derives the block, so a return to per-patient averaging over mixed labels has to publish different numbers rather than different prose",
+    "the split is by patient and the estimate is repeated cross-validation (5 repeats of 5-fold, pooled out-of-fold); the single seeded split is also in this record because the two estimators disagree, and hiding the disagreement would hide how fragile one split is",
+    "THE PAIRING IS AN INFERENCE: the release declares every one of its 693 specimen rows as 'Primary Solid Tumor', so its own sampleType column carries no timepoint at all and the only signal is the identifier suffix. Nothing in this release confirms the draw order, and 1 specimen(s) with an unrecognised suffix are excluded rather than guessed into a fold. See timepoint_census.cannot_establish",
+    "the two specimens are years apart and sequenced at different depths, so a change in an allele fraction is confounded by sampling",
+    "no treatment record and no outcome is joined, so nothing here is a therapy response or a prognosis",
+    "a declared 27-gene panel, not the whole variant space"
+  ]
+}

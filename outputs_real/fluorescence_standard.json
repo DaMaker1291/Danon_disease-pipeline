@@ -1,0 +1,544 @@
+{
+ "generated_utc": "2026-10-13T21:05:35Z",
+ "source": {
+  "case": "BraTS2021_01017",
+  "files": {
+   "BraTS2021_01017_mask.nii.gz": {
+    "path": "data\\engine_ready\\BraTS2021_01017_mask.nii.gz",
+    "sha256": "7dd87623776d4904050246ff6c2d24c08aa3f655f033e8a52db770e369fbfc98",
+    "bytes": 513
+   },
+   "BraTS2021_01017_prolif.nii.gz": {
+    "path": "data\\engine_ready\\BraTS2021_01017_prolif.nii.gz",
+    "sha256": "f04e6a7efdf754fcef2eb4dc98da0b6304308d47bd4588a39ed65da683ac3407",
+    "bytes": 606
+   },
+   "BraTS2021_01017_vessels_t1ce.nii.gz": {
+    "path": "data\\engine_ready\\BraTS2021_01017_vessels_t1ce.nii.gz",
+    "sha256": "974f41f87ce7fc1865be232f2633da6d3804d79d22a85965ab07396b1e5cd663",
+    "bytes": 2011
+   }
+  },
+  "note": "expert BraTS-2021 segmentation and its derived engine-ready maps; PRE-OPERATIVE only, so the planted field sits on the tumour rim and not on any resection cavity"
+ },
+ "synthetic_disclaimer": "the planted fluorescence field is manufactured by this repository and is not a measured 5-ALA acquisition",
+ "geometry": {
+  "grid": [
+   14,
+   24,
+   24
+  ],
+  "tumour_voxels": 1774,
+  "voxel_mm": 3.634
+ },
+ "identity": {
+  "stream1_uniform_total": 1153.1,
+  "engine_target_total": 1153.1000000000001,
+  "absolute_difference": 2.2737367544323206e-13
+ },
+ "descriptors": [
+  {
+   "mode": "uniform",
+   "decay_voxels": 2.0,
+   "n_support": 1774,
+   "total_intensity": 1774.0,
+   "rim_share": 0.8647125140924464,
+   "core_share": 1.0,
+   "mean_distance": 1.0560379114822676,
+   "peak_distance": 1.0
+  },
+  {
+   "mode": "rim",
+   "decay_voxels": 2.0,
+   "n_support": 1774,
+   "total_intensity": 1048.754517934037,
+   "rim_share": 0.8871647426435205,
+   "core_share": 1.0,
+   "mean_distance": 1.0467378939109124,
+   "peak_distance": 1.0
+  },
+  {
+   "mode": "core",
+   "decay_voxels": 2.0,
+   "n_support": 1774,
+   "total_intensity": 1487.0389756696804,
+   "rim_share": 0.8386054407942353,
+   "core_share": 1.0,
+   "mean_distance": 1.0668518153162552,
+   "peak_distance": 1.4142135623730951
+  },
+  {
+   "mode": "rim",
+   "decay_voxels": 1.0,
+   "n_support": 1774,
+   "total_intensity": 622.675079021204,
+   "rim_share": 0.906294601743288,
+   "core_share": 1.0,
+   "mean_distance": 1.0388140468255023,
+   "peak_distance": 1.0
+  },
+  {
+   "mode": "rim",
+   "decay_voxels": 2.0,
+   "n_support": 1774,
+   "total_intensity": 1048.754517934037,
+   "rim_share": 0.8871647426435205,
+   "core_share": 1.0,
+   "mean_distance": 1.0467378939109124,
+   "peak_distance": 1.0
+  },
+  {
+   "mode": "rim",
+   "decay_voxels": 4.0,
+   "n_support": 1774,
+   "total_intensity": 1363.2056415499094,
+   "rim_share": 0.8763757754649784,
+   "core_share": 1.0,
+   "mean_distance": 1.0512068304402629,
+   "peak_distance": 1.0
+  }
+ ],
+ "runs": [
+  {
+   "mode": "default",
+   "seed": 17,
+   "days": 60,
+   "initial_burden": 1153.1,
+   "final_burden": 98.80911175196982,
+   "pfs_day": null,
+   "progressed": false,
+   "final_resistant_fraction": 0.7250974820659721,
+   "outside_share": 0.3656878751725545,
+   "centroid_shift_voxels": 4.094938842799301
+  },
+  {
+   "mode": "default",
+   "seed": 17,
+   "days": 365,
+   "initial_burden": 1153.1,
+   "final_burden": 2591.708668804242,
+   "pfs_day": 269,
+   "progressed": true,
+   "final_resistant_fraction": 0.995019656419128,
+   "outside_share": null,
+   "centroid_shift_voxels": null
+  },
+  {
+   "mode": "default",
+   "seed": 18,
+   "days": 60,
+   "initial_burden": 1153.1,
+   "final_burden": 109.79323184139106,
+   "pfs_day": null,
+   "progressed": false,
+   "final_resistant_fraction": 0.7536541942974162,
+   "outside_share": 0.35320698934228795,
+   "centroid_shift_voxels": 2.467517449565416
+  },
+  {
+   "mode": "default",
+   "seed": 18,
+   "days": 365,
+   "initial_burden": 1153.1,
+   "final_burden": 3411.4843415428854,
+   "pfs_day": 217,
+   "progressed": true,
+   "final_resistant_fraction": 0.9982078512428552,
+   "outside_share": null,
+   "centroid_shift_voxels": null
+  },
+  {
+   "mode": "default",
+   "seed": 19,
+   "days": 60,
+   "initial_burden": 1153.1,
+   "final_burden": 124.8394526402421,
+   "pfs_day": null,
+   "progressed": false,
+   "final_resistant_fraction": 0.7834685320154229,
+   "outside_share": 0.3314187547372656,
+   "centroid_shift_voxels": 4.60283284002028
+  },
+  {
+   "mode": "default",
+   "seed": 19,
+   "days": 365,
+   "initial_burden": 1153.1,
+   "final_burden": 2835.599565521731,
+   "pfs_day": 248,
+   "progressed": true,
+   "final_resistant_fraction": 0.995444631485644,
+   "outside_share": null,
+   "centroid_shift_voxels": null
+  },
+  {
+   "mode": "uniform",
+   "seed": 17,
+   "days": 60,
+   "initial_burden": 1153.1,
+   "final_burden": 264.8957184986279,
+   "pfs_day": null,
+   "progressed": false,
+   "final_resistant_fraction": 0.9029840673706545,
+   "outside_share": 0.284427783019454,
+   "centroid_shift_voxels": 0.9835777080098533
+  },
+  {
+   "mode": "uniform",
+   "seed": 17,
+   "days": 365,
+   "initial_burden": 1153.1,
+   "final_burden": 4125.284838285776,
+   "pfs_day": 115,
+   "progressed": true,
+   "final_resistant_fraction": 0.9999876423224952,
+   "outside_share": null,
+   "centroid_shift_voxels": null
+  },
+  {
+   "mode": "uniform",
+   "seed": 18,
+   "days": 60,
+   "initial_burden": 1153.1,
+   "final_burden": 265.1002487347281,
+   "pfs_day": null,
+   "progressed": false,
+   "final_resistant_fraction": 0.9029823969293624,
+   "outside_share": 0.28431701084696803,
+   "centroid_shift_voxels": 0.981368484073935
+  },
+  {
+   "mode": "uniform",
+   "seed": 18,
+   "days": 365,
+   "initial_burden": 1153.1,
+   "final_burden": 4125.1649738362685,
+   "pfs_day": 115,
+   "progressed": true,
+   "final_resistant_fraction": 0.9999877172758505,
+   "outside_share": null,
+   "centroid_shift_voxels": null
+  },
+  {
+   "mode": "uniform",
+   "seed": 19,
+   "days": 60,
+   "initial_burden": 1153.1,
+   "final_burden": 276.652641843037,
+   "pfs_day": null,
+   "progressed": false,
+   "final_resistant_fraction": 0.906845702477807,
+   "outside_share": 0.2839398517251785,
+   "centroid_shift_voxels": 0.6324364646435741
+  },
+  {
+   "mode": "uniform",
+   "seed": 19,
+   "days": 365,
+   "initial_burden": 1153.1,
+   "final_burden": 4127.256297020134,
+   "pfs_day": 115,
+   "progressed": true,
+   "final_resistant_fraction": 0.9999877688019322,
+   "outside_share": null,
+   "centroid_shift_voxels": null
+  },
+  {
+   "mode": "rim",
+   "seed": 17,
+   "days": 60,
+   "initial_burden": 1153.1000000000004,
+   "final_burden": 262.3999444113792,
+   "pfs_day": null,
+   "progressed": false,
+   "final_resistant_fraction": 0.9019033843000746,
+   "outside_share": 0.285736418262551,
+   "centroid_shift_voxels": 0.9937481479923647
+  },
+  {
+   "mode": "rim",
+   "seed": 17,
+   "days": 365,
+   "initial_burden": 1153.1000000000004,
+   "final_burden": 4124.585384961408,
+   "pfs_day": 116,
+   "progressed": true,
+   "final_resistant_fraction": 0.9999877441091091,
+   "outside_share": null,
+   "centroid_shift_voxels": null
+  },
+  {
+   "mode": "rim",
+   "seed": 18,
+   "days": 60,
+   "initial_burden": 1153.1000000000004,
+   "final_burden": 262.60202051061043,
+   "pfs_day": null,
+   "progressed": false,
+   "final_resistant_fraction": 0.9019017671142749,
+   "outside_share": 0.28562405144773884,
+   "centroid_shift_voxels": 0.9915283413577547
+  },
+  {
+   "mode": "rim",
+   "seed": 18,
+   "days": 365,
+   "initial_burden": 1153.1000000000004,
+   "final_burden": 4124.72332179456,
+   "pfs_day": 116,
+   "progressed": true,
+   "final_resistant_fraction": 0.9999877960182098,
+   "outside_share": null,
+   "centroid_shift_voxels": null
+  },
+  {
+   "mode": "rim",
+   "seed": 19,
+   "days": 60,
+   "initial_burden": 1153.1000000000004,
+   "final_burden": 274.1924706684847,
+   "pfs_day": null,
+   "progressed": false,
+   "final_resistant_fraction": 0.9058594764360176,
+   "outside_share": 0.2851732439183615,
+   "centroid_shift_voxels": 0.6338327802912734
+  },
+  {
+   "mode": "rim",
+   "seed": 19,
+   "days": 365,
+   "initial_burden": 1153.1000000000004,
+   "final_burden": 4126.688437102648,
+   "pfs_day": 115,
+   "progressed": true,
+   "final_resistant_fraction": 0.9999877233071746,
+   "outside_share": null,
+   "centroid_shift_voxels": null
+  },
+  {
+   "mode": "core",
+   "seed": 17,
+   "days": 60,
+   "initial_burden": 1153.1,
+   "final_burden": 267.35461258224154,
+   "pfs_day": null,
+   "progressed": false,
+   "final_resistant_fraction": 0.9040823965993511,
+   "outside_share": 0.2830041379121295,
+   "centroid_shift_voxels": 0.9734611758093333
+  },
+  {
+   "mode": "core",
+   "seed": 17,
+   "days": 365,
+   "initial_burden": 1153.1,
+   "final_burden": 4125.594537522728,
+   "pfs_day": 115,
+   "progressed": true,
+   "final_resistant_fraction": 0.9999876794740683,
+   "outside_share": null,
+   "centroid_shift_voxels": null
+  },
+  {
+   "mode": "core",
+   "seed": 18,
+   "days": 60,
+   "initial_burden": 1153.1,
+   "final_burden": 267.56174148125746,
+   "pfs_day": null,
+   "progressed": false,
+   "final_resistant_fraction": 0.9040808277545772,
+   "outside_share": 0.2828949667738156,
+   "centroid_shift_voxels": 0.9712572329227706
+  },
+  {
+   "mode": "core",
+   "seed": 18,
+   "days": 365,
+   "initial_burden": 1153.1,
+   "final_burden": 4125.579345622576,
+   "pfs_day": 115,
+   "progressed": true,
+   "final_resistant_fraction": 0.9999878321023852,
+   "outside_share": null,
+   "centroid_shift_voxels": null
+  },
+  {
+   "mode": "core",
+   "seed": 19,
+   "days": 60,
+   "initial_burden": 1153.1,
+   "final_burden": 279.0762122847108,
+   "pfs_day": null,
+   "progressed": false,
+   "final_resistant_fraction": 0.9078513648630664,
+   "outside_share": 0.2825947287503945,
+   "centroid_shift_voxels": 0.6311179789162674
+  },
+  {
+   "mode": "core",
+   "seed": 19,
+   "days": 365,
+   "initial_burden": 1153.1,
+   "final_burden": 4127.784523734761,
+   "pfs_day": 114,
+   "progressed": true,
+   "final_resistant_fraction": 0.9999877457429126,
+   "outside_share": null,
+   "centroid_shift_voxels": null
+  }
+ ],
+ "summary": [
+  {
+   "mode": "default",
+   "days": 60,
+   "n": 3,
+   "median_pfs_day": 60.0,
+   "median_final_burden": 109.79323184139106,
+   "final_burden_spread": 26.030340888272278,
+   "median_paired_delta_vs_default": null,
+   "median_outside_share": 0.35320698934228795
+  },
+  {
+   "mode": "default",
+   "days": 365,
+   "n": 3,
+   "median_pfs_day": 248.0,
+   "median_final_burden": 2835.599565521731,
+   "final_burden_spread": 819.7756727386436,
+   "median_paired_delta_vs_default": null,
+   "median_outside_share": null
+  },
+  {
+   "mode": "uniform",
+   "days": 60,
+   "n": 3,
+   "median_pfs_day": 60.0,
+   "median_final_burden": 265.1002487347281,
+   "final_burden_spread": 11.756923344409074,
+   "median_paired_delta_vs_default": 155.30701689333705,
+   "median_outside_share": 0.28431701084696803
+  },
+  {
+   "mode": "uniform",
+   "days": 365,
+   "n": 3,
+   "median_pfs_day": 115.0,
+   "median_final_burden": 4125.284838285776,
+   "final_burden_spread": 2.091323183865825,
+   "median_paired_delta_vs_default": 1291.6567314984031,
+   "median_outside_share": null
+  },
+  {
+   "mode": "rim",
+   "days": 60,
+   "n": 3,
+   "median_pfs_day": 60.0,
+   "median_final_burden": 262.60202051061043,
+   "final_burden_spread": 11.792526257105521,
+   "median_paired_delta_vs_default": 152.80878866921938,
+   "median_outside_share": 0.28562405144773884
+  },
+  {
+   "mode": "rim",
+   "days": 365,
+   "n": 3,
+   "median_pfs_day": 116.0,
+   "median_final_burden": 4124.72332179456,
+   "final_burden_spread": 2.1030521412403687,
+   "median_paired_delta_vs_default": 1291.088871580917,
+   "median_outside_share": null
+  },
+  {
+   "mode": "core",
+   "days": 60,
+   "n": 3,
+   "median_pfs_day": 60.0,
+   "median_final_burden": 267.56174148125746,
+   "final_burden_spread": 11.721599702469234,
+   "median_paired_delta_vs_default": 157.7685096398664,
+   "median_outside_share": 0.2828949667738156
+  },
+  {
+   "mode": "core",
+   "days": 365,
+   "n": 3,
+   "median_pfs_day": 115.0,
+   "median_final_burden": 4125.594537522728,
+   "final_burden_spread": 2.205178112185422,
+   "median_paired_delta_vs_default": 1292.1849582130299,
+   "median_outside_share": null
+  }
+ ],
+ "layout_contrast": {
+  "60": {
+   "n_modes": 3,
+   "median_final_burden": 265.1002487347281,
+   "relative_spread": 0.018708850686933752
+  },
+  "365": {
+   "n_modes": 3,
+   "median_final_burden": 4125.284838285776,
+   "relative_spread": 0.0002111892299126621
+  }
+ },
+ "stream1_census": {
+  "still_refused": true,
+  "detail": "stream1_5ala status='REFUSED' on 0 cached capture(s): no 5-ALA fluorescence captures cached; mapping implemented and unit-tested, activates when a real capture is supplied"
+ },
+ "refusals": [
+  {
+   "shown_in_the_pitch": "extract the residual contrast-enhancing surgical cavity wall from a real post-operative T1-contrast MRI",
+   "why_refused": "no post-operative imaging is cached: the committed BraTS-2021 release is pre-operative only (six cases, one timepoint each; recorded in data/tcia_probe/multimodal_evidence.json), so a resection cavity cannot be extracted and the word 'cavity' is not used for what was planted",
+   "what_is_recorded_instead": "the planted field uses the PRE-OPERATIVE tumour rim of the expert segmentation (BraTS2021_01017); the substitution is named in the record"
+  },
+  {
+   "shown_in_the_pitch": "'inject synthetic fluorescence intensity values ... to simulate a digitized 5-ALA camera readout'",
+   "why_refused": "a field manufactured here and read back here proves the intake path works; it cannot show that real 5-ALA maps look like the planted construction, that fluorescence marks tumour, or that any mock-up volume (e.g. 0.42 cm3 residual) is recoverable",
+   "what_is_recorded_instead": "the intake identity on the real geometry, the matched-burden layout contrast under MTD, and the decay-length sweep -- every entry labelled synthetic"
+  },
+  {
+   "shown_in_the_pitch": "DSC perfusion maps from Ivy GAP or CPTAC-3",
+   "why_refused": "the repository's measured DSC perfusion is UPENN-GBM (456 patients with DSC series; three series downloaded and read), and Ivy GAP / CPTAC-3 are not probed here -- naming them would misdescribe what was measured",
+   "what_is_recorded_instead": "danon/perfusion.py and outputs_real/perfusion_cohort.json"
+  },
+  {
+   "shown_in_the_pitch": "'Longitudinal sequential MRIs: Fully Available' (MU-Glioma-Post, BRAIN-TUMOR-PROGRESSION)",
+   "why_refused": "available to read is not acquirable: MU-Glioma-Post documents 203 subjects / 596 post-treatment timepoints with the images behind a licence login, and the probe returns 0 patients and 0 segmentation series; the CFB-GBM manifest enumerates 393 usable T1-Gd pairs over 168 patients and 0 images are downloaded",
+   "what_is_recorded_instead": "the live census in danon/walkforward.py and the manifest counts; 0 scorable pairs"
+  },
+  {
+   "shown_in_the_pitch": "GLASS Consortium for sub-clone resistance shifts",
+   "why_refused": "the clone-SIZE step, not the data: the GLASS release IS measured in this tree now (danon.variants; the live counts are read back in the walk-forward census rather than restated here), and the engine carries exactly two bins -- sensitive and resistant -- so a k-bin allele-frequency spectrum would still need a summarisation rule this repository does not have, while a point clone fraction and an upper bound need a purity and a copy number the release does not carry",
+   "what_is_recorded_instead": "the walk-forward census's GLASS entry, its variant_channel block and danon/variants' own refusals"
+  },
+  {
+   "shown_in_the_pitch": "pathology WSI: 'trains and tests nuclear cell packing algorithms on real digitized H&E slides'",
+   "why_refused": "one slide is cached and it is haematoxylin-only; it yields a real measured cell DENSITY, which is not a proliferation index, and it cannot support a Ki-67 ratio; training a packing model would need labelled nuclei across more than one slide",
+   "what_is_recorded_instead": "the measured cellularity and the refused Ki-67 route in danon/histology.py via clinical_twin.clinical_stream_census()"
+  }
+ ],
+ "provenance": {
+  "intake_identity_measured_on_real_geometry": "established",
+  "layout_contrast_measured": "established",
+  "planted_field_is_a_5ala_acquisition": "proven_failed",
+  "synthetic_input_is_patient_evidence": "proven_failed",
+  "stream1_activates_on_synthetic_input": "proven_failed",
+  "resection_cavity_available_here": "proven_failed"
+ },
+ "notes": [
+  "the planted fluorescence field is manufactured by this repository and is not a measured 5-ALA acquisition",
+  "planted on the PRE-OPERATIVE tumour rim of BraTS2021_01017: no post-operative imaging is cached, so no resection cavity exists to plant on (the pitch's step 1 cannot be run as written)",
+  "the engine grid is (14, 24, 24) at 3.634 mm/voxel (1774 tumour voxels); the decay length is declared in voxels and its sweep is recorded rather than tuned",
+  "the case is a SHELL, not a ball: mean distance from the boundary is 1.07 voxels for every planted mode, so the three fluorescence layouts are nearly the same field (their day-365 medians agree to 0.014%, and 2.50 burden units separate them at day 60); the layout contrast is therefore recorded as INERT ON THIS CASE rather than presented as a measured sensitivity",
+  "what does move the endpoints is the resistant-clone layout: the engine's clustered R patch versus the stream's uniform r0 gives a paired median burden delta of +1291.66 at day 365, so the stream's clonal placement dominates its fluorophore pattern on this case -- a finding about this model's initial condition, not about 5-ALA",
+  "what this can show: the intake identity, whether a supplied seed changes the trajectory, and where the change comes from",
+  "what this cannot show: that a real 5-ALA map resembles the planted field, that fluorescence marks tumour, or anything about a patient"
+ ],
+ "what_a_synthetic_input_cannot_show": [
+  "that real 5-ALA fluorescence fields resemble any planted construction here: no capture is cached, and the constructions were chosen for contrast, not fitted to data",
+  "that fluorescence marks tumour: that is the biological claim, and a planted field assumes it rather than testing it",
+  "that a residual volume could be recovered from a real capture: the standard supplies the volume by construction",
+  "anything about a patient: the case is one de-identified BraTS-2021 segmentation and every field on it is synthetic"
+ ]
+}

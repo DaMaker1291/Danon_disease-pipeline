@@ -2,13 +2,19 @@ import React, { useState, useCallback, useEffect } from 'react';
 import UploadPortal from './components/UploadPortal';
 import ErrorBoundary from './components/ErrorBoundary';
 import Day365Outcome from './components/Day365Outcome';
+import TrialDesign from './components/TrialDesign';
 import EvolutionPlayer from './components/EvolutionPlayer';
 import TwinPlanner from './components/TwinPlanner';
+import DosingConsole from './components/DosingConsole';
 import VtiViewer from './components/VtiViewer';
 import ParaviewGallery from './components/ParaviewGallery';
 import Overview from './components/Overview';
+import TumorBoard from './components/TumorBoard';
+import ScanGallery from './components/ScanGallery';
 import Verification from './components/Verification';
+import EvolutionForecast from './components/EvolutionForecast';
 import PageHeader from './components/PageHeader';
+import EvidencePanel from './components/EvidencePanel';
 import { GROUPS, TABS } from './nav';
 import type { TabId } from './nav';
 
@@ -29,6 +35,11 @@ function tabFromHash(): TabId {
 export default function App() {
   // The landing page is the front door; each tab is addressable by hash.
   const [tab, setTab] = useState<TabId>(() => tabFromHash());
+  // Evidence mode starts ON: this app's whole posture is that the caveats are
+  // the product, so the switch can only ever ADD the evidence panel to the
+  // screen -- turning it off never removes the intended-use notice, the
+  // per-page provenance header or the footer.
+  const [evidenceOpen, setEvidenceOpen] = useState(true);
   const [twinVti, setTwinVti] = useState<string | null>(null);
   const setTwinVtiCb = useCallback((b64: string | null) => setTwinVti(b64), []);
 
@@ -51,6 +62,22 @@ export default function App() {
         return <Overview onNavigate={navigate} />;
       case 'verification':
         return <Verification />;
+      case 'tumorboard':
+        return (
+          <div className="content-grid" style={{ gridTemplateColumns: '1fr', gap: 0 }}>
+            <ErrorBoundary label="TumorBoard" resetKey={tab}>
+              <TumorBoard onNavigate={navigate} />
+            </ErrorBoundary>
+          </div>
+        );
+      case 'scans':
+        return (
+          <div className="content-grid">
+            <div style={{ gridColumn: '1 / -1' }}>
+              <ErrorBoundary label="ScanGallery" resetKey={tab}><ScanGallery /></ErrorBoundary>
+            </div>
+          </div>
+        );
       case 'twin':
         return (
           <div className="content-grid" style={{ gridTemplateColumns: '1.05fr 0.95fr' }}>
@@ -62,6 +89,10 @@ export default function App() {
               <ErrorBoundary label="VtiViewer" resetKey={tab}><VtiViewer vtiBase64={twinVti} /></ErrorBoundary>
             </div>
           </div>
+        );
+      case 'dosing':
+        return (
+          <ErrorBoundary label="DosingConsole" resetKey={tab}><DosingConsole /></ErrorBoundary>
         );
       case 'paraview':
         return (
@@ -87,12 +118,37 @@ export default function App() {
             </div>
           </div>
         );
+      case 'trialdesign':
+        return (
+          <div className="content-grid">
+            <div style={{ gridColumn: '1 / -1' }}>
+              <ErrorBoundary label="TrialDesign" resetKey={tab}><TrialDesign /></ErrorBoundary>
+            </div>
+          </div>
+        );
+      case 'forecast':
+        return (
+          <div className="content-grid">
+            <div style={{ gridColumn: '1 / -1' }}>
+              <ErrorBoundary label="EvolutionForecast" resetKey={tab}>
+                <EvolutionForecast />
+              </ErrorBoundary>
+            </div>
+          </div>
+        );
       case 'upload':
         return (
           <div className="content-grid">
             <div className="panel glass" style={{ gridColumn: '1 / -1' }}><UploadPortal /></div>
           </div>
         );
+      default: {
+        // Every TabId has a view. Adding a tab to nav.ts without a case here
+        // narrows `tab` no longer to `never`, so this line stops compiling --
+        // whereas before it rendered a page header over an empty body.
+        const unhandled: never = tab;
+        throw new Error(`no view is registered for tab ${String(unhandled)}`);
+      }
     }
   };
 
@@ -103,7 +159,7 @@ export default function App() {
           <div className="logo-wrap">
             <div>
               <h1>EvoTwin-10X</h1>
-              <span className="h-sub">Glioblastoma spatial twin · MRI → adaptive treatment schedule</span>
+              <span className="h-sub">Glioblastoma tumour twin · decision support, clinician sign-off required</span>
             </div>
           </div>
           {/*
@@ -114,12 +170,34 @@ export default function App() {
           */}
         </div>
         <div className="h-right">
+          <button
+            className={`chip chip-btn ${evidenceOpen ? 'chip-on' : ''}`}
+            onClick={() => setEvidenceOpen((v) => !v)}
+            aria-pressed={evidenceOpen}
+            title="Show the evidence behind every number: the tier vocabulary, the live audit, the paired model comparison and its censoring, and the regulatory gate. This switch only ever adds context; it cannot hide a caveat."
+          >
+            ● Evidence mode
+          </button>
           <div className="status-indicator">
             <div className="status-idle" />
             <span>recorded engine runs · no backend required</span>
           </div>
         </div>
       </header>
+
+      <div className="research-only-banner" role="note" aria-label="Intended-use notice">
+        <strong>INTENDED USE — clinical decision support; a named clinician decides.</strong>{' '}
+        Each screen states its evidence tier. The measured-patient screens (eg. Evolution Forecast)
+        publish an operating point and a decision curve from the same audited record: act only within
+        the threshold you have recalculated for your own prevalence, and record the reason for
+        overriding or withholding. Simulation screens are planning aids, not patient-specific outcome
+        predictions. No screen here acts autonomously or prescribes on its own; intended use,
+        approved actions and hard guardrails are set out in
+        clinical_twin/docs/clinical_use_model_card.md. This software has not been shown to stop or
+        cure cancer or improve survival.
+      </div>
+
+      {evidenceOpen && <EvidencePanel />}
 
       <nav className="app-nav glass">
         {GROUPS.map(g => (
@@ -163,12 +241,12 @@ export default function App() {
 
       <footer className="app-footer glass">
         <span>
-          EvoTwin-10X · spatial tumour-evolution twin engine · every number on this page is a recorded engine output or labelled as refused
+          EvoTwin-10X · clinical decision support under clinical_twin/docs/clinical_use_model_card.md · no autonomous action, no patient outcome predictions
         </span>
         {/* No test count here: a number in a footer is not re-derived by anything,
             and the one that used to sit here had drifted. The live count is the
             claim registry (danon/claims.py), which the audit checks. */}
-        <span className="f-right">paired steering-vs-MTD trials · ParaView VTI export · claims verified in danon/claims.py</span>
+        <span className="f-right">synthetic/model-based comparisons · no demonstrated clinical benefit</span>
       </footer>
     </div>
   );

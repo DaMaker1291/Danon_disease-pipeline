@@ -1,0 +1,44 @@
+{
+ "recorded_on": "2026-10-06T18:01:16",
+ "offline": false,
+ "question": "does expressing the engine's drug concentration in the label's own units add information, and what does the label's concentration scale actually say?",
+ "label": {
+  "url": "https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=046a9011-3911-4d3f-a15f-fbb56d5aad56&type=display",
+  "sentences": [
+   "8.6 Renal Impairment No dosage adjustment is recommended for patients with creatinine clearance (CLcr) of 36 to 130 mL/min/m 2 [see Clinical Pharmacology (12.3) ] .",
+   "12.3 Pharmacokinetics Following a single oral dose of 150 mg/m 2 , the mean C max is 7.5 mcg/mL for temozolomide and 282 ng/mL for MTIC.",
+   "Following a single 90-minute intravenous infusion of 150 mg/m 2 , the mean C max is 7.3 mcg/mL for temozolomide and 276 ng/mL for MTIC.",
+   "Elimination Clearance of temozolomide is approximately 5.5 L/hr/m 2 and the mean elimination half-life is 1.8 hours.",
+   "non-smoker), creatinine clearance (CLcr) of 36 to 130 mL/min/m 2 , or mild to moderate hepatic impairment (Child Pugh class A and B)."
+  ],
+  "status": 200
+ },
+ "relabelling": {
+  "days": 60,
+  "initial_resistant_fraction": 0.01,
+  "seed": 101,
+  "geometry": "make_gbm_phantom(size=16, seed=0), the audit's own phantom",
+  "scale": 1024.0,
+  "scale_note": "2^10: exact in binary floating point",
+  "kill_law": "kill_max * c / (c + EC50) per drug and clone (EvosteerSim.step)",
+  "transported_field_is_linear_in_the_source": "c += dt * (D * lap(c) + dose * source_strength * vessels - clearance * c)",
+  "base": {
+   "final_burden": 131.03954296901745,
+   "pfs_day": null,
+   "toxicity": 60.0
+  },
+  "both_scaled": {
+   "final_burden": 131.03954296901745,
+   "pfs_day": null,
+   "toxicity": 60.0
+  },
+  "ec50_scaled_only": {
+   "final_burden": 1295.920665769592,
+   "pfs_day": 6,
+   "toxicity": 60.0
+  },
+  "burden_arrays_bit_identical_when_both_scaled": true,
+  "burden_arrays_differ_when_only_ec50_scaled": true,
+  "kill_fraction_bit_identical_under_the_scale": true
+ }
+}

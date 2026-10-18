@@ -1,0 +1,329 @@
+{
+  "benchmark_name": "evotwin.phase1.change_detection",
+  "aggregates": {
+    "mean_sensitivity": 0.9777777777777779,
+    "mean_specificity": 0.7999999999999999,
+    "mean_precision": 0.9385620915032679,
+    "mean_false_alarms_per_1000_days": 0.547945205479452,
+    "mean_delay_days": 7.5,
+    "calibration_rate": 0.7492063492063492,
+    "total_cases": 60,
+    "total_missed": 1,
+    "total_false_alarms": 3
+  },
+  "runs": [
+    {
+      "seed": 11,
+      "n_cases": 20,
+      "detector_config": {
+        "confirmation_threshold": 4.5,
+        "suspicion_threshold": 3.2,
+        "min_points_for_call": 6,
+        "min_left_segment": 5,
+        "min_right_segment": 3
+      },
+      "evaluation": {
+        "sensitivity": 0.9333333333333333,
+        "specificity": 0.8,
+        "precision": 0.9333333333333333,
+        "false_alarms_per_1000_days": 0.547945205479452,
+        "median_delay_days": 5.5,
+        "calibration_rate": 0.7142857142857143
+      },
+      "missed_cases": [
+        "synthetic-case-009"
+      ],
+      "false_alarm_cases": [
+        "synthetic-case-019"
+      ],
+      "delayed_cases": [
+        {
+          "case_id": "synthetic-case-000",
+          "planted_day": 122,
+          "detector_day": 140
+        },
+        {
+          "case_id": "synthetic-case-001",
+          "planted_day": 94,
+          "detector_day": 112
+        },
+        {
+          "case_id": "synthetic-case-002",
+          "planted_day": 142,
+          "detector_day": 147
+        },
+        {
+          "case_id": "synthetic-case-003",
+          "planted_day": 176,
+          "detector_day": 182
+        },
+        {
+          "case_id": "synthetic-case-004",
+          "planted_day": 175,
+          "detector_day": 175
+        },
+        {
+          "case_id": "synthetic-case-005",
+          "planted_day": 170,
+          "detector_day": 126
+        },
+        {
+          "case_id": "synthetic-case-006",
+          "planted_day": 102,
+          "detector_day": 112
+        },
+        {
+          "case_id": "synthetic-case-007",
+          "planted_day": 142,
+          "detector_day": 147
+        },
+        {
+          "case_id": "synthetic-case-008",
+          "planted_day": 136,
+          "detector_day": 140
+        },
+        {
+          "case_id": "synthetic-case-010",
+          "planted_day": 135,
+          "detector_day": 140
+        },
+        {
+          "case_id": "synthetic-case-011",
+          "planted_day": 124,
+          "detector_day": 133
+        },
+        {
+          "case_id": "synthetic-case-012",
+          "planted_day": 124,
+          "detector_day": 126
+        },
+        {
+          "case_id": "synthetic-case-013",
+          "planted_day": 120,
+          "detector_day": 140
+        },
+        {
+          "case_id": "synthetic-case-014",
+          "planted_day": 104,
+          "detector_day": 119
+        }
+      ],
+      "n_insufficient": 0,
+      "insufficient_cases": [],
+      "scenario_fingerprint": "n=20,neg=0.25,mult=2.0,missing=0.1,noise=2.0"
+    },
+    {
+      "seed": 23,
+      "n_cases": 20,
+      "detector_config": {
+        "confirmation_threshold": 4.5,
+        "suspicion_threshold": 3.2,
+        "min_points_for_call": 6,
+        "min_left_segment": 5,
+        "min_right_segment": 3
+      },
+      "evaluation": {
+        "sensitivity": 1.0,
+        "specificity": 0.6,
+        "precision": 0.8823529411764706,
+        "false_alarms_per_1000_days": 1.095890410958904,
+        "median_delay_days": 8.0,
+        "calibration_rate": 0.6
+      },
+      "missed_cases": [],
+      "false_alarm_cases": [
+        "synthetic-case-015",
+        "synthetic-case-017"
+      ],
+      "delayed_cases": [
+        {
+          "case_id": "synthetic-case-000",
+          "planted_day": 110,
+          "detector_day": 231
+        },
+        {
+          "case_id": "synthetic-case-001",
+          "planted_day": 116,
+          "detector_day": 119
+        },
+        {
+          "case_id": "synthetic-case-002",
+          "planted_day": 166,
+          "detector_day": 168
+        },
+        {
+          "case_id": "synthetic-case-003",
+          "planted_day": 135,
+          "detector_day": 140
+        },
+        {
+          "case_id": "synthetic-case-004",
+          "planted_day": 144,
+          "detector_day": 147
+        },
+        {
+          "case_id": "synthetic-case-005",
+          "planted_day": 145,
+          "detector_day": 98
+        },
+        {
+          "case_id": "synthetic-case-006",
+          "planted_day": 139,
+          "detector_day": 168
+        },
+        {
+          "case_id": "synthetic-case-007",
+          "planted_day": 113,
+          "detector_day": 126
+        },
+        {
+          "case_id": "synthetic-case-008",
+          "planted_day": 166,
+          "detector_day": 168
+        },
+        {
+          "case_id": "synthetic-case-009",
+          "planted_day": 134,
+          "detector_day": 154
+        },
+        {
+          "case_id": "synthetic-case-010",
+          "planted_day": 142,
+          "detector_day": 168
+        },
+        {
+          "case_id": "synthetic-case-011",
+          "planted_day": 152,
+          "detector_day": 161
+        },
+        {
+          "case_id": "synthetic-case-012",
+          "planted_day": 164,
+          "detector_day": 168
+        },
+        {
+          "case_id": "synthetic-case-013",
+          "planted_day": 97,
+          "detector_day": 266
+        },
+        {
+          "case_id": "synthetic-case-014",
+          "planted_day": 118,
+          "detector_day": 126
+        }
+      ],
+      "n_insufficient": 0,
+      "insufficient_cases": [],
+      "scenario_fingerprint": "n=20,neg=0.25,mult=2.0,missing=0.1,noise=2.0"
+    },
+    {
+      "seed": 37,
+      "n_cases": 20,
+      "detector_config": {
+        "confirmation_threshold": 4.5,
+        "suspicion_threshold": 3.2,
+        "min_points_for_call": 6,
+        "min_left_segment": 5,
+        "min_right_segment": 3
+      },
+      "evaluation": {
+        "sensitivity": 1.0,
+        "specificity": 1.0,
+        "precision": 1.0,
+        "false_alarms_per_1000_days": 0.0,
+        "median_delay_days": 9.0,
+        "calibration_rate": 0.9333333333333333
+      },
+      "missed_cases": [],
+      "false_alarm_cases": [],
+      "delayed_cases": [
+        {
+          "case_id": "synthetic-case-000",
+          "planted_day": 124,
+          "detector_day": 133
+        },
+        {
+          "case_id": "synthetic-case-001",
+          "planted_day": 166,
+          "detector_day": 168
+        },
+        {
+          "case_id": "synthetic-case-002",
+          "planted_day": 114,
+          "detector_day": 126
+        },
+        {
+          "case_id": "synthetic-case-003",
+          "planted_day": 107,
+          "detector_day": 119
+        },
+        {
+          "case_id": "synthetic-case-004",
+          "planted_day": 128,
+          "detector_day": 140
+        },
+        {
+          "case_id": "synthetic-case-005",
+          "planted_day": 169,
+          "detector_day": 175
+        },
+        {
+          "case_id": "synthetic-case-006",
+          "planted_day": 125,
+          "detector_day": 140
+        },
+        {
+          "case_id": "synthetic-case-007",
+          "planted_day": 124,
+          "detector_day": 126
+        },
+        {
+          "case_id": "synthetic-case-008",
+          "planted_day": 141,
+          "detector_day": 154
+        },
+        {
+          "case_id": "synthetic-case-009",
+          "planted_day": 155,
+          "detector_day": 161
+        },
+        {
+          "case_id": "synthetic-case-010",
+          "planted_day": 144,
+          "detector_day": 147
+        },
+        {
+          "case_id": "synthetic-case-011",
+          "planted_day": 136,
+          "detector_day": 140
+        },
+        {
+          "case_id": "synthetic-case-012",
+          "planted_day": 132,
+          "detector_day": 147
+        },
+        {
+          "case_id": "synthetic-case-013",
+          "planted_day": 116,
+          "detector_day": 133
+        },
+        {
+          "case_id": "synthetic-case-014",
+          "planted_day": 144,
+          "detector_day": 147
+        }
+      ],
+      "n_insufficient": 0,
+      "insufficient_cases": [],
+      "scenario_fingerprint": "n=20,neg=0.25,mult=2.0,missing=0.1,noise=2.0"
+    }
+  ],
+  "limitations": [
+    "Synthetic only: the generator is exp-growth in radius with a rate change, not a tumour model; sensitivity on this data says nothing about real imaging or liquid-biopsy series.",
+    "Single change per case: no multiple-change, no gradual-drift, and no regression-to-baseline scenarios are in Phase 1.",
+    "Call-level, not event-level metrics: precision counts flagged CASES, and a case can only flag once in this version.",
+    "The detector knows the generative family (exp-growth, log-linear); a model violation is out of scope and would need a new baseline.",
+    "Calibration is scored only for confirmed calls with a planted day; suspected-only calls lower sensitivity but are not delay-scored.",
+    "No clinical claim of any kind: the report describes a controlled synthetic experiment; no patient benefit is implied or measured."
+  ]
+}

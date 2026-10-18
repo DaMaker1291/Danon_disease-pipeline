@@ -1,0 +1,240 @@
+{
+  "generated_utc": "2026-10-04T20:19:44Z",
+  "what_this_is": "The measured bench data that the scheduling engine's pharmacology constants must be reconciled against, the constants themselves, and the reason the reconciliation is refused. Written by _run_bench_anchors.py; every measured number is engine-independent.",
+  "molecule": {
+    "name": "TEMOZOLOMIDE",
+    "chembl_id": "CHEMBL810",
+    "mw_g_per_mol": 194.15,
+    "alogp": -2.08,
+    "psa": 108.17,
+    "hbd": 1,
+    "hba": 7,
+    "max_phase": 4.0,
+    "source": "ChEMBL (EBI) molecule endpoint",
+    "payload_sha256": "584bc4722c7d98ffe1e569caa3810cdca2a36dad2914ed08f079bc20eb2b55cc"
+  },
+  "glioma_line_potency": {
+    "standard_type": "IC50",
+    "n_records": 50,
+    "n_exact": 31,
+    "n_right_censored": 19,
+    "n_left_censored": 0,
+    "n_unconvertible_units": 0,
+    "median_exact_nM": 134970.0,
+    "most_potent_exact_nM": 6426.0,
+    "least_potent_exact_nM": 3186000.0,
+    "fold_spread_exact": 495.79831932773106,
+    "censored_fraction": 0.38,
+    "median_lower_bound_nM": 142985.0,
+    "exact_values_nM": [
+      6426.0,
+      7284.0,
+      12740.0,
+      34000.0,
+      36400.0,
+      36400.0,
+      37000.0,
+      43510.0,
+      54080.0,
+      60460.0,
+      67810.0,
+      69870.0,
+      106700.0,
+      113360.0,
+      119300.0,
+      134970.0,
+      151000.0,
+      189000.0,
+      203000.0,
+      348200.0,
+      354700.0,
+      455000.0,
+      570000.0,
+      640000.0,
+      879000.0,
+      962500.0,
+      973900.0,
+      1100000.0,
+      1504710.0,
+      2898000.0,
+      3186000.0
+    ],
+    "targets": [
+      "C6",
+      "DBTRG-05MG",
+      "LN-229",
+      "RG2",
+      "SNB-19",
+      "T98G",
+      "U-118-MG",
+      "U-251",
+      "U-87 MG"
+    ],
+    "publication_years": [
+      2012,
+      2013,
+      2014,
+      2015,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "notes": [
+      "19 record(s) are right-censored ('>' relation: assay saturated below 50% effect). True IC50 is at least the reported bound. They are excluded from the point estimate and reported as a bound instead.",
+      "the exact-only median is biased low by selection (records are exact when the assay reached 50% effect, which correlates with greater potency); the true cohort median lies above median_lower_bound_nM and is not bounded above by these data",
+      "records span 2012-2025; assay and readout drift over that window is not controlled for"
+    ],
+    "describe": "IC50 over 9 target(s): 31 exact (median 134,970 nM, most potent 6,426 nM, spread 496x), 19 right-censored (median lower bound 142,985 nM)",
+    "unit_rule": "mass-concentration records convert to molar ONLY through the molecule's molecular weight; anything unconvertible is counted in n_unconvertible_units and excluded from the point estimate"
+  },
+  "gdsc2_glioma_audit": {
+    "path": "data/gdsc/GDSC2_fitted_dose_response.csv",
+    "source": "https://ftp.sanger.ac.uk/pub/project/cancerrxgene/releases/current_release/GDSC2_fitted_dose_response_24Jul22.csv",
+    "n_rows_scanned": 242036,
+    "n_gbm_rows": 8384,
+    "n_gbm_drugs": 286,
+    "n_gbm_cell_lines": 34,
+    "n_inside_tested_range": 1991,
+    "n_above_max_tested": 6369,
+    "n_below_min_tested": 24,
+    "extrapolated_fraction": 0.7596612595419847,
+    "temozolomide_rows": 34,
+    "temozolomide_above_max_tested": 34,
+    "verdict": "8384 glioma-row(s) over 286 drug(s) and 34 line(s); 76.0% of glioma IC50s lie above the highest concentration tested, and for temozolomide it is 34 of 34",
+    "why_it_matters": "a fitted IC50 above the plate's maximum tested concentration is a model extrapolation, not a measurement; those values are lower bounds and cannot anchor a kill constant"
+  },
+  "engine_constants": {
+    "source": "danon/evosteer.py::DEFAULT_DRUGS / DEFAULT_CLONES",
+    "drugs": {
+      "kill_max_S": [
+        0.34,
+        0.1
+      ],
+      "kill_max_R": [
+        0.02,
+        0.34
+      ],
+      "ec50": [
+        0.3,
+        0.3
+      ],
+      "diffusion": [
+        0.35,
+        0.35
+      ],
+      "clearance": [
+        0.1,
+        0.1
+      ],
+      "toxicity_weight": [
+        1.0,
+        0.7
+      ],
+      "source_strength": 1.0
+    },
+    "clones": {
+      "growth_S": 0.16,
+      "growth_R": 0.12,
+      "carrying_capacity": 1.0,
+      "mutation_rate": 5e-05,
+      "competition": 0.6,
+      "drug_sensitivity_scale_R": 0.25
+    },
+    "engine_ec50_unit": null,
+    "evidence_tier": "AUTHORED ASSUMPTION -- not fitted to any measured kill rate. The engine's EC50 carries no concentration unit, so it cannot be compared to a molar IC50 at all; that refusal is the finding, not an omission to be papered over."
+  },
+  "ec50_comparison": {
+    "comparable": false,
+    "reason": "the engine's EC50 has no declared concentration unit (DrugParams documents only 'conc/day at full-dose vessels'), so an EC50-vs-IC50 ratio would be unitless nonsense. Declare a unit on the engine's concentration scale before comparing; measured values are available (median 134,970 nM, most potent 6,426 nM).",
+    "describe": "EC50 comparison REFUSED: the engine's EC50 has no declared concentration unit (DrugParams documents only 'conc/day at full-dose vessels'), so an EC50-vs-IC50 ratio would be unitless nonsense. Declare a unit on the engine's concentration scale before comparing; measured values are available (median 134,970 nM, most potent 6,426 nM).",
+    "engine_ec50_compared": 0.3,
+    "unit_declared": null
+  },
+  "reconciliation": {
+    "calibrated": false,
+    "verdict": "REFUSED. The engine's kill constants remain authored assumptions. Public potency data exist and are measured, but they cannot be substituted into the engine as if they were kill rates.",
+    "blockers": [
+      "TYPE: an IC50 is a concentration at 50% effect in a 2D monolayer at a fixed exposure time; the engine's kill_max is a per-day fractional kill rate in a 3D substrate with a diffusion gradient. Converting between them requires a rate-reporting (time-kill or clonogenic) assay, which is not in this tree.",
+      "UNIT: the engine's EC50 has no declared concentration unit, so any ratio between it and a molar IC50 is a type error rather than a fit (danon/pharmacology.py::compare_engine_ec50 refuses it).",
+      "CENSORING: 60 of temozolomide's 166 ChEMBL records are right-censored (the assay saturated below 50% effect), and GDSC2's glioma IC50s are largely extrapolated beyond the highest tested concentration -- the measured values are therefore bounded, and treating the bounds as exact points would import the assay's detection limit as pharmacology."
+    ],
+    "what_would_close_the_gap": [
+      "A time-kill (or clonogenic surviving-fraction) assay on paired TMZ-sensitive and TMZ-resistant glioma lines reporting the net per-day kill rate at >= 4 concentrations.",
+      "The untreated growth rate of the same lines on the same substrate, so growth_S/growth_R are measured rather than assumed.",
+      "A tmz concentration axis in molar units, so a declared EC50 unit can be attached to the engine's parameters.",
+      "The same experiment for the second drug on the same line pair, which is what would make the drug-B marrow and potency assumptions measured instead of swept."
+    ]
+  },
+  "provenance": {
+    "pharmacology": {
+      "chembl_activity_records": "established",
+      "chembl_molecule_descriptors": "established",
+      "glioma_line_potency_distribution": "established",
+      "stokes_einstein_free_diffusion": "unknown",
+      "brain_tissue_effective_diffusion": "unknown",
+      "logbb_qsar_prediction": "unknown",
+      "engine_ec50_concentration_unit": "unknown"
+    },
+    "note": "measured/curated inputs are ESTABLISHED at source; every quantity the engine actually consumes from them is UNKNOWN"
+  },
+  "cannot_prove": [
+    "ChEMBL records come from different assays, readouts (ATP/MTT/clonogenic), exposure times and passage numbers, and most of that context is absent per record. Spread across them is methodological, so it is not reported as a standard error or a confidence interval.",
+    "Potency in 2D monolayer culture at 72 h is not potency in a 3D tumour with a diffusion gradient, an intact blood-brain barrier and heterogeneous sub-clones. No in-vitro IC50, however well measured, establishes in-vivo tumour kill.",
+    "Stokes-Einstein gives free-solution diffusion. In brain, binding, cellular uptake, efflux and convection dominate transport, and the derived D_eff is an upper bound on free transport rather than a tissue measurement.",
+    "The Clark logBB equation is a published QSAR fitted on a 1990s set with a substituted descriptor (ALogP for cLogP); its sign is informative, its magnitude is not reliable, and temozolomide is a known counterexample.",
+    "Nothing here validates the engine. These are measured pharmacology and derived transport bounds to calibrate against, not evidence that the scheduling model is right.",
+    "None of these three targets is a clinical endpoint. Spatial Dice and in-vitro IC50 agreement say nothing about a patient's outcome.",
+    "A high R^2 or Dice score on a shifted estimand cannot be added to, averaged with, or used to raise an overall-survival C-index.",
+    "The responder label that exists is a follow-up status flag, not a treatment response; scoring it well would not mean detecting responders.",
+    "GDSC glioma IC50s are largely extrapolations, so even a perfect fit to them would be a fit to a lower bound.",
+    "The engine's Hill slope is fixed at n=1 and has never been checked against measured dose-response curves.",
+    "The trained policy's reward is AUTHORED: it is fixed as minus the normalised burden curve so that training and reporting share one functional, but choosing burden over another quantity is a modelling choice no data can contradict. What the held-out evaluation can contradict is whether the policy keeps its recorded advantage.",
+    "EGFRvIII status is not obtainable from open GDC data, so it cannot be listed as a feature of a classifier built on this repository."
+  ],
+  "engine_identity": {
+    "algorithm": "sha256",
+    "scope": "the engine's source files, not a built or certified artifact",
+    "files": [
+      {
+        "path": "danon/evosteer.py",
+        "sha256": "872e02f4803fe41b148812853709b38059d8508b5a65b0414d67c4f5d0ec2d3b",
+        "bytes": 73869
+      },
+      {
+        "path": "danon/accel.py",
+        "sha256": "f10e7dc93740ce9129fbb02c68cf5589e68b6dfa650d84bb9f9d15eee5475752",
+        "bytes": 12486
+      },
+      {
+        "path": "danon/anisotropy.py",
+        "sha256": "886b1dcaa8cb07b6df275675560700a0e1cc3b1e9a58869a1d444fc74476e90e",
+        "bytes": 24270
+      },
+      {
+        "path": "danon/uq.py",
+        "sha256": "133c4d788683c5ea9b3e478bcceb5ec84eed535c72f85f2078e933c0ae07c2cb",
+        "bytes": 8538
+      }
+    ],
+    "combined_sha256": "f5d1d334e03d27a98abe6810de1fa67a38ff55b2cc2565a1571c3048c895984f",
+    "verify_with": "sha256 over each file above, concatenated in that order, each prefixed with its path -- reproducible with hashlib on any machine"
+  },
+  "artifact_provenance": {
+    "engine": "measured: every AUBC/PFS/dominance figure is a real TumorEvolutionSimulator run in this module; the engine's source hash is recorded alongside the results",
+    "calendar": "measured: Schedule.dose_on is the engine's own dose series",
+    "myelosuppression": "DECLARED ASSUMPTION: real arithmetic on assumed parameters; not an NCCN, FDA or label threshold; not measured in this repository",
+    "schedule_search": "measured on the declared grid, whose size is reported; the grid was not pruned or extrapolated",
+    "clinical_outcome": "NOT CLAIMED: no schedule here is shown to help a patient; the engine is simulation-only",
+    "what_would_change_this": [
+      "bench-measured kill and growth constants for the drug in question",
+      "a real myelosuppression dataset to calibrate the ANC model",
+      "paired baseline/recurrence imaging to fix patient geometry"
+    ]
+  },
+  "wall_seconds": 0.9
+}

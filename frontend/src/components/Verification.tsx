@@ -1,14 +1,24 @@
 import React, { useMemo, useState } from 'react';
 import { useArtifact, artifactStamp } from '../utils/artifacts';
 import type { ClaimsArtifactData, ClaimRow } from '../types/artifacts';
+import { tierInfo } from '../utils/evidenceTier';
 
 /**
  * The verification page: the repository's claim registry, rendered.
  *
- * Reading the sentences is the point. "ESTABLISHED" means a check in
- * `danon/claims.py` agreed with the sentence at build time -- it does not mean
- * the biology is right, and the page says so rather than leaving a green tick
- * to imply it.
+ * Reading the sentences is the point. Two different things are shown and are
+ * deliberately kept apart:
+ *
+ * * the chip -- "verified" / "FAILING" -- is this repository's audit: a check
+ *   in `danon/claims.py` agreed with the sentence at build time. It says
+ *   nothing about whether the biology is right.
+ * * the tier -- `established`, `proven_failed`, ... -- is
+ *   `danon.cure.EvidenceStatus`: how well the mechanism is supported in
+ *   humans. A claim can be verified against this repo while its mechanism is
+ *   only `emerging_human`, or refused while the mechanism is `proven_failed`.
+ *
+ * Conflating those two is how a green tick starts implying clinical efficacy,
+ * so the tier names its source rather than borrowing the audit's vocabulary.
  */
 export default function Verification() {
   const { artifact, loading, error } = useArtifact<ClaimsArtifactData>('claims');
@@ -88,8 +98,9 @@ export default function Verification() {
                 key={t}
                 className={`chip chip-btn ${tier === t ? 'chip-on' : ''}`}
                 onClick={() => setTier(t)}
+                title={t === 'all' ? 'every evidence tier' : tierInfo(t).source}
               >
-                {t}
+                {t === 'all' ? 'all' : tierInfo(t).label}
               </button>
             ))}
           </div>
@@ -116,7 +127,8 @@ export default function Verification() {
               <div style={{ minWidth: 0 }}>
                 <div className="claim-sentence">{c.sentence}</div>
                 <div className="claim-meta">
-                  {c.id} · tier {c.tier}
+                  {c.id} · tier{' '}
+                  <span title={tierInfo(c.tier).source}>{tierInfo(c.tier).label}</span>
                   {c.study !== 'tumour_twin' && ` · study ${c.study}`}
                   {' · backed by '}{c.substantiated_by}
                 </div>

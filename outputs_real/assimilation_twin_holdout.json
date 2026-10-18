@@ -1,0 +1,85 @@
+{
+  "record_version": "assimilation_twin_validation_v1",
+  "generated_utc": "2026-10-18T11:20:05.504180+00:00",
+  "declared_configuration": {
+    "development_geom_seed": 3,
+    "prior_growth_mean": 0.04,
+    "prior_growth_half_width": 0.035,
+    "observation_days": [
+      14,
+      28,
+      42,
+      56
+    ],
+    "ensemble_size": 14,
+    "analysis_damping": 0.5,
+    "spread_inflation": 1.15
+  },
+  "held_out_seeds": [
+    5,
+    7,
+    11,
+    13
+  ],
+  "runs": [
+    {
+      "geom_seed": 5,
+      "blind_burden_accuracy_pct": 89.74078051809575,
+      "assimilated_burden_accuracy_pct": 93.68014728684855,
+      "burden_gain_points": 3.939366768752805,
+      "blind_fraction_accuracy_pct": 99.5304726509433,
+      "assimilated_fraction_accuracy_pct": 97.65432944722676,
+      "assimilated_beats_blind_on_burden": true
+    },
+    {
+      "geom_seed": 7,
+      "blind_burden_accuracy_pct": 83.41020564151145,
+      "assimilated_burden_accuracy_pct": 95.34845074111237,
+      "burden_gain_points": 11.93824509960092,
+      "blind_fraction_accuracy_pct": 99.5907778742874,
+      "assimilated_fraction_accuracy_pct": 97.08824679611429,
+      "assimilated_beats_blind_on_burden": true
+    },
+    {
+      "geom_seed": 11,
+      "blind_burden_accuracy_pct": 76.84044309317176,
+      "assimilated_burden_accuracy_pct": 93.01432048179947,
+      "burden_gain_points": 16.173877388627716,
+      "blind_fraction_accuracy_pct": 99.15377895933027,
+      "assimilated_fraction_accuracy_pct": 97.94738445283913,
+      "assimilated_beats_blind_on_burden": true
+    },
+    {
+      "geom_seed": 13,
+      "blind_burden_accuracy_pct": 83.45719159504286,
+      "assimilated_burden_accuracy_pct": 97.20624079084453,
+      "burden_gain_points": 13.749049195801675,
+      "blind_fraction_accuracy_pct": 99.58255928172018,
+      "assimilated_fraction_accuracy_pct": 97.42915997419061,
+      "assimilated_beats_blind_on_burden": true
+    }
+  ],
+  "summary": {
+    "seeds_where_assimilation_beats_blind": 4,
+    "seeds_total": 4,
+    "losses": 0,
+    "mean_burden_gain_points": 11.450134613195779,
+    "min_burden_gain_points": 3.939366768752805,
+    "mean_assimilated_burden_accuracy_pct": 94.81228982515123,
+    "min_assimilated_burden_accuracy_pct": 93.01432048179947,
+    "mean_blind_burden_accuracy_pct": 83.36215521195545,
+    "max_blind_burden_accuracy_pct": 89.74078051809575
+  },
+  "limitations": [
+    "held-out seeds vary the phantom and the noise stream, not the engine -- the truth is still this simulator",
+    "four seeds is a small sample; the reported minimum matters more than the mean",
+    "these numbers say the correction METHOD works on synthetic telemetry of this engine; they say nothing about a patient"
+  ],
+  "refusals": [
+    "no patient telemetry of any kind is used or bundled here",
+    "the twin's truth is the engine itself, so the audit cannot validate the engine against reality -- only the correction method against a known simulated truth",
+    "tracking accuracy on real tumours remains unknown; the record's numbers are synthetic by construction and labelled so in the design block",
+    "nothing here is a treatment recommendation or a prediction of any individual outcome"
+  ],
+  "reading": "assimilation beat the blind engine on 4 of 4 held-out seeds (mean burden accuracy 94.8% vs blind 83.4%; worst case 93.0%). Synthetic twin only (truth = this engine, observations = truth plus declared noise); no patient data is involved and no tracking accuracy on a real tumour is claimed"
+}

@@ -1,0 +1,253 @@
+{
+ "generated_utc": "2026-09-30T20:08:10Z",
+ "source": {
+  "cgga": {
+   "files": {
+    "CGGA.mRNAseq_325_clinical.20200506.txt.zip": {
+     "url": "https://www.cgga.org.cn/download?file=download/20200506/CGGA.mRNAseq_325_clinical.20200506.txt.zip&type=mRNAseq_325_clinical&time=20200506",
+     "sha256": "e8c00648666bb97ab3d68132970590b0f6713951c3b849ed83f13d421037e28e",
+     "bytes": 4546
+    },
+    "CGGA.mRNAseq_693_clinical.20200506.txt.zip": {
+     "url": "https://www.cgga.org.cn/download?file=download/20200506/CGGA.mRNAseq_693_clinical.20200506.txt.zip&type=mRNAseq_693_clinical&time=20200506",
+     "sha256": "4a587a484f2560232a887def1a99f908a7067ba300bf01a21b3cc65748e40268",
+     "bytes": 8418
+    }
+   },
+   "citation": "CGGA: Zhao Z, Zhang KN, Wang Q, et al. Chinese Glioma Genome Atlas (CGGA): A Comprehensive Resource with Functional Genomic Data from Chinese Glioma Patients. Genomics Proteomics Bioinformatics. 2021;19(1):1-12. doi:10.1016/j.gpb.2020.10.005. Clinical releases 2020-05-06.",
+   "downloaded_for": "out-of-distribution transport test"
+  },
+  "tcga": {
+   "path": "data/gdc_clinical/tcga_gbm_cases.json",
+   "sha256": "94eef14e54bf728b55c80c12bd17c90b992b37f8149784d9ec1b596dbf664a79",
+   "role": "training cohort for the frozen coefficients"
+  }
+ },
+ "tcga_reference": {
+  "n": 595,
+  "n_events": 491,
+  "names": [
+   "age_years",
+   "male",
+   "is_glioblastoma"
+  ],
+  "beta": [
+   0.03489616331870246,
+   0.17340838977850767,
+   1.0009234592112273
+  ],
+  "hazard_ratios": {
+   "age_years": 1.035512179068837,
+   "male": 1.189351725003719,
+   "is_glioblastoma": 2.720793210253102
+  },
+  "internal_c": 0.6559389476158495,
+  "internal_c_sd": 0.024695617547590854,
+  "notes": [
+   "595 patients with a usable os endpoint",
+   "491 events, 104 censored at last contact",
+   "1 patient(s) recorded Dead with no days_to_death: censored at last contact because there is no event time",
+   "21 dropped: no age recorded",
+   "1 dropped: no usable time or endpoint"
+  ]
+ },
+ "cohorts": {
+  "CGGA.mRNAseq_325_clinical.20200506.txt.zip": {
+   "path": "data\\cgga\\CGGA.mRNAseq_325_clinical.20200506.txt.zip",
+   "table_rows": 325,
+   "usable": 313,
+   "events": 218,
+   "dropped_no_age": 0,
+   "dropped_no_endpoint": 12,
+   "dropped_no_sex": 0,
+   "sex_values_normalised": 0,
+   "histology_counts": {
+    "GBM": 85,
+    "A": 46,
+    "O": 44,
+    "AA": 35,
+    "sGBM": 29,
+    "rGBM": 23,
+    "rAA": 22,
+    "AO": 12,
+    "rA": 9,
+    "NA": 4,
+    "rO": 4
+   },
+   "prs_counts": {
+    "Primary": 222,
+    "Recurrent": 58,
+    "Secondary": 29,
+    "NA": 4
+   },
+   "notes": [
+    "325 table rows; 313 usable; 218 events, 95 censored",
+    "12 dropped: no usable OS/censor",
+    "histology counts read from the file: {'GBM': 85, 'A': 46, 'O': 44, 'AA': 35, 'sGBM': 29, 'rGBM': 23, 'rAA': 22, 'AO': 12, 'rA': 9, 'NA': 4, 'rO': 4}",
+    "PRS_type counts read from the file: {'Primary': 222, 'Recurrent': 58, 'Secondary': 29, 'NA': 4}"
+   ]
+  },
+  "CGGA.mRNAseq_693_clinical.20200506.txt.zip": {
+   "path": "data\\cgga\\CGGA.mRNAseq_693_clinical.20200506.txt.zip",
+   "table_rows": 693,
+   "usable": 656,
+   "events": 394,
+   "dropped_no_age": 1,
+   "dropped_no_endpoint": 36,
+   "dropped_no_sex": 0,
+   "sex_values_normalised": 10,
+   "histology_counts": {
+    "GBM": 133,
+    "rGBM": 104,
+    "AA": 80,
+    "A": 78,
+    "rAA": 69,
+    "AO": 45,
+    "O": 44,
+    "rAO": 33,
+    "rA": 27,
+    "AOA": 15,
+    "rO": 14,
+    "OA": 8,
+    "rAOA": 5,
+    "rOA": 1
+   },
+   "prs_counts": {
+    "Primary": 403,
+    "Recurrent": 253
+   },
+   "notes": [
+    "693 table rows; 656 usable; 394 events, 262 censored",
+    "1 dropped: no age",
+    "36 dropped: no usable OS/censor",
+    "10 sex value(s) carried padding and were stripped before mapping",
+    "histology counts read from the file: {'GBM': 133, 'rGBM': 104, 'AA': 80, 'A': 78, 'rAA': 69, 'AO': 45, 'O': 44, 'rAO': 33, 'rA': 27, 'AOA': 15, 'rO': 14, 'OA': 8, 'rAOA': 5, 'rOA': 1}",
+    "PRS_type counts read from the file: {'Primary': 403, 'Recurrent': 253}"
+   ]
+  }
+ },
+ "tests": {
+  "CGGA.mRNAseq_325_clinical.20200506.txt.zip": [
+   {
+    "label": "primary gliomas, any grade",
+    "n": 222,
+    "n_events": 138,
+    "c_index": 0.740184637726259,
+    "age_only_c_index": 0.6599761423162699,
+    "note": "the glioblastoma dummy is informative here; scores age, sex and histological grade band"
+   },
+   {
+    "label": "primary GBM only",
+    "n": 85,
+    "n_events": 73,
+    "c_index": 0.5762632563942608,
+    "age_only_c_index": 0.5701809107922645,
+    "note": "the glioblastoma dummy is constant on this subset, so the transported score is age and sex"
+   }
+  ],
+  "CGGA.mRNAseq_693_clinical.20200506.txt.zip": [
+   {
+    "label": "primary gliomas, any grade",
+    "n": 403,
+    "n_events": 209,
+    "c_index": 0.7128992843428172,
+    "age_only_c_index": 0.647599930179787,
+    "note": "the glioblastoma dummy is informative here; scores age, sex and histological grade band"
+   },
+   {
+    "label": "primary GBM only",
+    "n": 133,
+    "n_events": 110,
+    "c_index": 0.5820640916290971,
+    "age_only_c_index": 0.588887535031071,
+    "note": "the glioblastoma dummy is constant on this subset, so the transported score is age and sex"
+   }
+  ]
+ },
+ "provenance": {
+  "cgga_clinical_release_cached": "established",
+  "ood_transport_of_covariate_model": "established",
+  "ood_transport_is_engine_validation": "proven_failed",
+  "single_cell_state_shift_prediction": "proven_failed",
+  "in_vitro_ic50_replicator_fit": "proven_failed",
+  "brainweb_inverse_tensor_recovery": "proven_failed",
+  "growth_dice_forecast": "proven_failed",
+  "cgga_pitch_figures_are_results": "proven_failed"
+ },
+ "pitch_figures": {
+  "cgga_ood_c_index": "CGGA out-of-distribution C-index 0.6412",
+  "cgga_gbm_n": "CGGA 'n=325 Glioblastoma'",
+  "scrna_jsd": "single-cell state-shift JSD < 0.12",
+  "in_vitro_r2": "in-vitro IC50 replicator fit R^2 >= 0.938",
+  "inverse_recovery_r2": "inverse tensor recovery R^2 >= 0.999",
+  "brats_dice": "3D sub-region Dice >= 0.88"
+ },
+ "corrections": [
+  {
+   "shown_in_the_pitch": "CGGA 'n=325 Glioblastoma'",
+   "why_refused": "the release named 325 holds 325 clinical rows; the number of them recorded as GBM is a different, smaller count, read from the file",
+   "what_is_recorded_instead": {
+    "CGGA.mRNAseq_325_clinical.20200506.txt.zip": {
+     "table_rows": 325,
+     "usable": 313,
+     "histology_GBM_scorable": 85,
+     "histology_GBM_in_table": 85,
+     "primary": 222,
+     "primary_GBM": 85
+    },
+    "CGGA.mRNAseq_693_clinical.20200506.txt.zip": {
+     "table_rows": 693,
+     "usable": 656,
+     "histology_GBM_scorable": 133,
+     "histology_GBM_in_table": 140,
+     "primary": 403,
+     "primary_GBM": 133
+    }
+   }
+  },
+  {
+   "shown_in_the_pitch": "CGGA out-of-distribution C-index 0.6412",
+   "why_refused": "a C-index is a measurement, not a target: the recorded value comes from applying frozen TCGA coefficients to the CGGA rows",
+   "what_is_recorded_instead": "see outputs_real\\cgga_ood.json: the C-index per subset and file, recomputable from the cached zips; the pitch's 0.6412 is not carried as a result"
+  },
+  {
+   "shown_in_the_pitch": "single-cell state-shift JSD < 0.12",
+   "why_refused": "no four-state composition is predicted anywhere in this repository, and the GEO workbook maps cells to tumours, not to states",
+   "what_is_recorded_instead": "single_cell_clone_fractions_from_bulk: PROVEN_FAILED in danon/genomics_intake.py; the dataset's reachability is recorded so the refusal is not a claim of unavailability"
+  },
+  {
+   "shown_in_the_pitch": "in-vitro IC50 replicator fit R^2 >= 0.938",
+   "why_refused": "the engine's EC50 is dimensionless, so an R^2 against a molar IC50 is a type error; and 34 of 34 temozolomide IC50s in GDSC2 are extrapolations beyond the highest concentration tested",
+   "what_is_recorded_instead": "danon/eval_targets.py::in_vitro_target(), called live by external_pipeline_matrix()"
+  },
+  {
+   "shown_in_the_pitch": "inverse tensor recovery R^2 >= 0.999",
+   "why_refused": "there is no inverse-tensor estimator to score, and recovering an injected tensor is a self-consistency check rather than a measurement against tissue",
+   "what_is_recorded_instead": "the forward operator is already verified against analytic solutions (check_solver_verified_against_analytic_solutions); no recovery figure is claimed"
+  },
+  {
+   "shown_in_the_pitch": "3D sub-region Dice >= 0.88",
+   "why_refused": "a Dice forecast needs an expert mask and a second timepoint for the same patient; the live spatial_dice_verdict says no probed collection carries both",
+   "what_is_recorded_instead": "BraTS-2021 segmentations are the committed geometry the engine runs on, not a forecast target"
+  },
+  {
+   "shown_in_the_pitch": "sample code: `risk_scores = ages * 0.035` described as a TCGA-calibrated coefficient, `assert c_index >= 0.620`, and `from lifelines.utils import concordance_index`",
+   "why_refused": "0.035 is an invented coefficient (the repository fits age, sex and diagnosis on the real cohort and applies those betas); 0.620 is a threshold chosen before the measurement, which turns a result into a pass/fail rubber stamp; lifelines is not a dependency here, and the repository already carries its own Harrell C (danon/validation.py::concordance_index); and a test that downloads inside pytest makes the suite depend on the network",
+   "what_is_recorded_instead": "the OOD test is a cohort script + cached file + claim check; whatever the transport C-index is, it is recorded as measured"
+  }
+ ],
+ "notes": [
+  "this validates a covariate model on external patients; it is not a validation of the treatment engine",
+  "no coefficient is refitted on CGGA: the fit is the TCGA cohort's and is applied unchanged, which is what makes this a transport test rather than a second internal validation",
+  "one external cohort at one metric is evidence of transport, not proof of 'zero overfitting': a model with no signal would read C~0.5, and a weak model can transport at the same 0.55-0.65 band",
+  "the model carries no treatment covariates; CGGA and TCGA differ in era and regimen, so this compares cohorts, not treatments",
+  "no imaging is linked to these rows, so nothing here is a spatial or engine validation"
+ ],
+ "engine_caveat": "this validates a covariate model on external patients; it is not a validation of the treatment engine",
+ "what_external_data_cannot_show": [
+  "an external C-index over age, sex and diagnosis is a statement about those covariates, not about the spatial engine, which has no patient-level C-index at all",
+  "one cohort at one metric cannot demonstrate 'zero overfitting': it demonstrates transport, and a weak model transports too",
+  "CGGA clinical rows carry no imaging link here, so no growth or geometry validation rides on them",
+  "none of the five pipelines, even if all five ran, would make the engine's dose schedule validated: that needs outcome data tied to a treatment the engine chose"
+ ]
+}

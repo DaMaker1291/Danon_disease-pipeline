@@ -1,0 +1,90 @@
+{
+ "algorithm": "ppo (clipped surrogate, GAE, gamma=1.0 so return = -AUBC), categorical head over schedule actions (A / B / holiday)",
+ "envs": 4,
+ "generated_utc": "2026-10-02T05:58:02Z",
+ "horizon_days": 365,
+ "hyperparameters": {
+  "clip": 0.2,
+  "configuration_history": "temperature fixed at 1.0 (this run): sampled AUBC ~0.021 vs greedy ~1.24 -- the advantage is in the randomisation. Temperature annealed 1.0 -> 0.2 (tried, rejected): the anneal sharpened the spread logits onto constant drug A (sampled ~1.0 at temperature 0.6) because PPO maximises the SAMPLED return, which a mixture already maximises. Both forms are evaluated and recorded rather than one being selected.",
+  "entropy_coef": 0.0,
+  "epochs": 4,
+  "hidden": 64,
+  "lr": 0.001,
+  "minibatch": 512,
+  "temperature_end": 1.0,
+  "temperature_start": 1.0,
+  "value_coef": 0.5
+ },
+ "iterations": 60,
+ "monitor_curve": [
+  {
+   "iteration": 20,
+   "median_aubc_deterministic": 1.2448176145569212,
+   "median_aubc_sampled": 0.02067885050789749
+  },
+  {
+   "iteration": 40,
+   "median_aubc_deterministic": 1.2448176145569212,
+   "median_aubc_sampled": 0.02386698373233384
+  },
+  {
+   "iteration": 60,
+   "median_aubc_deterministic": 1.2448176145569212,
+   "median_aubc_sampled": 0.021280740248579844
+  }
+ ],
+ "seed_partition": {
+  "evaluation": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29
+  ],
+  "monitor": [
+   900,
+   901,
+   902,
+   903,
+   904,
+   905,
+   906,
+   907,
+   908,
+   909
+  ],
+  "training": "1000+"
+ },
+ "source": "_train_evosteer_ppo.py",
+ "steps_per_second": 3.4,
+ "steps_total": 87600,
+ "torch": "2.2.1+cpu",
+ "wall_seconds": 26117.8,
+ "weights_path": "models/ppo_evosteer_policy.pt",
+ "weights_sha256": "486f1e808184e102e6ccfeae5409ad280af5a4f20a010ba39c6cf9ba0ebe8fa1"
+}

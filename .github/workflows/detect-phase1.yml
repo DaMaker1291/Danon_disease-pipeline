@@ -1,0 +1,75 @@
+name: Phase 1 detection engine
+
+on:
+  push:
+    paths:
+      - "danon/detect/**"
+      - "danon/observer.py"
+      - "danon/variants.py"
+      - "danon/evolution_forecast.py"
+      - "danon/robustness.py"
+      - "tests/test_detect_phase1.py"
+      - "tests/test_robustness.py"
+      - "tests/test_variants.py"
+      - "tests/test_evolution_forecast.py"
+      - "docs/validation_protocol.md"
+      - ".github/workflows/detect-phase1.yml"
+  pull_request:
+    paths:
+      - "danon/detect/**"
+      - "danon/observer.py"
+      - "danon/variants.py"
+      - "danon/evolution_forecast.py"
+      - "danon/robustness.py"
+      - "tests/test_detect_phase1.py"
+      - "tests/test_robustness.py"
+      - "tests/test_variants.py"
+      - "tests/test_evolution_forecast.py"
+      - "docs/validation_protocol.md"
+      - ".github/workflows/detect-phase1.yml"
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install test-relevant dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy scipy pandas pyarrow pydantic pytest
+      - name: Run the Phase 1 suite, the matrix's own tests and the variant channel
+        # The forecast file's data-dependent tests SKIP when the cached GLASS
+        # release is absent (a bare runner has no data/glass_paired and no
+        # outputs_real/glass_evolution_forecast.json), so this step cannot fail
+        # on a fresh clone -- and it still enforces the builders, the metrics and
+        # the refusal vocabulary, which need no cached data at all.
+        run: python -m pytest tests/test_detect_phase1.py tests/test_robustness.py tests/test_variants.py tests/test_evolution_forecast.py -q --durations=10 --durations-min=2.0
+      - name: Release gate — the stress-test matrix must PASS
+        run: |
+          python - <<'PY'
+          from danon.robustness import run_robustness_matrix, release_gate, write_robustness_record
+          results = run_robustness_matrix()
+          record = write_robustness_record(results, "outputs_real/robustness_record.json")
+          gate = release_gate(results)
+          print("GATE:", gate["gate"], gate["failing_probes"])
+          if gate["gate"] != "PASS":
+              raise SystemExit(f"release gate BLOCKED: {gate['failing_probes']}")
+          PY
+      - name: Reproduce the benchmark and assert the record is written
+        run: |
+          python -m danon.detect.cli --seeds 11 23 --n-cases 12 --out .phase1_ci_out
+          python - <<'PY'
+          import json
+          rec = json.load(open(".phase1_ci_out/benchmark_record.json"))
+          assert rec["benchmark_name"] == "evotwin.phase1.change_detection"
+          assert len(rec["runs"]) == 2
+          assert isinstance(rec["limitations"], list) and rec["limitations"]
+          print("record OK:", rec["aggregates"])
+          PY

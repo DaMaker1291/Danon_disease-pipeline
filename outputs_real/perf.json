@@ -1,0 +1,258 @@
+{
+ "bit_identity": {
+  "fields": [
+   {
+    "bitwise_equal": true,
+    "exact_equal": true,
+    "operator": "laplacian",
+    "shape": [
+     14,
+     24,
+     24
+    ]
+   },
+   {
+    "bitwise_equal": true,
+    "exact_equal": true,
+    "operator": "laplacian",
+    "shape": [
+     7,
+     9,
+     11
+    ]
+   },
+   {
+    "bitwise_equal": true,
+    "exact_equal": true,
+    "operator": "laplacian",
+    "shape": [
+     2,
+     14,
+     24,
+     24
+    ]
+   },
+   {
+    "bitwise_equal": true,
+    "exact_equal": true,
+    "operator": "divergence_d_grad",
+    "shape": [
+     14,
+     24,
+     24
+    ]
+   },
+   {
+    "bitwise_equal": true,
+    "exact_equal": true,
+    "operator": "divergence_d_grad",
+    "shape": [
+     9,
+     7,
+     5
+    ]
+   },
+   {
+    "bitwise_equal": null,
+    "exact_equal": true,
+    "operator": "harmonic_mean",
+    "shape": [
+     6,
+     5,
+     4
+    ]
+   },
+   {
+    "bitwise_equal": true,
+    "exact_equal": true,
+    "operator": "divergence_d_grad",
+    "shape": [
+     14,
+     24,
+     24
+    ],
+    "source": "patient t1ce-derived transport field x tumour mask"
+   }
+  ],
+  "trajectory": {
+   "heterogeneous": {
+    "burden_R_exact": true,
+    "burden_S_exact": true,
+    "days": 365,
+    "dominance_day_equal": true,
+    "dose_A_exact": true,
+    "final_N_S_bitwise": true,
+    "final_conc_A_bitwise": true,
+    "final_resistant_fraction_equal": true,
+    "pfs_day_equal": true,
+    "seed": 11,
+    "toxicity_equal": true
+   },
+   "scalar": {
+    "burden_R_exact": true,
+    "burden_S_exact": true,
+    "days": 365,
+    "dominance_day_equal": true,
+    "dose_A_exact": true,
+    "final_N_S_bitwise": true,
+    "final_conc_A_bitwise": true,
+    "final_resistant_fraction_equal": true,
+    "pfs_day_equal": true,
+    "seed": 11,
+    "toxicity_equal": true
+   }
+  }
+ },
+ "case": "BraTS2021_01017",
+ "day": {
+  "heterogeneous": {
+   "accelerated_ms_per_day": 31.679626666785524,
+   "accelerated_worst_ms_per_day": 34.51817333334475,
+   "measurement": "minimum of 6 interleaved runs of 30 days each; the 30-day run length is excluded from the rate as a constant, and both sides run in the same process under the same load",
+   "ratio": 1.9036593234171248,
+   "reference_ms_per_day": 60.30721666660004,
+   "reference_worst_ms_per_day": 68.42675999990509,
+   "reps": 6
+  },
+  "scalar": {
+   "accelerated_ms_per_day": 2.895106666740806,
+   "accelerated_worst_ms_per_day": 5.028089999783939,
+   "measurement": "minimum of 6 interleaved runs of 30 days each; the 30-day run length is excluded from the rate as a constant, and both sides run in the same process under the same load",
+   "ratio": 1.117130974982876,
+   "reference_ms_per_day": 3.2342133332955805,
+   "reference_worst_ms_per_day": 5.530746666772757,
+   "reps": 6
+  }
+ },
+ "elapsed_seconds": 387.02972769737244,
+ "engine_grid": [
+  14,
+  24,
+  24
+ ],
+ "measured_at": "2026-09-29T21:38:47Z",
+ "method": {
+  "ordering": "the 256^3 operator measurement runs LAST because it allocates ~GB; measuring the day cost after it inflated the day cost by ~4x in an earlier version of this script, which is why the contaminated record was deleted rather than kept",
+  "statistic": "minimum of N repetitions",
+  "why": "the same 30-day run measured 1.86-4.93 ms/day over 12 consecutive repetitions on this shared machine, a 2.7x spread; a minimum tends to the cost of the work, so every ratio here is an upper bound and no number here is a peak figure"
+ },
+ "numpy": "1.26.4",
+ "numpy_threads": "4",
+ "operators": [
+  {
+   "array_mb_float64": 0.064512,
+   "divergence_accelerated_seconds": 0.0007011999987298623,
+   "divergence_accelerated_worst_seconds": 0.004554500002996065,
+   "divergence_ratio": 2.3225898540817695,
+   "divergence_reference_seconds": 0.001628600002732128,
+   "divergence_reference_worst_seconds": 0.004916199999570381,
+   "laplacian_accelerated_seconds": 0.00020229999790899456,
+   "laplacian_accelerated_worst_seconds": 0.0004993999973521568,
+   "laplacian_ratio": 1.2481463391826326,
+   "laplacian_reference_seconds": 0.0002525000018067658,
+   "laplacian_reference_worst_seconds": 0.0008681000035721809,
+   "reps": 100,
+   "shape": [
+    14,
+    24,
+    24
+   ],
+   "voxels": 8064
+  },
+  {
+   "array_mb_float64": 2.097152,
+   "divergence_accelerated_seconds": 0.027406999994127546,
+   "divergence_accelerated_worst_seconds": 0.04551959999662358,
+   "divergence_ratio": 3.1719852600508953,
+   "divergence_reference_seconds": 0.08693460000358755,
+   "divergence_reference_worst_seconds": 0.1394903999971575,
+   "laplacian_accelerated_seconds": 0.005500200000824407,
+   "laplacian_accelerated_worst_seconds": 0.008607200004917104,
+   "laplacian_ratio": 1.71319224773266,
+   "laplacian_reference_seconds": 0.009422900002391543,
+   "laplacian_reference_worst_seconds": 0.01673379999556346,
+   "reps": 8,
+   "shape": [
+    64,
+    64,
+    64
+   ],
+   "voxels": 262144
+  },
+  {
+   "array_mb_float64": 134.217728,
+   "divergence_accelerated_seconds": 3.0522886000035214,
+   "divergence_accelerated_worst_seconds": 3.0522886000035214,
+   "divergence_ratio": 3.536277205237127,
+   "divergence_reference_seconds": 10.793738599997596,
+   "divergence_reference_worst_seconds": 10.793738599997596,
+   "laplacian_accelerated_seconds": 0.3705150000023423,
+   "laplacian_accelerated_worst_seconds": 0.3705150000023423,
+   "laplacian_ratio": 2.467580259891148,
+   "laplacian_reference_seconds": 0.9142754999993485,
+   "laplacian_reference_worst_seconds": 0.9142754999993485,
+   "reps": 1,
+   "shape": [
+    256,
+    256,
+    256
+   ],
+   "voxels": 16777216
+  }
+ ],
+ "seed_for_trajectory_identity": 11,
+ "throughput": {
+  "batch_one_stream": {
+   "ratio": 0.861771293574706,
+   "seconds": 5.540501099996618,
+   "worst_seconds": 6.375947900000028
+  },
+  "batch_per_replicate_streams": {
+   "ratio": 0.8333074703269245,
+   "seconds": 4.362086300003284,
+   "worst_seconds": 5.964349599998968
+  },
+  "conclusion": "widening the ARRAYS buys nothing measurable at this grid -- both stream modes sit at or below the serial rate -- while widening the PROCESSES does; and the array result is not an RNG artefact, since the single-stream draw is no better than the per-replicate one",
+  "days": 60,
+  "machine_cores": 12,
+  "measurement": "each strategy alternated with the serial loop it replaces, minimum of 3 rounds each",
+  "processes": {
+   "by_workers": {
+    "4": {
+     "ratio": 2.080233445688319,
+     "seconds": 1.5951975999996648,
+     "serial_seconds_beside_it": 3.3183834000010393,
+     "worst_seconds": 1.6235975000017788
+    },
+    "8": {
+     "ratio": 2.0061249059236785,
+     "seconds": 1.9556382000009762,
+     "serial_seconds_beside_it": 3.923254499997711,
+     "worst_seconds": 2.277310999998008
+    }
+   },
+   "serial_runner_seconds": 4.0476320999950985,
+   "serial_seconds_beside_it": 4.605313799998839
+  },
+  "replicates": 16,
+  "reps": 3,
+  "serial": {
+   "seconds": 3.6349591000034707,
+   "worst_seconds": 5.334858899994288
+  }
+ },
+ "tumor_voxels": 1774,
+ "uq_sweep_extrapolation": {
+  "days": 365,
+  "draws": 10000,
+  "hours_on_4_workers": 1.4110514796503513,
+  "hours_on_8_workers": 1.4631773290333312,
+  "note": "extrapolated from the measured accelerated per-day cost on the ENGINE grid (8,064 voxels), not from a clinical volume; it counts the runs that fit in a time budget and assumes the measured process ratio holds, which it will not on a busy or busy-at-boot machine -- the ratio is a measurement on THIS machine at THIS load",
+  "serial_hours": 2.935316481556651
+ },
+ "what_is_not_measured": [
+  "no GPU: this repository has no CUDA device, no JAX and no CuPy, so no GPU figure here is measured and none is claimed",
+  "no surrogate model: no FNO is trained or evaluated here, so no surrogate accuracy or latency figure is claimed",
+  "no clinical volume run: 256^3 operator costs are measured, but a full 365-day trajectory at that grid was not run"
+ ]
+}

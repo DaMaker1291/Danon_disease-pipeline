@@ -1,0 +1,2428 @@
+{
+  "generated_utc": "2026-10-04T22:01:16Z",
+  "geometry": {
+    "grid": [
+      24,
+      24,
+      24
+    ],
+    "tumour_voxels": 3178,
+    "voxel_mm": 1.0,
+    "phantom_seed": 12345,
+    "is_patient_imaging": false
+  },
+  "release_1_delivered": "outputs_real/dosing.json",
+  "release_2_grid": {
+    "intensity": [
+      0.5,
+      0.75,
+      1.0,
+      1.25,
+      1.5
+    ],
+    "resistant_fraction": [
+      0.001,
+      0.01,
+      0.1,
+      0.3
+    ],
+    "growth_noise": [
+      0.05,
+      0.2
+    ],
+    "feasibility_intensity_curve": [
+      0.05,
+      0.1,
+      0.15,
+      0.2,
+      0.25,
+      0.3,
+      0.35,
+      0.4,
+      0.45,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.8,
+      0.85,
+      0.9,
+      0.95,
+      1.0,
+      1.05,
+      1.1,
+      1.15,
+      1.2,
+      1.25,
+      1.3,
+      1.35,
+      1.4,
+      1.45,
+      1.5,
+      1.55,
+      1.6,
+      1.65,
+      1.7,
+      1.75,
+      1.8,
+      1.85,
+      1.9,
+      1.95,
+      2.0
+    ],
+    "marrow_weights_swept": [
+      1.0,
+      0.5
+    ]
+  },
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29
+  ],
+  "partial": false,
+  "release_1_winner": {
+    "schedule_text": "alternating A/B continuous: A 150 mg/m2 at 0.3 x full x3d, B 150 mg/m2 at 0.5 x full x3d, no rest",
+    "beats_single": true,
+    "aubc_ratio": 0.03320838239313755,
+    "dominance_delta_days": 150.5,
+    "notes": [
+      "single-drug arm is a grid of 26 calendars; the best is single-drug A: 150 mg/m2 x2d every 42d at median AUBC 1.3046 (dominance day 214) over 30 seeds.",
+      "of 24 alternating candidates, 4 are inadmissible under EVERY declared marrow weight and were not run; 20 were run and 12 are admissible at the primary weight 1.",
+      "at the conservative marrow weight 1 the best alternating calendar is alternating A/B continuous: A 150 mg/m2 at 0.3 x full x3d, B 150 mg/m2 at 0.5 x full x3d, no rest at median AUBC 0.0433 vs single-drug 1.3046 (ratio 0.0332); alternating WINS.",
+      "the verdict does NOT flip anywhere in the declared marrow-weight sweep, so it does not depend on the assumed potency of drug B."
+    ]
+  },
+  "release_1_reference_arm": {
+    "name": "single-drug A: 150 mg/m2 x2d every 42d",
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29
+    ]
+  },
+  "feasibility": {
+    "1.0": {
+      "drug_b_marrow_weight": 1.0,
+      "rows": [
+        {
+          "intensity": 0.05,
+          "anc_nadir": 4.3695,
+          "feasible": true
+        },
+        {
+          "intensity": 0.1,
+          "anc_nadir": 4.2391,
+          "feasible": true
+        },
+        {
+          "intensity": 0.15,
+          "anc_nadir": 4.1086,
+          "feasible": true
+        },
+        {
+          "intensity": 0.2,
+          "anc_nadir": 3.9782,
+          "feasible": true
+        },
+        {
+          "intensity": 0.25,
+          "anc_nadir": 3.8477,
+          "feasible": true
+        },
+        {
+          "intensity": 0.3,
+          "anc_nadir": 3.7173,
+          "feasible": true
+        },
+        {
+          "intensity": 0.35,
+          "anc_nadir": 3.5868,
+          "feasible": true
+        },
+        {
+          "intensity": 0.4,
+          "anc_nadir": 3.4563,
+          "feasible": true
+        },
+        {
+          "intensity": 0.45,
+          "anc_nadir": 3.3259,
+          "feasible": true
+        },
+        {
+          "intensity": 0.5,
+          "anc_nadir": 3.1954,
+          "feasible": true
+        },
+        {
+          "intensity": 0.55,
+          "anc_nadir": 3.065,
+          "feasible": true
+        },
+        {
+          "intensity": 0.6,
+          "anc_nadir": 2.9345,
+          "feasible": true
+        },
+        {
+          "intensity": 0.65,
+          "anc_nadir": 2.8041,
+          "feasible": true
+        },
+        {
+          "intensity": 0.7,
+          "anc_nadir": 2.6736,
+          "feasible": true
+        },
+        {
+          "intensity": 0.75,
+          "anc_nadir": 2.5431,
+          "feasible": true
+        },
+        {
+          "intensity": 0.8,
+          "anc_nadir": 2.4127,
+          "feasible": true
+        },
+        {
+          "intensity": 0.85,
+          "anc_nadir": 2.2822,
+          "feasible": true
+        },
+        {
+          "intensity": 0.9,
+          "anc_nadir": 2.1518,
+          "feasible": true
+        },
+        {
+          "intensity": 0.95,
+          "anc_nadir": 2.0213,
+          "feasible": true
+        },
+        {
+          "intensity": 1.0,
+          "anc_nadir": 1.8909,
+          "feasible": true
+        },
+        {
+          "intensity": 1.05,
+          "anc_nadir": 1.7604,
+          "feasible": true
+        },
+        {
+          "intensity": 1.1,
+          "anc_nadir": 1.6299,
+          "feasible": true
+        },
+        {
+          "intensity": 1.15,
+          "anc_nadir": 1.4995,
+          "feasible": false
+        },
+        {
+          "intensity": 1.2,
+          "anc_nadir": 1.369,
+          "feasible": false
+        },
+        {
+          "intensity": 1.25,
+          "anc_nadir": 1.2386,
+          "feasible": false
+        },
+        {
+          "intensity": 1.3,
+          "anc_nadir": 1.1081,
+          "feasible": false
+        },
+        {
+          "intensity": 1.35,
+          "anc_nadir": 0.9776,
+          "feasible": false
+        },
+        {
+          "intensity": 1.4,
+          "anc_nadir": 0.8472,
+          "feasible": false
+        },
+        {
+          "intensity": 1.45,
+          "anc_nadir": 0.7167,
+          "feasible": false
+        },
+        {
+          "intensity": 1.5,
+          "anc_nadir": 0.5863,
+          "feasible": false
+        },
+        {
+          "intensity": 1.55,
+          "anc_nadir": 0.4558,
+          "feasible": false
+        },
+        {
+          "intensity": 1.6,
+          "anc_nadir": 0.3254,
+          "feasible": false
+        },
+        {
+          "intensity": 1.65,
+          "anc_nadir": 0.1949,
+          "feasible": false
+        },
+        {
+          "intensity": 1.7,
+          "anc_nadir": 0.0644,
+          "feasible": false
+        },
+        {
+          "intensity": 1.75,
+          "anc_nadir": 0.0,
+          "feasible": false
+        },
+        {
+          "intensity": 1.8,
+          "anc_nadir": 0.0,
+          "feasible": false
+        },
+        {
+          "intensity": 1.85,
+          "anc_nadir": 0.0,
+          "feasible": false
+        },
+        {
+          "intensity": 1.9,
+          "anc_nadir": 0.0,
+          "feasible": false
+        },
+        {
+          "intensity": 1.95,
+          "anc_nadir": 0.0,
+          "feasible": false
+        },
+        {
+          "intensity": 2.0,
+          "anc_nadir": 0.0,
+          "feasible": false
+        }
+      ],
+      "max_feasible_intensity": 1.1,
+      "note": "the screen's ANC floor is the FDA label threshold; drug B's marrow potency per mg/m2 is an assumption and is swept, never set to 0.0 to make a calendar pass"
+    },
+    "0.5": {
+      "drug_b_marrow_weight": 0.5,
+      "rows": [
+        {
+          "intensity": 0.05,
+          "anc_nadir": 4.4103,
+          "feasible": true
+        },
+        {
+          "intensity": 0.1,
+          "anc_nadir": 4.3207,
+          "feasible": true
+        },
+        {
+          "intensity": 0.15,
+          "anc_nadir": 4.231,
+          "feasible": true
+        },
+        {
+          "intensity": 0.2,
+          "anc_nadir": 4.1413,
+          "feasible": true
+        },
+        {
+          "intensity": 0.25,
+          "anc_nadir": 4.0517,
+          "feasible": true
+        },
+        {
+          "intensity": 0.3,
+          "anc_nadir": 3.962,
+          "feasible": true
+        },
+        {
+          "intensity": 0.35,
+          "anc_nadir": 3.8723,
+          "feasible": true
+        },
+        {
+          "intensity": 0.4,
+          "anc_nadir": 3.7827,
+          "feasible": true
+        },
+        {
+          "intensity": 0.45,
+          "anc_nadir": 3.693,
+          "feasible": true
+        },
+        {
+          "intensity": 0.5,
+          "anc_nadir": 3.6033,
+          "feasible": true
+        },
+        {
+          "intensity": 0.55,
+          "anc_nadir": 3.5137,
+          "feasible": true
+        },
+        {
+          "intensity": 0.6,
+          "anc_nadir": 3.424,
+          "feasible": true
+        },
+        {
+          "intensity": 0.65,
+          "anc_nadir": 3.3343,
+          "feasible": true
+        },
+        {
+          "intensity": 0.7,
+          "anc_nadir": 3.2447,
+          "feasible": true
+        },
+        {
+          "intensity": 0.75,
+          "anc_nadir": 3.155,
+          "feasible": true
+        },
+        {
+          "intensity": 0.8,
+          "anc_nadir": 3.0653,
+          "feasible": true
+        },
+        {
+          "intensity": 0.85,
+          "anc_nadir": 2.9757,
+          "feasible": true
+        },
+        {
+          "intensity": 0.9,
+          "anc_nadir": 2.886,
+          "feasible": true
+        },
+        {
+          "intensity": 0.95,
+          "anc_nadir": 2.7963,
+          "feasible": true
+        },
+        {
+          "intensity": 1.0,
+          "anc_nadir": 2.7067,
+          "feasible": true
+        },
+        {
+          "intensity": 1.05,
+          "anc_nadir": 2.617,
+          "feasible": true
+        },
+        {
+          "intensity": 1.1,
+          "anc_nadir": 2.5273,
+          "feasible": true
+        },
+        {
+          "intensity": 1.15,
+          "anc_nadir": 2.4377,
+          "feasible": true
+        },
+        {
+          "intensity": 1.2,
+          "anc_nadir": 2.348,
+          "feasible": true
+        },
+        {
+          "intensity": 1.25,
+          "anc_nadir": 2.2583,
+          "feasible": true
+        },
+        {
+          "intensity": 1.3,
+          "anc_nadir": 2.1687,
+          "feasible": true
+        },
+        {
+          "intensity": 1.35,
+          "anc_nadir": 2.079,
+          "feasible": true
+        },
+        {
+          "intensity": 1.4,
+          "anc_nadir": 1.9893,
+          "feasible": true
+        },
+        {
+          "intensity": 1.45,
+          "anc_nadir": 1.8997,
+          "feasible": true
+        },
+        {
+          "intensity": 1.5,
+          "anc_nadir": 1.81,
+          "feasible": true
+        },
+        {
+          "intensity": 1.55,
+          "anc_nadir": 1.7203,
+          "feasible": true
+        },
+        {
+          "intensity": 1.6,
+          "anc_nadir": 1.6307,
+          "feasible": true
+        },
+        {
+          "intensity": 1.65,
+          "anc_nadir": 1.541,
+          "feasible": true
+        },
+        {
+          "intensity": 1.7,
+          "anc_nadir": 1.4514,
+          "feasible": false
+        },
+        {
+          "intensity": 1.75,
+          "anc_nadir": 1.3617,
+          "feasible": false
+        },
+        {
+          "intensity": 1.8,
+          "anc_nadir": 1.272,
+          "feasible": false
+        },
+        {
+          "intensity": 1.85,
+          "anc_nadir": 1.1824,
+          "feasible": false
+        },
+        {
+          "intensity": 1.9,
+          "anc_nadir": 1.0927,
+          "feasible": false
+        },
+        {
+          "intensity": 1.95,
+          "anc_nadir": 1.003,
+          "feasible": false
+        },
+        {
+          "intensity": 2.0,
+          "anc_nadir": 0.9134,
+          "feasible": false
+        }
+      ],
+      "max_feasible_intensity": 1.65,
+      "note": "the screen's ANC floor is the FDA label threshold; drug B's marrow potency per mg/m2 is an assumption and is swept, never set to 0.0 to make a calendar pass"
+    }
+  },
+  "cells": [
+    {
+      "intensity": 0.5,
+      "resistant_fraction": 0.001,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x0.5",
+        "median_aubc": 0.17594635063649783,
+        "iqr_aubc": [
+          0.17592848737227207,
+          0.1759726332924527
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 59.299999999999635,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 3.195,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.1858014457522859,
+        "iqr_aubc": [
+          1.1744589956722529,
+          1.2291642121505353
+        ],
+        "median_dominance_day": 224.5,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.1484,
+      "dominance_delta_days": 140.5,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 3.195,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.75,
+      "resistant_fraction": 0.001,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x0.75",
+        "median_aubc": 0.06503291739557136,
+        "iqr_aubc": [
+          0.0650255549427555,
+          0.06504959117615755
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 88.95000000000013,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 2.543,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.1858014457522859,
+        "iqr_aubc": [
+          1.1744589956722529,
+          1.2291642121505353
+        ],
+        "median_dominance_day": 224.5,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0548,
+      "dominance_delta_days": 140.5,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 2.543,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.0,
+      "resistant_fraction": 0.001,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x1",
+        "median_aubc": 0.043269599666719324,
+        "iqr_aubc": [
+          0.043266775315769286,
+          0.04327561281650231
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 118.59999999999927,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 1.891,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.1858014457522859,
+        "iqr_aubc": [
+          1.1744589956722529,
+          1.2291642121505353
+        ],
+        "median_dominance_day": 224.5,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0365,
+      "dominance_delta_days": 140.5,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 1.891,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.001,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x1.25",
+        "median_aubc": 0.03563025169743142,
+        "iqr_aubc": [
+          0.03562675269656908,
+          0.03563567474056434
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 148.25,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 1.239,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.1858014457522859,
+        "iqr_aubc": [
+          1.1744589956722529,
+          1.2291642121505353
+        ],
+        "median_dominance_day": 224.5,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.03,
+      "dominance_delta_days": 140.5,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 1.239,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.001,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x1.5",
+        "median_aubc": 0.03127058182946682,
+        "iqr_aubc": [
+          0.03126806349634914,
+          0.03127383873864072
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 177.90000000000026,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 0.586,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.1858014457522859,
+        "iqr_aubc": [
+          1.1744589956722529,
+          1.2291642121505353
+        ],
+        "median_dominance_day": 224.5,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0264,
+      "dominance_delta_days": 140.5,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 0.586,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.5,
+      "resistant_fraction": 0.001,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x0.5",
+        "median_aubc": 0.17570889727818262,
+        "iqr_aubc": [
+          0.1756483683635331,
+          0.1758250891734656
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 59.299999999999635,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 3.195,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.1855262919429634,
+        "iqr_aubc": [
+          1.1744966524567342,
+          1.2252338891471464
+        ],
+        "median_dominance_day": 224.5,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.1482,
+      "dominance_delta_days": 140.5,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 3.195,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.75,
+      "resistant_fraction": 0.001,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x0.75",
+        "median_aubc": 0.06498607618053592,
+        "iqr_aubc": [
+          0.06493310357087269,
+          0.06503944988815259
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 88.95000000000013,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 2.543,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.1855262919429634,
+        "iqr_aubc": [
+          1.1744966524567342,
+          1.2252338891471464
+        ],
+        "median_dominance_day": 224.5,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0548,
+      "dominance_delta_days": 140.5,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 2.543,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.0,
+      "resistant_fraction": 0.001,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x1",
+        "median_aubc": 0.04324944364225606,
+        "iqr_aubc": [
+          0.043238697008856554,
+          0.043266945771299026
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 118.59999999999927,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 1.891,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.1855262919429634,
+        "iqr_aubc": [
+          1.1744966524567342,
+          1.2252338891471464
+        ],
+        "median_dominance_day": 224.5,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0365,
+      "dominance_delta_days": 140.5,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 1.891,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.001,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x1.25",
+        "median_aubc": 0.035616272485253536,
+        "iqr_aubc": [
+          0.03560499494701834,
+          0.03563083407925082
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 148.25,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 1.239,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.1855262919429634,
+        "iqr_aubc": [
+          1.1744966524567342,
+          1.2252338891471464
+        ],
+        "median_dominance_day": 224.5,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.03,
+      "dominance_delta_days": 140.5,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 1.239,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.001,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x1.5",
+        "median_aubc": 0.03126064708665781,
+        "iqr_aubc": [
+          0.03125093885335492,
+          0.031274256257785224
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 177.90000000000026,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 0.586,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.1855262919429634,
+        "iqr_aubc": [
+          1.1744966524567342,
+          1.2252338891471464
+        ],
+        "median_dominance_day": 224.5,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0264,
+      "dominance_delta_days": 140.5,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 0.586,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.5,
+      "resistant_fraction": 0.01,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x0.5",
+        "median_aubc": 0.17594247517086634,
+        "iqr_aubc": [
+          0.17591964231211862,
+          0.17596783095164326
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 59.299999999999635,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 3.195,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3046140218798863,
+        "iqr_aubc": [
+          1.2765723528863218,
+          1.3438441118135833
+        ],
+        "median_dominance_day": 214.5,
+        "median_pfs_days": 38.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.1349,
+      "dominance_delta_days": 150.5,
+      "pfs_delta_days": 327.0,
+      "winner_anc_nadir": 3.195,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.75,
+      "resistant_fraction": 0.01,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x0.75",
+        "median_aubc": 0.06505934888040668,
+        "iqr_aubc": [
+          0.06503510940944332,
+          0.06507889136445327
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 88.95000000000013,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 2.543,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3046140218798863,
+        "iqr_aubc": [
+          1.2765723528863218,
+          1.3438441118135833
+        ],
+        "median_dominance_day": 214.5,
+        "median_pfs_days": 38.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0499,
+      "dominance_delta_days": 150.5,
+      "pfs_delta_days": 327.0,
+      "winner_anc_nadir": 2.543,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.0,
+      "resistant_fraction": 0.01,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x1",
+        "median_aubc": 0.04332412131403639,
+        "iqr_aubc": [
+          0.04331381747385027,
+          0.043333857122759736
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 118.59999999999927,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 1.891,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3046140218798863,
+        "iqr_aubc": [
+          1.2765723528863218,
+          1.3438441118135833
+        ],
+        "median_dominance_day": 214.5,
+        "median_pfs_days": 38.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0332,
+      "dominance_delta_days": 150.5,
+      "pfs_delta_days": 327.0,
+      "winner_anc_nadir": 1.891,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.01,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x1.25",
+        "median_aubc": 0.03569717008762729,
+        "iqr_aubc": [
+          0.035692054608568585,
+          0.03570345882262025
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 148.25,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 1.239,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3046140218798863,
+        "iqr_aubc": [
+          1.2765723528863218,
+          1.3438441118135833
+        ],
+        "median_dominance_day": 214.5,
+        "median_pfs_days": 38.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0274,
+      "dominance_delta_days": 150.5,
+      "pfs_delta_days": 327.0,
+      "winner_anc_nadir": 1.239,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.01,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x1.5",
+        "median_aubc": 0.031343150799836544,
+        "iqr_aubc": [
+          0.031338877896361396,
+          0.03134902261691404
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 177.90000000000026,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 0.586,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3046140218798863,
+        "iqr_aubc": [
+          1.2765723528863218,
+          1.3438441118135833
+        ],
+        "median_dominance_day": 214.5,
+        "median_pfs_days": 38.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.024,
+      "dominance_delta_days": 150.5,
+      "pfs_delta_days": 327.0,
+      "winner_anc_nadir": 0.586,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.5,
+      "resistant_fraction": 0.01,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x0.5",
+        "median_aubc": 0.17571142135097215,
+        "iqr_aubc": [
+          0.17564308952988006,
+          0.17582033019608118
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 59.299999999999635,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 3.195,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.299740154495809,
+        "iqr_aubc": [
+          1.2765209898828442,
+          1.3391808770973976
+        ],
+        "median_dominance_day": 215.0,
+        "median_pfs_days": 38.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.1352,
+      "dominance_delta_days": 150.0,
+      "pfs_delta_days": 327.0,
+      "winner_anc_nadir": 3.195,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.75,
+      "resistant_fraction": 0.01,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x0.75",
+        "median_aubc": 0.06499654092253604,
+        "iqr_aubc": [
+          0.06494629322625639,
+          0.06506424264867333
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 88.95000000000013,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 2.543,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.299740154495809,
+        "iqr_aubc": [
+          1.2765209898828442,
+          1.3391808770973976
+        ],
+        "median_dominance_day": 215.0,
+        "median_pfs_days": 38.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.05,
+      "dominance_delta_days": 150.0,
+      "pfs_delta_days": 327.0,
+      "winner_anc_nadir": 2.543,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.0,
+      "resistant_fraction": 0.01,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x1",
+        "median_aubc": 0.04330238890510113,
+        "iqr_aubc": [
+          0.043285495282771425,
+          0.04332008427335556
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 118.59999999999927,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 1.891,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.299740154495809,
+        "iqr_aubc": [
+          1.2765209898828442,
+          1.3391808770973976
+        ],
+        "median_dominance_day": 215.0,
+        "median_pfs_days": 38.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0333,
+      "dominance_delta_days": 150.0,
+      "pfs_delta_days": 327.0,
+      "winner_anc_nadir": 1.891,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.01,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x1.25",
+        "median_aubc": 0.03568621634506784,
+        "iqr_aubc": [
+          0.035669038360990835,
+          0.03569834819142008
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 148.25,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 1.239,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.299740154495809,
+        "iqr_aubc": [
+          1.2765209898828442,
+          1.3391808770973976
+        ],
+        "median_dominance_day": 215.0,
+        "median_pfs_days": 38.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0275,
+      "dominance_delta_days": 150.0,
+      "pfs_delta_days": 327.0,
+      "winner_anc_nadir": 1.239,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.01,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x1.5",
+        "median_aubc": 0.031332683170914186,
+        "iqr_aubc": [
+          0.031322915463473815,
+          0.03135009283532745
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 177.90000000000026,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 0.586,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.299740154495809,
+        "iqr_aubc": [
+          1.2765209898828442,
+          1.3391808770973976
+        ],
+        "median_dominance_day": 215.0,
+        "median_pfs_days": 38.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0241,
+      "dominance_delta_days": 150.0,
+      "pfs_delta_days": 327.0,
+      "winner_anc_nadir": 0.586,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.5,
+      "resistant_fraction": 0.1,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x0.5",
+        "median_aubc": 0.17415604259286258,
+        "iqr_aubc": [
+          0.17411753175703046,
+          0.17421952914706576
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 59.299999999999635,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 3.195,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3289947957469708,
+        "iqr_aubc": [
+          1.30063286290871,
+          1.3822540008493682
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.131,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 3.195,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.75,
+      "resistant_fraction": 0.1,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x0.75",
+        "median_aubc": 0.06455717779036005,
+        "iqr_aubc": [
+          0.06451276616591761,
+          0.06461693089568972
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 88.95000000000013,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 2.543,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3289947957469708,
+        "iqr_aubc": [
+          1.30063286290871,
+          1.3822540008493682
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0486,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 2.543,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.0,
+      "resistant_fraction": 0.1,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x1",
+        "median_aubc": 0.04311415090709877,
+        "iqr_aubc": [
+          0.04309476851553732,
+          0.04313820755702961
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 118.59999999999927,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 1.891,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3289947957469708,
+        "iqr_aubc": [
+          1.30063286290871,
+          1.3822540008493682
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0324,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 1.891,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.1,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x1.25",
+        "median_aubc": 0.03558023392858457,
+        "iqr_aubc": [
+          0.03557543139064985,
+          0.035603066978487356
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 148.25,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 1.239,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3289947957469708,
+        "iqr_aubc": [
+          1.30063286290871,
+          1.3822540008493682
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0268,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 1.239,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.1,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x1.5",
+        "median_aubc": 0.031281664351944696,
+        "iqr_aubc": [
+          0.03127360234041608,
+          0.031305679023749866
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 177.90000000000026,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 0.586,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3289947957469708,
+        "iqr_aubc": [
+          1.30063286290871,
+          1.3822540008493682
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0235,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 0.586,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.5,
+      "resistant_fraction": 0.1,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x0.5",
+        "median_aubc": 0.1739299428680158,
+        "iqr_aubc": [
+          0.1737987480349794,
+          0.17408928362329415
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 59.299999999999635,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 3.195,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3288256228077295,
+        "iqr_aubc": [
+          1.3005665844164613,
+          1.3821327218192327
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.1309,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 3.195,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.75,
+      "resistant_fraction": 0.1,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x0.75",
+        "median_aubc": 0.0645026311157797,
+        "iqr_aubc": [
+          0.0644564617910161,
+          0.06457836324464182
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 88.95000000000013,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 2.543,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3288256228077295,
+        "iqr_aubc": [
+          1.3005665844164613,
+          1.3821327218192327
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0485,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 2.543,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.0,
+      "resistant_fraction": 0.1,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x1",
+        "median_aubc": 0.04310555818100255,
+        "iqr_aubc": [
+          0.04308068731529016,
+          0.04312871581955069
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 118.59999999999927,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 1.891,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3288256228077295,
+        "iqr_aubc": [
+          1.3005665844164613,
+          1.3821327218192327
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0324,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 1.891,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.1,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x1.25",
+        "median_aubc": 0.03558049566969736,
+        "iqr_aubc": [
+          0.035566874298456126,
+          0.03560095668640302
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 148.25,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 1.239,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3288256228077295,
+        "iqr_aubc": [
+          1.3005665844164613,
+          1.3821327218192327
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0268,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 1.239,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.1,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x1.5",
+        "median_aubc": 0.03127892975560377,
+        "iqr_aubc": [
+          0.03126953247240749,
+          0.031300619521204484
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 177.90000000000026,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 0.586,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3288256228077295,
+        "iqr_aubc": [
+          1.3005665844164613,
+          1.3821327218192327
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0235,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 0.586,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.5,
+      "resistant_fraction": 0.3,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x0.5",
+        "median_aubc": 0.17415604259286258,
+        "iqr_aubc": [
+          0.17411753175703046,
+          0.17421952914706576
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 59.299999999999635,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 3.195,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3289947957469708,
+        "iqr_aubc": [
+          1.30063286290871,
+          1.3822540008493682
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.131,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 3.195,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.75,
+      "resistant_fraction": 0.3,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x0.75",
+        "median_aubc": 0.06455717779036005,
+        "iqr_aubc": [
+          0.06451276616591761,
+          0.06461693089568972
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 88.95000000000013,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 2.543,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3289947957469708,
+        "iqr_aubc": [
+          1.30063286290871,
+          1.3822540008493682
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0486,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 2.543,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.0,
+      "resistant_fraction": 0.3,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x1",
+        "median_aubc": 0.04311415090709877,
+        "iqr_aubc": [
+          0.04309476851553732,
+          0.04313820755702961
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 118.59999999999927,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 1.891,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3289947957469708,
+        "iqr_aubc": [
+          1.30063286290871,
+          1.3822540008493682
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0324,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 1.891,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.3,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x1.25",
+        "median_aubc": 0.03558023392858457,
+        "iqr_aubc": [
+          0.03557543139064985,
+          0.035603066978487356
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 148.25,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 1.239,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3289947957469708,
+        "iqr_aubc": [
+          1.30063286290871,
+          1.3822540008493682
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0268,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 1.239,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.3,
+      "growth_noise": 0.05,
+      "winner": {
+        "name": "release1_winner x1.5",
+        "median_aubc": 0.031281664351944696,
+        "iqr_aubc": [
+          0.03127360234041608,
+          0.031305679023749866
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 177.90000000000026,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 0.586,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3289947957469708,
+        "iqr_aubc": [
+          1.30063286290871,
+          1.3822540008493682
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0235,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 0.586,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.5,
+      "resistant_fraction": 0.3,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x0.5",
+        "median_aubc": 0.1739299428680158,
+        "iqr_aubc": [
+          0.1737987480349794,
+          0.17408928362329415
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 59.299999999999635,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 3.195,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3288256228077295,
+        "iqr_aubc": [
+          1.3005665844164613,
+          1.3821327218192327
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.1309,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 3.195,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 0.75,
+      "resistant_fraction": 0.3,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x0.75",
+        "median_aubc": 0.0645026311157797,
+        "iqr_aubc": [
+          0.0644564617910161,
+          0.06457836324464182
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 88.95000000000013,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 2.543,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3288256228077295,
+        "iqr_aubc": [
+          1.3005665844164613,
+          1.3821327218192327
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0485,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 2.543,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.0,
+      "resistant_fraction": 0.3,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x1",
+        "median_aubc": 0.04310555818100255,
+        "iqr_aubc": [
+          0.04308068731529016,
+          0.04312871581955069
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 118.59999999999927,
+        "n_progressed": 0,
+        "feasible": true,
+        "anc_nadir": 1.891,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3288256228077295,
+        "iqr_aubc": [
+          1.3005665844164613,
+          1.3821327218192327
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "SATURATES",
+      "aubc_ratio_winner_over_reference": 0.0324,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 1.891,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.3,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x1.25",
+        "median_aubc": 0.03558049566969736,
+        "iqr_aubc": [
+          0.035566874298456126,
+          0.03560095668640302
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 148.25,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 1.239,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3288256228077295,
+        "iqr_aubc": [
+          1.3005665844164613,
+          1.3821327218192327
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0268,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 1.239,
+      "reference_anc_nadir": 3.237
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.3,
+      "growth_noise": 0.2,
+      "winner": {
+        "name": "release1_winner x1.5",
+        "median_aubc": 0.03127892975560377,
+        "iqr_aubc": [
+          0.03126953247240749,
+          0.031300619521204484
+        ],
+        "median_dominance_day": 365.0,
+        "median_pfs_days": 365.0,
+        "median_toxicity": 177.90000000000026,
+        "n_progressed": 0,
+        "feasible": false,
+        "anc_nadir": 0.586,
+        "engine_runs": 30
+      },
+      "reference": {
+        "name": "release1_best_single[single-drug A: 150 mg/m2 x2d every 42d]",
+        "median_aubc": 1.3288256228077295,
+        "iqr_aubc": [
+          1.3005665844164613,
+          1.3821327218192327
+        ],
+        "median_dominance_day": 178.0,
+        "median_pfs_days": 39.0,
+        "median_toxicity": 18.0,
+        "n_progressed": 30,
+        "feasible": true,
+        "anc_nadir": 3.237,
+        "engine_runs": 30
+      },
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0235,
+      "dominance_delta_days": 187.0,
+      "pfs_delta_days": 326.0,
+      "winner_anc_nadir": 0.586,
+      "reference_anc_nadir": 3.237
+    }
+  ],
+  "reversals": [
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.001,
+      "growth_noise": 0.05,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.03,
+      "dominance_delta_days": 140.5,
+      "winner_anc_nadir": 1.239
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.001,
+      "growth_noise": 0.05,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0264,
+      "dominance_delta_days": 140.5,
+      "winner_anc_nadir": 0.586
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.001,
+      "growth_noise": 0.2,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.03,
+      "dominance_delta_days": 140.5,
+      "winner_anc_nadir": 1.239
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.001,
+      "growth_noise": 0.2,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0264,
+      "dominance_delta_days": 140.5,
+      "winner_anc_nadir": 0.586
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.01,
+      "growth_noise": 0.05,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0274,
+      "dominance_delta_days": 150.5,
+      "winner_anc_nadir": 1.239
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.01,
+      "growth_noise": 0.05,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.024,
+      "dominance_delta_days": 150.5,
+      "winner_anc_nadir": 0.586
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.01,
+      "growth_noise": 0.2,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0275,
+      "dominance_delta_days": 150.0,
+      "winner_anc_nadir": 1.239
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.01,
+      "growth_noise": 0.2,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0241,
+      "dominance_delta_days": 150.0,
+      "winner_anc_nadir": 0.586
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.1,
+      "growth_noise": 0.05,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0268,
+      "dominance_delta_days": 187.0,
+      "winner_anc_nadir": 1.239
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.1,
+      "growth_noise": 0.05,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0235,
+      "dominance_delta_days": 187.0,
+      "winner_anc_nadir": 0.586
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.1,
+      "growth_noise": 0.2,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0268,
+      "dominance_delta_days": 187.0,
+      "winner_anc_nadir": 1.239
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.1,
+      "growth_noise": 0.2,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0235,
+      "dominance_delta_days": 187.0,
+      "winner_anc_nadir": 0.586
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.3,
+      "growth_noise": 0.05,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0268,
+      "dominance_delta_days": 187.0,
+      "winner_anc_nadir": 1.239
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.3,
+      "growth_noise": 0.05,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0235,
+      "dominance_delta_days": 187.0,
+      "winner_anc_nadir": 0.586
+    },
+    {
+      "intensity": 1.25,
+      "resistant_fraction": 0.3,
+      "growth_noise": 0.2,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0268,
+      "dominance_delta_days": 187.0,
+      "winner_anc_nadir": 1.239
+    },
+    {
+      "intensity": 1.5,
+      "resistant_fraction": 0.3,
+      "growth_noise": 0.2,
+      "status": "INFEASIBLE",
+      "aubc_ratio_winner_over_reference": 0.0235,
+      "dominance_delta_days": 187.0,
+      "winner_anc_nadir": 0.586
+    }
+  ],
+  "engine_runs": 1440,
+  "wall_seconds": 178.6,
+  "summary": {
+    "cells": 40,
+    "wins": 0,
+    "saturates": 24,
+    "reversed": 0,
+    "infeasible": 16,
+    "max_feasible_intensity_by_marrow_weight": {
+      "1.0": 1.1,
+      "0.5": 1.65
+    },
+    "lowest_winning_intensity_per_group": {
+      "r0=0.001|noise=0.05": 0.5,
+      "r0=0.001|noise=0.2": 0.5,
+      "r0=0.01|noise=0.05": 0.5,
+      "r0=0.01|noise=0.2": 0.5,
+      "r0=0.1|noise=0.05": 0.5,
+      "r0=0.1|noise=0.2": 0.5,
+      "r0=0.3|noise=0.05": 0.5,
+      "r0=0.3|noise=0.2": 0.5
+    },
+    "verdict": "the alternating calendar's advantage and its safety bracket are both reported as boundaries; a cell that reverses or breaks the ANC floor is a limit of the claim, not a footnote to it"
+  },
+  "engine_identity": {
+    "algorithm": "sha256",
+    "scope": "the engine's source files, not a built or certified artifact",
+    "files": [
+      {
+        "path": "danon/evosteer.py",
+        "sha256": "872e02f4803fe41b148812853709b38059d8508b5a65b0414d67c4f5d0ec2d3b",
+        "bytes": 73869
+      },
+      {
+        "path": "danon/accel.py",
+        "sha256": "f10e7dc93740ce9129fbb02c68cf5589e68b6dfa650d84bb9f9d15eee5475752",
+        "bytes": 12486
+      },
+      {
+        "path": "danon/anisotropy.py",
+        "sha256": "886b1dcaa8cb07b6df275675560700a0e1cc3b1e9a58869a1d444fc74476e90e",
+        "bytes": 24270
+      },
+      {
+        "path": "danon/uq.py",
+        "sha256": "133c4d788683c5ea9b3e478bcceb5ec84eed535c72f85f2078e933c0ae07c2cb",
+        "bytes": 8538
+      }
+    ],
+    "combined_sha256": "f5d1d334e03d27a98abe6810de1fa67a38ff55b2cc2565a1571c3048c895984f",
+    "verify_with": "sha256 over each file above, concatenated in that order, each prefixed with its path -- reproducible with hashlib on any machine"
+  },
+  "provenance": {
+    "engine": "measured: every AUBC/PFS/dominance figure is a real TumorEvolutionSimulator run in this module; the engine's source hash is recorded alongside the results",
+    "calendar": "measured: Schedule.dose_on is the engine's own dose series",
+    "myelosuppression": "DECLARED ASSUMPTION: real arithmetic on assumed parameters; not an NCCN, FDA or label threshold; not measured in this repository",
+    "schedule_search": "measured on the declared grid, whose size is reported; the grid was not pruned or extrapolated",
+    "clinical_outcome": "NOT CLAIMED: no schedule here is shown to help a patient; the engine is simulation-only",
+    "what_would_change_this": [
+      "bench-measured kill and growth constants for the drug in question",
+      "a real myelosuppression dataset to calibrate the ANC model",
+      "paired baseline/recurrence imaging to fix patient geometry"
+    ]
+  }
+}

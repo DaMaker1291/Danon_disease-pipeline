@@ -1,7 +1,7 @@
 {
  "key": "evolution",
  "title": "Paired spatial evolution, 365 days: adaptive switch vs MTD",
- "generated_utc": "2026-09-24T18:09:09Z",
+ "generated_utc": "2026-10-17T13:33:04Z",
  "source": "danon.evolution_export.export_paired_evolution(case BraTS2021_01017, r0=0.005, seed=101, days=365, dense_until=45)",
  "notes": [
   "every frame is the engine's validated end-of-day spatial state; frame aggregates are checked against the run's own burden arrays before export",
@@ -15,7 +15,7 @@
   "patient_prediction": "proven_failed"
  },
  "data": {
-  "generated_utc": "2026-09-24T18:09:09Z",
+  "generated_utc": "2026-10-17T13:33:04Z",
   "model": "EvoSteer paired spatial evolution: adaptive collateral switch vs MTD",
   "seed": 101,
   "r0": 0.005,

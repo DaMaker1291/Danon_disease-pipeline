@@ -5,11 +5,18 @@ on a white background, written with an MPP, so the reported nuclei per mm^2 can 
 checked against arithmetic rather than against itself. The refusal tests are the
 other half -- a Ki-67 fraction must not be derivable from a slide that carries no
 Ki-67 stain, in any of the ways someone might try.
+
+The last class pins the same refusal from the public-data side: the two external
+sources a roadmap names for that numerator -- the TCGA clinical XMLs and Ivy GAP
+-- were read, and neither carries a labelling index. The TCGA field list and the
+Ivy GAP column lists are re-searched there, so the recorded absence cannot drift.
 """
 
 from __future__ import annotations
 
+import json
 import os
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -294,3 +301,130 @@ class TestRealSlide:
         assert stain["stain"] == "haematoxylin-only"
         with pytest.raises(HistologyError):
             ki67_fraction(stain)
+
+
+# ---------------------------------------------------------------------------
+# The two external sources a public-data route names for the Ki-67 numerator
+# ---------------------------------------------------------------------------
+
+RECORD = Path(__file__).resolve().parents[1] / "outputs_real" / "ki67_source_probe.json"
+#: Every spelling a labelling index could hide under in a field or column name.
+#: Deliberately does NOT include 'ctmvp': that is the microvascular-proliferation
+#: STRUCTURE area fraction, and matching it would be the exact mistake this
+#: probe records the difference against.
+TOKENS = ("ki67", "ki_67", "ki-67", "mib", "labelling", "labeling")
+
+
+@pytest.fixture(scope="module")
+def probe_record() -> dict:
+    if not RECORD.exists():
+        pytest.skip("run _ki67_source_probe.py to record the external-source probe")
+    with RECORD.open(encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def _named(names) -> list:
+    return [n for n in names if any(t in str(n).lower() for t in TOKENS)]
+
+
+class TestExternalKi67Sources:
+    """The refusal is not only 'this archive has no Ki-67 slide'.
+
+    A public-data route says the numerator is already typed into the TCGA
+    clinical XMLs, or can be pulled from Ivy GAP. Both were read; neither
+    carries it. These tests hold the recorded evidence to its own field and
+    column lists, so an edited record cannot assert an absence its evidence
+    denies.
+    """
+
+    def test_the_tcga_gbm_clinical_schema_carries_no_ki67_field(self, probe_record):
+        gdc = probe_record["gdc_tcga_gbm_clinical_schema"]
+        assert gdc["status"] == 200 and gdc["schema_version"]
+        fields = gdc["field_names"]
+        assert len(fields) >= 50
+        # It IS the clinical record: the fields a GBM supplement demonstrably has.
+        assert any("karnofsky" in f.lower() for f in fields)
+        assert any("vital_status" in f.lower() for f in fields)
+        assert any("days_to_death" in f.lower() for f in fields)
+        # And it has no proliferation index anywhere in it.
+        assert _named(fields) == []
+        assert gdc["proliferation_tokens_found"] == []
+
+    def test_ivygap_tables_expose_no_labelling_index_and_show_the_ctmvp_trap(
+        self, probe_record
+    ):
+        tables = probe_record["ivygap_tables"]["tables"]
+        assert {
+            "tumor_details.csv",
+            "sub_block_details.csv",
+            "rna_seq_samples_details.csv",
+            "gene_expression_details.csv",
+        } == set(tables)
+        for name, table in tables.items():
+            assert table["status"] == 200, name
+            assert table["columns"], name
+            assert _named(table["columns"]) == [], name
+        # The per-tumour table is the per-tumour table: MGMT methylation and
+        # survival are there, Ki-67 is not.
+        tumour = tables["tumor_details.csv"]["columns"]
+        assert {"mgmt_methylation", "survival_days", "initial_kps"} <= set(tumour)
+        assert "ki67" not in " ".join(tumour).lower()
+        # The trap: the atlas DOES name proliferation -- microvascular
+        # proliferation, an area fraction of a vessel structure. A keyword
+        # search would find it; it is not a labelling index, and the token list
+        # above must not match it while the column is present.
+        sub_block = tables["sub_block_details.csv"]["columns"]
+        assert "normalized_area_ctmvp" in sub_block
+        assert _named(["normalized_area_ctmvp"]) == []
+        assert _named(sub_block) == []
+
+    def test_no_ivy_named_collection_in_the_tcia_public_list(self, probe_record):
+        tcia = probe_record["tcia_collections"]
+        assert tcia["status"] == 200
+        assert tcia["n_collections"] >= 100
+        assert tcia["ivy_named_collections"] == []
+        # The list really was read: it carries the GBM collections instead.
+        assert "UPENN-GBM" in tcia["brain_named_collections"]
+
+    def test_the_check_passes_and_names_both_sources(self):
+        from danon.claims import CHECKS
+
+        res = CHECKS["stream2_histology_measured"]()
+        assert res.supported, res.detail
+        assert "no Ki-67/MIB-1 field in it" in res.detail
+        assert "normalized_area_ctmvp" in res.detail
+        assert "no ivy-named collection" in res.detail
+
+    def test_the_sentence_and_limit_carry_the_finding(self):
+        from danon.claims import CLAIMS
+
+        claim = {c.id: c for c in CLAIMS}[
+            "stream2_biopsy_measures_cellularity_and_refuses_ki67"
+        ]
+        assert "schema 2.7" in claim.sentence
+        assert "MICROVASCULAR proliferation" in claim.sentence
+        assert "unstructured and were NOT parsed" in claim.limit
+        assert "empty body anonymously" in claim.limit
+
+    def test_the_check_fails_if_a_ki67_field_appears(self, monkeypatch):
+        """The absence is live: a schema that gains the field must break it."""
+        import danon.claims as claims_mod
+
+        original = claims_mod._ki67_source_probe_record()
+        assert original is not None
+        doctored = json.loads(json.dumps(original))
+        gdc = doctored["gdc_tcga_gbm_clinical_schema"]
+        gdc["field_names"].append("gbm:ki_67_staining_results")
+        gdc["proliferation_tokens_found"] = []
+        monkeypatch.setattr(claims_mod, "_ki67_source_probe_record", lambda: doctored)
+        res = claims_mod.check_stream2_histology_measured_and_ki67_refused()
+        assert res.supported is False
+        assert "the public-data route is live" in res.detail
+
+    def test_the_check_fails_if_the_record_is_missing(self, monkeypatch):
+        import danon.claims as claims_mod
+
+        monkeypatch.setattr(claims_mod, "_ki67_source_probe_record", lambda: None)
+        res = claims_mod.check_stream2_histology_measured_and_ki67_refused()
+        assert res.supported is False
+        assert "_ki67_source_probe.py" in res.detail

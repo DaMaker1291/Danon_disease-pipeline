@@ -1,0 +1,154 @@
+{
+ "disclaimer": "A portability run measures that the unmodified solver accepts an arbitrary geometry and parameter set deterministically and bounded; the phantom is not any organ's tissue, and nothing here supports a prediction about any cancer other than glioblastoma.",
+ "swap_surface": {
+  "TumorGeometry": [
+   "tumor_mask",
+   "proliferative",
+   "vessels",
+   "voxel_mm"
+  ],
+  "CloneParams": [
+   "growth_S",
+   "growth_R",
+   "carrying_capacity",
+   "mutation_rate",
+   "competition",
+   "drug_sensitivity_scale_R"
+  ],
+  "DrugParams": [
+   "kill_max_S",
+   "kill_max_R",
+   "ec50",
+   "diffusion",
+   "clearance",
+   "toxicity_weight",
+   "source_strength"
+  ],
+  "ImmuneParams": [
+   "kill_max",
+   "neoantigen_factor"
+  ],
+  "DiffusionField": [
+   "d_engine",
+   "d_mm2_per_day",
+   "voxel_mm",
+   "provenance"
+  ]
+ },
+ "swap_surface_fields": 23,
+ "phantom": {
+  "size": 24,
+  "shape": [
+   24,
+   24,
+   24
+  ],
+  "tumour_voxels": 4984,
+  "proliferation": "uniform (no necrotic-core structure)",
+  "note": "deliberately not make_gbm_phantom and not any organ's tissue; it exists to measure that the solver needs no brain input"
+ },
+ "runs": [
+  {
+   "days": 60,
+   "seed": 17,
+   "initial_burden": 3239.6000000000004,
+   "final_burden": 2311.0036481551933,
+   "max_daily_burden": 3493.9714664477274,
+   "capacity": 4984.0,
+   "capacity_ratio": 0.7010376136532358,
+   "pfs_day": null,
+   "progressed": false,
+   "finite": true,
+   "bounded": true
+  },
+  {
+   "days": 365,
+   "seed": 17,
+   "initial_burden": 3239.6000000000004,
+   "final_burden": 7160.543830905764,
+   "max_daily_burden": 7160.543830905764,
+   "capacity": 4984.0,
+   "capacity_ratio": 1.4367062261046877,
+   "pfs_day": 124,
+   "progressed": true,
+   "finite": true,
+   "bounded": true
+  }
+ ],
+ "bound_note": "capacity = K x mask voxels. The model's growth equilibrium is 1.4x capacity (S crowds against only 0.6 of an R at cap), so bounded means <= 2.0x capacity (BOUND_RATIO); the measured max on this phantom is recorded per run, not clipped.",
+ "inventory": {
+  "tissue_d_keys": [
+   "edema",
+   "grey_matter",
+   "necrotic_core",
+   "white_matter"
+  ],
+  "tissue_d_brain_only": true,
+  "default_drugs_diffusion": [
+   0.35,
+   0.35
+  ],
+  "default_clones_growth_S": 0.16,
+  "calibration_markers": {
+   "clone_params_calibrated": true,
+   "immune_params_assumed": true,
+   "tissue_d_assumed": true
+  },
+  "data_organ_hits": {
+   "breast": [],
+   "lung": [],
+   "pancreas": [],
+   "non_gbm_drugs": []
+  }
+ },
+ "refusals": [
+  {
+   "refusal": "swap_table_breast",
+   "pitch_says": "Metastatic Breast Cancer | Mammary / Fatty Parenchyma Mesh | Automated Ultrasound + DCE-MRI | Paclitaxel / Trastuzumab",
+   "refused_because": "0 mammary meshes, 0 ultrasound/DCE-MRI assets and 0 paclitaxel or trastuzumab parameter sets exist in this tree (live file-path scan of data/), and the tissue diffusion table holds brain classes only."
+  },
+  {
+   "refusal": "swap_table_lung",
+   "pitch_says": "Non-Small Cell Lung Cancer | Porous Pulmonary Alveolar Mesh | Low-Dose CT + PET Perfusion | Osimertinib / Pembrolizumab",
+   "refused_because": "0 pulmonary meshes, 0 CT/PET assets and 0 osimertinib or pembrolizumab parameter sets exist in this tree (live file-path scan of data/)."
+  },
+  {
+   "refusal": "swap_table_pancreas",
+   "pitch_says": "Pancreatic Adenocarcinoma | Dense Fibrotic Stromal Mesh | Endoscopic Ultrasound + CT | Gemcitabine / FOLFIRINOX",
+   "refused_because": "0 pancreatic meshes, 0 EUS assets and 0 gemcitabine or FOLFIRINOX parameter sets exist in this tree (live file-path scan of data/)."
+  },
+  {
+   "refusal": "ninety_percent_swap",
+   "pitch_says": "you keep 90% of the codebase identical and simply swap out the tissue and drug parameters",
+   "refused_because": "The 90% was never measured. What IS measured: the solver's whole tissue/drug surface is 5 dataclasses and 23 fields (introspected live), and 100% of their values in this repository are glioma-derived or explicitly assumed."
+  },
+  {
+   "refusal": "judge_sentence_generalizes",
+   "pitch_says": "this exact software framework generalizes to predict spatial recurrence and evolutionary resistance in metastatic breast, lung, and pancreatic cancers",
+   "refused_because": "Portability is a property of the code: the phantom run shows the unmodified solver executes on arbitrary geometry, but no non-glioma image, mesh, drug parameter set or outcome exists here to calibrate on or test against, so there is no measured breast, lung or pancreatic prediction to report."
+  },
+  {
+   "refusal": "judge_sentence_postop_residual",
+   "pitch_says": "EvoTwin-10X was built precisely to model those invisible residual cells after surgery",
+   "refused_because": "No post-operative imaging exists anywhere in this tree (the cached BraTS-2021 cases are pre-operative only), so the post-surgical residual state is not an input this repository has ever had: the clinical intake plants on the pre-operative rim, and stream 1 is REFUSED on its live count of 0 cached captures (claim #49)."
+  },
+  {
+   "refusal": "every_cancer_benefits_from_pulsing",
+   "pitch_says": "Every cancer type benefits from pulsed or modulated drug scheduling to delay the tipping point of resistant takeover.",
+   "refused_because": "Schedule effects in this repository are measured only under the glioma-calibrated clone/drug/immune parameters, on phantoms and committed BraTS-2021 cases. 'Every cancer type' is a universal quantifier over diseases that have no data, mesh or parameter set here."
+  }
+ ],
+ "provenance": {
+  "predicts_breast_lung_pancreas_recurrence": "proven_failed",
+  "non_brain_mesh_exists_here": "proven_failed",
+  "non_brain_drug_parameter_set_exists": "proven_failed",
+  "postoperative_residual_input_available_here": "proven_failed"
+ },
+ "notes": [
+  "The phantom is not lung, breast or pancreas tissue -- no such tissue geometry, image or parameter set exists in this repository to build one from; calling it an organ would be mocked.",
+  "A run that executes on other geometry says the CODE is generic; it says nothing about whether any equation describes another cancer.",
+  "Every value on the swap surface is glioma-derived or explicitly assumed (CALIBRATED / ASSUMED markers are recorded live).",
+  "The tissue diffusion table holds brain classes only, and its own docstring marks the values ASSUMED -- no DTI or perfusion series is present in this tree.",
+  "No non-glioma outcome exists here to test a prediction against, so cross-cancer accuracy has no denominator."
+ ]
+}

@@ -13,7 +13,7 @@ Run:  uvicorn api_server:app --port 8000
 import logging
 import re
 from contextlib import asynccontextmanager
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 from fastapi import FastAPI, UploadFile, File, HTTPException
@@ -817,7 +817,7 @@ def phase_synthesis(req: SynthesisRequest):
 
 
 # --------------------------------------------------------------------------- #
-# Digital-twin planning: MRI mask in, treatment plan out
+# Digital-twin simulation: MRI mask in, paired 365-day research run out
 # --------------------------------------------------------------------------- #
 TWIN_MAX_UPLOAD_BYTES = 64 * 1024 * 1024
 
@@ -855,8 +855,12 @@ def twin_plan(file: UploadFile = File(...)):
     import base64
     import os
     import tempfile
-    from danon.imaging import MAX_TOTAL_VOXELS
-    from danon.twin_plan import downsample_mask_to_budget, plan_from_mask
+    from danon.imaging import MAX_TOTAL_VOXELS, mask_bytes_provenance
+    from danon.twin_plan import (
+        derived_voxel_sizes,
+        downsample_mask_to_budget,
+        plan_from_mask,
+    )
 
     name = (file.filename or "").lower()
     if not (name.endswith(".nii") or name.endswith(".nii.gz")):
@@ -875,18 +879,35 @@ def twin_plan(file: UploadFile = File(...)):
     if int((arr > 0).sum()) == 0:
         raise HTTPException(422, "mask has no nonzero voxels: nothing to simulate")
 
+    # Provenance of the exact bytes handed to us: the shape and spacing the
+    # file declared, and a hash so a recorded run can be tied to one file. The
+    # engine runs on a temp copy, so these are the only record of the input.
+    # Computed by danon.imaging so the API and the audit cannot disagree on
+    # what "the input" is (sha256 over the bytes AS RECEIVED, not a rewrite).
+    input_provenance = mask_bytes_provenance(raw)
+    input_sha256 = input_provenance["input_sha256"]
+    original_shape = input_provenance["original_grid_shape_xyz"]
+    source_voxel_mm = input_provenance["source_voxel_mm"]
+
     downsample_factors: List[int] = []
+    derived_sizes: Tuple[float, ...] = tuple(float(v) for v in hdr.voxel_sizes)
     tmp: Optional[str] = None
     try:
         if arr.size > MAX_TOTAL_VOXELS:
             # Oversize grid: block-max downsample (tumour-preserving), then
-            # rewrite as a clean uint8 .nii carrying the file's voxel sizes.
+            # rewrite as a clean uint8 .nii. The derived header carries the
+            # SCALED spacing, not the source spacing -- one halving makes each
+            # derived voxel span two source voxels per axis, and writing the
+            # source spacing back would understate every physical volume taken
+            # from the file by 8x per halving (the defect danon.grid_artifact
+            # records against the committed derived volumes).
             downsampled, downsample_factors = downsample_mask_to_budget(arr > 0)
+            derived_sizes = derived_voxel_sizes(hdr.voxel_sizes, downsample_factors)
             fd, tmp = tempfile.mkstemp(suffix=".nii")
             os.close(fd)
             from danon.imaging import write_nifti
             write_nifti(
-                tmp, downsampled.astype(np.uint8), voxel_sizes=tuple(hdr.voxel_sizes)
+                tmp, downsampled.astype(np.uint8), voxel_sizes=derived_sizes
             )
         else:
             fd, tmp = tempfile.mkstemp(
@@ -909,16 +930,220 @@ def twin_plan(file: UploadFile = File(...)):
         base64.b64encode(result.vti_bytes).decode("ascii") if result.vti_bytes else None
     )
     payload = result.to_json_dict()
-    # The plan was computed on a temp path; report the user's filename.
+    # The plan was computed on a temp path; report the user's filename, and
+    # report the input's own geometry beside the grid the engine actually ran.
     payload["geometry"]["mask_path"] = file.filename
+    payload["geometry"]["original_grid_shape_xyz"] = original_shape
+    payload["geometry"]["source_voxel_mm"] = source_voxel_mm
+    payload["geometry"]["source_voxel_sizes_mm"] = input_provenance[
+        "source_voxel_sizes_mm"
+    ]
+    payload["geometry"]["input_sha256"] = input_sha256
+    # Also carried in the provenance block, so the run is tied to the file even
+    # by a reader who looks at the human-readable record rather than geometry.
+    payload["provenance"]["input_sha256"] = input_sha256
     if downsample_factors:
+        per_axis = 2 ** len(downsample_factors)
         payload["geometry"]["downsample_factors"] = downsample_factors
+        payload["geometry"]["downsample_per_axis"] = per_axis
         payload["notes"].append(
-            f"grid exceeded the engine budget and was block-max-downsampled by "
-            f"{downsample_factors} per axis (tumour-preserving max-pooling: a "
-            f"block containing tumour stays tumour) -- reported, not silent"
+            f"grid exceeded the engine budget and was block-max-downsampled "
+            f"{per_axis}x per axis (tumour-preserving max-pooling: a block "
+            f"containing tumour stays tumour), and the derived header carries "
+            f"the scaled voxel size {derived_sizes} -- reported, not silent. "
+            f"The reported tumour volume is therefore the block-max volume on "
+            f"the coarser grid: it can only be equal-or-larger than the source "
+            f"volume, never smaller."
         )
     return _snake_to_camel({**payload, "vti_base64": vti_b64})
+
+
+# Dosing console: a real calendar in, a real engine run out
+# --------------------------------------------------------------------------- #
+# The UI used to ship a dosing panel with no engine behind it. This endpoint is
+# that engine: it takes a calendar, runs the actual TumorEvolutionSimulator on
+# it, and returns what happened. Nothing here is a lookup table or a mock.
+DOSING_MAX_DAYS = 730
+
+
+class DosingRequest(BaseModel):
+    """One calendar, or a search over a declared grid.
+
+    `mode="single"` runs exactly the calendar given. `mode="search"` runs the
+    declared grid and reports every cell that actually ran, including the ones
+    that lost.
+    """
+
+    mode: str = Field(default="single", pattern="^(single|search)$")
+    on_days: int = Field(default=5, ge=1, le=60)
+    cycle_days: int = Field(default=26, ge=1, le=180)
+    dose_mg_m2: float = Field(default=150.0, ge=0.0, le=1000.0)
+    dose_level: float = Field(default=1.0, ge=0.0, le=1.0)
+    days: int = Field(default=365, ge=2, le=DOSING_MAX_DAYS)
+    n_seeds: int = Field(default=3, ge=1, le=30)
+    seed0: int = Field(default=0, ge=0)
+    initial_resistant_fraction: float = Field(default=0.01, ge=0.0, lt=1.0)
+    growth_noise: float = Field(default=0.05, ge=0.0)
+    # search-only grid
+    on_days_grid: List[int] = Field(default_factory=lambda: [3, 5, 7, 10])
+    cycle_days_grid: List[int] = Field(default_factory=lambda: [21, 28, 35, 42])
+    dose_levels_grid: List[float] = Field(default_factory=lambda: [0.4, 0.6, 0.8])
+    # Optional shorter-horizon screen. Measured HARMFUL on this engine -- see
+    # outputs_real/dosing.json["screen_fidelity"] -- so it is off by default and
+    # the response carries the measured verdict either way.
+    screen_days: Optional[int] = Field(default=None, ge=2, le=DOSING_MAX_DAYS)
+
+
+def _short_screen_verdict(screen_days: Optional[int]) -> Dict:
+    """Attach the MEASURED verdict on short-horizon screening to the response.
+
+    Read from the artifact rather than hardcoded, so if the calibration is ever
+    re-run the API stops repeating a stale reassurance. A client that asks for a
+    short screen gets told what it costs before it trusts the winner.
+    """
+    import json as _json
+    import os as _os
+    from danon.claims import ROOT as _ROOT
+
+    path = _os.path.join(_ROOT, "outputs_real", "dosing.json")
+    measured: Optional[Dict] = None
+    if _os.path.exists(path):
+        try:
+            with open(path, encoding="utf-8") as fh:
+                measured = _json.load(fh).get("screen_fidelity")
+        except (OSError, ValueError):
+            measured = None
+
+    if measured:
+        return {
+            "short_screen_requested_days": screen_days,
+            "measured_at_days": measured.get("screen_days"),
+            "measured_spearman": measured.get("spearman_rho"),
+            "measured_kendall_tau": measured.get("kendall_tau"),
+            "measured_top_k_caught": measured.get("top_k_caught_by_screen"),
+            "measured_top_k_missed": measured.get("top_k_missed_by_screen"),
+            "screen_keeps_full_winner": measured.get("screen_keeps_full_winner"),
+            "verdict": (
+                "MEASURED HARMFUL on this engine: a shorter horizon ranks "
+                "candidates NEGATIVELY against the full-horizon ranking and "
+                "discards the true winner. Do not trust a winner chosen by a "
+                "short screen."
+                if not measured.get("screen_keeps_full_winner")
+                else (
+                    "measured acceptable at this horizon: the screen retained "
+                    "the full-horizon winner."
+                )
+            ),
+        }
+    return {
+        "short_screen_requested_days": screen_days,
+        "verdict": (
+            "no calibration artifact found (outputs_real/dosing.json is "
+            "missing its screen_fidelity section), so short screening is "
+            "UNVALIDATED here. Rank stage 1 on the full horizon instead."
+        ),
+    }
+
+
+@app.post("/api/dosing/plan")
+def dosing_plan(req: DosingRequest):
+    """Run a real calendar (or a real search) on the real evolutionary engine.
+
+    Returns measured outcomes plus the provenance that says which parts are
+    engine output and which are declared assumptions. A search that fails to
+    beat continuous MTD says so in `beats_baselines` and explains it in
+    `notes`; it never returns a winner that did not win.
+    """
+    import time as _time
+    from danon.dosing import (
+        MyelosuppressionModel,
+        Schedule,
+        evaluate_schedule,
+        provenance,
+        screen_schedule,
+        search_schedules,
+    )
+    from danon.evosteer import TumorEvolutionSimulator, make_gbm_phantom
+
+    if req.mode == "single" and req.on_days > req.cycle_days:
+        raise HTTPException(
+            422,
+            f"on_days ({req.on_days}) cannot exceed cycle_days ({req.cycle_days}): "
+            f"a holiday longer than the block is not a schedule, it is a pause",
+        )
+
+    t0 = _time.time()
+    geom = make_gbm_phantom(size=24, seed=12345)
+    sim = TumorEvolutionSimulator(geom)
+    myelo = MyelosuppressionModel()
+    seeds = tuple(range(req.seed0, req.seed0 + req.n_seeds))
+
+    base = {
+        "geometry": {
+            "grid": list(geom.tumor_mask.shape),
+            "tumour_voxels": int(geom.tumor_mask.sum()),
+            "phantom_seed": 12345,
+            "is_patient_imaging": False,
+        },
+        "myelosuppression_model": myelo.to_dict(),
+        "provenance": provenance(),
+    }
+
+    if req.mode == "search":
+        result = search_schedules(
+            sim,
+            seeds=seeds,
+            days=req.days,
+            on_days=tuple(req.on_days_grid),
+            cycle_days=tuple(req.cycle_days_grid),
+            dose_levels=tuple(req.dose_levels_grid),
+            dose_mg_m2=req.dose_mg_m2,
+            initial_resistant_fraction=req.initial_resistant_fraction,
+            growth_noise=req.growth_noise,
+            myelo=myelo,
+            screen_seeds=min(2, len(seeds)),
+            confirm_top=min(3, len(seeds)),
+            screen_days=req.screen_days,
+        )
+        payload = {**base, "mode": "search", **result.to_dict()}
+        payload["short_screen_verdict"] = _short_screen_verdict(req.screen_days)
+    else:
+        sched = Schedule.cyclic(
+            "A", req.dose_mg_m2, req.on_days, req.cycle_days, req.days,
+            dose_level=req.dose_level,
+        )
+        safety = screen_schedule(sched, req.days, myelo)
+        score = evaluate_schedule(
+            f"{req.dose_mg_m2:g} mg/m2 x{req.on_days}d every {req.cycle_days}d",
+            sched, sim, seeds, req.days,
+            req.initial_resistant_fraction, req.growth_noise, myelo,
+        )
+        mtd = evaluate_schedule(
+            "MTD (continuous)",
+            Schedule.continuous("A", req.dose_mg_m2, req.days),
+            sim, seeds, req.days,
+            req.initial_resistant_fraction, req.growth_noise, myelo,
+        )
+        payload = {
+            **base,
+            "mode": "single",
+            "calendar": score.to_dict(),
+            "safety": safety.to_dict(),
+            "mtd_comparison": mtd.to_dict(),
+            "beats_mtd": score.median_aubc < mtd.median_aubc,
+            "notes": (
+                []
+                if score.median_aubc < mtd.median_aubc
+                else [
+                    f"this calendar did not beat continuous MTD on {len(seeds)} "
+                    f"seeds (AUBC {score.median_aubc:.4f} vs {mtd.median_aubc:.4f}); "
+                    f"reported as measured, not as a win"
+                ]
+            ),
+        }
+
+    payload["wall_seconds"] = round(_time.time() - t0, 2)
+    return _snake_to_camel(payload)
 
 
 if __name__ == "__main__":

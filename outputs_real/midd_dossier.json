@@ -1,0 +1,64 @@
+{
+  "generated_utc": "2026-10-04T22:12:57Z",
+  "reading_copy": "outputs_real/midd_dossier.md",
+  "sources": {
+    "release_1": "outputs_real/dosing.json",
+    "release_2": "outputs_real/release2_sweep.json",
+    "bench_anchors": "outputs_real/bench_anchors.json"
+  },
+  "release_2_partial": false,
+  "headline": {
+    "selected_calendar": "alternating A/B continuous: A 150 mg/m2 at 0.3 x full x3d, B 150 mg/m2 at 0.5 x full x3d, no rest",
+    "median_aubc": 0.04332412131403639,
+    "median_pfs_days": 365.0,
+    "screen_admissible": true,
+    "anc_nadir": 1.890851096426958
+  },
+  "not_claimed": [
+    "no patient-level prediction",
+    "no human effect size",
+    "no human safety assurance",
+    "no calibrated kill constants"
+  ],
+  "references": [
+    {
+      "what": "FDA Model-Informed Drug Development (MIDD) Paired Meeting Program",
+      "url": "https://www.fda.gov/drugs/development-resources/model-informed-drug-development-paired-meeting-program",
+      "status": "external; not fetched or verified by this repository"
+    },
+    {
+      "what": "ICH M15 -- General Principles for Model-Informed Drug Development",
+      "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/m15-general-principles-model-informed-drug-development",
+      "status": "external; not fetched or verified by this repository"
+    },
+    {
+      "what": "PDUFA VII Federal Register notice re-establishing the MIDD paired meeting program",
+      "url": "https://www.federalregister.gov/documents/2023/01/11/2023-00389/prescription-drug-user-fee-act-of-2023-vii-meetings-program-for-model-informed-drug-development",
+      "status": "external; not fetched or verified by this repository"
+    }
+  ],
+  "anc_calibration": {
+    "status": "blocked on real data; screen remains label-anchored",
+    "data_routes": [
+      {
+        "source": "Project Data Sphere (de-identified patient-level oncology trial data; registration required)",
+        "url": "https://data.projectdatasphere.org/",
+        "fits": "completed GBM trials with per-visit laboratory results and dose-delivery records"
+      },
+      {
+        "source": "Vivli (independent data-sharing platform; data-use agreement required)",
+        "url": "https://vivli.org/",
+        "fits": "sponsor-controlled trials whose data are not on an open platform"
+      }
+    ],
+    "request_fields": [
+      "the ANC value and its unit (x10^9/L or cells/uL), per draw",
+      "the study day of each draw, and the cycle number and cycle day",
+      "the temozolomide dose actually delivered in that cycle (not the protocol dose), including any cycle stopped early",
+      "growth-factor support (G-CSF/GM-CSF) with dates, since it truncates the nadir the kernel is trying to predict",
+      "baseline ANC and any baseline haematological comorbidity",
+      "at minimum 20 patients and 100 post-dose draws for a 2-parameter kernel fit with a held-out calibration check"
+    ]
+  },
+  "word_count": 3100
+}

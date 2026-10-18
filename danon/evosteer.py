@@ -490,8 +490,14 @@ def make_policy(kind: PolicyKind, **kwargs) -> BasePolicy:
 from danon.anisotropy import LEGACY_CELL_MIGRATION_VOXEL2_PER_DAY, divergence_d_grad
 
 
-def _laplacian(f: np.ndarray) -> np.ndarray:
-    """Zero-flux (edge-padded) 3D Laplacian."""
+def _laplacian_reference(f: np.ndarray) -> np.ndarray:
+    """Zero-flux (edge-padded) 3D Laplacian, written out in full.
+
+    This is the DEFINITION `_laplacian` must reproduce bit for bit. It is not
+    called by the simulator any more (its `np.pad` was 37.7% of the operator's
+    cost at the engine's own grid), but it stays here, live and tested, so the
+    accelerated version has something to be equal TO.
+    """
     p = np.pad(f, 1, mode="edge")
     return (
         p[:-2, 1:-1, 1:-1]
@@ -502,6 +508,24 @@ def _laplacian(f: np.ndarray) -> np.ndarray:
         + p[1:-1, 1:-1, 2:]
         - 6.0 * f
     )
+
+
+def _laplacian(
+    f: np.ndarray,
+    out: Optional[np.ndarray] = None,
+    workspace: Optional[object] = None,
+) -> np.ndarray:
+    """The operator the simulator calls: `_laplacian_reference`, same numbers.
+
+    Same six edge-padded neighbours minus `6f`, added in the same order, with
+    the padding buffer, the `6f` temporary and the result buffer all reusable.
+    `danon.accel` documents why the order is part of the contract.
+    """
+    from danon import accel
+
+    if out is None:
+        out = np.empty_like(np.asarray(f, dtype=float))
+    return accel.laplacian_into(f, out, workspace)
 
 
 @dataclass
@@ -527,6 +551,23 @@ class SimulationTrajectory:
     def pfs_value(self, trial_days: int) -> float:
         """Censored PFS in days: progression day, else the trial length."""
         return float(self.pfs_day) if self.pfs_day is not None else float(trial_days)
+
+
+@dataclass(frozen=True)
+class TrajectorySpec:
+    """One replicate of a batch: its OWN policy instance, and its seed.
+
+    `policy` is an instance, not a factory, because policies are stateful
+    (`reset()` is called here, and a stateful schedule that carried state
+    between replicates would make the batch depend on its own ordering). Each
+    replicate therefore needs its own object: pass `AdaptiveDosePolicy()` once
+    per spec.
+    """
+
+    policy: "BasePolicy"
+    seed: int
+    initial_resistant_fraction: float = 0.01
+    fill_fraction: float = 0.65
 
 
 class TumorEvolutionSimulator:
@@ -760,6 +801,16 @@ class TumorEvolutionSimulator:
         b_init = float(N_S.sum() + N_R.sum())
         pfs_threshold = (1.0 + RANO_PROGRESSION_FRACTION) * b_init
 
+        # Reusable buffers for the transport kernels: the pad copy and the
+        # `6f` temporary become per-run allocations instead of per-call ones,
+        # and the two operator outputs are handed back rather than allocated.
+        # Bit-identity with the allocating path is pinned by tests.
+        from danon import accel
+
+        ws = accel.KernelWorkspace()
+        lap_buf = np.empty(self._shape)
+        dg_buf = np.empty(self._shape)
+
         bS = np.empty(days)
         bR = np.empty(days)
         dA_log = np.empty(days)
@@ -804,9 +855,11 @@ class TumorEvolutionSimulator:
             # the same model in the homogeneous limit.
             if self._diff_pattern is None:
                 for _ in range(n_sub):
-                    c_A += dts * (dA * _laplacian(c_A) + doseA * src * vessels
+                    c_A += dts * (dA * _laplacian(c_A, out=lap_buf, workspace=ws)
+                                  + doseA * src * vessels
                                   - (clr_pat * clr[0] if clr_pat is not None else clr[0]) * c_A)
-                    c_B += dts * (dB * _laplacian(c_B) + doseB * src * vessels
+                    c_B += dts * (dB * _laplacian(c_B, out=lap_buf, workspace=ws)
+                                  + doseB * src * vessels
                                   - (clr_pat * clr[1] if clr_pat is not None else clr[1]) * c_B)
                     np.maximum(c_A, 0.0, out=c_A)
                     np.maximum(c_B, 0.0, out=c_B)
@@ -814,12 +867,18 @@ class TumorEvolutionSimulator:
                 clrA = clr[0] if clr_pat is None else clr[0] * clr_pat
                 clrB = clr[1] if clr_pat is None else clr[1] * clr_pat
                 for _ in range(n_sub):
+                    # `dg_buf` is consumed by the expression before the second
+                    # call reuses it, so one buffer serves both drugs.
                     c_A += dts * (
-                        dA * divergence_d_grad(c_A, self._diff_pattern)
+                        dA * divergence_d_grad(
+                            c_A, self._diff_pattern, workspace=ws, out=dg_buf
+                        )
                         + doseA * src * vessels - clrA * c_A
                     )
                     c_B += dts * (
-                        dB * divergence_d_grad(c_B, self._diff_pattern)
+                        dB * divergence_d_grad(
+                            c_B, self._diff_pattern, workspace=ws, out=dg_buf
+                        )
                         + doseB * src * vessels - clrB * c_B
                     )
                     np.maximum(c_A, 0.0, out=c_A)
@@ -895,8 +954,16 @@ class TumorEvolutionSimulator:
                 else LEGACY_CELL_MIGRATION_VOXEL2_PER_DAY
             )
             if motility:
-                N_S = np.clip(N_S + motility * _laplacian(N_S), 0.0, None)
-                N_R = np.clip(N_R + motility * _laplacian(N_R), 0.0, None)
+                N_S = np.clip(
+                    N_S + motility * _laplacian(N_S, out=lap_buf, workspace=ws),
+                    0.0,
+                    None,
+                )
+                N_R = np.clip(
+                    N_R + motility * _laplacian(N_R, out=lap_buf, workspace=ws),
+                    0.0,
+                    None,
+                )
 
             # Extinction floor, applied to the end-of-day state: a voxel
             # holding less than half a cell holds no cells. This is what stops
@@ -941,6 +1008,303 @@ class TumorEvolutionSimulator:
             traj.final_N_S = N_S
             traj.final_N_R = N_R
         return traj
+
+    # -- batched replicates -------------------------------------------------
+
+    def run_batch(
+        self,
+        specs: Sequence["TrajectorySpec"],
+        days: int,
+        *,
+        growth_noise: float = 0.05,
+        immune: Optional[ImmuneParams] = None,
+        observation_hook: Optional[Callable[[int, int, float, float], None]] = None,
+        keep_fields: bool = False,
+        clearance_pattern: Optional[np.ndarray] = None,
+        stream: str = "per_replicate",
+    ) -> List[SimulationTrajectory]:
+        """Run many replicates at once, each one bit-identical to its own `run`.
+
+        WHY THIS EXISTS
+        ---------------
+        A 95% interval over stochastic parameters needs thousands of draws, and a
+        single 365-day trajectory costs ~1.5 ms of ENGINE time on this case but
+        ~1 ms of numpy CALL overhead per day -- around 40 array operations on an
+        8,064-voxel field are each dominated by per-call cost, not by arithmetic.
+        Running the replicates as one batch of `(B,) + shape` arrays replaces
+        40 calls per day with 40 calls per day FOR ALL B, which is where the
+        throughput in `outputs_real/perf.json` comes from. It is a batched
+        interpreter, not a GPU: the arithmetic is the same float64 numpy.
+
+        IDENTITY, WHICH IS THE POINT
+        ----------------------------
+        `run_batch` reproduces `run`, element by element, EXACTLY -- not to a
+        tolerance. The daily loop consumes randomness in one place only (a
+        normal draw for growth noise, then a Poisson draw for mutation when
+        `mutation_rate > 0`), and the initial state comes from `seed()`, which
+        draws from its own generator. So each replicate here gets its own
+        `default_rng(seed)` and draws in the same order, which makes the two
+        paths consume identical streams, and every arithmetic expression is the
+        same expression broadcast over a leading axis. `tests/test_batchsim.py`
+        pins this by comparing whole trajectories day by day.
+
+        `stream` SELECTS WHAT IDENTITY COSTS
+        ------------------------------------
+        'per_replicate' (the default) draws each replicate's noise from its own
+        generator, in the order the serial loop draws, so every element is
+        bit-identical to the `run` call it stands in for. It is also the slow
+        choice: B separate `normal` calls per day instead of one.
+
+        'batched' draws the whole batch's noise in ONE call from a generator
+        seeded by the tuple of replicate seeds. It is reproducible run to run,
+        and the draws are the same distributions, but the realisation is not the
+        serial one. Measured on the committed BraTS case, the per-replicate
+        streams cost more than the batching saves -- both modes are in this
+        module because neither is free and the choice has to be made with the
+        numbers in `outputs_real/perf.json` in hand, not by preference.
+
+        WHAT IS DIFFERENT
+        -----------------
+        Two things, both deliberate: `observation_hook` receives the replicate
+        index first (`hook(index, day, burden_S, burden_R)`), because a hook on a
+        batch has to say which replicate it is reporting on; and the diffusion
+        field and clearance pattern are shared by every replicate, since they
+        describe one patient, while the seeds and the policies are what vary.
+        """
+        from danon import accel  # local: keeps module import order unchanged
+
+        specs = list(specs)
+        batch = len(specs)
+        if batch == 0:
+            raise ValueError("run_batch needs at least one spec")
+        if days < 2:
+            raise ValueError("need at least 2 days")
+        clr_pat_norm: Optional[np.ndarray] = None
+        if clearance_pattern is not None:
+            clr_pat = np.asarray(clearance_pattern, dtype=float)
+            if clr_pat.shape != self._shape:
+                raise ValueError(
+                    f"clearance pattern shape {clr_pat.shape} does not match "
+                    f"geometry {self._shape}"
+                )
+            if np.any(clr_pat < 0.0):
+                raise ValueError("clearance pattern must be non-negative")
+            mean = float(clr_pat.mean())
+            if mean <= 0.0:
+                raise ValueError("clearance pattern has zero mean: no clearance at all")
+            clr_pat_norm = clr_pat / mean
+        self._run_clr_pattern = clr_pat_norm
+        if stream not in ("per_replicate", "batched"):
+            raise ValueError(
+                "stream must be 'per_replicate' (bit-identical to run) or "
+                "'batched' (one draw for the whole batch, reproducible but a "
+                "different realisation)"
+            )
+        fill = [float(s.fill_fraction) for s in specs]
+        r0 = [float(s.initial_resistant_fraction) for s in specs]
+        gens = [np.random.default_rng(int(s.seed)) for s in specs]
+        # In 'batched' mode a single generator draws the whole batch's noise in
+        # one call. That is the fast path, and it is NOT the serial trajectory:
+        # see `stream` in the docstring.
+        batch_gen = np.random.default_rng([int(s.seed) for s in specs])
+        for spec in specs:
+            spec.policy.reset()
+        seeds = [self.seed(r, seed=int(s.seed), fill_fraction=f)
+                 for r, f, s in zip(r0, fill, specs)]
+        N_S = np.stack([s[0] for s in seeds])
+        N_R = np.stack([s[1] for s in seeds])
+        shape = (batch,) + self._shape
+        c_A = np.zeros(shape)
+        c_B = np.zeros(shape)
+        K = self.clones.carrying_capacity
+        rS, rR, mu = (
+            self.clones.growth_S,
+            self.clones.growth_R,
+            self.clones.mutation_rate,
+        )
+        prolif = self.geom.proliferative[None]
+        vessels = self.geom.vessels[None]
+        clr = self.drugs.clearance
+        clr_pat = self._run_clr_pattern
+        src = self.drugs.source_strength
+        kmax_S = self.drugs.kill_max_S
+        kmax_R = self.drugs.kill_max_R
+        ec50 = self.drugs.ec50
+
+        dt = 1.0
+        dA, dB = self.drugs.diffusion
+        pattern_peak = (
+            float(self._diff_pattern.max()) if self._diff_pattern is not None else 1.0
+        )
+        sub_dt = min(
+            0.4 / (6.0 * max(dA * pattern_peak, 1e-9)),
+            0.4 / (6.0 * max(dB * pattern_peak, 1e-9)),
+            1.0,
+        )
+        n_sub = max(1, int(math.ceil(dt / sub_dt)))
+        dts = dt / n_sub
+
+        b_init = N_S.sum(axis=(1, 2, 3)) + N_R.sum(axis=(1, 2, 3))
+        pfs_threshold = (1.0 + RANO_PROGRESSION_FRACTION) * b_init
+        ws = accel.KernelWorkspace()
+        lap_buf = np.empty(shape)
+        dg_buf = np.empty(shape)
+
+        bS = np.empty((days, batch))
+        bR = np.empty((days, batch))
+        dAl = np.empty((days, batch))
+        dBl = np.empty((days, batch))
+        toxicity = np.zeros(batch)
+        pfs_day: List[Optional[int]] = [None] * batch
+        dominance_day: List[Optional[int]] = [None] * batch
+        weight = self.drugs.toxicity_weight
+        motility = (
+            self._cell_motility
+            if self._cell_motility is not None
+            else LEGACY_CELL_MIGRATION_VOXEL2_PER_DAY
+        )
+
+        for day in range(days):
+            sum_S = N_S.sum(axis=(1, 2, 3))
+            sum_R = N_R.sum(axis=(1, 2, 3))
+            burden = sum_S + sum_R
+            detectable = burden >= DETECTION_BURDEN_DENSITY
+            with np.errstate(invalid="ignore", divide="ignore"):
+                frac = np.where(
+                    (burden > 0.0) & detectable, sum_R / np.where(burden > 0.0, burden, 1.0), 0.0
+                )
+            doseA = np.empty(batch)
+            doseB = np.empty(batch)
+            for i, spec in enumerate(specs):
+                st = PolicyState(
+                    day=day,
+                    burden=float(burden[i]),
+                    burden_initial=float(b_init[i]),
+                    resistant_fraction=float(frac[i]) if (burden[i] > 0.0 and detectable[i]) else 0.0,
+                )
+                d_a, d_b = spec.policy.dose(st)
+                doseA[i], doseB[i] = d_a, d_b
+            bS[day] = sum_S
+            bR[day] = sum_R
+            dAl[day] = doseA
+            dBl[day] = doseB
+            toxicity += doseA * weight[0] + doseB * weight[1]
+            for i in range(batch):
+                if pfs_day[i] is None and burden[i] > pfs_threshold[i]:
+                    pfs_day[i] = day
+                if dominance_day[i] is None and detectable[i] and frac[i] > 0.5:
+                    dominance_day[i] = day
+
+            if self._diff_pattern is None:
+                for _ in range(n_sub):
+                    c_A += dts * (
+                        dA * accel.laplacian_into(c_A, lap_buf, ws)
+                        + doseA[:, None, None, None] * src * vessels
+                        - (clr_pat * clr[0] if clr_pat is not None else clr[0]) * c_A
+                    )
+                    c_B += dts * (
+                        dB * accel.laplacian_into(c_B, lap_buf, ws)
+                        + doseB[:, None, None, None] * src * vessels
+                        - (clr_pat * clr[1] if clr_pat is not None else clr[1]) * c_B
+                    )
+                    np.maximum(c_A, 0.0, out=c_A)
+                    np.maximum(c_B, 0.0, out=c_B)
+            else:
+                clrA = clr[0] if clr_pat is None else clr[0] * clr_pat
+                clrB = clr[1] if clr_pat is None else clr[1] * clr_pat
+                for _ in range(n_sub):
+                    c_A += dts * (
+                        dA * accel.divergence_d_grad_into(
+                            c_A, self._diff_pattern, dg_buf, ws
+                        )
+                        + doseA[:, None, None, None] * src * vessels
+                        - clrA * c_A
+                    )
+                    c_B += dts * (
+                        dB * accel.divergence_d_grad_into(
+                            c_B, self._diff_pattern, dg_buf, ws
+                        )
+                        + doseB[:, None, None, None] * src * vessels
+                        - clrB * c_B
+                    )
+                    np.maximum(c_A, 0.0, out=c_A)
+                    np.maximum(c_B, 0.0, out=c_B)
+
+            # Randomness. In 'per_replicate' mode one generator per replicate is
+            # drawn in the order the serial loop draws, so the streams coincide
+            # and every element reproduces its own `run` exactly. In 'batched'
+            # mode one call covers the batch: B separate draws cost B times the
+            # RNG, which is the whole reason this mode exists.
+            if stream == "per_replicate":
+                noise = np.stack([g.normal(0.0, growth_noise, self._shape) for g in gens])
+            else:
+                noise = batch_gen.normal(0.0, growth_noise, shape)
+            noise = np.clip(1.0 + noise, 0.0, None)
+            room_S = np.clip(1.0 - (N_S + self.clones.competition * N_R) / K, 0.0, 1.0)
+            room_R = np.clip(1.0 - (N_S + N_R) / K, 0.0, 1.0)
+            grow_S = rS * N_S * room_S * prolif * noise
+            grow_R = rR * N_R * room_R * prolif * noise
+            if mu > 0:
+                if stream == "per_replicate":
+                    new_R = np.stack(
+                        [g.poisson(np.clip(grow_S[i], 0.0, None) * mu)
+                         for i, g in enumerate(gens)]
+                    )
+                else:
+                    new_R = batch_gen.poisson(np.clip(grow_S, 0.0, None) * mu)
+            else:
+                new_R = 0.0
+            kill_R_A = (
+                kmax_R[0] * self.clones.drug_sensitivity_scale_R * c_A / (c_A + ec50[0])
+            )
+            kill_S = kmax_S[0] * c_A / (c_A + ec50[0]) + kmax_S[1] * c_B / (c_B + ec50[1])
+            kill_R = kill_R_A + kmax_R[1] * c_B / (c_B + ec50[1])
+            if immune is not None:
+                density = np.clip((N_S + N_R) / K, 0.0, 1.0)
+                imm_kill = immune.kill_max * immune.neoantigen_factor * (1.0 - density)
+            else:
+                imm_kill = 0.0
+            N_S = np.clip(N_S + grow_S - N_S * (kill_S + imm_kill) - new_R, 0.0, None)
+            N_R = np.clip(N_R + grow_R - N_R * (kill_R + imm_kill) + new_R, 0.0, None)
+            if motility:
+                N_S = np.clip(
+                    N_S + motility * accel.laplacian_into(N_S, lap_buf, ws), 0.0, None
+                )
+                N_R = np.clip(
+                    N_R + motility * accel.laplacian_into(N_R, lap_buf, ws), 0.0, None
+                )
+            np.copyto(N_S, 0.0, where=N_S < MIN_VIABLE_DENSITY)
+            np.copyto(N_R, 0.0, where=N_R < MIN_VIABLE_DENSITY)
+            if observation_hook is not None:
+                for i in range(batch):
+                    observation_hook(i, day, float(sum_S[i]), float(sum_R[i]))
+
+        out: List[SimulationTrajectory] = []
+        for i, spec in enumerate(specs):
+            total = float(N_S[i].sum() + N_R[i].sum())
+            traj = SimulationTrajectory(
+                policy=spec.policy.describe(),
+                days=days,
+                burden_S=np.ascontiguousarray(bS[:, i]),
+                burden_R=np.ascontiguousarray(bR[:, i]),
+                dose_A=np.ascontiguousarray(dAl[:, i]),
+                dose_B=np.ascontiguousarray(dBl[:, i]),
+                pfs_day=pfs_day[i],
+                progressed=pfs_day[i] is not None,
+                initial_resistant_fraction=r0[i],
+                toxicity=float(toxicity[i]),
+                final_resistant_fraction=(
+                    float(N_R[i].sum() / total) if total >= DETECTION_BURDEN_DENSITY else 0.0
+                ),
+                resistant_dominance_day=dominance_day[i],
+            )
+            if keep_fields:
+                traj.final_conc_A = c_A[i].copy()
+                traj.final_conc_B = c_B[i].copy()
+                traj.final_N_S = N_S[i].copy()
+                traj.final_N_R = N_R[i].copy()
+            out.append(traj)
+        return out
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,201 @@
+{
+ "key": "paired_extension",
+ "title": "Paired-seed PFS extension \u2014 its own estimand, with its censoring",
+ "generated_utc": "2026-10-17T13:32:11Z",
+ "source": "danon.paired_extension over outputs_real/campaign_log.json (recorded paired replicates)",
+ "notes": [
+  "computed from recorded replicates, no engine run; the bootstrap seed is fixed so the interval is reproducible",
+  "the paired difference in DAYS and the per-case ratio of medians are different estimands and are labelled as such",
+  "the adaptive arm reaches the horizon in every recorded replicate, so the difference is a right-censored lower bound, not a point estimate",
+  "a model comparison over paired seeds, not observed patient progression-free survival"
+ ],
+ "provenance": {
+  "engine_predicts_patients": "unknown",
+  "clinical_benefit": "unknown"
+ },
+ "data": {
+  "n_cases": 18,
+  "n_pairs": 54,
+  "horizon_days": 365,
+  "bootstrap_n_boot": 2000,
+  "bootstrap_seed": 20261008,
+  "paired_difference_estimand": "mean of (policy PFS - MTD PFS) in days, over replicates paired by seed",
+  "paired_mean_difference_days": 86.11111111111111,
+  "paired_median_difference_days": 98.5,
+  "paired_mean_difference_ci95_days": [
+   73.49953703703704,
+   98.39120370370368
+  ],
+  "n_policy_replicates_at_horizon": 54,
+  "is_right_censored_lower_bound": true,
+  "ratio_of_medians_estimand": "median_policy / median_mtd - 1, per case (the outcome cards' `pfs_extension` label)",
+  "ratio_of_medians_extension_median": 0.38783269961977185,
+  "records": [
+   {
+    "case_id": "BraTS2021_01017",
+    "patient_id": "TCGA-02-0016",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 268.0,
+    "ratio_of_medians_extension": 0.3619402985074627,
+    "paired_mean_difference_days": 101.0
+   },
+   {
+    "case_id": "BraTS2021_01017",
+    "patient_id": "TCGA-02-0038",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 253.0,
+    "ratio_of_medians_extension": 0.4426877470355731,
+    "paired_mean_difference_days": 115.66666666666667
+   },
+   {
+    "case_id": "BraTS2021_01017",
+    "patient_id": "TCGA-02-0039",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 253.0,
+    "ratio_of_medians_extension": 0.4426877470355731,
+    "paired_mean_difference_days": 115.66666666666667
+   },
+   {
+    "case_id": "BraTS2021_01018",
+    "patient_id": "TCGA-02-0016",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 365.0,
+    "ratio_of_medians_extension": 0.1162079510703364,
+    "paired_mean_difference_days": 12.666666666666666
+   },
+   {
+    "case_id": "BraTS2021_01018",
+    "patient_id": "TCGA-02-0038",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 364.0,
+    "ratio_of_medians_extension": 0.11378973375617671,
+    "paired_mean_difference_days": 22.666666666666668
+   },
+   {
+    "case_id": "BraTS2021_01018",
+    "patient_id": "TCGA-02-0039",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 364.0,
+    "ratio_of_medians_extension": 0.11378973375617671,
+    "paired_mean_difference_days": 22.666666666666668
+   },
+   {
+    "case_id": "BraTS2021_01019",
+    "patient_id": "TCGA-02-0016",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 335.0,
+    "ratio_of_medians_extension": 0.08955223880597014,
+    "paired_mean_difference_days": 41.0
+   },
+   {
+    "case_id": "BraTS2021_01019",
+    "patient_id": "TCGA-02-0038",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 318.0,
+    "ratio_of_medians_extension": 0.14779874213836477,
+    "paired_mean_difference_days": 57.333333333333336
+   },
+   {
+    "case_id": "BraTS2021_01019",
+    "patient_id": "TCGA-02-0039",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 318.0,
+    "ratio_of_medians_extension": 0.14779874213836477,
+    "paired_mean_difference_days": 57.333333333333336
+   },
+   {
+    "case_id": "BraTS2021_01020",
+    "patient_id": "TCGA-02-0016",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 273.0,
+    "ratio_of_medians_extension": 0.336996336996337,
+    "paired_mean_difference_days": 108.33333333333333
+   },
+   {
+    "case_id": "BraTS2021_01020",
+    "patient_id": "TCGA-02-0038",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 263.0,
+    "ratio_of_medians_extension": 0.38783269961977185,
+    "paired_mean_difference_days": 118.33333333333333
+   },
+   {
+    "case_id": "BraTS2021_01020",
+    "patient_id": "TCGA-02-0039",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 263.0,
+    "ratio_of_medians_extension": 0.38783269961977185,
+    "paired_mean_difference_days": 118.33333333333333
+   },
+   {
+    "case_id": "BraTS2021_01021",
+    "patient_id": "TCGA-02-0016",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 253.0,
+    "ratio_of_medians_extension": 0.4426877470355731,
+    "paired_mean_difference_days": 111.0
+   },
+   {
+    "case_id": "BraTS2021_01021",
+    "patient_id": "TCGA-02-0038",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 241.0,
+    "ratio_of_medians_extension": 0.5145228215767634,
+    "paired_mean_difference_days": 123.0
+   },
+   {
+    "case_id": "BraTS2021_01021",
+    "patient_id": "TCGA-02-0039",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 241.0,
+    "ratio_of_medians_extension": 0.5145228215767634,
+    "paired_mean_difference_days": 123.0
+   },
+   {
+    "case_id": "BraTS2021_01022",
+    "patient_id": "TCGA-02-0016",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 260.0,
+    "ratio_of_medians_extension": 0.40384615384615385,
+    "paired_mean_difference_days": 89.33333333333333
+   },
+   {
+    "case_id": "BraTS2021_01022",
+    "patient_id": "TCGA-02-0038",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 242.0,
+    "ratio_of_medians_extension": 0.5082644628099173,
+    "paired_mean_difference_days": 106.33333333333333
+   },
+   {
+    "case_id": "BraTS2021_01022",
+    "patient_id": "TCGA-02-0039",
+    "n_pairs": 3,
+    "median_pfs_policy": 365.0,
+    "median_pfs_mtd": 242.0,
+    "ratio_of_medians_extension": 0.5082644628099173,
+    "paired_mean_difference_days": 106.33333333333333
+   }
+  ],
+  "estimand_note": "two statistics are carried and they are NOT interchangeable: the paired replicate difference in DAYS, and the per-case RATIO OF MEDIANS the outcome cards call `pfs_extension`. Quoting one under the other's name is the drift this record is meant to prevent.",
+  "lower_bound_note": "right-censored: 54 adaptive replicate(s) reached the 365 d horizon, so every paired difference is a LOWER BOUND and the interval is a bound on a bound -- never a bare point estimate of a difference.",
+  "limit": "a simulator comparison over paired seeds on model geometry: PFS is the simulator's own RANO >= 25% rule, not observed patient progression-free survival, and no patient-level validation exists here."
+ }
+}

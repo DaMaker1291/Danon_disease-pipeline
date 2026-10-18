@@ -125,7 +125,7 @@ export default function UploadPortal() {
           {loading ? 'Processing…' : 'Drop an MRI availability manifest (.tsv, .txt)'}
         </div>
         <div className="upload-zone-text" style={{ fontSize: 11 }}>
-          or click to browse — a tumour mask goes on the MRI → Plan tab
+          or click to browse — a tumour mask goes on the MRI → Simulate tab
         </div>
         <input
           ref={fileRef}

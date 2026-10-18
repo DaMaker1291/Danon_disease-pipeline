@@ -779,6 +779,72 @@ def build_evolution_artifact(
     )
 
 
+def build_evolution_forecast_artifact() -> Dict[str, Any]:
+    """The real-specimen evolution forecast, read from its own record.
+
+    Deliberately READ rather than recomputed: the record is produced by
+    `_glass_forecast_cohort.py` off the cached GLASS release, and rebuilding the
+    fold split or the bootstrap here would give a second definition of the same
+    number -- the failure this envelope exists to prevent. If the record is
+    absent the artifact RAISES: a forecast screen with no forecast behind it is
+    exactly the invented-number failure mode this module was written to end.
+
+    The record's verdicts are interval-aware (see the record), so the screen
+    shows the model beating only the baselines its own intervals clear -- one of
+    two here -- rather than a point estimate dressed as skill. The record's
+    `pooling` block travels with it: it names the unit of every pooled score (a
+    row, carrying its own label) and counts the patients whose rows disagree,
+    which is why a single per-patient label is refused.
+    """
+    path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "outputs_real", "glass_evolution_forecast.json",
+    )
+    if not os.path.exists(path):
+        raise FileNotFoundError(
+            "evolution forecast missing: outputs_real/glass_evolution_forecast.json "
+            "(rebuild with _glass_forecast_cohort.py over the cached GLASS "
+            "records). This artifact refuses to draw a forecast it does not have."
+        )
+    with open(path, encoding="utf-8") as fh:
+        record = json.load(fh)
+
+    return _artifact(
+        key="evolution_forecast",
+        title=(
+            "Does an earlier specimen predict a later molecular change? "
+            "Scored on real paired tumours"
+        ),
+        source=(
+            "danon.evolution_forecast over the paired GLASS specimens recorded "
+            "in outputs_real/glass_variants.json; the full record with its "
+            "split and bootstrap seeds is outputs_real/glass_evolution_forecast.json"
+        ),
+        data=record,
+        notes=[
+            "every allele fraction is computed from that specimen's own "
+            "tumorAltCount/tumorRefCount reads; nothing is imputed",
+            "each task is scored against a dumb honest baseline (majority class; "
+            "no-change persistence) and BOTH verdicts are interval-aware -- read "
+            "the intervals, not the point estimates",
+            "the split is by patient, so a second specimen of the same tumour "
+            "cannot leak into training",
+            "this is one public cohort, a declared 27-gene panel, and no therapy "
+            "record or outcome is joined: nothing here is a treatment effect, a "
+            "prognosis, or guidance for anyone's care",
+        ],
+        provenance={
+            "allele_fractions_measured_from_real_specimens": (
+                EvidenceStatus.ESTABLISHED
+            ),
+            "patient_level_split_enforced": EvidenceStatus.ESTABLISHED,
+            "baselines_are_reported_beside_the_model": EvidenceStatus.ESTABLISHED,
+            "clinical_benefit": EvidenceStatus.UNKNOWN,
+            "engine_predicts_patients": EvidenceStatus.UNKNOWN,
+        },
+    )
+
+
 # ---------------------------------------------------------------------------
 # claims (the verification registry, rendered in the app)
 # ---------------------------------------------------------------------------
@@ -860,8 +926,136 @@ def build_claims_artifact() -> Dict[str, Any]:
     )
 
 
+def build_tumor_board_artifact() -> Dict[str, Any]:
+    """The five tumour-board panels, assembled from records that already exist.
+
+    Deliberately NOT recomputed here: the outcome cohort, the evolution frames
+    and the performance record are read from their own artifacts, so the screen
+    and the record cannot disagree -- which is the failure this envelope exists
+    to prevent. Every field without a source is carried as a refusal alongside
+    the value a dashboard mock-up showed for it, in `tumor_board.refusals`.
+
+    The claims audit is the one exception, and it is read from THIS run when
+    this run produced one (see `_BUILT`): the audit bar's count must be the
+    audit's count, and reading the file back would publish the previous build's
+    number beside a timestamp from this one.
+    """
+    from danon.tumor_board import (
+        build_tumor_board,
+        tumor_board_provenance,
+        what_a_tumor_board_cannot_show,
+    )
+
+    fresh_claims = _BUILT.get("claims")
+    return _artifact(
+        key="tumorboard",
+        title="Tumour board — five panels, and what each one cannot show",
+        source=(
+            "recorded: outputs_real/outcome_cards.json (outcome cohort), "
+            "outputs_real/app_artifacts/evolution.json (day frames), "
+            "outputs_real/perf.json (engine performance), the claims audit "
+            + ("from this run" if fresh_claims is not None else "on disk")
+            + ", and a live count of the test tree"
+        ),
+        data=build_tumor_board(claims_payload=fresh_claims),
+        notes=[
+            "every panel value is read from a recorded engine run, named in the "
+            "artifact; nothing here is computed at render time",
+            "fields this repository has no data for are refused with the module "
+            "that would have to produce them, and the figure a mock-up showed "
+            "is carried as the thing being refused",
+            "no GPU, surrogate-model, frame-rate or regulatory figure appears: "
+            "none of those measurements exist in this repository",
+        ],
+        provenance=tumor_board_provenance(),
+    )
+
+
+def build_paired_extension_artifact() -> Dict[str, Any]:
+    """The paired-seed PFS extension, as its own estimand, with its censoring.
+
+    The outcome cards call ``pfs_extension`` the ratio of the two arms' median
+    PFS. This artifact carries, beside it, the statistic the repository's own
+    campaign rule describes -- the PAIRED replicate difference in days, with a
+    bootstrap 95% interval over pairs -- so the two are never presented as one
+    number. It reads the recorded replicates in ``outputs_real/campaign_log.json``
+    and runs no engine, so the interval is reproducible offline from the same
+    bytes.
+    """
+    from danon.paired_extension import paired_pfs_extension_report
+
+    return _artifact(
+        key="paired_extension",
+        title="Paired-seed PFS extension — its own estimand, with its censoring",
+        source=(
+            "danon.paired_extension over outputs_real/campaign_log.json "
+            "(recorded paired replicates)"
+        ),
+        data=paired_pfs_extension_report(),
+        notes=[
+            "computed from recorded replicates, no engine run; the bootstrap "
+            "seed is fixed so the interval is reproducible",
+            "the paired difference in DAYS and the per-case ratio of medians are "
+            "different estimands and are labelled as such",
+            "the adaptive arm reaches the horizon in every recorded replicate, "
+            "so the difference is a right-censored lower bound, not a point "
+            "estimate",
+            "a model comparison over paired seeds, not observed patient "
+            "progression-free survival",
+        ],
+        provenance={
+            "engine_predicts_patients": EvidenceStatus.UNKNOWN,
+            "clinical_benefit": EvidenceStatus.UNKNOWN,
+        },
+    )
+
+
+def build_trial_design_artifact() -> Dict[str, Any]:
+    """The trial-design screen: the counterfactual, the noise floor, the rule-out.
+
+    Recorded so the audit can re-derive what the screen shows. The browser
+    screen computes the same comparison live from the outcome cards, and this
+    record is the other half of that: the declared ANC screen's verdicts, which
+    cannot be recomputed without the Python model, plus the numbers the live
+    computation is cross-checked against.
+    """
+    from danon.trial_design import (
+        trial_design_provenance,
+        trial_design_report,
+        what_a_trial_design_screen_cannot_do,
+    )
+
+    return _artifact(
+        key="trial_design",
+        title="Trial design — the counterfactual, the noise floor, the rule-out",
+        source=(
+            "danon.trial_design over outputs_real/outcome_cards.json (recorded "
+            "paired replicates) and danon.dosing.MyelosuppressionModel (the "
+            "DECLARED ANC screen)"
+        ),
+        data=trial_design_report(),
+        notes=[
+            "the counterfactual is a statement about what the model did under "
+            "declared assumptions, not a prediction about a patient",
+            "the noise floor is a resolvability ladder: the same paired "
+            "differences at three scales, because whether a difference resolves "
+            "is a property of the replicate count",
+            "the rule-out panel names calendars the DECLARED ANC screen "
+            "refused. That screen's kernel is fitted to the label's single "
+            "reported datum and its drug-B potency is assumed, so a rejection "
+            "is a statement about the model and not a licence finding",
+            "nothing here names a calendar to administer; the benefit badge "
+            "stays UNKNOWN",
+        ],
+        provenance=trial_design_provenance(),
+    )
+
+
 BUILDERS = {
     "claims": build_claims_artifact,
+    "tumorboard": build_tumor_board_artifact,
+    "paired_extension": build_paired_extension_artifact,
+    "trial_design": build_trial_design_artifact,
     "pipeline": build_pipeline_artifact,
     "microfluidics": build_microfluidics_artifact,
     "lnp": build_lnp_artifact,
@@ -870,6 +1064,7 @@ BUILDERS = {
     "structure": build_structure_artifact,
     "paraview": build_paraview_artifact,
     "evolution": build_evolution_artifact,
+    "evolution_forecast": build_evolution_forecast_artifact,
 }
 
 # Which public folder each artifact mirrors into. The tumour twin's files stay
@@ -878,8 +1073,12 @@ BUILDERS = {
 # a build, not a disease.
 MIRROR_SUBDIR = {
     "claims": "artifacts",
+    "tumorboard": "artifacts",
+    "paired_extension": "artifacts",
+    "trial_design": "artifacts",
     "paraview": "artifacts",
     "evolution": "artifacts",
+    "evolution_forecast": "artifacts",
     "pipeline": "vector_design",
     "microfluidics": "vector_design",
     "lnp": "vector_design",
@@ -889,20 +1088,49 @@ MIRROR_SUBDIR = {
 }
 
 
+#: Artifacts that READ another artifact's payload. The dependency is an order:
+#: `write_app_artifacts` builds every payload before it writes any, so a reader
+#: that falls back to the file on disk is reading the PREVIOUS build's numbers.
+_DEPENDS_ON = {
+    "tumorboard": ("claims",),
+    # The claims artifact's own audit includes the checks that read the
+    # paired-extension and trial-design records, so those payloads must exist
+    # before the audit runs.
+    "claims": ("paired_extension", "trial_design"),
+}
+
+#: Payloads built in this process, so a dependent artifact can carry this run's
+#: numbers instead of the file's. Keyed by artifact key; cleared per build call.
+_BUILT: Dict[str, Dict[str, Any]] = {}
+
+
 def build_app_artifacts(
     keys: Optional[List[str]] = None,
     log: Optional[callable] = None,
 ) -> Dict[str, Dict[str, Any]]:
-    """Build every requested artifact (default: all of them)."""
+    """Build every requested artifact (default: all of them), dependencies first."""
     chosen = list(keys or BUILDERS)
     unknown = [k for k in chosen if k not in BUILDERS]
     if unknown:
         raise ValueError(f"unknown artifact keys: {unknown}; known: {sorted(BUILDERS)}")
 
+    order = list(chosen)
+    for key, deps in _DEPENDS_ON.items():
+        if key not in order:
+            continue
+        for dep in deps:
+            if dep in order and order.index(dep) > order.index(key):
+                order.remove(dep)
+                order.insert(min(order.index(key), len(order)), dep)
+                if log is not None:
+                    log(f"  reordered {dep} before {key} (it reads {dep}'s payload)")
+
+    _BUILT.clear()
     out: Dict[str, Dict[str, Any]] = {}
-    for key in chosen:
+    for key in order:
         payload = BUILDERS[key]()
         out[key] = payload
+        _BUILT[key] = payload
         if log is not None:
             log(f"  built {key:<14s} ({len(json.dumps(payload['data'])):>7,d} bytes of data)")
     if not out:

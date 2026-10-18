@@ -1,5 +1,7 @@
 /**
- * TwinPlanner — upload an MRI segmentation mask, get the 365-day plan.
+ * TwinPlanner — upload a segmentation mask, run the paired 365-day research
+ * simulation. It returns model outputs on that mask, never a treatment plan
+ * for the person the scan came from.
  *
  * What this component promises: it renders ONLY what the /api/twin/plan
  * endpoint returns from the real simulation engine. The paired metrics,
@@ -28,6 +30,13 @@ export interface TwinPlanResponse {
     proliferativeSource: string;
     engineBudgetVoxels: number;
     budgetFraction: number;
+    /* Provenance of the input file, reported beside the grid the engine ran. */
+    originalGridShapeXyz?: number[];
+    sourceVoxelMm?: number;
+    sourceVoxelSizesMm?: number[];
+    downsampleFactors?: number[];
+    downsamplePerAxis?: number;
+    inputSha256?: string;
   };
   scheduleText: string;
   dailyCurves: {
@@ -161,7 +170,7 @@ export default function TwinPlanner({ onVti }: Props) {
       )}
 
       {state.error && (
-        <div className="panel glass"><div className="panel-title" style={{ color: '#f87171' }}>⚠ Planning failed</div>
+        <div className="panel glass"><div className="panel-title" style={{ color: '#f87171' }}>⚠ Simulation failed</div>
           <pre className="mono" style={{ whiteSpace: 'pre-wrap', fontSize: 12 }}>{state.error}</pre></div>
       )}
 
@@ -169,10 +178,15 @@ export default function TwinPlanner({ onVti }: Props) {
       {d && (
         <>
           <div className="plan-metrics-row">
-            <Metric label="Steering median PFS" value={`${d.pairedMetrics.policyMedianPfsDays.toFixed(0)} d`} sub={`${d.pairedMetrics.nReplicates} paired replicates`} accent="cyan" />
-            <Metric label="MTD control median PFS" value={`${d.pairedMetrics.mtdMedianPfsDays.toFixed(0)} d`} sub="same geometry, same seeds" accent="blue" />
-            <Metric label="PFS extension" value={pct(d.pairedMetrics.pfsExtensionMedian)} sub={d.pairedMetrics.pfsExtensionMedian === null ? 'no progression in control' : 'paired per-patient median'} accent="violet" />
-            <Metric label="Toxicity reduction" value={pct(d.pairedMetrics.toxicityReductionMedian)} sub={`steering ${d.pairedMetrics.refToxicity.toFixed(0)} vs MTD ${d.pairedMetrics.mtdToxicity.toFixed(0)} dose-days`} accent="cyan" />
+            <Metric label="Simulated steering median PFS" value={`${d.pairedMetrics.policyMedianPfsDays.toFixed(0)} d`} sub={`${d.pairedMetrics.nReplicates} paired replicates`} accent="cyan" />
+            <Metric label="Simulated MTD median PFS" value={`${d.pairedMetrics.mtdMedianPfsDays.toFixed(0)} d`} sub="same geometry, same seeds" accent="blue" />
+            <Metric label="Simulated PFS extension" value={pct(d.pairedMetrics.pfsExtensionMedian)} sub={d.pairedMetrics.pfsExtensionMedian === null ? 'no progression in control' : 'paired median over replicates'} accent="violet" />
+            <Metric label="Simulated toxicity reduction" value={pct(d.pairedMetrics.toxicityReductionMedian)} sub={`steering ${d.pairedMetrics.refToxicity.toFixed(0)} vs MTD ${d.pairedMetrics.mtdToxicity.toFixed(0)} dose-days`} accent="cyan" />
+          </div>
+          <div className="plan-note">
+            These four numbers are <b>model outputs</b> from the simulation on your uploaded mask under
+            assumed engine parameters. They are not patient outcome predictions, and they are not a
+            treatment recommendation or a schedule to give anyone.
           </div>
 
           <div className="content-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
@@ -225,13 +239,27 @@ export default function TwinPlanner({ onVti }: Props) {
               <div className="panel-title">Uploaded geometry (measured from your file)</div>
               <table className="kv-table">
                 <tbody>
-                  <Row k="Grid" v={`${d.geometry.gridShapeXyz.join(' × ')} = ${d.geometry.totalVoxels.toLocaleString()} voxels`} />
+                  <Row k="Grid (engine)" v={`${d.geometry.gridShapeXyz.join(' × ')} = ${d.geometry.totalVoxels.toLocaleString()} voxels`} />
+                  {d.geometry.originalGridShapeXyz && d.geometry.originalGridShapeXyz.join() !== d.geometry.gridShapeXyz.join() && (
+                    <Row k="Grid (your file)" v={`${d.geometry.originalGridShapeXyz.join(' × ')} = ${d.geometry.originalGridShapeXyz.reduce((a, b) => a * b, 1).toLocaleString()} voxels`} />
+                  )}
                   <Row k="Tumour" v={`${d.geometry.tumourVoxels.toLocaleString()} voxels · ${d.geometry.tumourVolumeMm3.toLocaleString(undefined, { maximumFractionDigits: 0 })} mm³`} />
-                  <Row k="Voxel size" v={`${d.geometry.voxelMm.toFixed(2)} mm (from file header)`} />
+                  <Row
+                    k="Voxel size (engine)"
+                    v={d.geometry.downsamplePerAxis
+                      ? `${d.geometry.voxelMm.toFixed(2)} mm · your file declared ${d.geometry.sourceVoxelMm?.toFixed(2)} mm`
+                      : `${d.geometry.voxelMm.toFixed(2)} mm (from file header)`}
+                  />
+                  {d.geometry.downsampleFactors && (
+                    <Row k="Downsampled" v={`block-max ×${d.geometry.downsamplePerAxis} per axis, tumour-preserving (a block containing tumour stays tumour)`} />
+                  )}
                   <Row k="Bounding box" v={d.geometry.boundingBoxXyz.min.join(', ') + ' → ' + d.geometry.boundingBoxXyz.max.join(', ')} />
                   <Row k="Vasculature" v={d.geometry.vasculatureSource} />
                   <Row k="Proliferation" v={d.geometry.proliferativeSource} />
                   <Row k="Engine budget" v={`${(d.geometry.budgetFraction * 100).toFixed(1)}% of 4.0M voxel budget`} />
+                  {d.geometry.inputSha256 && (
+                    <Row k="Input SHA-256" v={`${d.geometry.inputSha256.slice(0, 16)}… (full hash in the API response)`} />
+                  )}
                 </tbody>
               </table>
               <div className="plan-actions">
@@ -241,13 +269,23 @@ export default function TwinPlanner({ onVti }: Props) {
                   </a>
                 )}
                 <button className="btn btn-run" onClick={() => { onVti?.(null); setState({ loading: false, data: null, error: null, vtiUrl: null, elapsed: null }); }}>
-                  ⟲ Plan another scan
+                  ⟲ Simulate another mask
                 </button>
               </div>
               <div className="plan-note">
                 The .vti opens directly in ParaView: four point scalars (drug_A, drug_B, sensitive, resistant) plus the tumour mask,
-                on the uploaded file's own voxel grid. <b>No ParaView install? The 3D panel below is the same data rendered in-browser.</b>
+                on {d.geometry.downsampleFactors
+                  ? `the engine's downsampled grid (×${d.geometry.downsamplePerAxis} coarser per axis than your file)`
+                  : "the uploaded file's own voxel grid"}. <b>No ParaView install? The 3D panel below is the same data rendered in-browser.</b>
               </div>
+              {d.geometry.downsampleFactors && (
+                <div className="plan-note" style={{ color: '#fbbf24' }}>
+                  Your mask exceeded the engine's 4.0M-voxel budget, so this run used a block-max-downsampled copy.
+                  The tumour volume above is the block-max volume on the coarser grid, so it can only be equal-or-larger
+                  than the source, never smaller; the engine's constants are voxel-unit, so its voxel is the coarse one
+                  ({d.geometry.voxelMm.toFixed(2)} mm, taken from the scaled header).
+                </div>
+              )}
             </div>
 
             <div className="panel glass">

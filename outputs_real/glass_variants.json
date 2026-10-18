@@ -1,0 +1,308 @@
+{
+  "record_version": "glass_variants_v1",
+  "source": {
+    "api": "https://www.cbioportal.org/api",
+    "study_id": "difg_glass",
+    "public_study": true,
+    "sample_list_id": "difg_glass_sequenced",
+    "fetched_utc": "2026-10-13T20:23:35.917003+00:00",
+    "raw_cache": "data\\glass_paired\\glass_mutations.json",
+    "panel": [
+      "MGMT (entrez 4255)",
+      "MSH6 (entrez 2956)",
+      "MSH2 (entrez 4436)",
+      "MSH3 (entrez 4437)",
+      "MLH1 (entrez 4292)",
+      "PMS2 (entrez 5395)",
+      "POLE (entrez 5426)",
+      "TP53 (entrez 7157)",
+      "EGFR (entrez 1956)",
+      "PTEN (entrez 5728)",
+      "IDH1 (entrez 3417)",
+      "IDH2 (entrez 3418)",
+      "ATRX (entrez 546)",
+      "NF1 (entrez 4763)",
+      "PIK3CA (entrez 5290)",
+      "PIK3R1 (entrez 5295)",
+      "RB1 (entrez 5925)",
+      "CDKN2A (entrez 1029)",
+      "CDK4 (entrez 1019)",
+      "MDM2 (entrez 4193)",
+      "MDM4 (entrez 4194)",
+      "PDGFRA (entrez 5156)",
+      "TERT (entrez 7015)",
+      "BRAF (entrez 673)",
+      "CIC (entrez 23152)",
+      "FUBP1 (entrez 8880)",
+      "SETD2 (entrez 29072)"
+    ],
+    "panel_is_declared_not_genome_wide": true,
+    "unfiltered_query_status": 400,
+    "timepoint_label_rule": "suffix of the sample id: '-TP' primary, '-R<n>' recurrence, '-RM' metastasis, anything else Unlabelled -- with the API's own sampleType recorded beside it"
+  },
+  "measured": {
+    "n_mutation_records": 1686,
+    "n_records_with_allele_counts": 1686,
+    "n_records_dropped_no_counts_or_zero_depth": 0,
+    "n_spectra": 543,
+    "n_patients": 281,
+    "n_samples": 543,
+    "n_genes_with_records": 27,
+    "spectra_by_timepoint_label": {
+      "Primary": 249,
+      "Recurrence": 294
+    },
+    "api_sample_types": {
+      "Primary Solid Tumor": 693
+    },
+    "allele_fraction": {
+      "n": 1686,
+      "min": 0.0032258064516129032,
+      "median": 0.375,
+      "max": 1.0,
+      "definition": "alt / (alt + ref), computed from read counts"
+    },
+    "paired_change": {
+      "n_pairs": 248,
+      "n_patients_with_a_pair": 226,
+      "variants_shared": 475,
+      "variants_gained": 462,
+      "variants_lost": 179,
+      "median_af_delta_shared": -0.006060606060606044,
+      "largest_rise": {
+        "af_delta": 0.6937984496124031,
+        "patient_id": "GLSS-MD-0086",
+        "variant": "TP53:17:7577022:G>A",
+        "primary": "GLSS-MD-0086-TP",
+        "recurrence": "GLSS-MD-0086-R1"
+      }
+    },
+    "worked_example": {
+      "patient_id": "GLSS-DK-0008",
+      "primary": "GLSS-DK-0008-TP",
+      "recurrence": "GLSS-DK-0008-R1",
+      "variant": "TP53:17:7579591:C>A",
+      "af_primary": 0.058823529411764705,
+      "af_recurrence": 0.3684210526315789,
+      "af_delta": 0.3095975232198142,
+      "lower_bound_primary": 0.058823529411764705,
+      "lower_bound_recurrence": 0.3684210526315789
+    }
+  },
+  "calls": [
+    {
+      "gene": "MGMT",
+      "entrez_gene_id": 4255,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=4255&pageSize=100000",
+      "status": 200,
+      "n_records": 4
+    },
+    {
+      "gene": "MSH6",
+      "entrez_gene_id": 2956,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=2956&pageSize=100000",
+      "status": 200,
+      "n_records": 41
+    },
+    {
+      "gene": "MSH2",
+      "entrez_gene_id": 4436,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=4436&pageSize=100000",
+      "status": 200,
+      "n_records": 14
+    },
+    {
+      "gene": "MSH3",
+      "entrez_gene_id": 4437,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=4437&pageSize=100000",
+      "status": 200,
+      "n_records": 13
+    },
+    {
+      "gene": "MLH1",
+      "entrez_gene_id": 4292,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=4292&pageSize=100000",
+      "status": 200,
+      "n_records": 24
+    },
+    {
+      "gene": "PMS2",
+      "entrez_gene_id": 5395,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=5395&pageSize=100000",
+      "status": 200,
+      "n_records": 6
+    },
+    {
+      "gene": "POLE",
+      "entrez_gene_id": 5426,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=5426&pageSize=100000",
+      "status": 200,
+      "n_records": 23
+    },
+    {
+      "gene": "TP53",
+      "entrez_gene_id": 7157,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=7157&pageSize=100000",
+      "status": 200,
+      "n_records": 330
+    },
+    {
+      "gene": "EGFR",
+      "entrez_gene_id": 1956,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=1956&pageSize=100000",
+      "status": 200,
+      "n_records": 146
+    },
+    {
+      "gene": "PTEN",
+      "entrez_gene_id": 5728,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=5728&pageSize=100000",
+      "status": 200,
+      "n_records": 149
+    },
+    {
+      "gene": "IDH1",
+      "entrez_gene_id": 3417,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=3417&pageSize=100000",
+      "status": 200,
+      "n_records": 247
+    },
+    {
+      "gene": "IDH2",
+      "entrez_gene_id": 3418,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=3418&pageSize=100000",
+      "status": 200,
+      "n_records": 3
+    },
+    {
+      "gene": "ATRX",
+      "entrez_gene_id": 546,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=546&pageSize=100000",
+      "status": 200,
+      "n_records": 162
+    },
+    {
+      "gene": "NF1",
+      "entrez_gene_id": 4763,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=4763&pageSize=100000",
+      "status": 200,
+      "n_records": 129
+    },
+    {
+      "gene": "PIK3CA",
+      "entrez_gene_id": 5290,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=5290&pageSize=100000",
+      "status": 200,
+      "n_records": 76
+    },
+    {
+      "gene": "PIK3R1",
+      "entrez_gene_id": 5295,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=5295&pageSize=100000",
+      "status": 200,
+      "n_records": 35
+    },
+    {
+      "gene": "RB1",
+      "entrez_gene_id": 5925,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=5925&pageSize=100000",
+      "status": 200,
+      "n_records": 56
+    },
+    {
+      "gene": "CDKN2A",
+      "entrez_gene_id": 1029,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=1029&pageSize=100000",
+      "status": 200,
+      "n_records": 11
+    },
+    {
+      "gene": "CDK4",
+      "entrez_gene_id": 1019,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=1019&pageSize=100000",
+      "status": 200,
+      "n_records": 8
+    },
+    {
+      "gene": "MDM2",
+      "entrez_gene_id": 4193,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=4193&pageSize=100000",
+      "status": 200,
+      "n_records": 1
+    },
+    {
+      "gene": "MDM4",
+      "entrez_gene_id": 4194,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=4194&pageSize=100000",
+      "status": 200,
+      "n_records": 7
+    },
+    {
+      "gene": "PDGFRA",
+      "entrez_gene_id": 5156,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=5156&pageSize=100000",
+      "status": 200,
+      "n_records": 18
+    },
+    {
+      "gene": "TERT",
+      "entrez_gene_id": 7015,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=7015&pageSize=100000",
+      "status": 200,
+      "n_records": 29
+    },
+    {
+      "gene": "BRAF",
+      "entrez_gene_id": 673,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=673&pageSize=100000",
+      "status": 200,
+      "n_records": 23
+    },
+    {
+      "gene": "CIC",
+      "entrez_gene_id": 23152,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=23152&pageSize=100000",
+      "status": 200,
+      "n_records": 64
+    },
+    {
+      "gene": "FUBP1",
+      "entrez_gene_id": 8880,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=8880&pageSize=100000",
+      "status": 200,
+      "n_records": 35
+    },
+    {
+      "gene": "SETD2",
+      "entrez_gene_id": 29072,
+      "url": "https://www.cbioportal.org/api/molecular-profiles/difg_glass_mutations/mutations?sampleListId=difg_glass_sequenced&entrezGeneId=29072&pageSize=100000",
+      "status": 200,
+      "n_records": 32
+    }
+  ],
+  "what_is_refused": {
+    "point_clone_fraction": "refused: a point clone fraction would require a copy number, a purity and a cellularity model, none of which this release carries; a lower bound is published instead of a point",
+    "upper_bound_on_clone_fraction": "refused: an upper bound on the clone fraction needs the local copy number (f = A_t * total/variant copies), and the mutation records of this release carry no copy number or purity field -- so only a lower bound is published",
+    "two_bin_summarisation": "refused: this spectrum has k bins and the engine has 2, so it cannot be scored as a clone state -- danon.walkforward.clonal_jsd refuses a support of a different size by construction, and no summarisation rule from a k-bin allele-frequency spectrum onto a two-bin cell-population fraction exists in this repository",
+    "lower_bound_derivation": "A_t = f * (variant copies / total copies) and variant copies <= total copies, so A_t <= f: the measured tumour allele fraction is a lower bound on the fraction of tumour cells carrying the variant"
+  },
+  "provenance": {
+    "allele_fraction_from_read_counts": "established",
+    "clone_fraction_lower_bound": "established",
+    "somatic_assumption": "unknown",
+    "tumour_purity": "unknown",
+    "point_clone_fraction": "proven_failed",
+    "upper_bound_on_clone_fraction": "proven_failed",
+    "two_bin_summarisation": "proven_failed",
+    "clinical_benefit": "unknown",
+    "engine_predicts_patients": "unknown"
+  },
+  "cannot_know": "This channel measures allele fractions in bulk specimens and lower bounds on the fraction of tumour cells carrying a variant. It is NOT a clonal reconstruction: two variants at the same lower bound may sit in the same cells or in different cells, and nothing here resolves that. It carries no copy number, no purity, no treatment record and no outcome, so it cannot say whether a change was caused by therapy, by sampling or by drift, and it cannot be scored as the engine's clone state. A rising variant is a measurement, not a prediction.",
+  "limitations": [
+    "a DECLARED gene panel, not the whole variant space: the mutations endpoint of this profile requires a gene filter",
+    "no purity and no copy number are carried, so only a lower bound on the clone fraction is published",
+    "specimens are labelled by KIND, not by day, so 'primary versus recurrence' is the only pairing and no day-0/day-N mapping exists",
+    "no treatment record and no outcome is joined to these specimens",
+    "the panel is genome-filtered by gene, so a change in a gene outside it is invisible here"
+  ]
+}

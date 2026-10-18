@@ -42,11 +42,12 @@ the difference impossible to blur in a report.
 from __future__ import annotations
 
 import gzip
+import hashlib
 import math
 import struct
 from collections import deque
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -127,6 +128,37 @@ def _parse_header(raw: bytes) -> NiftiHeader:
         little_endian=(endian == "<"),
         magic=magic,
     )
+
+
+def mask_bytes_provenance(raw: bytes) -> Dict[str, Any]:
+    """Identity of an uploaded mask: its bytes, and its header's own geometry.
+
+    A recorded run must be tied to the exact file it was computed from. The
+    engine runs on a temp copy, so the uploaded bytes are the only record of
+    the input; this returns the fields that make that record checkable:
+
+    * ``input_sha256`` over the bytes **as received** -- a ``.nii.gz`` is
+      hashed compressed, not re-serialised, so the digest identifies the file
+      the caller sent rather than a normalised rewrite of it;
+    * ``original_grid_shape_xyz`` -- the dims the header declares, in the same
+      x-fastest (x, y, z) order the engine indexes, so it equals
+      ``mask.shape`` for the array this file yields;
+    * ``source_voxel_sizes_mm`` and their mean ``source_voxel_mm``, which is
+      the scalar ``PatientGeometry.voxel_mm`` is derived from.
+
+    Computed from the header alone, without materialising the data array, so
+    reporting the identity cannot alter what a run does. Shared by the API and
+    the reproducibility check so the two cannot drift on what "the input" is.
+    """
+    blob = gzip.decompress(raw) if raw[:2] == b"\x1f\x8b" else raw
+    hdr = _parse_header(blob[:348])
+    sizes = tuple(float(v) for v in hdr.voxel_sizes)
+    return {
+        "input_sha256": hashlib.sha256(raw).hexdigest(),
+        "original_grid_shape_xyz": [int(d) for d in hdr.dims],
+        "source_voxel_sizes_mm": [sizes[0], sizes[1], sizes[2]],
+        "source_voxel_mm": float(np.mean(sizes)),
+    }
 
 
 def read_nifti(path: str) -> Tuple[np.ndarray, NiftiHeader]:

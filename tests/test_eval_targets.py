@@ -8,6 +8,7 @@ no claimed 0.9x figure may appear as a measurement anywhere.
 
 from __future__ import annotations
 
+import json
 import os
 
 import numpy as np
@@ -297,23 +298,66 @@ class TestEgfrviii:
 
 
 class TestRlTier:
-    def test_no_rl_agent_is_reported(self):
-        v = rl_policy_target()
+    """Two live branches: refused without a trained artifact, measured with one.
+
+    The refusal is exercised against a path that does not exist, so these tests
+    keep working after the policy is trained -- the branch is real either way.
+    """
+
+    MISSING = "outputs_real/does_not_exist_rl_artifact.json"
+
+    def test_refuses_when_no_training_artifact_exists(self):
+        v = rl_policy_target(artifact_path=self.MISSING)
         assert v.status is TargetStatus.REFUSED_NO_DATA
         assert v.measured is None
         assert not v.has_number
-        assert "no reinforcement-learning agent exists" in v.detail
+        assert "no valid, reproducible RL evaluation artifact" in v.detail
 
-    def test_the_dosing_policies_are_named_as_closed_form(self):
-        v = rl_policy_target()
+    def test_the_dosing_policies_are_named_as_closed_form_when_refusing(self):
+        v = rl_policy_target(artifact_path=self.MISSING)
         blob = v.detail + " " + " ".join(v.blockers)
         for name in ("MTDPolicy", "AdaptiveDosePolicy", "CollateralSwitchPolicy"):
             assert name in blob
         assert "constant" in blob
 
-    def test_the_metric_itself_is_called_unfalsifiable(self):
+    def test_the_authored_reward_stays_a_recorded_limit(self):
+        v = rl_policy_target(artifact_path=self.MISSING)
+        assert any("author-defined" in b or "falsified" in b for b in v.blockers)
+
+    def test_refuses_an_artifact_with_a_swapped_weight_hash(self, tmp_path):
+        from danon.rl_steering import ARTIFACT_PATH, load_artifact
+
+        art = load_artifact(ARTIFACT_PATH)
+        if art is None:
+            pytest.skip("train the policy first: python _train_evosteer_ppo.py")
+        art["weights_sha256"] = "0" * 64
+        path = tmp_path / "tampered.json"
+        path.write_text(json.dumps(art), encoding="utf-8")
+        verdict = rl_policy_target(artifact_path=str(path))
+        assert verdict.status is TargetStatus.REFUSED_NO_DATA
+        assert verdict.measured is None
+        assert "hash mismatch" in verdict.detail
+
+    def test_reports_the_measured_artifact_when_present(self):
+        from danon.rl_steering import ARTIFACT_PATH, load_artifact
+
+        if load_artifact(ARTIFACT_PATH) is None:
+            pytest.skip("train the policy first: python _train_evosteer_ppo.py")
         v = rl_policy_target()
-        assert any("cannot be" in b and "falsified" in b for b in v.blockers)
+        if v.has_number:
+            assert v.status is TargetStatus.MEASURED
+        else:
+            assert v.status is TargetStatus.REFUSED_ESTIMAND
+            assert any("denominator is zero" in b for b in v.blockers)
+        assert v.n >= 20
+        assert "IN SILICO" in v.detail
+        assert "historical 95.4% target not evaluated" in v.claimed
+        # the measured branch keeps the remaining limits visible
+        assert any("synthetic" in b for b in v.blockers)
+        assert any("author-defined" in b for b in v.blockers)
+        assert any("alternation" in b for b in v.blockers)
+        if v.has_number:
+            assert v.measured == pytest.approx(1.0051)
 
 
 # ---------------------------------------------------------------------------
@@ -334,9 +378,13 @@ class TestSolverTier:
         verdicts = target_verdicts(with_gdsc=False, with_solver=True)
         measured = [v for v in verdicts if v.has_number]
         refused = [v for v in verdicts if not v.has_number]
-        assert len(measured) == 1
-        assert len(refused) >= 3
-        assert measured[0].name.startswith("PDE stencil")
+        # the synthetic PDE stencil is always measurable; the RL tier joins it
+        # only once a policy has been trained and evaluated
+        rl = [v for v in verdicts if v.name.startswith("RL")][0]
+        assert len(measured) == (2 if rl.has_number else 1)
+        assert len(refused) >= 2
+        for v in measured:
+            assert v.name.startswith("PDE stencil") or v.name.startswith("RL")
 
 
 # ---------------------------------------------------------------------------
@@ -345,11 +393,23 @@ class TestSolverTier:
 
 
 class TestCeilingReport:
-    def test_no_target_reports_a_measured_score(self):
-        """None of the three proposed targets can produce a number here."""
+    def test_no_clinical_target_reports_a_measured_score(self):
+        """The clinical tiers cannot produce a number here, whatever else can.
+
+        The RL tier is the one exception once a policy has been trained, and it
+        arrives labelled: a measured RL number must carry the IN SILICO note, so
+        it cannot be read as a clinical score.
+        """
         verdicts = target_verdicts(with_gdsc=False)
         assert verdicts
-        assert not any(v.has_number for v in verdicts)
+        clinical = [v for v in verdicts if not v.name.startswith("RL")]
+        assert clinical
+        assert not any(v.has_number for v in clinical)
+        rl = [v for v in verdicts if v.name.startswith("RL")][0]
+        if rl.has_number:
+            assert "IN SILICO" in rl.detail
+        else:
+            assert rl.status is TargetStatus.REFUSED_NO_DATA
 
     def test_no_claimed_value_appears_as_a_measured_score(self):
         """Each proposed figure may appear as a CLAIM, never as a measurement.
@@ -367,15 +427,16 @@ class TestCeilingReport:
         lines = text.splitlines()
         claimed_lines = [ln for ln in lines if "claimed" in ln]
         measured_lines = [ln for ln in lines if "measured" in ln]
-        assert any("95.4%" in ln for ln in claimed_lines)
         assert not any("95.4%" in ln for ln in measured_lines)
         # Most tiers have no number at all. The responder tier carries 0.6155
         # measured on the nearest reachable label while its status still refuses
         # the claim, which is the intended split -- so the invariant is that a
         # measured number on a refused tier never satisfies the claim.
-        # Composition depends on the with_gdsc flag, so this is a floor not an
-        # exact count: at least the spatial and RL tiers carry no number here.
-        assert sum("no number" in ln for ln in measured_lines) >= 2
+        # Composition depends on the with_gdsc flag AND on whether a policy has
+        # been trained, so this is a floor rather than an exact count: the
+        # spatial tier never carries a number here, which is the part that has
+        # to hold.
+        assert sum("no number" in ln for ln in measured_lines) >= 1
         assert "refused_no_label" in text
         assert "Refusing a tier does not raise another" in text
 
@@ -383,7 +444,8 @@ class TestCeilingReport:
         assert "SYNTHETIC" not in measured_ceiling_report(with_gdsc=False)
         text = measured_ceiling_report(with_gdsc=False, with_solver=True)
         assert "SYNTHETIC" in text
-        assert "1 measurable" in text
+        rl = [v for v in target_verdicts(with_gdsc=False) if v.name.startswith("RL")][0]
+        assert f"{2 if rl.has_number else 1} measurable" in text
 
     def test_report_labels_each_proposed_claim_and_its_status(self):
         text = measured_ceiling_report(with_gdsc=False)

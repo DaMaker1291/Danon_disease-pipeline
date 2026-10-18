@@ -1,4 +1,4 @@
-"""Patient-specific digital-twin planning: MRI mask in, treatment plan out.
+"""Digital-twin research simulation: MRI mask in, paired 365-day run out.
 
 WHY THIS MODULE EXISTS
 ----------------------
@@ -35,7 +35,7 @@ from __future__ import annotations
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
@@ -280,3 +280,26 @@ def downsample_mask_to_budget(mask: np.ndarray, budget: int = MAX_TOTAL_VOXELS):
                 "refusing to degrade it further"
             )
     return work, factors
+
+
+def derived_voxel_sizes(
+    voxel_sizes: Sequence[float], factors: Sequence[int]
+) -> Tuple[float, ...]:
+    """The spacing a downsampled volume must carry in its OWN header.
+
+    One factor-2 halving means each derived voxel spans two source voxels per
+    axis, so the derived header's spacing is the source spacing times two per
+    halving. Writing the source spacing back into the derived file instead
+    understates the derived voxel volume -- and every physical volume taken
+    from it -- by 8x per halving: the exact defect `danon.grid_artifact`
+    records against the committed derived volumes (a 1 mm header over 48 mm^3
+    voxels), and the reason `danon.realdata` builds its decimated spacing as
+    `source_vox[i] * factors[i]`. The engine's own constants are voxel-unit,
+    so this changes what the geometry REPORT says, not what the engine solves.
+    """
+    per_axis = 1
+    for f in factors:
+        if int(f) <= 0:
+            raise ValueError(f"downsample factors must be positive, got {f}")
+        per_axis *= int(f)
+    return tuple(float(v) * per_axis for v in voxel_sizes)
